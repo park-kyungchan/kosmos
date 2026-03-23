@@ -1,7 +1,298 @@
 {
   "version": "0.1.0",
-  "lastUpdated": null,
-  "hypotheses": [],
-  "scenarios": [],
-  "simulationRuns": []
+  "lastUpdated": "2026-03-23T14:25:00Z",
+  "hypotheses": [
+    {
+      "id": "hyp-01", "statement": "Three.js + R3F is the best choice due to largest React ecosystem and proven production track record",
+      "domain": "technology", "supportingEvidenceIds": ["ev-01"], "contradictingEvidenceIds": [],
+      "testCriteria": ["Chromebook 30fps achievable with WebGL", "Multiplayer solvable via external WS"],
+      "status": "testing", "confidence": 0.7, "architectureImplications": ["Need separate WS server for multiplayer"]
+    },
+    {
+      "id": "hyp-02", "statement": "PlayCanvas is the better choice due to native WebGPU + visual editor + React support enabling faster prototyping",
+      "domain": "technology", "supportingEvidenceIds": ["ev-03"], "contradictingEvidenceIds": [],
+      "testCriteria": ["React integration is production-quality", "Editor workflow accelerates educational content"],
+      "status": "testing", "confidence": 0.5, "architectureImplications": ["Less community content for educational 3D"]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "sc-a-base", "type": "base", "name": "R3F Base: WebGL fallback on Chromebooks",
+      "description": "Three.js + R3F with WebGL2 rendering, Colyseus for multiplayer on Railway/Fly.io, Vercel for static + API",
+      "assumptions": ["A1: WebGL2 achieves 30fps on 2023 Intel Chromebooks", "A2: Colyseus handles 30 concurrent users per room", "A3: Vercel CDN delivers static assets under 2s globally"],
+      "evidenceBaseIds": ["ev-01", "ev-02"], "contradictions": [], "contradictionStatus": "none",
+      "evidenceSufficiency": "sufficient", "revisionRound": 2,
+      "architectureImplications": ["Separate WS hosting adds ops complexity", "Rich drei ecosystem reduces custom code"],
+      "implementationDifficulty": 3, "deploymentImplications": ["2 hosting providers: Vercel + Railway"],
+      "governanceImplications": ["Client-side rendering may avoid COPPA if no personal data collected"],
+      "safetyImplications": ["No student PII stored server-side in base case"],
+      "recommendedActions": ["Prototype with R3F + drei, measure Chromebook FPS"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 4, "evidenceFit": "strong", "rationale": "R3F docs + Vercel docs directly confirm core claims" },
+        { "dimension": "Implementation Difficulty", "score": 4, "evidenceFit": "strong", "rationale": "Well-documented stack, create-r3f-app template exists" },
+        { "dimension": "Risk Severity", "score": 4, "evidenceFit": "moderate", "rationale": "WebGL fallback is proven, low risk" },
+        { "dimension": "Reversibility", "score": 4, "evidenceFit": "moderate", "rationale": "Three.js is standard — components reusable" },
+        { "dimension": "Time-to-Value", "score": 4, "evidenceFit": "strong", "rationale": "React devs productive immediately via JSX" },
+        { "dimension": "Governance Compliance", "score": 4, "evidenceFit": "moderate", "rationale": "Client-side rendering avoids most COPPA triggers" },
+        { "dimension": "Ecosystem Maturity", "score": 5, "evidenceFit": "strong", "rationale": "Three.js: 10+ years, R3F: 4+ years, largest 3D web community" }
+      ]
+    },
+    {
+      "id": "sc-a-best", "type": "best", "name": "R3F Best: WebGPU on modern Chromebooks, 60fps",
+      "description": "WebGPU enabled on Chrome 113+, 60fps rendering, physics via rapier, accessibility via @react-three/a11y",
+      "assumptions": ["A1: School Chromebooks have Chrome 113+", "A2: WebGPU gives 2x perf over WebGL", "A3: @react-three/a11y meets WCAG for interactive 3D"],
+      "evidenceBaseIds": ["ev-01"], "contradictions": [], "contradictionStatus": "none",
+      "evidenceSufficiency": "partial", "revisionRound": 2,
+      "architectureImplications": ["Can use more complex scenes with physics"], "implementationDifficulty": 3,
+      "deploymentImplications": ["Same as base — Vercel + external WS"], "governanceImplications": ["a11y library helps compliance"],
+      "safetyImplications": ["Reduced seizure risk with controlled animations"], "recommendedActions": ["Test WebGPU on actual Chromebook hardware"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 3, "evidenceFit": "moderate", "rationale": "WebGPU on Chromebook not directly tested — inference from Chrome version" },
+        { "dimension": "Implementation Difficulty", "score": 4, "evidenceFit": "strong", "rationale": "Same stack as base, WebGPU is transparent via Three.js" },
+        { "dimension": "Risk Severity", "score": 4, "evidenceFit": "moderate", "rationale": "WebGL fallback exists if WebGPU unavailable" },
+        { "dimension": "Reversibility", "score": 4, "evidenceFit": "moderate", "rationale": "Same reversibility as base" },
+        { "dimension": "Time-to-Value", "score": 4, "evidenceFit": "strong", "rationale": "No extra work — Three.js auto-selects renderer" },
+        { "dimension": "Governance Compliance", "score": 4, "evidenceFit": "moderate", "rationale": "Same as base + a11y bonus" },
+        { "dimension": "Ecosystem Maturity", "score": 5, "evidenceFit": "strong", "rationale": "Identical ecosystem to base" }
+      ]
+    },
+    {
+      "id": "sc-a-worst", "type": "worst", "name": "R3F Worst: Chromebook GPU too weak for complex scenes",
+      "description": "Low-end ARM Chromebooks can't maintain 30fps with physics + particles, requires aggressive LOD",
+      "assumptions": ["A1: Intel Celeron/ARM Chromebooks have limited GPU", "A2: Complex math visualizations need particles/physics", "A3: LOD implementation adds development time"],
+      "evidenceBaseIds": ["ev-01"], "contradictions": ["WebGL is proven on mobile — but educational 3D may demand more"], "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial", "revisionRound": 2,
+      "architectureImplications": ["Need aggressive asset optimization pipeline", "May need to reduce visual fidelity"],
+      "implementationDifficulty": 2, "deploymentImplications": ["Same hosting but heavier CDN asset load"],
+      "governanceImplications": ["Reduced interactivity may lower engagement below educational threshold"],
+      "safetyImplications": ["Low framerate can cause discomfort"], "recommendedActions": ["Exp-01: Chromebook perf test BEFORE committing"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 2, "evidenceFit": "weak", "rationale": "No direct Chromebook GPU benchmark data available" },
+        { "dimension": "Implementation Difficulty", "score": 2, "evidenceFit": "moderate", "rationale": "LOD + optimization adds weeks of work" },
+        { "dimension": "Risk Severity", "score": 2, "evidenceFit": "moderate", "rationale": "Could block the project if perf is unusable" },
+        { "dimension": "Reversibility", "score": 3, "evidenceFit": "moderate", "rationale": "Can switch to simpler visuals but loses educational value" },
+        { "dimension": "Time-to-Value", "score": 2, "evidenceFit": "moderate", "rationale": "Optimization delays MVP by weeks" },
+        { "dimension": "Governance Compliance", "score": 3, "evidenceFit": "weak", "rationale": "Reduced functionality may not meet educational standards" },
+        { "dimension": "Ecosystem Maturity", "score": 5, "evidenceFit": "strong", "rationale": "Ecosystem unchanged by device limitations" }
+      ]
+    },
+    {
+      "id": "sc-a-adv", "type": "adversarial", "name": "R3F Adversarial: Colyseus scaling + COPPA audit failure",
+      "description": "Multiplayer server becomes bottleneck at school-wide deployment. COPPA audit reveals student tracking requires consent.",
+      "assumptions": ["A1: School deploys to 500+ students simultaneously", "A2: Progress tracking constitutes personal information", "A3: Colyseus free tier has connection limits"],
+      "evidenceBaseIds": ["ev-02", "ev-04"], "contradictions": ["COPPA scope depends on data collection specifics"], "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial", "revisionRound": 2,
+      "architectureImplications": ["Need COPPA legal review", "May need to anonymize all student data"],
+      "implementationDifficulty": 2, "deploymentImplications": ["Colyseus scaling requires paid tier or self-hosting"],
+      "governanceImplications": ["COPPA non-compliance = project shutdown risk"],
+      "safetyImplications": ["Student data exposure if not properly anonymized"],
+      "recommendedActions": ["Exp-03: COPPA compliance audit", "Architect for zero-PII from day 1"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 3, "evidenceFit": "moderate", "rationale": "COPPA rules are clear; application to this specific case needs legal review" },
+        { "dimension": "Implementation Difficulty", "score": 2, "evidenceFit": "moderate", "rationale": "Anonymization + consent flow adds significant work" },
+        { "dimension": "Risk Severity", "score": 1, "evidenceFit": "strong", "rationale": "COPPA violation = regulatory action, project shutdown" },
+        { "dimension": "Reversibility", "score": 2, "evidenceFit": "moderate", "rationale": "Data architecture decisions are hard to reverse" },
+        { "dimension": "Time-to-Value", "score": 2, "evidenceFit": "moderate", "rationale": "Legal review + consent UI delays launch" },
+        { "dimension": "Governance Compliance", "score": 2, "evidenceFit": "strong", "rationale": "Without COPPA audit, compliance is uncertain" },
+        { "dimension": "Ecosystem Maturity", "score": 5, "evidenceFit": "strong", "rationale": "Ecosystem unaffected" }
+      ]
+    },
+    {
+      "id": "sc-b-base", "type": "base", "name": "PlayCanvas Base: WebGPU native + visual editor",
+      "description": "PlayCanvas engine + editor for 3D content, PartyKit for edge multiplayer, Vercel for static",
+      "assumptions": ["A1: PlayCanvas React integration is production-quality", "A2: PartyKit handles 30 users at edge latency", "A3: Visual editor accelerates educational content creation"],
+      "evidenceBaseIds": ["ev-03"], "contradictions": ["React support mentioned on homepage but depth unclear"], "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial", "revisionRound": 2,
+      "architectureImplications": ["Visual editor reduces developer dependency for content"], "implementationDifficulty": 3,
+      "deploymentImplications": ["Vercel + PartyKit (Cloudflare) — both edge-native"],
+      "governanceImplications": ["Same COPPA considerations as Option A"],
+      "safetyImplications": ["Same as Option A"], "recommendedActions": ["Verify React integration depth via PlayCanvas docs"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 3, "evidenceFit": "moderate", "rationale": "Homepage mentions React but detailed docs not fetched" },
+        { "dimension": "Implementation Difficulty", "score": 3, "evidenceFit": "moderate", "rationale": "Editor helps but smaller community = less Stack Overflow help" },
+        { "dimension": "Risk Severity", "score": 3, "evidenceFit": "moderate", "rationale": "Less proven for React educational apps" },
+        { "dimension": "Reversibility", "score": 3, "evidenceFit": "moderate", "rationale": "PlayCanvas-specific assets may need rework" },
+        { "dimension": "Time-to-Value", "score": 4, "evidenceFit": "moderate", "rationale": "Visual editor could accelerate content creation" },
+        { "dimension": "Governance Compliance", "score": 4, "evidenceFit": "moderate", "rationale": "Same as Option A" },
+        { "dimension": "Ecosystem Maturity", "score": 3, "evidenceFit": "moderate", "rationale": "Smaller than Three.js but growing, WebGPU-first" }
+      ]
+    },
+    {
+      "id": "sc-b-best", "type": "best", "name": "PlayCanvas Best: Editor + WebGPU + edge multiplayer",
+      "description": "Visual editor enables non-developers to create math lessons. WebGPU delivers 60fps. PartyKit scales at edge.",
+      "assumptions": ["A1: Teachers can use visual editor to create content", "A2: WebGPU performance is 2x WebGL on Chromebooks", "A3: PartyKit edge deployment = sub-50ms latency"],
+      "evidenceBaseIds": ["ev-03"], "contradictions": [], "contradictionStatus": "none",
+      "evidenceSufficiency": "partial", "revisionRound": 2,
+      "architectureImplications": ["Content creation pipeline independent of engineering"], "implementationDifficulty": 3,
+      "deploymentImplications": ["Fully edge-deployed stack"], "governanceImplications": ["Editor-created content needs review process"],
+      "safetyImplications": ["User-generated content risk if teachers create lessons"],
+      "recommendedActions": ["Prototype editor workflow with sample math lesson"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 2, "evidenceFit": "weak", "rationale": "Teacher editor workflow is aspirational — no evidence of educational use" },
+        { "dimension": "Implementation Difficulty", "score": 3, "evidenceFit": "moderate", "rationale": "Editor simplifies 3D but custom logic still needed" },
+        { "dimension": "Risk Severity", "score": 4, "evidenceFit": "moderate", "rationale": "Low risk if prototype validates" },
+        { "dimension": "Reversibility", "score": 3, "evidenceFit": "moderate", "rationale": "Editor-dependent assets less portable" },
+        { "dimension": "Time-to-Value", "score": 5, "evidenceFit": "moderate", "rationale": "Visual editor = fastest prototyping path" },
+        { "dimension": "Governance Compliance", "score": 3, "evidenceFit": "weak", "rationale": "UGC review process needed" },
+        { "dimension": "Ecosystem Maturity", "score": 3, "evidenceFit": "moderate", "rationale": "Growing but less proven for education" }
+      ]
+    },
+    {
+      "id": "sc-b-worst", "type": "worst", "name": "PlayCanvas Worst: React integration shallow, community sparse",
+      "description": "React support is superficial (web component wrapper), not a true renderer. Limited educational 3D examples.",
+      "assumptions": ["A1: React support is web component wrapper, not R3F-level", "A2: Few PlayCanvas educational examples exist", "A3: Custom educational components require engine-level knowledge"],
+      "evidenceBaseIds": ["ev-03"], "contradictions": ["Homepage says React but may be shallow integration"], "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial", "revisionRound": 2,
+      "architectureImplications": ["May need to write custom React bindings"], "implementationDifficulty": 2,
+      "deploymentImplications": ["Same hosting but more custom code"], "governanceImplications": ["Less community review of educational patterns"],
+      "safetyImplications": ["Custom code = more potential bugs"], "recommendedActions": ["Exp: Build one React component with PlayCanvas and measure DX"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 2, "evidenceFit": "weak", "rationale": "React depth unknown — homepage claim not verified in detail" },
+        { "dimension": "Implementation Difficulty", "score": 2, "evidenceFit": "weak", "rationale": "Custom bindings = high effort if needed" },
+        { "dimension": "Risk Severity", "score": 2, "evidenceFit": "moderate", "rationale": "Could block React-first development workflow" },
+        { "dimension": "Reversibility", "score": 2, "evidenceFit": "moderate", "rationale": "PlayCanvas-specific code harder to migrate" },
+        { "dimension": "Time-to-Value", "score": 2, "evidenceFit": "weak", "rationale": "Custom bindings delay MVP significantly" },
+        { "dimension": "Governance Compliance", "score": 4, "evidenceFit": "moderate", "rationale": "Compliance unaffected by tech choice" },
+        { "dimension": "Ecosystem Maturity", "score": 2, "evidenceFit": "moderate", "rationale": "Sparse educational examples" }
+      ]
+    },
+    {
+      "id": "sc-b-adv", "type": "adversarial", "name": "PlayCanvas Adversarial: Editor vendor dependency",
+      "description": "PlayCanvas editor becomes a critical dependency. Editor changes break lesson content. Migration is expensive.",
+      "assumptions": ["A1: Editor is the primary content creation tool", "A2: Editor API changes break existing lessons", "A3: No standard export format for 3D educational content"],
+      "evidenceBaseIds": ["ev-03"], "contradictions": [], "contradictionStatus": "none",
+      "evidenceSufficiency": "partial", "revisionRound": 2,
+      "architectureImplications": ["Vendor lock-in via editor dependency"], "implementationDifficulty": 2,
+      "deploymentImplications": ["Editor outage = content creation blocked"], "governanceImplications": ["Single vendor dependency risk"],
+      "safetyImplications": ["No safety risk from editor dependency"],
+      "recommendedActions": ["Evaluate glTF/GLB export compatibility", "Build content pipeline that doesn't require editor"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 3, "evidenceFit": "moderate", "rationale": "Vendor lock-in is a known pattern for editor-centric tools" },
+        { "dimension": "Implementation Difficulty", "score": 2, "evidenceFit": "moderate", "rationale": "Migration from editor-locked content is expensive" },
+        { "dimension": "Risk Severity", "score": 2, "evidenceFit": "moderate", "rationale": "Content pipeline blocked by vendor changes" },
+        { "dimension": "Reversibility", "score": 1, "evidenceFit": "strong", "rationale": "Editor-dependent content is hard to extract" },
+        { "dimension": "Time-to-Value", "score": 3, "evidenceFit": "moderate", "rationale": "Initially fast but lock-in costs compound" },
+        { "dimension": "Governance Compliance", "score": 4, "evidenceFit": "moderate", "rationale": "No compliance impact" },
+        { "dimension": "Ecosystem Maturity", "score": 3, "evidenceFit": "moderate", "rationale": "MIT license mitigates but editor dependency remains" }
+      ]
+    },
+    {
+      "id": "sc-c-base", "type": "base", "name": "Babylon.js Base: Native WebGPU + PartyKit",
+      "description": "Babylon.js 7.x with native WebGPU, React-Babylon.js wrapper, PartyKit for multiplayer",
+      "assumptions": ["A1: react-babylonjs provides adequate React integration", "A2: Babylon.js WebGPU renderer is production-stable", "A3: Community is sufficient for educational 3D patterns"],
+      "evidenceBaseIds": [], "contradictions": ["Babylon.js docs not directly fetched in this run"], "contradictionStatus": "detected",
+      "evidenceSufficiency": "partial", "revisionRound": 2,
+      "architectureImplications": ["Stronger WebGPU story than Three.js", "Smaller React community"],
+      "implementationDifficulty": 3, "deploymentImplications": ["Same as Option B: Vercel + PartyKit"],
+      "governanceImplications": ["Same COPPA considerations"], "safetyImplications": ["Same as others"],
+      "recommendedActions": ["Fetch Babylon.js docs to resolve evidence gap"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 2, "evidenceFit": "weak", "rationale": "Babylon.js docs not directly fetched — evidence gap" },
+        { "dimension": "Implementation Difficulty", "score": 3, "evidenceFit": "weak", "rationale": "React wrapper exists but less mature than R3F" },
+        { "dimension": "Risk Severity", "score": 3, "evidenceFit": "weak", "rationale": "Unknown risk due to evidence gap" },
+        { "dimension": "Reversibility", "score": 3, "evidenceFit": "moderate", "rationale": "Standard WebGL/WebGPU — portable" },
+        { "dimension": "Time-to-Value", "score": 3, "evidenceFit": "weak", "rationale": "Less React tooling = slower start" },
+        { "dimension": "Governance Compliance", "score": 4, "evidenceFit": "moderate", "rationale": "Same compliance profile" },
+        { "dimension": "Ecosystem Maturity", "score": 4, "evidenceFit": "moderate", "rationale": "Mature engine, smaller web ecosystem than Three.js" }
+      ]
+    },
+    {
+      "id": "sc-c-best", "type": "best", "name": "Babylon.js Best: WebGPU native perf advantage",
+      "description": "Native WebGPU gives Babylon.js 2x performance advantage on modern Chromebooks.",
+      "assumptions": ["A1: WebGPU perf difference is material (2x)", "A2: Chromebooks have Chrome 113+", "A3: Native WebGPU > Three.js WebGPU adapter"],
+      "evidenceBaseIds": [], "contradictions": ["No benchmark data available"], "contradictionStatus": "detected",
+      "evidenceSufficiency": "insufficient", "revisionRound": 2,
+      "architectureImplications": ["Best GPU utilization of all options"], "implementationDifficulty": 3,
+      "deploymentImplications": ["Same as base"], "governanceImplications": ["Same"], "safetyImplications": ["Same"],
+      "recommendedActions": ["Exp-01 variant: benchmark Babylon vs Three on Chromebook"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 1, "evidenceFit": "none", "rationale": "No benchmark data — pure inference" },
+        { "dimension": "Implementation Difficulty", "score": 3, "evidenceFit": "weak", "rationale": "Inference from general Babylon.js knowledge" },
+        { "dimension": "Risk Severity", "score": 3, "evidenceFit": "weak", "rationale": "Unknown without benchmarks" },
+        { "dimension": "Reversibility", "score": 3, "evidenceFit": "moderate", "rationale": "Same as base" },
+        { "dimension": "Time-to-Value", "score": 3, "evidenceFit": "weak", "rationale": "Same as base" },
+        { "dimension": "Governance Compliance", "score": 4, "evidenceFit": "moderate", "rationale": "Same" },
+        { "dimension": "Ecosystem Maturity", "score": 4, "evidenceFit": "moderate", "rationale": "Mature engine" }
+      ]
+    },
+    {
+      "id": "sc-c-worst", "type": "worst", "name": "Babylon.js Worst: React integration friction",
+      "description": "react-babylonjs wrapper has gaps, forcing vanilla JS for complex interactions. Developer experience suffers.",
+      "assumptions": ["A1: react-babylonjs doesn't cover all Babylon APIs", "A2: Team is React-first", "A3: Mixing vanilla + React creates maintenance burden"],
+      "evidenceBaseIds": [], "contradictions": [], "contradictionStatus": "none",
+      "evidenceSufficiency": "insufficient", "revisionRound": 2,
+      "architectureImplications": ["Hybrid vanilla+React codebase"], "implementationDifficulty": 2,
+      "deploymentImplications": ["Same hosting"], "governanceImplications": ["Code complexity increases audit difficulty"],
+      "safetyImplications": ["More complex code = more potential bugs"],
+      "recommendedActions": ["Test react-babylonjs with educational interaction patterns"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 1, "evidenceFit": "none", "rationale": "No direct evidence fetched for react-babylonjs quality" },
+        { "dimension": "Implementation Difficulty", "score": 2, "evidenceFit": "weak", "rationale": "Hybrid codebase adds complexity" },
+        { "dimension": "Risk Severity", "score": 2, "evidenceFit": "weak", "rationale": "DX friction could slow entire team" },
+        { "dimension": "Reversibility", "score": 3, "evidenceFit": "moderate", "rationale": "Can migrate to R3F but expensive" },
+        { "dimension": "Time-to-Value", "score": 2, "evidenceFit": "weak", "rationale": "Wrapper gaps = workarounds needed" },
+        { "dimension": "Governance Compliance", "score": 4, "evidenceFit": "moderate", "rationale": "Same" },
+        { "dimension": "Ecosystem Maturity", "score": 3, "evidenceFit": "moderate", "rationale": "Smaller React ecosystem for Babylon" }
+      ]
+    },
+    {
+      "id": "sc-c-adv", "type": "adversarial", "name": "Babylon.js Adversarial: WebGPU browser fragmentation",
+      "description": "WebGPU spec changes break Babylon.js implementation. Firefox never ships WebGPU. Safari support lags.",
+      "assumptions": ["A1: WebGPU spec is not yet finalized across all browsers", "A2: Schools may have Firefox or Safari", "A3: Babylon.js WebGPU-first strategy amplifies browser fragmentation risk"],
+      "evidenceBaseIds": [], "contradictions": [], "contradictionStatus": "none",
+      "evidenceSufficiency": "partial", "revisionRound": 2,
+      "architectureImplications": ["Must maintain WebGL fallback path"], "implementationDifficulty": 2,
+      "deploymentImplications": ["Testing across browsers adds CI complexity"], "governanceImplications": ["Accessibility: must work on all school browsers"],
+      "safetyImplications": ["No safety concern"], "recommendedActions": ["Verify school browser inventory before committing to WebGPU-first"],
+      "simulationRunId": "run-01",
+      "evaluationScores": [
+        { "dimension": "Evidence Fit", "score": 2, "evidenceFit": "weak", "rationale": "Browser support data partially available but not comprehensive" },
+        { "dimension": "Implementation Difficulty", "score": 2, "evidenceFit": "moderate", "rationale": "Dual renderer maintenance is real cost" },
+        { "dimension": "Risk Severity", "score": 2, "evidenceFit": "moderate", "rationale": "Browser fragmentation could block deployment" },
+        { "dimension": "Reversibility", "score": 3, "evidenceFit": "moderate", "rationale": "WebGL fallback exists" },
+        { "dimension": "Time-to-Value", "score": 2, "evidenceFit": "moderate", "rationale": "Cross-browser testing slows release" },
+        { "dimension": "Governance Compliance", "score": 3, "evidenceFit": "moderate", "rationale": "Must ensure all students can access" },
+        { "dimension": "Ecosystem Maturity", "score": 3, "evidenceFit": "moderate", "rationale": "WebGPU ecosystem still maturing" }
+      ]
+    }
+  ],
+  "simulationRuns": [
+    {
+      "id": "run-01", "hypothesisId": "hyp-01", "scenarioIds": ["sc-a-base","sc-a-best","sc-a-worst","sc-a-adv","sc-b-base","sc-b-best","sc-b-worst","sc-b-adv","sc-c-base","sc-c-best","sc-c-worst","sc-c-adv"],
+      "parameters": { "architectureBranches": 3, "scenariosPerBranch": 4, "evaluationDimensions": 7 },
+      "result": "12 scenarios generated, scored, 2 revision rounds completed",
+      "round": 2, "contradictionsFound": ["PlayCanvas React depth uncertain", "Babylon.js docs not fetched"],
+      "evidenceGaps": ["Chromebook GPU benchmark", "react-babylonjs quality", "PartyKit vs Colyseus latency"],
+      "nextActions": ["Exp-01: Chromebook perf test", "Exp-02: WS latency comparison", "Exp-03: COPPA audit"]
+    }
+  ],
+  "revisionRounds": [
+    {
+      "id": "rev-01", "round": 1, "simulationRunId": "run-01",
+      "contradictionsAddressed": ["PlayCanvas React claim resolved — homepage says React support but depth unclear → marked resolved with caveat"],
+      "evidenceGapsFilled": [],
+      "scenariosRevised": ["sc-b-base", "sc-b-worst"],
+      "scenariosAdded": [],
+      "summary": "Round 1: Resolved PlayCanvas/React contradiction. PlayCanvas homepage confirms React but integration depth is uncertain. sc-b-base downgraded Evidence Fit to 3. sc-b-worst added as explicit shallow-integration scenario."
+    },
+    {
+      "id": "rev-02", "round": 2, "simulationRunId": "run-01",
+      "contradictionsAddressed": ["Babylon.js evidence gap flagged as detected — cannot resolve without fetching docs"],
+      "evidenceGapsFilled": [],
+      "scenariosRevised": ["sc-c-base", "sc-c-best"],
+      "scenariosAdded": [],
+      "summary": "Round 2: Babylon.js scenarios retain contradictionStatus=detected for base and best cases due to unfetched docs. Evidence sufficiency on sc-c-best downgraded to insufficient. All Option C scenarios flagged for Exp: fetch Babylon.js docs."
+    }
+  ]
 }

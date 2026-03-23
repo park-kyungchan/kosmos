@@ -1,9 +1,133 @@
 {
   "version": "0.1.0",
-  "lastUpdated": null,
-  "entries": [],
-  "requirements": [],
-  "questions": [],
+  "lastUpdated": "2026-03-23T14:00:00Z",
+  "entries": [
+    {
+      "type": "decomposition",
+      "timestamp": "2026-03-23T14:00:00Z",
+      "agent": "orchestrator",
+      "objective": "Research production-viable tech stack for 3D math learning experience (Roblox-like, elementary school, Vercel deployment)",
+      "rationale": "Decomposed into 7 research questions across 4 domains: technology (Q1,Q2,Q6), deployment (Q3), governance (Q4), architecture (Q5,Q7)"
+    },
+    {
+      "type": "routing",
+      "timestamp": "2026-03-23T14:00:01Z",
+      "agent": "orchestrator",
+      "decisions": {
+        "Q1": "external — tier-1 official docs for three.js, babylon.js, playcanvas",
+        "Q2": "external — tier-1 official docs for colyseus, partykit, liveblocks",
+        "Q3": "external — tier-1 vercel.com/docs",
+        "Q4": "external — tier-1 ftc.gov COPPA guidance",
+        "Q5": "internal — BROWSE.md recipes: §DATA.EN-*, §ENTRY.RQ-*, §PHIL.DT-*",
+        "Q6": "external — tier-1 caniuse.com, chromestatus.com",
+        "Q7": "external — tier-3/4 educational UX research"
+      }
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req-01",
+      "description": "Production-viable 3D rendering in browser for ages 6-12",
+      "category": "functional",
+      "priority": "p0"
+    },
+    {
+      "id": "req-02",
+      "description": "Real-time multiplayer for classroom collaboration",
+      "category": "functional",
+      "priority": "p1"
+    },
+    {
+      "id": "req-03",
+      "description": "Deployable on Vercel with acceptable performance",
+      "category": "non-functional",
+      "priority": "p0"
+    },
+    {
+      "id": "req-04",
+      "description": "COPPA-compliant for children under 13",
+      "category": "regulatory",
+      "priority": "p0"
+    },
+    {
+      "id": "req-05",
+      "description": "30fps+ on school Chromebooks (Intel/ARM)",
+      "category": "non-functional",
+      "priority": "p0"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-01",
+      "text": "What 3D rendering engines are production-viable for browser-based educational apps in 2026?",
+      "domain": "technology",
+      "priority": "p0",
+      "route": "external",
+      "scope": "WebGL/WebGPU engines with React integration, 2025-2026 releases",
+      "successCriteria": ">= 3 candidates compared on performance, ecosystem, React support",
+      "status": "open"
+    },
+    {
+      "id": "q-02",
+      "text": "What multiplayer frameworks support real-time educational 3D collaboration?",
+      "domain": "technology",
+      "priority": "p1",
+      "route": "external",
+      "scope": "WebSocket/WebRTC, < 100 concurrent users per session",
+      "successCriteria": ">= 2 candidates compared on latency, hosting, Vercel compat",
+      "status": "open"
+    },
+    {
+      "id": "q-03",
+      "text": "What are Vercel's deployment constraints for 3D web applications?",
+      "domain": "deployment",
+      "priority": "p0",
+      "route": "external",
+      "scope": "Function limits, CDN, edge runtime, WebSocket support",
+      "successCriteria": "Concrete limits documented: regions, concurrency, /tmp, streaming",
+      "status": "open"
+    },
+    {
+      "id": "q-04",
+      "text": "What COPPA/child safety requirements apply to ages 6-12 educational platforms?",
+      "domain": "governance",
+      "priority": "p1",
+      "route": "external",
+      "scope": "US COPPA, EU Age-Appropriate Design Code",
+      "successCriteria": "Compliance checklist with actionable requirements",
+      "status": "open"
+    },
+    {
+      "id": "q-05",
+      "text": "How does ontology-driven architecture map to educational domain entities?",
+      "domain": "architecture",
+      "priority": "p2",
+      "route": "internal",
+      "scope": "D/L/A classification: Student, Lesson, Problem, Score, Progress",
+      "successCriteria": "Complete D/L/A mapping using BROWSE.md recipes",
+      "status": "open"
+    },
+    {
+      "id": "q-06",
+      "text": "What is WebGPU browser support status on target devices (school Chromebooks)?",
+      "domain": "technology",
+      "priority": "p0",
+      "route": "external",
+      "scope": "Chrome, Safari, Firefox support matrix, fallback story",
+      "successCriteria": "Support matrix with dates + WebGL fallback viability",
+      "status": "open"
+    },
+    {
+      "id": "q-07",
+      "text": "What educational UX patterns maximize engagement for elementary math?",
+      "domain": "design",
+      "priority": "p1",
+      "route": "external",
+      "scope": "Gamification, immediate feedback, progressive difficulty",
+      "successCriteria": ">= 3 evidence-backed patterns with implementation implications",
+      "status": "open"
+    }
+  ],
   "recommendations": [],
   "experiments": []
 }

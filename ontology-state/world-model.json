@@ -1,17 +1,30 @@
 {
   "version": "0.1.0",
-  "lastUpdated": null,
-  "session": {
-    "id": null,
-    "objective": null,
-    "startedAt": null
-  },
-  "objects": [],
+  "lastUpdated": "2026-03-23T14:15:00Z",
+  "session": { "id": "bench-001", "objective": "3D math learning experience tech stack research", "startedAt": "2026-03-23T14:00:00Z" },
+  "objects": [
+    { "id": "obj-ot-01", "name": "Student", "ontologyType": "object-type", "domain": "data", "description": "Elementary school learner (ages 6-12) with progress tracking", "provenance": "synthesis", "evidenceIds": ["ev-06"], "relatedObjectIds": ["obj-ot-02", "obj-ot-03"] },
+    { "id": "obj-ot-02", "name": "MathProblem", "ontologyType": "object-type", "domain": "data", "description": "A math exercise with difficulty level, topic, and expected answer", "provenance": "synthesis", "evidenceIds": ["ev-06"], "relatedObjectIds": ["obj-ot-01"] },
+    { "id": "obj-ot-03", "name": "LearningSession", "ontologyType": "object-type", "domain": "data", "description": "A timed session where student interacts with 3D environment", "provenance": "synthesis", "evidenceIds": ["ev-07"], "relatedObjectIds": ["obj-ot-01", "obj-ot-02"] },
+    { "id": "obj-ot-04", "name": "ScoreRecord", "ontologyType": "object-type", "domain": "data", "description": "Tracks correct/incorrect attempts per problem per session", "provenance": "synthesis", "evidenceIds": ["ev-07"], "relatedObjectIds": ["obj-ot-01", "obj-ot-02", "obj-ot-03"] },
+    { "id": "obj-ot-05", "name": "ThreeJsR3F", "ontologyType": "object-type", "domain": "data", "description": "Three.js + react-three-fiber v9: React 19 renderer, no perf overhead, MIT", "provenance": "official", "evidenceIds": ["ev-01"], "relatedObjectIds": [] },
+    { "id": "obj-ot-06", "name": "BabylonJs", "ontologyType": "object-type", "domain": "data", "description": "Babylon.js 7.x: native WebGPU, Apache-2.0, React wrapper available", "provenance": "official", "evidenceIds": [], "relatedObjectIds": [] },
+    { "id": "obj-ot-07", "name": "PlayCanvas", "ontologyType": "object-type", "domain": "data", "description": "PlayCanvas: WebGPU ready, MIT open source, visual editor, React support", "provenance": "official", "evidenceIds": ["ev-03"], "relatedObjectIds": [] },
+    { "id": "obj-lt-01", "name": "StudentSolvesProblems", "ontologyType": "link-type", "domain": "logic", "description": "Links Student to MathProblems attempted", "provenance": "synthesis", "evidenceIds": ["ev-06"], "relatedObjectIds": ["obj-ot-01", "obj-ot-02"] },
+    { "id": "obj-lt-02", "name": "SessionContainsProblems", "ontologyType": "link-type", "domain": "logic", "description": "Links LearningSession to MathProblems presented", "provenance": "synthesis", "evidenceIds": ["ev-06"], "relatedObjectIds": ["obj-ot-03", "obj-ot-02"] },
+    { "id": "obj-fn-01", "name": "ComputeDifficulty", "ontologyType": "function", "domain": "logic", "description": "DECIDE: adaptive difficulty based on student's ScoreRecord history", "provenance": "synthesis", "evidenceIds": ["ev-07"], "relatedObjectIds": ["obj-ot-04", "obj-ot-02"] },
+    { "id": "obj-at-01", "name": "SubmitAnswer", "ontologyType": "action-type", "domain": "action", "description": "ACT: student submits answer, creates ScoreRecord", "provenance": "synthesis", "evidenceIds": ["ev-07"], "relatedObjectIds": ["obj-ot-04"] },
+    { "id": "obj-at-02", "name": "StartSession", "ontologyType": "action-type", "domain": "action", "description": "ACT: initiates a LearningSession with selected topic + difficulty", "provenance": "synthesis", "evidenceIds": ["ev-07"], "relatedObjectIds": ["obj-ot-03"] }
+  ],
   "properties": [],
   "links": [],
   "interfaces": [],
   "actions": [],
   "functions": [],
-  "securityConcerns": [],
-  "governancePolicies": []
+  "securityConcerns": [
+    { "id": "sec-01", "concern": "COPPA compliance for under-13 data collection", "severity": "critical", "evidenceId": "ev-04" }
+  ],
+  "governancePolicies": [
+    { "id": "gov-01", "policy": "No personal information collection without verifiable parental consent", "source": "16 CFR Part 312" }
+  ]
 }
