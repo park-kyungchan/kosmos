@@ -1,73 +1,87 @@
 #!/usr/bin/env bun
 /**
- * Hook: validate-stop
+ * Hook: validate-stop (Phase 2 — BLOCKING for research sessions)
  * Event: Stop
  *
- * Prevents the agent from stopping without producing required outputs.
- * Checks that key ontology-state files were updated during the session.
+ * For substantial research sessions, blocks stop if no state files were updated.
+ * Detects research sessions by checking if any research questions or sources exist.
  *
  * Exit codes:
- *   0 = allow stop (outputs present or non-research session)
- *   2 = block (missing required outputs)
+ *   0 = allow stop
+ *   2 = block (research session without state updates)
  */
+
+export {};
 
 import { existsSync } from "fs";
 
 const PROJECT_ROOT = "/home/palantirkc/kosmos";
 
-const stateFiles = [
-  `${PROJECT_ROOT}/ontology-state/world-model.json`,
-  `${PROJECT_ROOT}/ontology-state/source-map.json`,
-  `${PROJECT_ROOT}/ontology-state/scenarios.json`,
-  `${PROJECT_ROOT}/ontology-state/decision-log.json`,
-];
+const stateFiles = {
+  worldModel: `${PROJECT_ROOT}/ontology-state/world-model.json`,
+  sourceMap: `${PROJECT_ROOT}/ontology-state/source-map.json`,
+  scenarios: `${PROJECT_ROOT}/ontology-state/scenarios.json`,
+  decisionLog: `${PROJECT_ROOT}/ontology-state/decision-log.json`,
+};
 
-// Check if any state file was recently modified (within last 30 minutes)
-const THIRTY_MIN = 30 * 60 * 1000;
-const now = Date.now();
+let isResearchSession = false;
+let anyStateUpdated = false;
 
-let anyUpdated = false;
+// Check decision-log for research questions (indicates research session)
+try {
+  const logFile = Bun.file(stateFiles.decisionLog);
+  const logContent = await logFile.text();
+  const logData = JSON.parse(logContent);
+  if (
+    (logData.questions && logData.questions.length > 0) ||
+    (logData.entries && logData.entries.length > 0)
+  ) {
+    isResearchSession = true;
+  }
+} catch {
+  // File doesn't exist or can't be parsed — not a research session
+}
 
-for (const filePath of stateFiles) {
+if (!isResearchSession) {
+  // Not a research session — allow stop (scaffolding, config changes, etc.)
+  process.exit(0);
+}
+
+// For research sessions, check if any state file has real content
+for (const [key, filePath] of Object.entries(stateFiles)) {
   if (!existsSync(filePath)) continue;
-  const file = Bun.file(filePath);
   try {
+    const file = Bun.file(filePath);
     const content = await file.text();
     const data = JSON.parse(content);
-    // Check if the file has entries (non-empty state)
-    if (data.entries && data.entries.length > 0) {
-      anyUpdated = true;
-      break;
-    }
-    if (data.objects && data.objects.length > 0) {
-      anyUpdated = true;
-      break;
-    }
-    if (data.sources && data.sources.length > 0) {
-      anyUpdated = true;
-      break;
-    }
-    if (data.scenarios && data.scenarios.length > 0) {
-      anyUpdated = true;
+
+    // Check for non-empty state
+    const hasContent =
+      (data.objects && data.objects.length > 0) ||
+      (data.sources && data.sources.length > 0) ||
+      (data.scenarios && data.scenarios.length > 0) ||
+      (data.entries && data.entries.length > 0) ||
+      (data.questions && data.questions.length > 0);
+
+    if (hasContent) {
+      anyStateUpdated = true;
       break;
     }
   } catch {
-    // File exists but can't be parsed — skip
+    // Skip unparseable files
   }
 }
 
-// If no state files were updated, this might be a non-research session
-// (e.g., scaffolding, config changes). Allow stop.
-// In a production version, this would check the session type.
-if (!anyUpdated) {
-  // Soft warning — don't block, but inform
-  process.stdout.write(
-    JSON.stringify({
-      message:
-        "Warning: No ontology-state files were updated in this session. " +
-        "If this was a research session, world-model.json should have been updated.",
-    })
+if (!anyStateUpdated) {
+  process.stderr.write(
+    "BLOCKED: Research session detected (questions in decision-log) but no state files were updated.\n" +
+    "A research session must update at least one of:\n" +
+    "  - ontology-state/world-model.json (ontologist)\n" +
+    "  - ontology-state/source-map.json (researcher)\n" +
+    "  - ontology-state/scenarios.json (simulator)\n" +
+    "If this is not a research session, clear the decision-log questions first."
   );
+  process.exit(2);
 }
 
 process.exit(0);

@@ -23,6 +23,15 @@ export type OntologyDomain =
   | "security"
   | "cross-cutting";
 
+export type SourceTier =
+  | "tier-1-official-docs"
+  | "tier-2-release-notes"
+  | "tier-3-vendor-blogs"
+  | "tier-4-benchmarks"
+  | "tier-5-community";
+
+export type ContradictionStatus = "none" | "detected" | "resolved" | "unresolvable";
+
 export interface Timestamped {
   id: string;
   createdAt: string; // ISO 8601
@@ -38,6 +47,8 @@ export interface ResearchQuestion extends Timestamped {
   priority: Priority;
   decomposedFrom: string | null; // parent question ID
   status: "open" | "answered" | "deferred";
+  scope: string; // what is in/out of scope for this question
+  successCriteria: string; // how we know this question is answered
   answerSummary: string | null;
   evidenceIds: string[];
 }
@@ -58,20 +69,24 @@ export interface SourceDocument extends Timestamped {
   filePath: string | null; // for internal research library sources
   retrievedAt: string; // ISO 8601
   provenance: Provenance;
+  tier: SourceTier; // source hierarchy tier
   domain: string;
   summary: string;
   markers: string[]; // grep-visible markers (e.g., "§LOGIC.FN-15")
   reliability: "high" | "medium" | "low" | "unknown";
+  freshnessDate: string | null; // when the source content was published/updated
 }
 
 export interface Claim extends Timestamped {
   text: string;
+  isAtomic: boolean; // true if this is a single, indivisible assertion
   sourceId: string; // SourceDocument ID
   provenance: Provenance;
   confidence: number; // 0.0 - 1.0
   domain: string;
   contradictedBy: string[]; // other Claim IDs
   supportedBy: string[]; // Evidence IDs
+  retrievedDate: string; // ISO 8601 — when the underlying fact was current
 }
 
 export interface Evidence extends Timestamped {
@@ -159,6 +174,8 @@ export interface Scenario extends Timestamped {
   assumptions: string[];
   evidenceBaseIds: string[]; // Evidence IDs
   contradictions: string[];
+  contradictionStatus: ContradictionStatus;
+  revisionRound: number; // which revision round produced this version (>= 1)
   architectureImplications: string[];
   implementationDifficulty: 1 | 2 | 3 | 4 | 5;
   deploymentImplications: string[];
@@ -166,6 +183,24 @@ export interface Scenario extends Timestamped {
   safetyImplications: string[];
   recommendedActions: string[];
   simulationRunId: string | null;
+  evaluationScores: EvaluationScore[]; // scored dimensions
+}
+
+export interface EvaluationScore {
+  dimension: string;
+  score: number; // 1-5
+  evidenceFit: "strong" | "moderate" | "weak" | "none";
+  rationale: string;
+}
+
+export interface RevisionRound extends Timestamped {
+  round: number; // 1-based
+  simulationRunId: string;
+  contradictionsAddressed: string[];
+  evidenceGapsFilled: string[];
+  scenariosRevised: string[]; // Scenario IDs that were updated
+  scenariosAdded: string[]; // new Scenario IDs created
+  summary: string; // what changed and why
 }
 
 // ─── Stage 7: Decision ───────────────────────────────────────
@@ -188,9 +223,11 @@ export interface DecisionRecommendation extends Timestamped {
   alternatives: AlternativeOption[];
   confidence: number; // 0.0 - 1.0
   evidenceSummary: string;
-  riskIds: string[];
+  scenarioIds: string[]; // REQUIRED: must link to >= 1 scenario — enforced by validator
+  riskIds: string[]; // REQUIRED: must link to >= 1 risk — enforced by validator
   whatWouldChangeDecision: string[];
   nextExperimentIds: string[];
+  isComplete: boolean; // false until all required links are present
 }
 
 export interface AlternativeOption {

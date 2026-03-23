@@ -11,6 +11,8 @@ export type {
   Severity,
   Priority,
   OntologyDomain,
+  SourceTier,
+  ContradictionStatus,
   Timestamped,
   // Stage 1: Intake
   ResearchQuestion,
@@ -29,6 +31,8 @@ export type {
   SimulationRun,
   ScenarioType,
   Scenario,
+  EvaluationScore,
+  RevisionRound,
   // Stage 7: Decision
   Risk,
   DecisionRecommendation,
@@ -56,5 +60,7 @@ export {
   isDecisionRecommendation,
   isNextExperiment,
   isOntologyObject,
+  isRevisionRound,
+  isCompleteRecommendation,
   validators,
 } from "./validators.ts";

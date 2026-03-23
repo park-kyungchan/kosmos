@@ -1,15 +1,17 @@
 #!/usr/bin/env bun
 /**
- * Hook: enforce-browse-protocol
+ * Hook: enforce-browse-protocol (Phase 2 — BLOCKING)
  * Event: PreToolUse (Grep | Read)
  *
- * Blocks broad unbounded scanning of the research library.
+ * BLOCKS broad unbounded scanning of the research library.
  * Allows targeted marker-based grep (the correct browse protocol).
  *
  * Exit codes:
  *   0 = allow (targeted query or non-research path)
  *   2 = block (broad scan of research library)
  */
+
+export {};
 
 const input = await Bun.stdin.text();
 
@@ -26,7 +28,6 @@ let payload: HookPayload;
 try {
   payload = JSON.parse(input);
 } catch {
-  // If we can't parse, allow the tool call
   process.exit(0);
 }
 
@@ -34,12 +35,18 @@ const { tool_name, tool_input } = payload;
 
 const RESEARCH_PATH = "/home/palantirkc/.claude/research";
 
-// Check if the tool targets the research library
 const targetPath = tool_input.path || tool_input.file_path || "";
 const isResearchTarget = targetPath.includes(".claude/research");
 
 if (!isResearchTarget) {
-  // Not targeting research library — allow
+  process.exit(0);
+}
+
+// BROWSE.md and INDEX.md are always allowed — they're the entry point
+if (
+  targetPath.endsWith("BROWSE.md") ||
+  targetPath.endsWith("INDEX.md")
+) {
   process.exit(0);
 }
 
@@ -47,13 +54,10 @@ if (tool_name === "Grep") {
   const pattern = tool_input.pattern || "";
 
   // Block overly broad patterns on the research library
-  const broadPatterns = [
-    /^\.\*$/,          // match everything
-    /^\.\+$/,          // match anything
-    /^.{0,3}$/,        // patterns too short to be meaningful
-  ];
-
-  const isBroad = broadPatterns.some((re) => re.test(pattern));
+  const isBroadPattern =
+    /^\.\*$/.test(pattern) ||
+    /^\.\+$/.test(pattern) ||
+    pattern.length <= 2;
 
   // Check if path is too broad (root of research/ without domain scoping)
   const isRootScan =
@@ -62,21 +66,26 @@ if (tool_name === "Grep") {
     targetPath === `${RESEARCH_PATH}/palantir` ||
     targetPath === `${RESEARCH_PATH}/palantir/`;
 
-  if (isBroad && isRootScan) {
+  if (isBroadPattern && isRootScan) {
     process.stderr.write(
       "BLOCKED: Broad unbounded scan of research library.\n" +
-      "Use BROWSE.md protocol: Question -> Recipe -> Grep (targeted markers) -> Compose -> Reason.\n" +
+      "Use BROWSE.md protocol: Question -> Recipe -> Grep (specific markers) -> Compose -> Reason.\n" +
+      "Required: specific pattern (>2 chars) OR domain-scoped path (e.g., palantir/logic/).\n" +
       "Example: Grep({ pattern: '\\\\[§LOGIC\\\\.FN-15\\\\]', path: '~/.claude/research/palantir/logic/' })"
+    );
+    process.exit(2);
+  }
+
+  // Block root-level scan even with specific pattern
+  if (isRootScan && !pattern.includes("§")) {
+    process.stderr.write(
+      "BLOCKED: Root-level grep on research library without marker pattern.\n" +
+      "Scope your grep to a domain directory (e.g., palantir/data/, palantir/logic/).\n" +
+      "Or use §-marker patterns to target specific sections."
     );
     process.exit(2);
   }
 }
 
-if (tool_name === "Read") {
-  // Reading specific files is fine — the protocol allows it after grep
-  // We only block if someone tries to read INDEX.md or BROWSE.md
-  // without following up with targeted grep (can't enforce this here)
-}
-
-// Allow targeted operations
+// Targeted operations are allowed
 process.exit(0);

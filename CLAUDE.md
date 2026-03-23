@@ -257,26 +257,52 @@ State files are updated incrementally. Every update must include:
 
 ---
 
-## Hooks
+## Enforcement Hooks (Phase 2 — Hardened)
 
-Four enforcement hooks in `.claude/hooks/`:
+Four hooks in `.claude/hooks/` enforce research discipline:
 
-| Hook | Event | Purpose |
-|------|-------|---------|
-| `enforce-browse-protocol.ts` | PreToolUse (Grep/Read) | Blocks broad scanning of research library |
-| `validate-stop.ts` | Stop | Prevents stop without required report sections |
-| `normalize-research-question.ts` | PreToolUse (Agent) | Ensures research questions decomposed before agent spawn |
-| `post-subagent-worldmodel-check.ts` | PostToolUse (Agent) | Verifies world model updated after research |
+| Hook | Event | Mode | Enforces |
+|------|-------|------|----------|
+| `enforce-browse-protocol.ts` | PreToolUse (Grep/Read) | **BLOCKING** | No broad scanning of `~/.claude/research/`. Requires bounded path + specific pattern. |
+| `validate-stop.ts` | Stop | **BLOCKING** (research sessions) | World-model or source-map must be updated for substantial research runs. |
+| `normalize-research-question.ts` | PreToolUse (Agent) | Advisory | Warns when research agents spawn without structured questions. |
+| `post-subagent-worldmodel-check.ts` | PostToolUse (Agent) | **BLOCKING** (ontologist) | Blocks if ontologist agent exits without updating world-model.json. |
+
+**Hook exit codes**: 0 = allow, 2 = block (stderr = error message), other = allow with warning.
 
 ---
 
-## Schema Validation
+## Schema Enforcement (Phase 2 — Hardened)
 
-All runtime state must conform to schemas in `schemas/`:
-- 14 core types covering the full research-to-decision pipeline
-- Type guards for runtime validation
-- See `schemas/types.ts` for the complete vocabulary
-- See `schemas/validators.ts` for validation functions
+All runtime state conforms to TypeScript schemas in `schemas/`:
+
+### Core Types (15 types + validators)
+- 15 domain types covering the full research-to-decision pipeline
+- Runtime type guards for every type (no external dependencies)
+- `isCompleteRecommendation()` — strict validator that BLOCKS incomplete recommendations
+
+### Enforced Invariants
+- Every `ResearchQuestion` MUST have `scope` and `successCriteria`
+- Every `SourceDocument` MUST have a `tier` (source hierarchy) and `freshnessDate`
+- Every `Claim` MUST be atomic (`isAtomic: true`) with `retrievedDate`
+- Every `Scenario` MUST have `contradictionStatus` and `evaluationScores`
+- Every `DecisionRecommendation` MUST link to >= 1 Scenario AND >= 1 Risk
+- Incomplete recommendations (`isComplete: false`) CANNOT appear in final reports
+
+### Source Hierarchy (Enforced on Researcher)
+| Tier | Source Type | Priority |
+|------|-----------|----------|
+| Tier 1 | Official documentation | Highest |
+| Tier 2 | Release notes / changelogs | High |
+| Tier 3 | Vendor architecture blogs | Medium |
+| Tier 4 | Credible benchmarks | Medium |
+| Tier 5 | Community content | Lowest |
+
+### Simulation Engine (Enforced on Simulator)
+- >= 4 scenarios per hypothesis (base/best/worst/adversarial)
+- >= 2 revision rounds when contradictions detected
+- All scenarios scored on 7 evaluation dimensions
+- RevisionRound objects track complete audit trail
 
 ---
 

@@ -9,6 +9,8 @@ import type {
   Provenance,
   Severity,
   Priority,
+  SourceTier,
+  ContradictionStatus,
   Timestamped,
   ResearchQuestion,
   UserRequirement,
@@ -26,6 +28,7 @@ import type {
   NextExperiment,
   OntologyObject,
   ScenarioType,
+  RevisionRound,
 } from "./types.ts";
 
 // ─── Primitive Validators ────────────────────────────────────
@@ -35,6 +38,12 @@ const SEVERITIES: Severity[] = ["critical", "high", "medium", "low"];
 const PRIORITIES: Priority[] = ["p0", "p1", "p2", "p3"];
 const SCENARIO_TYPES: ScenarioType[] = ["base", "best", "worst", "adversarial"];
 const DIFFICULTY_RANGE = [1, 2, 3, 4, 5] as const;
+const SOURCE_TIERS: SourceTier[] = [
+  "tier-1-official-docs", "tier-2-release-notes", "tier-3-vendor-blogs",
+  "tier-4-benchmarks", "tier-5-community",
+];
+const CONTRADICTION_STATUSES: ContradictionStatus[] = ["none", "detected", "resolved", "unresolvable"];
+const EVIDENCE_FIT = ["strong", "moderate", "weak", "none"] as const;
 
 function isString(v: unknown): v is string {
   return typeof v === "string";
@@ -83,6 +92,8 @@ export function isResearchQuestion(v: unknown): v is ResearchQuestion {
     isInEnum(obj.priority, PRIORITIES) &&
     (obj.decomposedFrom === null || isString(obj.decomposedFrom)) &&
     isInEnum(obj.status, ["open", "answered", "deferred"]) &&
+    isString(obj.scope) &&
+    isString(obj.successCriteria) &&
     (obj.answerSummary === null || isString(obj.answerSummary)) &&
     isStringArray(obj.evidenceIds)
   );
@@ -111,10 +122,12 @@ export function isSourceDocument(v: unknown): v is SourceDocument {
     (obj.filePath === null || isString(obj.filePath)) &&
     isISO8601(obj.retrievedAt) &&
     isInEnum(obj.provenance, PROVENANCES) &&
+    isInEnum(obj.tier, SOURCE_TIERS) &&
     isString(obj.domain) &&
     isString(obj.summary) &&
     isStringArray(obj.markers) &&
-    isInEnum(obj.reliability, ["high", "medium", "low", "unknown"])
+    isInEnum(obj.reliability, ["high", "medium", "low", "unknown"]) &&
+    (obj.freshnessDate === null || isISO8601(obj.freshnessDate))
   );
 }
 
@@ -124,12 +137,14 @@ export function isClaim(v: unknown): v is Claim {
   return (
     hasTimestamped(obj) &&
     isString(obj.text) &&
+    typeof obj.isAtomic === "boolean" &&
     isString(obj.sourceId) &&
     isInEnum(obj.provenance, PROVENANCES) &&
     isConfidence(obj.confidence) &&
     isString(obj.domain) &&
     isStringArray(obj.contradictedBy) &&
-    isStringArray(obj.supportedBy)
+    isStringArray(obj.supportedBy) &&
+    isISO8601(obj.retrievedDate)
   );
 }
 
@@ -241,13 +256,17 @@ export function isScenario(v: unknown): v is Scenario {
     isStringArray(obj.assumptions) &&
     isStringArray(obj.evidenceBaseIds) &&
     isStringArray(obj.contradictions) &&
+    isInEnum(obj.contradictionStatus, CONTRADICTION_STATUSES) &&
+    isNumber(obj.revisionRound) &&
+    (obj.revisionRound as number) >= 1 &&
     isStringArray(obj.architectureImplications) &&
     isInEnum(obj.implementationDifficulty, DIFFICULTY_RANGE) &&
     isStringArray(obj.deploymentImplications) &&
     isStringArray(obj.governanceImplications) &&
     isStringArray(obj.safetyImplications) &&
     isStringArray(obj.recommendedActions) &&
-    (obj.simulationRunId === null || isString(obj.simulationRunId))
+    (obj.simulationRunId === null || isString(obj.simulationRunId)) &&
+    Array.isArray(obj.evaluationScores)
   );
 }
 
@@ -278,9 +297,13 @@ export function isDecisionRecommendation(v: unknown): v is DecisionRecommendatio
     Array.isArray(obj.alternatives) &&
     isConfidence(obj.confidence) &&
     isString(obj.evidenceSummary) &&
+    isStringArray(obj.scenarioIds) &&
+    (obj.scenarioIds as string[]).length >= 1 && // ENFORCED: must link >= 1 scenario
     isStringArray(obj.riskIds) &&
+    (obj.riskIds as string[]).length >= 1 && // ENFORCED: must link >= 1 risk
     isStringArray(obj.whatWouldChangeDecision) &&
-    isStringArray(obj.nextExperimentIds)
+    isStringArray(obj.nextExperimentIds) &&
+    typeof obj.isComplete === "boolean"
   );
 }
 
@@ -320,6 +343,38 @@ export function isOntologyObject(v: unknown): v is OntologyObject {
   );
 }
 
+export function isRevisionRound(v: unknown): v is RevisionRound {
+  if (typeof v !== "object" || v === null) return false;
+  const obj = v as Record<string, unknown>;
+  return (
+    hasTimestamped(obj) &&
+    isNumber(obj.round) &&
+    (obj.round as number) >= 1 &&
+    isString(obj.simulationRunId) &&
+    isStringArray(obj.contradictionsAddressed) &&
+    isStringArray(obj.evidenceGapsFilled) &&
+    isStringArray(obj.scenariosRevised) &&
+    isStringArray(obj.scenariosAdded) &&
+    isString(obj.summary)
+  );
+}
+
+/**
+ * Strict validator: ensures a DecisionRecommendation is complete
+ * and ready for final output. Incomplete recommendations MUST NOT
+ * appear in final reports.
+ */
+export function isCompleteRecommendation(v: unknown): v is DecisionRecommendation {
+  if (!isDecisionRecommendation(v)) return false;
+  return (
+    v.isComplete === true &&
+    v.scenarioIds.length >= 1 &&
+    v.riskIds.length >= 1 &&
+    v.whatWouldChangeDecision.length >= 1 &&
+    v.confidence > 0
+  );
+}
+
 // ─── Aggregate Validator ─────────────────────────────────────
 
 export type ValidatorMap = {
@@ -338,6 +393,7 @@ export type ValidatorMap = {
   DecisionRecommendation: typeof isDecisionRecommendation;
   NextExperiment: typeof isNextExperiment;
   OntologyObject: typeof isOntologyObject;
+  RevisionRound: typeof isRevisionRound;
 };
 
 export const validators: ValidatorMap = {
@@ -356,4 +412,5 @@ export const validators: ValidatorMap = {
   DecisionRecommendation: isDecisionRecommendation,
   NextExperiment: isNextExperiment,
   OntologyObject: isOntologyObject,
+  RevisionRound: isRevisionRound,
 };

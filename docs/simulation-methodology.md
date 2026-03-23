@@ -6,12 +6,19 @@ Simulation in Kosmos is NOT execution of code. It is structured
 counterfactual reasoning — systematically exploring "what if?"
 questions to stress-test hypotheses before making recommendations.
 
-## The Simulation Loop
+## The Simulation Engine (Phase 2 — Upgraded from Template)
 
 ```
-Hypothesis → Scenario Generation (4 types) → Evidence Check →
-Contradiction Resolution → Revision (≥2 rounds) → Scored Output
+Hypothesis Generation → Initial Scenarios (Round 1) →
+Evaluation Scoring (7 dimensions) → Contradiction Detection →
+Revision Loop (≥2 rounds, mandatory) → Persistence →
+RevisionRound audit trail
 ```
+
+The simulator is now a **structured revision engine**, not a template filler.
+Every scenario is scored, contradictions are tracked with explicit status
+(`none`/`detected`/`resolved`/`unresolvable`), and revision rounds produce
+`RevisionRound` objects that form the complete audit trail.
 
 ## Hypothesis Generation
 
