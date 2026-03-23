@@ -1,10 +1,12 @@
 #!/usr/bin/env bun
 /**
- * Hook: enforce-browse-protocol (Phase 2 — BLOCKING)
+ * Hook: enforce-browse-protocol (Phase 3 — BLOCKING, portable)
  * Event: PreToolUse (Grep | Read)
  *
  * BLOCKS broad unbounded scanning of the research library.
  * Allows targeted marker-based grep (the correct browse protocol).
+ *
+ * Environment: KOSMOS_RESEARCH_BASE (fallback: ~/.claude/research)
  *
  * Exit codes:
  *   0 = allow (targeted query or non-research path)
@@ -33,7 +35,9 @@ try {
 
 const { tool_name, tool_input } = payload;
 
-const RESEARCH_PATH = "/home/palantirkc/.claude/research";
+const RESEARCH_BASE =
+  process.env.KOSMOS_RESEARCH_BASE ||
+  `${process.env.HOME || "~"}/.claude/research`;
 
 const targetPath = tool_input.path || tool_input.file_path || "";
 const isResearchTarget = targetPath.includes(".claude/research");
@@ -43,28 +47,23 @@ if (!isResearchTarget) {
 }
 
 // BROWSE.md and INDEX.md are always allowed — they're the entry point
-if (
-  targetPath.endsWith("BROWSE.md") ||
-  targetPath.endsWith("INDEX.md")
-) {
+if (targetPath.endsWith("BROWSE.md") || targetPath.endsWith("INDEX.md")) {
   process.exit(0);
 }
 
 if (tool_name === "Grep") {
   const pattern = tool_input.pattern || "";
 
-  // Block overly broad patterns on the research library
   const isBroadPattern =
     /^\.\*$/.test(pattern) ||
     /^\.\+$/.test(pattern) ||
     pattern.length <= 2;
 
-  // Check if path is too broad (root of research/ without domain scoping)
+  // Check if path targets root (not domain-scoped)
+  const normalized = targetPath.replace(/\/+$/, "");
   const isRootScan =
-    targetPath === RESEARCH_PATH ||
-    targetPath === `${RESEARCH_PATH}/` ||
-    targetPath === `${RESEARCH_PATH}/palantir` ||
-    targetPath === `${RESEARCH_PATH}/palantir/`;
+    normalized.endsWith("/research") ||
+    normalized.endsWith("/research/palantir");
 
   if (isBroadPattern && isRootScan) {
     process.stderr.write(
@@ -76,7 +75,6 @@ if (tool_name === "Grep") {
     process.exit(2);
   }
 
-  // Block root-level scan even with specific pattern
   if (isRootScan && !pattern.includes("§")) {
     process.stderr.write(
       "BLOCKED: Root-level grep on research library without marker pattern.\n" +
@@ -87,5 +85,4 @@ if (tool_name === "Grep") {
   }
 }
 
-// Targeted operations are allowed
 process.exit(0);

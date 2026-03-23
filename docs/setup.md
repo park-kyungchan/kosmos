@@ -1,0 +1,88 @@
+# Kosmos Setup Guide
+
+## Prerequisites
+
+- **Bun** >= 1.0 (TypeScript runtime)
+- **Claude Code** with MCP tools (scrapling, context7)
+- Access to `~/.claude/research/` Palantir research library (81 files, ~1,205 markers)
+
+## Environment Variables
+
+Set these in `.claude/settings.json` `env` section, or export in your shell:
+
+| Variable | Purpose | Default Fallback |
+|----------|---------|-----------------|
+| `KOSMOS_PROJECT_ROOT` | Absolute path to this repo | `process.cwd()` |
+| `KOSMOS_RESEARCH_BASE` | Absolute path to `~/.claude/research/` | `$HOME/.claude/research` |
+
+### Setting env vars
+
+**Option 1: settings.json** (recommended — auto-injected into hooks)
+```json
+{
+  "env": {
+    "KOSMOS_PROJECT_ROOT": "/path/to/your/kosmos",
+    "KOSMOS_RESEARCH_BASE": "/path/to/your/.claude/research"
+  }
+}
+```
+
+**Option 2: Shell export** (for manual testing)
+```bash
+export KOSMOS_PROJECT_ROOT="$(pwd)"
+export KOSMOS_RESEARCH_BASE="$HOME/.claude/research"
+```
+
+## Installation
+
+```bash
+git clone https://github.com/park-kyungchan/kosmos.git
+cd kosmos
+bun install
+
+# Update settings.json env paths to match your machine
+# Then verify:
+bunx tsc --noEmit  # should pass with 0 errors
+```
+
+## Verification
+
+```bash
+# TypeScript check (schemas only — hooks are standalone)
+bunx tsc --noEmit
+
+# Verify hooks are executable
+bun run .claude/hooks/enforce-browse-protocol.ts <<< '{}'
+# Should exit 0 (empty payload = allow)
+```
+
+## Project Structure
+
+```
+kosmos/
+├── CLAUDE.md                    # Project constitution (7-stage pipeline)
+├── .claude/
+│   ├── agents/                  # 6 specialized agents
+│   ├── hooks/                   # 4 enforcement hooks (TypeScript + Bun)
+│   └── settings.json            # Hook config + env vars
+├── schemas/                     # TypeScript type definitions + validators
+│   ├── types.ts                 # 15+ domain types
+│   ├── validators.ts            # Runtime type guards
+│   └── index.ts                 # Public API
+├── ontology-state/              # Runtime state (JSON, updated by agents)
+│   ├── world-model.json
+│   ├── source-map.json
+│   ├── scenarios.json
+│   └── decision-log.json
+├── reports/                     # Output templates + benchmark artifacts
+├── docs/                        # Architecture, methodology, governance docs
+├── package.json
+└── tsconfig.json
+```
+
+## Portability Notes
+
+- All hooks resolve paths via `KOSMOS_PROJECT_ROOT` env var with `process.cwd()` fallback
+- No hardcoded absolute paths in hook logic
+- Settings.json `command` fields use `${KOSMOS_PROJECT_ROOT:-.}` shell expansion
+- Clone to any directory, update `env` section in settings.json, and hooks work

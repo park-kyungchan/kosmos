@@ -104,3 +104,44 @@ Every OntologyObject must have:
 - Every `evidenceId` must exist in source-map.json
 - Every `relatedObjectId` must exist in world-model.json
 - No orphaned references allowed
+
+---
+
+## Object Lifecycle Rules (Phase 3)
+
+### ResearchQuestion Lifecycle
+```
+open → answered     (successCriteria met AND evidenceIds.length >= 1)
+open → deferred     (priority drops OR scope excluded by orchestrator)
+deferred → open     (priority restored OR scope re-included)
+answered → open     (contradicting evidence found — reopened)
+```
+- Questions in "open" state block the pipeline from progressing past their domain
+- Questions in "deferred" state are excluded from report requirements
+- Only "answered" questions contribute to the final report
+
+### Claim Lifecycle
+- `freshnessStatus` is derived from `retrievedDate`:
+  - < 6 months = "current"
+  - 6-12 months = "aging"
+  - > 12 months = "stale"
+- Claims with `freshnessStatus: "stale"` trigger evaluator R5 if they dominate critical reasoning
+- Claims MUST be atomic (`isAtomic: true`) — compound claims must be split
+- Every claim MUST link to a SourceDocument via `sourceId`
+
+### Scenario Lifecycle
+- `evidenceSufficiency` is determined by assumption coverage:
+  - All assumptions have evidence IDs → "sufficient"
+  - Some assumptions lack evidence → "partial"
+  - Majority lack evidence → "insufficient"
+- Scenarios with `evidenceSufficiency: "insufficient"` are BLOCKED from supporting recommendations
+- Scenarios with `contradictionStatus: "detected"` are BLOCKED from supporting recommendations
+- Use `isScenarioReportReady()` validator to check both conditions
+
+### DecisionRecommendation Lifecycle
+- `isComplete` starts as `false`
+- Only the evaluator agent can set `isComplete: true` (after R1-R10 pass)
+- `winRationale` must explain WHY this option wins (not just "it's best")
+- `alternatives` must each explain WHY they lost (`whyNot` field)
+- `whatWouldChangeDecision` must specify concrete evidence thresholds
+- Use `isCompleteRecommendation()` validator before including in final reports

@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun run /home/palantirkc/kosmos/.claude/hooks/enforce-browse-protocol.ts",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/enforce-browse-protocol.ts",
             "timeout": 5000
           }
         ]
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun run /home/palantirkc/kosmos/.claude/hooks/normalize-research-question.ts",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/normalize-research-question.ts",
             "timeout": 5000
           }
         ]
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun run /home/palantirkc/kosmos/.claude/hooks/post-subagent-worldmodel-check.ts",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/post-subagent-worldmodel-check.ts",
             "timeout": 5000
           }
         ]
@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun run /home/palantirkc/kosmos/.claude/hooks/validate-stop.ts",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/validate-stop.ts",
             "timeout": 5000
           }
         ]

@@ -1,10 +1,9 @@
 #!/usr/bin/env bun
 /**
- * Hook: post-subagent-worldmodel-check (Phase 2 — BLOCKING for ontologist)
+ * Hook: post-subagent-worldmodel-check (Phase 3 — BLOCKING for ontologist, portable)
  * Event: PostToolUse (Agent)
  *
- * After an ontologist agent completes, BLOCKS if world-model.json was not updated.
- * Advisory for other agent types.
+ * Environment: KOSMOS_PROJECT_ROOT (fallback: cwd)
  *
  * Exit codes:
  *   0 = allow
@@ -24,27 +23,20 @@ interface HookPayload {
     subagent_type?: string;
     description?: string;
   };
-  tool_result?: string;
 }
 
 let payload: HookPayload;
-try {
-  payload = JSON.parse(input);
-} catch {
-  process.exit(0);
-}
+try { payload = JSON.parse(input); } catch { process.exit(0); }
 
 const prompt = payload.tool_input?.prompt || "";
 const agentType = payload.tool_input?.subagent_type || "";
 
-// Determine if this was an ontologist agent
 const isOntologist =
   agentType.includes("ontologist") ||
   prompt.toLowerCase().includes("world model") ||
   prompt.toLowerCase().includes("world-model") ||
   prompt.toLowerCase().includes("ontology normalization");
 
-// Determine if this was a researcher agent
 const isResearcher =
   agentType.includes("researcher") ||
   prompt.toLowerCase().includes("retrieve evidence") ||
@@ -54,40 +46,33 @@ if (!isOntologist && !isResearcher) {
   process.exit(0);
 }
 
+const PROJECT_ROOT =
+  process.env.KOSMOS_PROJECT_ROOT || process.cwd();
+
 const FIVE_MIN = 5 * 60 * 1000;
 
 if (isOntologist) {
-  const WORLD_MODEL = "/home/palantirkc/kosmos/ontology-state/world-model.json";
-  if (!existsSync(WORLD_MODEL)) {
+  const path = `${PROJECT_ROOT}/ontology-state/world-model.json`;
+  if (!existsSync(path)) {
     process.stderr.write(
-      "BLOCKED: Ontologist agent completed but world-model.json does not exist.\n" +
-      "The ontologist MUST create/update ontology-state/world-model.json with research findings."
+      "BLOCKED: Ontologist completed but world-model.json does not exist."
     );
     process.exit(2);
   }
-
-  const stat = statSync(WORLD_MODEL);
-  if (Date.now() - stat.mtimeMs > FIVE_MIN) {
+  if (Date.now() - statSync(path).mtimeMs > FIVE_MIN) {
     process.stderr.write(
-      "BLOCKED: Ontologist agent completed but world-model.json was NOT recently updated.\n" +
-      "The ontologist MUST update world-model.json with normalized research findings."
+      "BLOCKED: Ontologist completed but world-model.json was not recently updated."
     );
     process.exit(2);
   }
 }
 
 if (isResearcher) {
-  const SOURCE_MAP = "/home/palantirkc/kosmos/ontology-state/source-map.json";
-  if (existsSync(SOURCE_MAP)) {
-    const stat = statSync(SOURCE_MAP);
-    if (Date.now() - stat.mtimeMs > FIVE_MIN) {
-      // Advisory only for researcher — warn but don't block
-      process.stdout.write(
-        JSON.stringify({
-          message: "Warning: Researcher agent completed but source-map.json was not recently updated.",
-        })
-      );
-    }
+  const path = `${PROJECT_ROOT}/ontology-state/source-map.json`;
+  if (existsSync(path) && Date.now() - statSync(path).mtimeMs > FIVE_MIN) {
+    process.stdout.write(JSON.stringify({
+      message: "Warning: Researcher completed but source-map.json was not recently updated.",
+    }));
   }
 }
 

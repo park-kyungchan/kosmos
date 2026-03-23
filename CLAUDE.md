@@ -257,52 +257,47 @@ State files are updated incrementally. Every update must include:
 
 ---
 
-## Enforcement Hooks (Phase 2 — Hardened)
+## Enforcement Hooks (Phase 3 — Portable + Blocking)
 
-Four hooks in `.claude/hooks/` enforce research discipline:
+Four hooks in `.claude/hooks/`, all using `KOSMOS_PROJECT_ROOT` env var:
 
 | Hook | Event | Mode | Enforces |
 |------|-------|------|----------|
-| `enforce-browse-protocol.ts` | PreToolUse (Grep/Read) | **BLOCKING** | No broad scanning of `~/.claude/research/`. Requires bounded path + specific pattern. |
-| `validate-stop.ts` | Stop | **BLOCKING** (research sessions) | World-model or source-map must be updated for substantial research runs. |
-| `normalize-research-question.ts` | PreToolUse (Agent) | Advisory | Warns when research agents spawn without structured questions. |
-| `post-subagent-worldmodel-check.ts` | PostToolUse (Agent) | **BLOCKING** (ontologist) | Blocks if ontologist agent exits without updating world-model.json. |
+| `enforce-browse-protocol.ts` | PreToolUse (Grep/Read) | **BLOCKING** | No broad scanning of research library |
+| `validate-stop.ts` | Stop | **BLOCKING** (research sessions) | State files must be updated |
+| `normalize-research-question.ts` | PreToolUse (Agent) | Advisory | Structured questions check |
+| `post-subagent-worldmodel-check.ts` | PostToolUse (Agent) | **BLOCKING** (ontologist) | world-model.json must be updated |
 
-**Hook exit codes**: 0 = allow, 2 = block (stderr = error message), other = allow with warning.
+**Portability**: All hooks resolve paths via `process.env.KOSMOS_PROJECT_ROOT || process.cwd()`.
+No hardcoded absolute paths. See `docs/setup.md` for environment configuration.
 
 ---
 
-## Schema Enforcement (Phase 2 — Hardened)
+## Schema Enforcement (Phase 3 — Lifecycle + Quality Gates)
 
-All runtime state conforms to TypeScript schemas in `schemas/`:
-
-### Core Types (15 types + validators)
-- 15 domain types covering the full research-to-decision pipeline
-- Runtime type guards for every type (no external dependencies)
-- `isCompleteRecommendation()` — strict validator that BLOCKS incomplete recommendations
+### Core Types (17 types + validators)
+- 17 domain types with lifecycle state tracking
+- Runtime type guards + lifecycle validators
+- `isCompleteRecommendation()` — blocks incomplete recommendations
+- `isScenarioReportReady()` — blocks scenarios with unresolved contradictions
 
 ### Enforced Invariants
-- Every `ResearchQuestion` MUST have `scope` and `successCriteria`
-- Every `SourceDocument` MUST have a `tier` (source hierarchy) and `freshnessDate`
-- Every `Claim` MUST be atomic (`isAtomic: true`) with `retrievedDate`
-- Every `Scenario` MUST have `contradictionStatus` and `evaluationScores`
-- Every `DecisionRecommendation` MUST link to >= 1 Scenario AND >= 1 Risk
-- Incomplete recommendations (`isComplete: false`) CANNOT appear in final reports
+- Every `ResearchQuestion` MUST have `scope`, `successCriteria`, explicit state transitions
+- Every `SourceDocument` MUST have `tier` (5-level hierarchy) and `freshnessDate`
+- Every `Claim` MUST be atomic with `retrievedDate` and `freshnessStatus`
+- Every `Scenario` MUST have `contradictionStatus`, `evidenceSufficiency`, `evaluationScores`
+- Every `DecisionRecommendation` MUST have `winRationale`, >= 1 Scenario, >= 1 Risk
 
-### Source Hierarchy (Enforced on Researcher)
-| Tier | Source Type | Priority |
-|------|-----------|----------|
-| Tier 1 | Official documentation | Highest |
-| Tier 2 | Release notes / changelogs | High |
-| Tier 3 | Vendor architecture blogs | Medium |
-| Tier 4 | Credible benchmarks | Medium |
-| Tier 5 | Community content | Lowest |
+### Evaluator Hard Gate (10 rejection criteria)
+The evaluator is the ONLY agent that can set `isComplete: true`. Rules R1-R10
+enforce: no low-tier-only evidence, no unresolved contradictions, no missing links,
+no stale evidence, no blurred provenance, no missing rationale. See `.claude/agents/evaluator.md`.
 
-### Simulation Engine (Enforced on Simulator)
-- >= 4 scenarios per hypothesis (base/best/worst/adversarial)
-- >= 2 revision rounds when contradictions detected
-- All scenarios scored on 7 evaluation dimensions
-- RevisionRound objects track complete audit trail
+### Simulation Policy Separation
+- Scoring rubric: `docs/scoring-rubric.md` (standalone, 7 dimensions with 1-5 definitions)
+- Contradiction classification: resolvable / evidence-gap / irreconcilable
+- Revision triggers, split/discard criteria, stopping conditions — all in rubric
+- Simulator references rubric; does not embed policy
 
 ---
 

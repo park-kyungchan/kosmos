@@ -6,19 +6,25 @@ Simulation in Kosmos is NOT execution of code. It is structured
 counterfactual reasoning — systematically exploring "what if?"
 questions to stress-test hypotheses before making recommendations.
 
-## The Simulation Engine (Phase 2 — Upgraded from Template)
+## The Simulation Engine (Phase 3 — Policy/Execution Separation)
 
 ```
 Hypothesis Generation → Initial Scenarios (Round 1) →
-Evaluation Scoring (7 dimensions) → Contradiction Detection →
-Revision Loop (≥2 rounds, mandatory) → Persistence →
-RevisionRound audit trail
+Evaluation Scoring (7 dimensions, per scoring-rubric.md) →
+Contradiction Classification (resolvable/gap/irreconcilable) →
+Revision Loop (≥2 rounds, mandatory) → Evidence Sufficiency Check →
+RevisionRound audit trail → Evaluator Hard Gate
 ```
 
-The simulator is now a **structured revision engine**, not a template filler.
-Every scenario is scored, contradictions are tracked with explicit status
-(`none`/`detected`/`resolved`/`unresolvable`), and revision rounds produce
-`RevisionRound` objects that form the complete audit trail.
+**Key Phase 3 change**: Scoring and revision **policy** is now separated from
+execution. The simulator agent references `docs/scoring-rubric.md` for all
+scoring definitions, contradiction classification rules, revision triggers,
+and stopping criteria. The agent is an execution engine; the rubric is the
+policy layer.
+
+Every scenario tracks `evidenceSufficiency` (sufficient/partial/insufficient)
+in addition to `contradictionStatus`. Scenarios with insufficient evidence
+CANNOT support a DecisionRecommendation (enforced by `isScenarioReportReady()`).
 
 ## Hypothesis Generation
 

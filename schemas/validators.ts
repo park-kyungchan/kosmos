@@ -11,6 +11,8 @@ import type {
   Priority,
   SourceTier,
   ContradictionStatus,
+  EvidenceSufficiency,
+  FreshnessStatus,
   Timestamped,
   ResearchQuestion,
   UserRequirement,
@@ -43,6 +45,8 @@ const SOURCE_TIERS: SourceTier[] = [
   "tier-4-benchmarks", "tier-5-community",
 ];
 const CONTRADICTION_STATUSES: ContradictionStatus[] = ["none", "detected", "resolved", "unresolvable"];
+const EVIDENCE_SUFFICIENCY: EvidenceSufficiency[] = ["sufficient", "partial", "insufficient"];
+const FRESHNESS_STATUSES: FreshnessStatus[] = ["current", "aging", "stale"];
 const EVIDENCE_FIT = ["strong", "moderate", "weak", "none"] as const;
 
 function isString(v: unknown): v is string {
@@ -144,7 +148,8 @@ export function isClaim(v: unknown): v is Claim {
     isString(obj.domain) &&
     isStringArray(obj.contradictedBy) &&
     isStringArray(obj.supportedBy) &&
-    isISO8601(obj.retrievedDate)
+    isISO8601(obj.retrievedDate) &&
+    isInEnum(obj.freshnessStatus, FRESHNESS_STATUSES)
   );
 }
 
@@ -257,6 +262,7 @@ export function isScenario(v: unknown): v is Scenario {
     isStringArray(obj.evidenceBaseIds) &&
     isStringArray(obj.contradictions) &&
     isInEnum(obj.contradictionStatus, CONTRADICTION_STATUSES) &&
+    isInEnum(obj.evidenceSufficiency, EVIDENCE_SUFFICIENCY) &&
     isNumber(obj.revisionRound) &&
     (obj.revisionRound as number) >= 1 &&
     isStringArray(obj.architectureImplications) &&
@@ -294,6 +300,7 @@ export function isDecisionRecommendation(v: unknown): v is DecisionRecommendatio
     hasTimestamped(obj) &&
     isString(obj.question) &&
     isString(obj.recommendedOptionId) &&
+    isString(obj.winRationale) &&
     Array.isArray(obj.alternatives) &&
     isConfidence(obj.confidence) &&
     isString(obj.evidenceSummary) &&
@@ -363,6 +370,15 @@ export function isRevisionRound(v: unknown): v is RevisionRound {
  * Strict validator: ensures a DecisionRecommendation is complete
  * and ready for final output. Incomplete recommendations MUST NOT
  * appear in final reports.
+ *
+ * Lifecycle conditions:
+ *   - isComplete === true
+ *   - scenarioIds >= 1
+ *   - riskIds >= 1
+ *   - whatWouldChangeDecision >= 1
+ *   - winRationale is non-empty
+ *   - alternatives >= 1 (no single-option recommendations)
+ *   - confidence > 0
  */
 export function isCompleteRecommendation(v: unknown): v is DecisionRecommendation {
   if (!isDecisionRecommendation(v)) return false;
@@ -371,7 +387,23 @@ export function isCompleteRecommendation(v: unknown): v is DecisionRecommendatio
     v.scenarioIds.length >= 1 &&
     v.riskIds.length >= 1 &&
     v.whatWouldChangeDecision.length >= 1 &&
+    v.winRationale.length > 0 &&
+    v.alternatives.length >= 1 &&
     v.confidence > 0
+  );
+}
+
+/**
+ * Checks that a Scenario is eligible to support a recommendation.
+ * Scenarios with unresolved contradictions or insufficient evidence
+ * CANNOT back a final recommendation.
+ */
+export function isScenarioReportReady(v: unknown): v is Scenario {
+  if (!isScenario(v)) return false;
+  return (
+    v.contradictionStatus !== "detected" &&
+    v.evidenceSufficiency !== "insufficient" &&
+    v.evaluationScores.length >= 1
   );
 }
 

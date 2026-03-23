@@ -13,6 +13,8 @@ export type {
   OntologyDomain,
   SourceTier,
   ContradictionStatus,
+  EvidenceSufficiency,
+  FreshnessStatus,
   Timestamped,
   // Stage 1: Intake
   ResearchQuestion,
@@ -62,5 +64,6 @@ export {
   isOntologyObject,
   isRevisionRound,
   isCompleteRecommendation,
+  isScenarioReportReady,
   validators,
 } from "./validators.ts";

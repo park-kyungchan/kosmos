@@ -32,6 +32,39 @@ export type SourceTier =
 
 export type ContradictionStatus = "none" | "detected" | "resolved" | "unresolvable";
 
+export type EvidenceSufficiency = "sufficient" | "partial" | "insufficient";
+export type FreshnessStatus = "current" | "aging" | "stale";
+
+// ─── Lifecycle State Machine Transitions ─────────────────────
+//
+// ResearchQuestion:
+//   open → answered     (successCriteria met AND evidenceIds.length >= 1)
+//   open → deferred     (priority drops OR scope excluded by orchestrator)
+//   deferred → open     (priority restored OR scope re-included)
+//   answered → open     (contradicting evidence found — reopened)
+//
+// Claim:
+//   freshnessStatus determined by: now - retrievedDate
+//     < 6 months  → "current"
+//     6-12 months → "aging"
+//     > 12 months → "stale"
+//
+// Scenario:
+//   evidenceSufficiency determined by:
+//     all assumptions have evidenceBaseIds → "sufficient"
+//     some assumptions lack evidence      → "partial"
+//     majority lack evidence              → "insufficient"
+//   Scenarios with "insufficient" CANNOT support a recommendation.
+//
+// DecisionRecommendation:
+//   isComplete = false until:
+//     scenarioIds.length >= 1
+//     riskIds.length >= 1
+//     whatWouldChangeDecision.length >= 1
+//     winRationale is non-empty
+//     all referenced scenarios have contradictionStatus != "detected"
+//     all referenced scenarios have evidenceSufficiency != "insufficient"
+
 export interface Timestamped {
   id: string;
   createdAt: string; // ISO 8601
@@ -87,6 +120,7 @@ export interface Claim extends Timestamped {
   contradictedBy: string[]; // other Claim IDs
   supportedBy: string[]; // Evidence IDs
   retrievedDate: string; // ISO 8601 — when the underlying fact was current
+  freshnessStatus: FreshnessStatus; // derived from retrievedDate age
 }
 
 export interface Evidence extends Timestamped {
@@ -175,6 +209,7 @@ export interface Scenario extends Timestamped {
   evidenceBaseIds: string[]; // Evidence IDs
   contradictions: string[];
   contradictionStatus: ContradictionStatus;
+  evidenceSufficiency: EvidenceSufficiency;
   revisionRound: number; // which revision round produced this version (>= 1)
   architectureImplications: string[];
   implementationDifficulty: 1 | 2 | 3 | 4 | 5;
@@ -220,6 +255,7 @@ export interface Risk extends Timestamped {
 export interface DecisionRecommendation extends Timestamped {
   question: string;
   recommendedOptionId: string; // ArchitectureOption ID
+  winRationale: string; // explicit reason THIS option wins over alternatives
   alternatives: AlternativeOption[];
   confidence: number; // 0.0 - 1.0
   evidenceSummary: string;
@@ -227,7 +263,7 @@ export interface DecisionRecommendation extends Timestamped {
   riskIds: string[]; // REQUIRED: must link to >= 1 risk — enforced by validator
   whatWouldChangeDecision: string[];
   nextExperimentIds: string[];
-  isComplete: boolean; // false until all required links are present
+  isComplete: boolean; // false until all lifecycle conditions met
 }
 
 export interface AlternativeOption {
