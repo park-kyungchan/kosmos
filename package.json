@@ -1,0 +1,14 @@
+{
+  "name": "kosmos",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Ontology-driven AI research and decision-support operating system",
+  "scripts": {
+    "typecheck": "bunx tsc --noEmit",
+    "validate": "bun run schemas/validators.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/bun": "latest"
+  }
+}

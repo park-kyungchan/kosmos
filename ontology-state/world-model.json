@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "lastUpdated": null,
+  "session": {
+    "id": null,
+    "objective": null,
+    "startedAt": null
+  },
+  "objects": [],
+  "properties": [],
+  "links": [],
+  "interfaces": [],
+  "actions": [],
+  "functions": [],
+  "securityConcerns": [],
+  "governancePolicies": []
+}

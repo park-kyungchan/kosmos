@@ -1,0 +1,53 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Grep|Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run /home/palantirkc/kosmos/.claude/hooks/enforce-browse-protocol.ts",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run /home/palantirkc/kosmos/.claude/hooks/normalize-research-question.ts",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run /home/palantirkc/kosmos/.claude/hooks/post-subagent-worldmodel-check.ts",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run /home/palantirkc/kosmos/.claude/hooks/validate-stop.ts",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "KOSMOS_PROJECT_ROOT": "/home/palantirkc/kosmos",
+    "KOSMOS_RESEARCH_BASE": "/home/palantirkc/.claude/research"
+  }
+}
