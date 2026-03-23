@@ -15,6 +15,14 @@ export {};
 
 import { existsSync } from "fs";
 
+// Guard against infinite loops — if this hook already fired once, allow stop
+const input = await Bun.stdin.text();
+let hookPayload: Record<string, unknown> = {};
+try { hookPayload = JSON.parse(input); } catch { /* ignore */ }
+if (hookPayload.stop_hook_active === true) {
+  process.exit(0); // Second call — always allow
+}
+
 const PROJECT_ROOT = "/home/palantirkc/kosmos";
 
 const stateFiles = {
