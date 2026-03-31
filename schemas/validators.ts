@@ -31,6 +31,7 @@ import type {
   OntologyObject,
   ScenarioType,
   RevisionRound,
+  TechBlueprint,
 } from "./types.ts";
 
 // ─── Primitive Validators ────────────────────────────────────
@@ -342,7 +343,7 @@ export function isOntologyObject(v: unknown): v is OntologyObject {
       "object-type", "property", "shared-property", "value-type",
       "link-type", "interface", "action-type", "function",
     ]) &&
-    isInEnum(obj.domain, ["data", "logic", "action", "security", "cross-cutting"]) &&
+    isInEnum(obj.domain, ["data", "logic", "action", "security", "learn", "cross-cutting"]) &&
     isString(obj.description) &&
     isInEnum(obj.provenance, PROVENANCES) &&
     isStringArray(obj.evidenceIds) &&
@@ -407,6 +408,45 @@ export function isScenarioReportReady(v: unknown): v is Scenario {
   );
 }
 
+// ─── Blueprint Validators ───────────────────────────────
+
+export function isTechBlueprint(v: unknown): v is TechBlueprint {
+  if (typeof v !== "object" || v === null) return false;
+  const obj = v as Record<string, unknown>;
+  return (
+    hasTimestamped(obj) &&
+    typeof obj.projectScope === "object" &&
+    typeof obj.designPrinciples === "object" &&
+    Array.isArray(obj.primitives) &&
+    typeof obj.ontologyMapping === "object" &&
+    typeof obj.recommendedStack === "object" &&
+    typeof obj.forwardProp === "object" &&
+    typeof obj.backwardProp === "object" &&
+    Array.isArray(obj.implementationStrategy) &&
+    isInEnum(obj.evaluatorGate, ["ACCEPT", "REJECT"]) &&
+    isString(obj.evaluatorReason) &&
+    isStringArray(obj.scenarioIds) &&
+    isStringArray(obj.riskIds) &&
+    isStringArray(obj.sourceIds) &&
+    isConfidence(obj.confidence)
+  );
+}
+
+/**
+ * Strict validator: ensures a TechBlueprint is complete and accepted.
+ * Only blueprints that passed the evaluator gate can be in final output.
+ */
+export function isBlueprintReady(v: unknown): v is TechBlueprint {
+  if (!isTechBlueprint(v)) return false;
+  return (
+    v.evaluatorGate === "ACCEPT" &&
+    v.scenarioIds.length >= 1 &&
+    v.riskIds.length >= 1 &&
+    v.implementationStrategy.length >= 1 &&
+    v.confidence > 0
+  );
+}
+
 // ─── Aggregate Validator ─────────────────────────────────────
 
 export type ValidatorMap = {
@@ -426,6 +466,7 @@ export type ValidatorMap = {
   NextExperiment: typeof isNextExperiment;
   OntologyObject: typeof isOntologyObject;
   RevisionRound: typeof isRevisionRound;
+  TechBlueprint: typeof isTechBlueprint;
 };
 
 export const validators: ValidatorMap = {
@@ -445,4 +486,5 @@ export const validators: ValidatorMap = {
   NextExperiment: isNextExperiment,
   OntologyObject: isOntologyObject,
   RevisionRound: isRevisionRound,
+  TechBlueprint: isTechBlueprint,
 };

@@ -21,6 +21,7 @@ export type OntologyDomain =
   | "logic"
   | "action"
   | "security"
+  | "learn"
   | "cross-cutting";
 
 export type SourceTier =
@@ -302,6 +303,86 @@ export interface OntologyObject extends Timestamped {
   provenance: Provenance;
   evidenceIds: string[];
   relatedObjectIds: string[];
+}
+
+// ─── Blueprint Output ───────────────────────────────────
+
+export interface DesignPrinciples {
+  ddd: string[];   // Domain-Driven Design 적용 사항
+  dry: string[];   // Don't Repeat Yourself 적용 사항
+  ocp: string[];   // Open for extension, Closed for modification
+  pecs: string[];  // Producer Extends, Consumer Super
+}
+
+export interface PropagationPath {
+  description: string;
+  steps: string[];  // e.g. ["ontology → contracts", "contracts → backend runtime"]
+  healthStatus: "healthy" | "partial" | "broken";
+  gaps: string[];   // identified breaks in the propagation chain
+}
+
+export interface ImplementationPhase {
+  phase: 1 | 2 | 3;
+  name: string;     // "Golden Tables" | "Operational Decision-Making" | "AI-First"
+  description: string;
+  deliverables: string[];
+  dependencies: string[];
+}
+
+export interface OntologyLayerMapping {
+  data: OntologyObject[];
+  logic: OntologyObject[];
+  action: OntologyObject[];
+  security: OntologyObject[];
+  learn: OntologyObject[];
+}
+
+export interface StackRecommendation {
+  name: string;
+  technologies: TechnologyCandidate[];
+  rationale: string;
+  alternatives: { name: string; whyNot: string }[];
+  confidence: number; // 0.0 - 1.0
+}
+
+export interface TechBlueprint extends Timestamped {
+  // Project scope (BackendOntology + FrontendOntology)
+  projectScope: {
+    objective: string;
+    backendDomains: string[];   // D/L/A/Security/Learn coverage
+    frontendSurfaces: string[]; // views, agents, scenarios, interactions
+  };
+
+  // DevCon 5 design principles application
+  designPrinciples: DesignPrinciples;
+
+  // Ontology primitives selected
+  primitives: string[]; // interfaces, structs, reducers, derived properties, etc.
+
+  // D/L/A mapping
+  ontologyMapping: OntologyLayerMapping;
+
+  // Technology stack recommendation
+  recommendedStack: StackRecommendation;
+
+  // Forward / Backward propagation paths
+  forwardProp: PropagationPath;
+  backwardProp: PropagationPath;
+
+  // Implementation strategy (3-phase journey)
+  implementationStrategy: ImplementationPhase[];
+
+  // Evaluator gate result
+  evaluatorGate: "ACCEPT" | "REJECT";
+  evaluatorReason: string;
+
+  // Links to supporting artifacts
+  scenarioIds: string[];
+  riskIds: string[];
+  sourceIds: string[];
+
+  // Overall confidence
+  confidence: number; // 0.0 - 1.0
 }
 
 // ─── Session State ───────────────────────────────────────────

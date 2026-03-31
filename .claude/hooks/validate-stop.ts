@@ -12,7 +12,7 @@
 
 export {};
 
-import { existsSync } from "fs";
+import { existsSync, statSync } from "fs";
 
 // Guard against infinite loops
 const input = await Bun.stdin.text();
@@ -32,17 +32,26 @@ const stateFiles = {
   decisionLog: `${PROJECT_ROOT}/ontology-state/decision-log.json`,
 };
 
+// Detect research session: decision-log.json must have been modified
+// within the last 2 hours (current session scope, not stale from prior runs)
+const TWO_HOURS = 2 * 60 * 60 * 1000;
 let isResearchSession = false;
 let anyStateUpdated = false;
 
 try {
-  const logFile = Bun.file(stateFiles.decisionLog);
-  const logData = JSON.parse(await logFile.text());
-  if (
-    (logData.questions && logData.questions.length > 0) ||
-    (logData.entries && logData.entries.length > 0)
-  ) {
-    isResearchSession = true;
+  if (existsSync(stateFiles.decisionLog)) {
+    const { mtimeMs } = statSync(stateFiles.decisionLog);
+    const isRecent = Date.now() - mtimeMs < TWO_HOURS;
+
+    if (isRecent) {
+      const logData = JSON.parse(await Bun.file(stateFiles.decisionLog).text());
+      if (
+        (logData.questions && logData.questions.length > 0) ||
+        (logData.entries && logData.entries.length > 0)
+      ) {
+        isResearchSession = true;
+      }
+    }
   }
 } catch { /* not a research session */ }
 
@@ -68,6 +77,29 @@ if (!anyStateUpdated) {
   process.stderr.write(
     "BLOCKED: Research session detected but no state files updated.\n" +
     "Update at least one of: world-model.json, source-map.json, scenarios.json"
+  );
+  process.exit(2);
+}
+
+// Check blueprint.json exists for research sessions
+const blueprintPath = `${PROJECT_ROOT}/ontology-state/blueprint.json`;
+let blueprintValid = false;
+if (existsSync(blueprintPath)) {
+  try {
+    const bpData = JSON.parse(await Bun.file(blueprintPath).text());
+    if (
+      bpData.blueprint !== null &&
+      bpData.blueprint !== undefined
+    ) {
+      blueprintValid = true;
+    }
+  } catch { /* malformed — treat as invalid */ }
+}
+
+if (!blueprintValid) {
+  process.stderr.write(
+    "BLOCKED: Research session without blueprint output. " +
+    "Run reporter agent to generate blueprint."
   );
   process.exit(2);
 }

@@ -1,0 +1,203 @@
+{
+  "version": "0.6.0",
+  "lastUpdated": "2026-03-28T12:30:00Z",
+  "sessionId": "mathcrew-deep-dive-001",
+  "blueprint": {
+    "createdAt": "2026-03-28T11:00:00Z",
+    "updatedAt": "2026-03-28T12:30:00Z",
+    "projectScope": {
+      "objective": "mathcrew frontend 3D rendering quality revolution, edu-tech stack adoption, content delivery paradigm shift, component architecture innovation",
+      "backendDomains": ["DATA (12 entities + xAPI + FSRS)", "LOGIC (BKT + CRA + scaffolding + scene state machines)", "ACTION (xAPI emission, FSRS scheduling, scaffold adjustment)", "SECURITY (existing RBAC + 4-layer AI safety)", "LEARN (xAPI LRS, 5 misconception detectors, refinement signals)"],
+      "frontendSurfaces": ["views (4 existing)", "agentSurfaces (2 existing)", "interaction (7 primitives -> Koota traits)", "rendering (MeshToonNodeMaterial + ToonOutlinePassNode + bloom + godrays)", "scenarioFlows (CRA C->R->A, instruction-first for elementary)"]
+    },
+    "designPrinciples": {
+      "ddd": [
+        "Each interaction primitive = Koota entity with traits, 1:1 with ontology PrimitiveRegistryDefinition",
+        "CRA stages as first-class domain concepts (P1)",
+        "FSRS card = Question entity + scheduling metadata",
+        "5 misconception types as typed error codes (P10)"
+      ],
+      "dry": [
+        "Extract InteractionEngine via Koota traits (shared pickup/drop/build across scenes)",
+        "Unify step progression with XState actor (replace 5x useStepProgression hooks)",
+        "Shared TSL toon material library (MeshToonNodeMaterial + shared gradientMap)"
+      ],
+      "ocp": [
+        "Koota traits: new scene = spawn entity with traits, zero changes to SceneEngine",
+        "TSL PostProcessing pipeline via composition (add effects, never modify chain)",
+        "Scaffold Engine: pluggable hint providers per misconception type"
+      ],
+      "pecs": [
+        "Producer: scene spawns Koota entities with specific trait shapes",
+        "Consumer: SceneEngine queries entities by trait archetype",
+        "Input: producers emit abstract actions, consumers interpret per-context",
+        "§DC5-06 mapping: Koota Traits = Structs, Relations = Object-backed Links"
+      ]
+    },
+    "primitives": [
+      "Interfaces — InteractionPrimitive<T> via Koota trait archetypes",
+      "Structs — CRAProgress { stage, confidence, evidence[] }",
+      "Derived Properties — scaffoldLevel, fsrsSchedule, craStage, failurePattern",
+      "Object-backed Link Types — Koota relation() for island progression, studentMasteryAtCRAStage",
+      "Reducers — misconception frequency aggregation per student per concept"
+    ],
+    "pedagogicalPrinciples": [
+      "P1: CRA State Machine (Tau-BC = 0.9965)",
+      "P2: Interactive-Only Concrete (VRA framework)",
+      "P3: Math-as-Mechanic / intrinsic integration (Zombie Division 7x)",
+      "P4: High-Guidance Default (d=0.90 vs d=0.19)",
+      "P5: Instruction-First for Elementary (PF contraindicated for grades 3-5)",
+      "P6: 3-Tier Hints (nudge → hint → worked example → direct)",
+      "P7: Fading + Self-Explanation (medium-large effect)",
+      "P8: Segmented Animation (learner-paced)",
+      "P9: Dual-Channel Delivery (audio + visual, Temporal Contiguity d=0.87)",
+      "P10: 5 Misconception Detectors",
+      "P11: 4 Visual Models (arrays, sharing, Venn, factor trees)",
+      "P12: Zones of Proximal Flow (Flow ∩ ZPD)",
+      "P13: Gesture-Concept Alignment (incongruent impairs)"
+    ],
+    "recommendedStack": {
+      "name": "Scene Engine Revolution (Option B) — Updated with Koota + Safety Layer",
+      "technologies": [
+        {"name": "Koota", "role": "pmndrs official ECS — entity management with traits + relations", "version": "latest"},
+        {"name": "XState v5", "role": "Scene state machine + island actors", "version": "5.x"},
+        {"name": "Zustand", "role": "Global app state (session, mastery, active island)", "version": "latest"},
+        {"name": "ts-fsrs", "role": "Spaced repetition scheduling", "version": "4.x"},
+        {"name": "@xapi/xapi", "role": "xAPI statement client (96.8% TypeScript)", "version": "latest"},
+        {"name": "@react-three/a11y", "role": "3D canvas accessibility", "version": "latest"},
+        {"name": "MeshToonNodeMaterial", "role": "Built-in TSL toon rendering (no custom shaders)", "version": "Three.js 0.183+"},
+        {"name": "ToonOutlinePassNode", "role": "Built-in outline post-processing", "version": "Three.js 0.183+"},
+        {"name": "detect-gpu", "role": "GPU tier detection for adaptive quality", "version": "5.x"},
+        {"name": "Motion", "role": "Spring-physics R3F animation for math objects", "version": "latest"},
+        {"name": "manim-web", "role": "3Blue1Brown math animations (TypeScript, React)", "version": "0.3.16"},
+        {"name": "Mafs", "role": "2D math visualization SVG overlay", "version": "0.21.0"},
+        {"name": "mathjs", "role": "Expression evaluation + verification for AI safety", "version": "latest"}
+      ],
+      "rationale": "Koota(pmndrs ECS) + XState(actors) + Zustand(global) = 3-layer state. MeshToonNodeMaterial = built-in toon rendering. SafeTutors 4-layer safety. Instruction-first pedagogy (P5). viber3d reference architecture validated.",
+      "alternatives": [
+        {"name": "Miniplex instead of Koota", "whyNot": "No relation() system, not pmndrs ecosystem, no §DC5-06 direct mapping"},
+        {"name": "Evolutionary Upgrade (Option A)", "whyNot": "God component unresolved, D/L/A Fit 5/10"},
+        {"name": "Full Rebuild (Option C)", "whyNot": "React ecosystem abandoned, ontology-first destroyed, irreversible"}
+      ],
+      "confidence": 0.87
+    },
+    "aiSafety": {
+      "architecture": "4-layer (SafeTutors + Khanmigo pattern)",
+      "layers": [
+        "L1: Pedagogical Prompt — Socratic, no answer disclosure, grade-level language",
+        "L2: Input Threat Detection — PII, self-harm, profanity",
+        "L3: Async Moderation Agent — turn count tracking, 3+ hints zoom out, 8 queries/day",
+        "L4: Teacher HITL Review — unresolved confusion escalation with full history"
+      ],
+      "criticalFinding": "SafeTutors: multi-turn pedagogical harm 17.7% → 77.8%. PNAS: unguarded AI harms learning outcomes.",
+      "mathVerification": "mathjs + SymPy pattern from Khanmigo: verify both tutor and student work before responding"
+    },
+    "koreanCurriculum": {
+      "grade": "5th grade, 1st semester",
+      "unit": "Unit 2: 약수와 배수",
+      "sequence": ["약수", "배수", "약수와 배수의 관계", "공약수", "최대공약수", "공배수", "최소공배수"],
+      "downstreamDependency": "Unit 3 (약분과 통분) + Unit 4 (분수의 덧셈과 뺄셈) — 3 consecutive dependent units, rare in Korean elementary math",
+      "significance": "초등 수학의 첫 논리 관문 — 개념적 추론이 단순 계산을 대체하는 전환점"
+    },
+    "misconceptionTaxonomy": [
+      {"code": "MC-01", "name": "Factors/Multiples Confusion", "detection": "lists multiples when asked for factors", "correction": "Rectangular Arrays"},
+      {"code": "MC-02", "name": "GCF/LCM Confusion", "detection": "applies LCM procedure for GCF", "correction": "Venn Diagram"},
+      {"code": "MC-03", "name": "Limited Factor Concept", "detection": "only finds factors < 10", "correction": "Equal Sharing with larger numbers"},
+      {"code": "MC-04", "name": "Exponent Errors", "detection": "3^2 computed as 6", "correction": "Factor Tree with branching"},
+      {"code": "MC-05", "name": "Procedural Without Conceptual", "detection": "correct algorithm, fails transfer", "correction": "Sharing Model with narrative"}
+    ],
+    "forwardProp": {
+      "description": "Extended ontology -> Koota traits -> core contracts -> client runtime",
+      "steps": [
+        "ontology/frontend.ts + interaction/rendering/scenarioFlows",
+        "packages/core/koota-traits.ts (trait definitions from ontology)",
+        "packages/core/cra-progression.ts (CRA stage logic — P1)",
+        "packages/core/scaffold-engine.ts (hint escalation — P6)",
+        "packages/core/fsrs-adapter.ts (FSRS scheduling)",
+        "packages/core/misconception-detector.ts (5 error types — P10)",
+        "packages/client/world/SceneEngine.ts (Koota world + XState actors)",
+        "packages/client/world/InputAbstraction.ts (unified input — P13)",
+        "packages/client/world/ToonMaterials.ts (MeshToonNodeMaterial library)"
+      ],
+      "healthStatus": "partial",
+      "gaps": ["FrontendOntology.interaction empty", "FrontendOntology.rendering empty", "FrontendOntology.scenarioFlows empty", "No Koota traits defined", "No CRA progression", "No misconception detector"]
+    },
+    "backwardProp": {
+      "description": "3D events -> xAPI -> LRS -> CRA tracking -> FSRS -> scaffolding -> misconception detection -> refinement -> ontology",
+      "steps": [
+        "3D interaction events (Koota entity state changes)",
+        "xAPI statement emission (@xapi/xapi: Actor + Verb + Object + misconception extension)",
+        "LRS storage + existing HookEvent/AuditLog parallel",
+        "CRA progression tracking (which stage per student per concept?)",
+        "FSRS scheduling updates (when should student revisit?)",
+        "Scaffold level adjustment (P6: which hint tier?)",
+        "Misconception classification (P10: which of 5 error types?)",
+        "AI safety monitoring (SafeTutors L3: turn count, harm detection)",
+        "Refinement signals to teacher dashboard",
+        "Future ontology updates"
+      ],
+      "healthStatus": "partial",
+      "gaps": ["No xAPI emission", "No CRA tracking", "No FSRS adapter", "No misconception detector", "No AI safety layer"]
+    },
+    "implementationStrategy": [
+      {
+        "phase": 1, "name": "Golden Tables",
+        "description": "Rendering revolution + data normalization + input abstraction",
+        "deliverables": [
+          "MeshToonNodeMaterial + ToonOutlinePassNode (all islands)",
+          "detect-gpu + PerformanceMonitor (2-layer adaptive quality)",
+          "@xapi/xapi statement schema + embedded LRS in NestJS",
+          "InputAbstraction (touch + keyboard + gamepad unified)",
+          "@react-three/a11y integration",
+          "SceneRegistry pattern (MathWorld.tsx decomposition start)"
+        ],
+        "dependencies": ["R3F v9.5", "Three.js 0.183"]
+      },
+      {
+        "phase": 2, "name": "Operational Decision-Making",
+        "description": "3-layer state + adaptive logic + instruction-first pedagogy",
+        "deliverables": [
+          "Koota + XState + Zustand 3-layer state architecture",
+          "ts-fsrs adaptive scheduling",
+          "CRA Progression Tracker (P1: gate criteria per concept zone)",
+          "Scaffold Engine (P6: 4-tier hints, instruction-first P5)",
+          "5 Misconception Detectors (P10: MC-01 to MC-05)",
+          "Motion R3F spring animations for math objects"
+        ],
+        "dependencies": ["Phase 1"]
+      },
+      {
+        "phase": 3, "name": "AI-First",
+        "description": "AI tutoring with safety + math animations + procedural environment",
+        "deliverables": [
+          "Socratic Tutoring Agent (Khanmigo pattern + 4-layer safety)",
+          "manim-web 3Blue1Brown math animations",
+          "Mafs 2D math HUD overlays",
+          "MeshPortalMaterial diegetic scene transitions",
+          "TSL procedural water/terrain between islands",
+          "Korean audio narration (P9: dual-channel delivery)"
+        ],
+        "dependencies": ["Phase 2"]
+      }
+    ],
+    "evaluatorGate": "ACCEPT",
+    "evaluatorReason": "All 13 gates passed. Updated with: Koota > Miniplex (§DC5-06 mapping), MeshToonNodeMaterial (built-in), SafeTutors 4-layer safety, Productive Failure corrected (P5: instruction-first for elementary), 5 misconception types, Korean curriculum mapping, 13 pedagogical design principles with effect sizes.",
+    "scenarioIds": ["base", "best", "worst", "adversarial"],
+    "riskIds": ["xstate-complexity", "webgpu-stability", "touch-ux", "mathworld-refactor", "bkt-no-js", "ai-safety-multi-turn", "koota-maturity"],
+    "sourceIds": [
+      "context7-tsl", "threejs-MeshToonNodeMaterial", "threejs-ToonOutlinePassNode",
+      "koota-github", "viber3d-starter", "xstate-stately", "zustand-pmndrs",
+      "tsfsrs-npm", "xapi-xapi-npm", "a11y-pmndrs", "detect-gpu-pmndrs",
+      "motion-dev", "manim-web-npm", "mafs-dev", "mathjs-npm",
+      "cra-metaanalysis-2025-ebner", "kapur-productive-failure-2021",
+      "embodied-cognition-pmc-2017", "zombie-division-habgood-2011",
+      "safetutors-benchmark-2025", "khanmigo-lite-system-prompt",
+      "pnas-ai-harms-learning-2024", "socraticai-2024",
+      "oatutor-chi-2023", "sutarto-misconceptions-2021",
+      "mayer-multimedia-principles", "temporal-contiguity-ginns-d087",
+      "korean-5th-grade-yaksu-unit2",
+      "dc5-05", "dc5-06", "dc5-04", "dc-sig-03", "fde-09"
+    ],
+    "confidence": 0.87
+  }
+}

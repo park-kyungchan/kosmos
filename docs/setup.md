@@ -62,18 +62,19 @@ bun run .claude/hooks/enforce-browse-protocol.ts <<< '{}'
 kosmos/
 ├── CLAUDE.md                    # Project constitution (7-stage pipeline)
 ├── .claude/
-│   ├── agents/                  # 6 specialized agents
-│   ├── hooks/                   # 4 enforcement hooks (TypeScript + Bun)
+│   ├── agents/                  # 6 specialized agents (opus/sonnet)
+│   ├── hooks/                   # 7 enforcement hooks (TypeScript + Bun)
 │   └── settings.json            # Hook config + env vars
 ├── schemas/                     # TypeScript type definitions + validators
-│   ├── types.ts                 # 15+ domain types
-│   ├── validators.ts            # Runtime type guards
+│   ├── types.ts                 # 17 domain types + TechBlueprint
+│   ├── validators.ts            # Runtime type guards + lifecycle validators
 │   └── index.ts                 # Public API
 ├── ontology-state/              # Runtime state (JSON, updated by agents)
-│   ├── world-model.json
-│   ├── source-map.json
-│   ├── scenarios.json
-│   └── decision-log.json
+│   ├── world-model.json         # D/L/A ontology graph (ontologist)
+│   ├── source-map.json          # Sources + claims (researcher)
+│   ├── scenarios.json           # Scenarios + runs (simulator)
+│   ├── decision-log.json        # Decisions + routing (orchestrator)
+│   └── blueprint.json           # TechBlueprint output (reporter)
 ├── reports/                     # Output templates + benchmark artifacts
 ├── docs/                        # Architecture, methodology, governance docs
 ├── package.json

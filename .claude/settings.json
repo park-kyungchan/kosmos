@@ -1,5 +1,16 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/inject-prior-state.ts",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Grep|Read",
@@ -29,6 +40,22 @@
           {
             "type": "command",
             "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/post-subagent-worldmodel-check.ts",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/validate-agent-output.ts",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/reinject-state-after-compact.ts",
             "timeout": 5000
           }
         ]

@@ -1,20 +1,39 @@
 {
-  "version": "0.1.0",
-  "lastUpdated": "2026-03-23T14:15:00Z",
-  "session": { "id": "bench-001", "objective": "3D math learning experience tech stack research", "startedAt": "2026-03-23T14:00:00Z" },
+  "version": "0.3.0",
+  "lastUpdated": "2026-03-23T22:00:00Z",
+  "sessions": [
+    {
+      "id": "bench-003",
+      "objective": "RED-TEAM: COPPA/FERPA compliance for EdTech pilot",
+      "startedAt": "2026-03-23T17:00:00Z",
+      "note": "Previous session — findings preserved, still relevant to mathcrew"
+    },
+    {
+      "id": "audit-001",
+      "objective": "Cold audit of mathcrew codebase for architecture, decomposition, and 3D feasibility",
+      "startedAt": "2026-03-23T20:00:00Z"
+    }
+  ],
   "objects": [
-    { "id": "obj-ot-01", "name": "Student", "ontologyType": "object-type", "domain": "data", "description": "Elementary school learner (ages 6-12) with progress tracking", "provenance": "synthesis", "evidenceIds": ["ev-06"], "relatedObjectIds": ["obj-ot-02", "obj-ot-03"] },
-    { "id": "obj-ot-02", "name": "MathProblem", "ontologyType": "object-type", "domain": "data", "description": "A math exercise with difficulty level, topic, and expected answer", "provenance": "synthesis", "evidenceIds": ["ev-06"], "relatedObjectIds": ["obj-ot-01"] },
-    { "id": "obj-ot-03", "name": "LearningSession", "ontologyType": "object-type", "domain": "data", "description": "A timed session where student interacts with 3D environment", "provenance": "synthesis", "evidenceIds": ["ev-07"], "relatedObjectIds": ["obj-ot-01", "obj-ot-02"] },
-    { "id": "obj-ot-04", "name": "ScoreRecord", "ontologyType": "object-type", "domain": "data", "description": "Tracks correct/incorrect attempts per problem per session", "provenance": "synthesis", "evidenceIds": ["ev-07"], "relatedObjectIds": ["obj-ot-01", "obj-ot-02", "obj-ot-03"] },
-    { "id": "obj-ot-05", "name": "ThreeJsR3F", "ontologyType": "object-type", "domain": "data", "description": "Three.js + react-three-fiber v9: React 19 renderer, no perf overhead, MIT", "provenance": "official", "evidenceIds": ["ev-01"], "relatedObjectIds": [] },
-    { "id": "obj-ot-06", "name": "BabylonJs", "ontologyType": "object-type", "domain": "data", "description": "Babylon.js 7.x: native WebGPU, Apache-2.0, React wrapper available", "provenance": "official", "evidenceIds": [], "relatedObjectIds": [] },
-    { "id": "obj-ot-07", "name": "PlayCanvas", "ontologyType": "object-type", "domain": "data", "description": "PlayCanvas: WebGPU ready, MIT open source, visual editor, React support", "provenance": "official", "evidenceIds": ["ev-03"], "relatedObjectIds": [] },
-    { "id": "obj-lt-01", "name": "StudentSolvesProblems", "ontologyType": "link-type", "domain": "logic", "description": "Links Student to MathProblems attempted", "provenance": "synthesis", "evidenceIds": ["ev-06"], "relatedObjectIds": ["obj-ot-01", "obj-ot-02"] },
-    { "id": "obj-lt-02", "name": "SessionContainsProblems", "ontologyType": "link-type", "domain": "logic", "description": "Links LearningSession to MathProblems presented", "provenance": "synthesis", "evidenceIds": ["ev-06"], "relatedObjectIds": ["obj-ot-03", "obj-ot-02"] },
-    { "id": "obj-fn-01", "name": "ComputeDifficulty", "ontologyType": "function", "domain": "logic", "description": "DECIDE: adaptive difficulty based on student's ScoreRecord history", "provenance": "synthesis", "evidenceIds": ["ev-07"], "relatedObjectIds": ["obj-ot-04", "obj-ot-02"] },
-    { "id": "obj-at-01", "name": "SubmitAnswer", "ontologyType": "action-type", "domain": "action", "description": "ACT: student submits answer, creates ScoreRecord", "provenance": "synthesis", "evidenceIds": ["ev-07"], "relatedObjectIds": ["obj-ot-04"] },
-    { "id": "obj-at-02", "name": "StartSession", "ontologyType": "action-type", "domain": "action", "description": "ACT: initiates a LearningSession with selected topic + difficulty", "provenance": "synthesis", "evidenceIds": ["ev-07"], "relatedObjectIds": ["obj-ot-03"] }
+    { "id": "obj-rt-ot-01", "name": "Student", "ontologyType": "object-type", "domain": "data", "description": "Elementary learner (6-12). SERVER-STORED identity + progress.", "provenance": "synthesis", "evidenceIds": ["ev-v2-07"], "relatedObjectIds": ["obj-rt-ot-02", "obj-rt-ot-03", "obj-rt-ot-04"] },
+    { "id": "obj-rt-ot-02", "name": "MathProblem", "ontologyType": "object-type", "domain": "data", "description": "Math exercise with difficulty, topic, expected answer.", "provenance": "synthesis", "evidenceIds": ["ev-v2-07"], "relatedObjectIds": [] },
+    { "id": "obj-rt-ot-03", "name": "ScoreRecord", "ontologyType": "object-type", "domain": "data", "description": "REGULATED DATA: Student ID + problem ID + score + timestamp.", "provenance": "synthesis", "evidenceIds": ["ev-v2-07"], "relatedObjectIds": ["obj-rt-ot-01", "obj-rt-ot-02"] },
+    { "id": "obj-rt-ot-04", "name": "LearningSession", "ontologyType": "object-type", "domain": "data", "description": "REGULATED DATA: Session with student ID, start/end time, problems attempted.", "provenance": "synthesis", "evidenceIds": ["ev-v2-07"], "relatedObjectIds": ["obj-rt-ot-01"] },
+    { "id": "obj-rt-ot-05", "name": "Teacher", "ontologyType": "object-type", "domain": "data", "description": "Teacher user with authenticated identity.", "provenance": "synthesis", "evidenceIds": [], "relatedObjectIds": ["obj-rt-ot-01"] },
+    { "id": "obj-rt-ot-06", "name": "Classroom", "ontologyType": "object-type", "domain": "data", "description": "Organizational unit linking Teacher to Students.", "provenance": "synthesis", "evidenceIds": [], "relatedObjectIds": ["obj-rt-ot-05", "obj-rt-ot-01"] },
+    { "id": "obj-rt-lt-01", "name": "StudentInClassroom", "ontologyType": "link-type", "domain": "logic", "description": "M:N relationship: students in classrooms.", "provenance": "synthesis", "evidenceIds": [], "relatedObjectIds": ["obj-rt-ot-01", "obj-rt-ot-06"] },
+    { "id": "obj-rt-fn-01", "name": "ComputeDifficulty", "ontologyType": "function", "domain": "logic", "description": "DECIDE: adaptive difficulty from ScoreRecord history.", "provenance": "synthesis", "evidenceIds": ["ev-v2-07"], "relatedObjectIds": ["obj-rt-ot-03"] },
+    { "id": "obj-rt-fn-02", "name": "AggregateClassPerformance", "ontologyType": "function", "domain": "logic", "description": "DECIDE: computes class-level aggregates for teacher dashboard.", "provenance": "synthesis", "evidenceIds": [], "relatedObjectIds": ["obj-rt-ot-03", "obj-rt-ot-06"] },
+    { "id": "obj-rt-at-01", "name": "SubmitAnswer", "ontologyType": "action-type", "domain": "action", "description": "ACT: student submits answer, creates ScoreRecord.", "provenance": "synthesis", "evidenceIds": ["ev-v2-07"], "relatedObjectIds": ["obj-rt-ot-03"] },
+    { "id": "obj-rt-at-02", "name": "StartSession", "ontologyType": "action-type", "domain": "action", "description": "ACT: initiates LearningSession.", "provenance": "synthesis", "evidenceIds": [], "relatedObjectIds": ["obj-rt-ot-04"] },
+    { "id": "obj-rt-at-03", "name": "ViewDashboard", "ontologyType": "action-type", "domain": "action", "description": "ACT: teacher views student performance.", "provenance": "synthesis", "evidenceIds": [], "relatedObjectIds": ["obj-rt-ot-05", "obj-rt-ot-03"] },
+
+    { "id": "obj-au-ot-01", "name": "MathWorld_Monolith", "ontologyType": "object-type", "domain": "cross-cutting", "description": "AUDIT FINDING: MathWorld.tsx was a 200-line monolith mixing 6 concerns. DECOMPOSED into Player, FollowCamera, Bridge, constants, MathWorld.", "provenance": "synthesis", "evidenceIds": ["ev-au-01"], "relatedObjectIds": [] },
+    { "id": "obj-au-ot-02", "name": "DeadDependency_Ecctrl", "ontologyType": "object-type", "domain": "cross-cutting", "description": "AUDIT FINDING: ecctrl in package.json but never imported. REMOVED.", "provenance": "official", "evidenceIds": ["ev-au-02"], "relatedObjectIds": [] },
+    { "id": "obj-au-ot-03", "name": "DeadDependency_Leva", "ontologyType": "object-type", "domain": "cross-cutting", "description": "AUDIT FINDING: leva in package.json but never imported. REMOVED.", "provenance": "official", "evidenceIds": ["ev-au-02"], "relatedObjectIds": [] },
+    { "id": "obj-au-ot-04", "name": "StaleHandoff", "ontologyType": "object-type", "domain": "cross-cutting", "description": "AUDIT FINDING: handoff-v0.1 doc describes non-existent features (story/, scenes3d/, Ecctrl). CORRECTED with notice.", "provenance": "official", "evidenceIds": ["ev-au-03"], "relatedObjectIds": [] },
+    { "id": "obj-au-fn-01", "name": "isUnlocked_Duplication", "ontologyType": "function", "domain": "logic", "description": "AUDIT FINDING: isUnlocked logic duplicated between core/prerequisite.ts (tested) and MathWorld.tsx (inline, hardcoded IDs). Client should use core/.", "provenance": "official", "evidenceIds": ["ev-au-04"], "relatedObjectIds": [] },
+    { "id": "obj-au-ot-05", "name": "R3F_Rendering_Stack", "ontologyType": "object-type", "domain": "data", "description": "React Three Fiber 9.5 + Three.js r183 + Rapier 2.2 + Drei 10.7. Confirmed as correct choice for mathcrew's scale (~30 objects).", "provenance": "synthesis", "evidenceIds": ["ev-au-05"], "relatedObjectIds": [] }
   ],
   "properties": [],
   "links": [],
@@ -22,9 +41,11 @@
   "actions": [],
   "functions": [],
   "securityConcerns": [
-    { "id": "sec-01", "concern": "COPPA compliance for under-13 data collection", "severity": "critical", "evidenceId": "ev-04" }
+    { "id": "sec-rt-01", "concern": "COPPA CERTAINLY TRIGGERED: storing student data from children under 13", "severity": "critical", "evidenceId": null },
+    { "id": "sec-rt-02", "concern": "FERPA LIKELY TRIGGERED: student scores stored by EdTech vendor", "severity": "critical", "evidenceId": null }
   ],
   "governancePolicies": [
-    { "id": "gov-01", "policy": "No personal information collection without verifiable parental consent", "source": "16 CFR Part 312" }
+    { "id": "gov-rt-01", "policy": "COPPA compliance MUST be verified by legal counsel before deployment", "source": "bench-003 red-team" },
+    { "id": "gov-rt-02", "policy": "Conservative interpretation on all ambiguities", "source": "bench-003 red-team" }
   ]
 }

@@ -1,131 +1,115 @@
 {
-  "version": "0.1.0",
-  "lastUpdated": "2026-03-23T14:00:00Z",
+  "version": "0.4.0",
+  "lastUpdated": "2026-03-28T10:00:00Z",
+  "sessionId": "mathcrew-deep-dive-001",
+  "previousBenchmarks": ["bench-001", "bench-002", "bench-003"],
   "entries": [
     {
       "type": "decomposition",
-      "timestamp": "2026-03-23T14:00:00Z",
+      "timestamp": "2026-03-28T10:00:00Z",
       "agent": "orchestrator",
-      "objective": "Research production-viable tech stack for 3D math learning experience (Roblox-like, elementary school, Vercel deployment)",
-      "rationale": "Decomposed into 7 research questions across 4 domains: technology (Q1,Q2,Q6), deployment (Q3), governance (Q4), architecture (Q5,Q7)"
+      "objective": "DEEP DIVE: mathcrew Frontend/Ontology/Backend full audit + revolutionary improvement research. Focus areas: (1) 3D rendering quality breakthrough, (2) education-specialized tech stack, (3) content delivery paradigm shift, (4) component architecture revolution, (5) interaction paradigm innovation.",
+      "rationale": "mathcrew has a solid ontology-first foundation (BackendOntology + FrontendOntology, 5 islands, 7 interaction primitives, LEARN infrastructure). But the frontend 3D rendering is classroom-basic (shadows off, no post-processing), interaction is keyboard-only (E/Q), content delivery is chalkboard-centric. The gap between ontology sophistication and frontend execution quality is the primary concern."
+    },
+    {
+      "type": "current-state-audit",
+      "timestamp": "2026-03-28T10:00:01Z",
+      "agent": "orchestrator",
+      "findings": {
+        "ontology": {
+          "strength": "Well-structured BackendOntology (12 DATA entities, 17 link types, 6 derived properties, 5 decision rules) + FrontendOntology (4 views, 2 agent surfaces, 7 interaction primitives, 5 object types)",
+          "gap": "FrontendOntology declarations are rich but runtime rendering does not reflect the declared sophistication. Ontology declares 'teaching surface' but runtime delivers basic geometry."
+        },
+        "rendering": {
+          "current": "R3F 9.5 + Three.js 0.183 + WebGPU/WebGL fallback. ProceduralSky (basic gradient + points), TSL fog, PostProcessing (MRT bloom/GTAO/vignette/FXAA — mostly disabled). Quality presets: classroom (everything off) vs immersive (vignette+FXAA only).",
+          "gap": "No stylized shading (toon/cel), no water/ocean, no weather, no dynamic lighting for learning phases, no particle effects for math visualization. Islands are flat cylinders with solid colors."
+        },
+        "interaction": {
+          "current": "Keyboard-only: WASD movement, E pickup/interact, Q drop, R reset, Enter advance. 7 interaction primitives registered but 3 still 'designed' or 'undesigned'.",
+          "gap": "No touch support, no gamepad, no gesture recognition, no accessibility (screen reader + 3D), no multi-modal feedback (audio/haptic). Mobile/tablet unusable."
+        },
+        "contentDelivery": {
+          "current": "5-phase Kolb cycle per scene (motivate→explain→demonstrate→practice→assess). NPC narration via Board3D chalkboard. Step-by-step linear progression.",
+          "gap": "No adaptive branching within scenes, no multi-representation (CRA: concrete→representational→abstract), no animated math explanations (3Blue1Brown-style), no audio narration, no hint escalation system."
+        },
+        "components": {
+          "current": "MathWorld.tsx (770 lines) orchestrates everything. Per-scene components (PetShareScene, DualPetShareScene, etc). State managed via useState chains.",
+          "gap": "No state machine for scene flow, no ECS, no lazy scene loading, no micro-scene architecture. MathWorld.tsx is becoming a God component."
+        },
+        "stack": {
+          "current": "NestJS + MongoDB + React + R3F + Rapier. No xAPI, no LRS, no adaptive engine, no spaced repetition, no IRT calibration.",
+          "gap": "Backend stores attempts but doesn't do adaptive computation beyond simple mastery%. No learning analytics beyond basic counts."
+        }
+      }
     },
     {
       "type": "routing",
-      "timestamp": "2026-03-23T14:00:01Z",
+      "timestamp": "2026-03-28T10:00:02Z",
       "agent": "orchestrator",
       "decisions": {
-        "Q1": "external — tier-1 official docs for three.js, babylon.js, playcanvas",
-        "Q2": "external — tier-1 official docs for colyseus, partykit, liveblocks",
-        "Q3": "external — tier-1 vercel.com/docs",
-        "Q4": "external — tier-1 ftc.gov COPPA guidance",
-        "Q5": "internal — BROWSE.md recipes: §DATA.EN-*, §ENTRY.RQ-*, §PHIL.DT-*",
-        "Q6": "external — tier-1 caniuse.com, chromestatus.com",
-        "Q7": "external — tier-3/4 educational UX research"
+        "RQ1": "external+context7 — 3D rendering: TSL toon shading, procedural terrain/water, WebGPU compute for math viz, R3F v9 patterns",
+        "RQ2": "external — Interaction: embodied cognition, touch/gesture, accessibility-first 3D, multi-modal feedback",
+        "RQ3": "external — Pedagogy: CRA digital implementation, scaffolding patterns, game-based learning evidence, Korean math curriculum",
+        "RQ4": "external — Edu-tech: xAPI/LRS, BKT/IRT/FSRS adaptive engines, AI tutoring patterns, learning analytics",
+        "RQ5": "external+context7 — Architecture: ECS for R3F, XState scene flow, micro-scenes, diegetic UI, R3F v9 advanced",
+        "internal-01": "§DC5-05 design principles (DDD/DRY/OCP/PECS) — applied to component architecture revolution",
+        "internal-02": "§DC5-06 ontology primitives — applied to interaction primitive plugin system",
+        "internal-03": "§DC5-04 3-phase journey — applied to implementation roadmap (Golden Tables→Kinetics→AI-First)",
+        "internal-04": "§DC-SIG-03 builder scope — frontend ontology must include application+agent+scenario surfaces",
+        "internal-05": "§FDE-09 expanded builder surfaces — agent-driven content creation and evaluation"
       }
     }
   ],
   "requirements": [
-    {
-      "id": "req-01",
-      "description": "Production-viable 3D rendering in browser for ages 6-12",
-      "category": "functional",
-      "priority": "p0"
-    },
-    {
-      "id": "req-02",
-      "description": "Real-time multiplayer for classroom collaboration",
-      "category": "functional",
-      "priority": "p1"
-    },
-    {
-      "id": "req-03",
-      "description": "Deployable on Vercel with acceptable performance",
-      "category": "non-functional",
-      "priority": "p0"
-    },
-    {
-      "id": "req-04",
-      "description": "COPPA-compliant for children under 13",
-      "category": "regulatory",
-      "priority": "p0"
-    },
-    {
-      "id": "req-05",
-      "description": "30fps+ on school Chromebooks (Intel/ARM)",
-      "category": "non-functional",
-      "priority": "p0"
-    }
+    { "id": "req-dd-01", "description": "3D rendering quality leap: stylized shading, procedural environments, math-specific visualization", "category": "functional", "priority": "p0", "domain": "FRONTEND" },
+    { "id": "req-dd-02", "description": "Multi-device interaction: touch + keyboard + gamepad + accessibility", "category": "functional", "priority": "p0", "domain": "FRONTEND" },
+    { "id": "req-dd-03", "description": "Evidence-based content delivery: CRA progression, scaffolding, multi-modal", "category": "functional", "priority": "p0", "domain": "LOGIC" },
+    { "id": "req-dd-04", "description": "Adaptive learning engine: BKT/IRT/FSRS beyond simple mastery%", "category": "functional", "priority": "p1", "domain": "LOGIC" },
+    { "id": "req-dd-05", "description": "Component architecture overhaul: decompose MathWorld.tsx God component", "category": "architecture", "priority": "p0", "domain": "FRONTEND" },
+    { "id": "req-dd-06", "description": "Learning analytics: xAPI traces, teacher dashboard with actionable insights", "category": "functional", "priority": "p1", "domain": "LEARN" },
+    { "id": "req-dd-07", "description": "Performance: 30fps on Chromebooks with new rendering features", "category": "non-functional", "priority": "p0", "domain": "FRONTEND" },
+    { "id": "req-dd-08", "description": "Preserve ontology-first authority chain through all changes", "category": "constraint", "priority": "p0", "domain": "META" }
   ],
   "questions": [
     {
-      "id": "q-01",
-      "text": "What 3D rendering engines are production-viable for browser-based educational apps in 2026?",
-      "domain": "technology",
+      "id": "q-dd-01",
+      "text": "What TSL/WebGPU techniques achieve Pixar-quality stylized rendering while maintaining 30fps on Chromebooks?",
+      "domain": "FRONTEND/RENDERING",
+      "priority": "p0",
+      "route": "external+context7",
+      "status": "researching"
+    },
+    {
+      "id": "q-dd-02",
+      "text": "What interaction paradigms beyond keyboard E/Q enable embodied math learning in 3D?",
+      "domain": "FRONTEND/INTERACTION",
       "priority": "p0",
       "route": "external",
-      "scope": "WebGL/WebGPU engines with React integration, 2025-2026 releases",
-      "successCriteria": ">= 3 candidates compared on performance, ecosystem, React support",
-      "status": "open"
+      "status": "researching"
     },
     {
-      "id": "q-02",
-      "text": "What multiplayer frameworks support real-time educational 3D collaboration?",
-      "domain": "technology",
-      "priority": "p1",
-      "route": "external",
-      "scope": "WebSocket/WebRTC, < 100 concurrent users per session",
-      "successCriteria": ">= 2 candidates compared on latency, hosting, Vercel compat",
-      "status": "open"
-    },
-    {
-      "id": "q-03",
-      "text": "What are Vercel's deployment constraints for 3D web applications?",
-      "domain": "deployment",
+      "id": "q-dd-03",
+      "text": "How to implement CRA (Concrete-Representational-Abstract) progression in a digital 3D math environment?",
+      "domain": "LOGIC/CONTENT",
       "priority": "p0",
       "route": "external",
-      "scope": "Function limits, CDN, edge runtime, WebSocket support",
-      "successCriteria": "Concrete limits documented: regions, concurrency, /tmp, streaming",
-      "status": "open"
+      "status": "researching"
     },
     {
-      "id": "q-04",
-      "text": "What COPPA/child safety requirements apply to ages 6-12 educational platforms?",
-      "domain": "governance",
+      "id": "q-dd-04",
+      "text": "What education-specialized tech components (xAPI, BKT, IRT, FSRS) integrate with TypeScript/Bun stack?",
+      "domain": "DATA/TECH",
       "priority": "p1",
       "route": "external",
-      "scope": "US COPPA, EU Age-Appropriate Design Code",
-      "successCriteria": "Compliance checklist with actionable requirements",
-      "status": "open"
+      "status": "researching"
     },
     {
-      "id": "q-05",
-      "text": "How does ontology-driven architecture map to educational domain entities?",
-      "domain": "architecture",
-      "priority": "p2",
-      "route": "internal",
-      "scope": "D/L/A classification: Student, Lesson, Problem, Score, Progress",
-      "successCriteria": "Complete D/L/A mapping using BROWSE.md recipes",
-      "status": "open"
-    },
-    {
-      "id": "q-06",
-      "text": "What is WebGPU browser support status on target devices (school Chromebooks)?",
-      "domain": "technology",
+      "id": "q-dd-05",
+      "text": "What component architecture patterns (ECS, state machines, micro-scenes) best decompose a 3D educational world?",
+      "domain": "FRONTEND/ARCHITECTURE",
       "priority": "p0",
-      "route": "external",
-      "scope": "Chrome, Safari, Firefox support matrix, fallback story",
-      "successCriteria": "Support matrix with dates + WebGL fallback viability",
-      "status": "open"
-    },
-    {
-      "id": "q-07",
-      "text": "What educational UX patterns maximize engagement for elementary math?",
-      "domain": "design",
-      "priority": "p1",
-      "route": "external",
-      "scope": "Gamification, immediate feedback, progressive difficulty",
-      "successCriteria": ">= 3 evidence-backed patterns with implementation implications",
-      "status": "open"
+      "route": "external+context7",
+      "status": "researching"
     }
   ],
   "recommendations": [],

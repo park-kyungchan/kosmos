@@ -1,47 +1,67 @@
-# Kosmos — Ontology-Driven AI Research & Decision-Support OS
+# Kosmos — Ontology-First Tech Implementation Deep Research Engine
 
 ## Project Identity
 
-Kosmos is a Claude Code project operating system for systematic research,
-ontology-based world modeling, multi-hypothesis reasoning, and decision support.
+Kosmos is a Claude Code research codebase that performs **deep research
+for Ontology/Frontend/Backend technical implementation**.
 
-It is NOT a chat interface. It is NOT a summarization tool.
+It is NOT a general-purpose research tool. It does NOT handle legal reviews,
+compliance questions, or non-technical analysis.
 
-It is a structured reasoning pipeline that:
-1. Decomposes user requests into explicit research questions
-2. Retrieves evidence from internal (Palantir research library) and external sources
-3. Normalizes findings into an ontology-style world model
-4. Generates and tests multiple competing hypotheses
-5. Simulates scenarios across base/best/worst/adversarial cases
-6. Produces decision-support outputs with ranked alternatives
+When a user says "이런 앱 만들어줘", Kosmos:
+1. Gathers and clarifies requirements
+2. Deep-researches the optimal D/L/A design, tech stack, and architecture
+3. Applies Palantir DevCon 5 design principles throughout
+4. Outputs a **TechBlueprint** + **13-section report**
+
+The output feeds downstream tools: ontology-design, writing-plans, or direct implementation.
 
 ## Tech Stack
 
 - **TypeScript + Bun** — all executable code
 - No external runtime dependencies for core schemas
 - MCP tools for external research (scrapling, context7, WebSearch)
-- Agent Teams for parallel research and verification
+- Claude Code Native Runtime: hooks, subagents, file-based state
 
 ---
 
 ## Research Pipeline (7 Stages)
 
-Every substantial request flows through 7 stages:
+Every request flows through 7 stages:
 
 ```
-Research Intake → Internal Browse → External Research →
+Requirements Intake → Internal Browse → External Research →
 Ontology Normalization → Hypothesis Generation →
-Simulation Loop → Decision Support Output
+Simulation Loop → Blueprint + Report Output
 ```
 
-### Stage 1: Research Intake
+### Stage 1: Requirements Intake
 
-Decompose user request into explicit `ResearchQuestion` objects.
+Decompose user request into `ProjectOntologyScope`:
 
-- Each question: `{ text, domain, priority, decomposedFrom, status }`
-- Questions must be falsifiable or answerable with evidence
-- Maximum 3 levels of decomposition depth
-- Write decomposed questions to `ontology-state/decision-log.json`
+```
+BackendOntology:
+  - DATA: what entities exist
+  - LOGIC: how to reason about them
+  - ACTION: what changes reality
+  - SECURITY: who governs access/trust
+  - LEARN: what feedback/outcomes are recorded
+
+FrontendOntology (optional):
+  - views: user-facing pages/dashboards
+  - agentSurfaces: agent interaction panels
+  - scenarioFlows: what-if planning surfaces
+  - interaction: user input contracts
+  - rendering: visual/3D/spatial surfaces
+```
+
+Each research question gets a D/L/A domain tag and follows the DevCon 5
+3-phase journey framework:
+1. **Golden Tables** — data integration, source mapping
+2. **Operational Decision-Making** — encode kinetics (actions, logic, functions)
+3. **AI-First** — layer LLMs and automation atop captured kinetics
+
+Write decomposition to `ontology-state/decision-log.json`.
 
 ### Stage 2: Internal Browse (Palantir Research Library)
 
@@ -49,134 +69,152 @@ Decompose user request into explicit `ResearchQuestion` objects.
 
 The internal research library at `~/.claude/research/palantir/` contains:
 - **81 files**, **~1,205 markers**, organized by domain
-- **BROWSE.md** (`~/.claude/research/BROWSE.md`) — AI agent query interface (ALWAYS start here)
-- **INDEX.md** (`~/.claude/research/INDEX.md`) — structural reference, marker prefixes, constraints
+- **BROWSE.md** — AI agent query interface (ALWAYS start here)
+- **INDEX.md** — structural reference, marker prefixes, constraints
 
-#### Browse Protocol
+#### DevCon 5 Markers (Critical for v2)
 
-1. **Question**: Frame the information need as a specific question
-2. **Recipe**: Look up the question in BROWSE.md's Question Recipes table
-3. **Grep**: Follow the recipe's marker chain with targeted grep
-   ```
-   Grep({ pattern: "\\[§LOGIC\\.R-02\\]", path: "~/.claude/research/palantir/logic/" })
-   ```
-4. **Compose**: Read only the sections the markers point to (150 lines at a time)
-5. **Reason**: Synthesize across markers to answer the original question
+| Marker Range | Content | Location |
+|-------------|---------|----------|
+| §DC5-01~10 | DevCon 5 sessions (Human-Agent Leverage, Advanced Ontology, Army SF, AI FDE, DevEx, Foundations) | `palantir/platform/devcon.md` |
+| §DC-SIG-01~07 | Significance for our system | `palantir/platform/devcon.md` |
+| §DC-EVO-01 | Evolution arcs DC1→DC5 | `palantir/platform/devcon.md` |
+| §FDE-01~09 | AI FDE capabilities | `palantir/platform/ai-fde.md` |
 
-#### Hard Rules
+#### Design Principles to Search For
+
+| Principle | Source | Application |
+|-----------|--------|------------|
+| **DDD** (Domain-Driven Design) | §DC5-05 | Objects = real-world things 1:1 |
+| **DRY** (Rule of Three) | §DC5-05 | Refactor after 3 duplications |
+| **OCP** (Open/Closed) | §DC5-05 | Core locked, extensions open |
+| **PECS** (Producer Extends, Consumer Super) | §DC5-05 | Plug-and-play ontology via interfaces |
+
+#### Browse Protocol Rules
 
 - **NEVER** scan all 81 files. ALWAYS use BROWSE.md recipes first.
-- **NEVER** use `Grep({ pattern: ".*" })` or broad wildcards on the research library.
-- **ALWAYS** prefer marker chains and bounded grep over broad reading.
-- **ALWAYS** preserve provenance boundaries:
-  - `[Official]` = direct Palantir content (from their docs, AIPCon, DevCon)
-  - `[Synthesis]` = our analytical synthesis (frameworks, naming, heuristics)
-  - `[Inference]` = reasoned conclusion drawn from official evidence
-- **NEVER** present `[Synthesis]` or `[Inference]` as `[Official]`.
+- **NEVER** use broad wildcards on the research library.
+- §DC5 markers are allowed on root-level grep (hook exception).
+- **ALWAYS** preserve provenance: `[Official]`, `[Synthesis]`, `[Inference]`.
 - **ALWAYS** cite the marker(s) that support each claim.
-
-#### Core Axioms (from BROWSE.md)
-
-| # | Axiom | Provenance |
-|---|-------|-----------|
-| A1 | Causation, not correlation | [Synthesis] from [Official] |
-| A2 | Decisions, not data | [Official] |
-| A3 | Explicit over implicit | [Official] substance, [Synthesis] label |
-| A4 | Semantic compilation | [Official] concept, [Synthesis] 4-stage model |
-| A5 | Twin feedback loop (SENSE-DECIDE-ACT-LEARN) | [Synthesis] loop, [Official] components |
-
-#### Marker System
-
-- Multi-file: `[§PREFIX.ABBREV-NN]` (e.g., `[§DATA.EN-01]`)
-- Single-file: `[§PREFIX-NN]` (e.g., `[§ARCH-01]`)
-- Cross-refs: `→[§ID]` links to another section
-- Use `Grep({ pattern: "\\[§DATA\\." })` for DATA domain scoping
 
 ### Stage 3: External Research
 
-Use external sources when:
-- Latest stacks, APIs, pricing, benchmarks, deployment tools, vendor capabilities needed
-- Implementation decisions depend on current ecosystem reality
-- Internal research does not fully answer the question
+Use external sources for **technology stack decisions only**:
+- Library/framework versions, APIs, benchmarks, pricing
+- Current ecosystem reality (npm, GitHub, official docs)
+- Implementation patterns and deployment options
 
 External source rules:
-- Prefer official docs and primary sources over blog posts
-- Capture: source URL, access date, and provenance tier
-- Distinguish platform facts from design interpretation
+- Prefer official docs (tier-1) over blog posts (tier-3+)
 - Use scrapling MCP for web fetching, context7 for library docs
-- All external findings become `SourceDocument` objects in `ontology-state/source-map.json`
+- Capture: source URL, access date, provenance tier
+- **DO NOT** research non-technical topics (legal, regulatory, compliance)
+
+All findings → `ontology-state/source-map.json`.
 
 ### Stage 4: Ontology Normalization
 
-Map ALL findings into ontology concepts:
+Map ALL findings into D/L/A domains using semantic heuristics:
 
-| Layer | Concepts |
-|-------|----------|
-| **Semantic** (what exists) | Object Types, Properties, Value Types, Link Types, Interfaces |
-| **Kinetic** (what happens) | Action Types, Functions, Security, Governance, Validation |
-| **Decision Support** (what to do) | Scenarios, Risks, Recommendations, Next Experiments |
+| Domain | Question | Heuristic |
+|--------|----------|-----------|
+| **DATA** | Does this describe WHAT EXISTS? | SH-02: "Delete LOGIC+ACTION, still describes reality?" → DATA |
+| **LOGIC** | Does this describe HOW TO REASON? | Links, interfaces, derived properties, functions |
+| **ACTION** | Does this CHANGE REALITY? | Mutations, webhooks, automations |
+| **SECURITY** | Who governs access/trust? | RBAC, policies, approvals |
+| **LEARN** | What feedback/outcomes are recorded? | Evaluations, lineage, drift signals |
+
+#### Ontology Primitives Selection (DevCon 5 §DC5-06)
+
+For each project, select from these primitives:
+- **Interfaces** — polymorphic workflows, multi-inheritance, PECS
+- **Structs** — compound properties with metadata
+- **Reducers** — collapse multi-value histories to focus value
+- **Derived Properties** — semantic business logic without denormalization
+- **Object-Backed Link Types** — relationship metadata when semantically meaningful
+
+#### ForwardPropagation Path
+
+Design the compilation chain:
+```
+ontology definitions → core contracts → backend runtime → frontend runtime
+```
+Every runtime name must match an ontology name.
+
+#### BackwardPropagation Path
+
+Design the learning chain:
+```
+runtime events → lineage/audit → evaluations → refinement → ontology updates
+```
+Every important decision must leave a trace.
 
 Update `ontology-state/world-model.json` after every normalization pass.
-Every object must have: `id`, `type`, `domain`, `provenance`, `evidenceIds`.
 
 ### Stage 5: Hypothesis Generation
 
-For each architectural or strategic question, generate >= 2 competing hypotheses.
+For each architectural question, generate >= 2 competing hypotheses.
 Each hypothesis must specify:
-- The claim (clear, falsifiable statement)
+- The claim: "This stack is optimal for this D/L/A structure because..."
 - Supporting evidence (with provenance tags)
 - Contradicting evidence
-- Testability criteria
-- Architecture implications
-
-Do NOT collapse to a single hypothesis prematurely.
-Maintain competing hypotheses until simulation resolves them.
+- DevCon 5 principle alignment (DDD/DRY/OCP/PECS fit)
+- ForwardProp/BackwardProp implications
 
 ### Stage 6: Simulation Loop
 
-For each hypothesis or decision point, generate >= 4 scenarios:
+For each hypothesis, generate >= 4 scenarios (base/best/worst/adversarial).
 
-| Scenario | Description |
-|----------|-------------|
-| **Base Case** | Most likely outcome given current evidence |
-| **Best Case** | Optimistic outcome if favorable conditions hold |
-| **Worst Case** | Pessimistic outcome if unfavorable conditions hold |
-| **Adversarial** | What breaks? What does an attacker/competitor exploit? |
+#### Evaluation Dimensions (10)
 
-Each scenario must include:
-- Assumptions (numbered, falsifiable)
-- Evidence base (source IDs)
-- Contradictions (what evidence argues against this scenario)
-- Architecture implications
-- Implementation difficulty (1-5 scale)
-- Deployment implications
-- Governance / safety implications
-- Recommended next actions
+| # | Dimension | Question |
+|---|-----------|----------|
+| 1 | Evidence Fit | How well-supported are assumptions? |
+| 2 | Implementation Difficulty | How hard to build? |
+| 3 | Risk Severity | How bad is the worst case? |
+| 4 | Reversibility | How easy to change course? |
+| 5 | Time-to-Value | How quickly does this deliver? |
+| 6 | Governance Compliance | Does this satisfy safety/policy needs? |
+| 7 | Ecosystem Maturity | How stable is the stack? |
+| 8 | **D/L/A Fit** | Is the DATA/LOGIC/ACTION classification clean? |
+| 9 | **ForwardProp Health** | Is ontology→contract→backend→frontend propagation healthy? |
+| 10 | **Agent Composability** | Can agents compose ontology-based tools? |
 
-**Revision rounds**: Run >= 2 rounds of scenario revision when contradictions
-or missing evidence appear. Each round narrows uncertainty or reveals new questions.
+Scoring definitions in `docs/scoring-rubric.md`.
+Run >= 2 revision rounds. Update `ontology-state/scenarios.json`.
 
-Update `ontology-state/scenarios.json` after each simulation pass.
+### Stage 7: Blueprint + Report Output
 
-### Stage 7: Decision Support Output
+Every research session produces TWO outputs:
 
-Every user-facing report follows this 13-section structure:
+#### Output A: TechBlueprint (`ontology-state/blueprint.json`)
+
+Structured JSON following `TechBlueprint` type in `schemas/types.ts`:
+- Project scope (BackendOntology + FrontendOntology)
+- DevCon 5 principles application
+- Ontology primitives selected
+- D/L/A mapping
+- Recommended stack with alternatives
+- ForwardProp/BackwardProp paths
+- 3-phase implementation strategy
+- Evaluator gate result
+
+#### Output B: 13-Section Report (`reports/final-report.md`)
 
 1. User Objective
-2. Research Questions
+2. Research Questions (with D/L/A domain tags)
 3. Retrieval Plan
-4. Internal Palantir Findings
-5. External Current Findings
-6. Ontology Mapping
+4. Internal Palantir Findings (DevCon 5 principles)
+5. External Current Findings (tech stack)
+6. Ontology Mapping (D/L/A + primitives)
 7. Competing Architecture Options
-8. Simulation Results
+8. Simulation Results (10 dimensions)
 9. Scenario Matrix
-10. Recommended Path
+10. Recommended Path (3-phase strategy)
 11. Risks / Unknowns
 12. Next Experiments
 13. What Would Change the Decision
-
-Report templates live in `reports/`. Final output written to `reports/final-report.md`.
 
 ---
 
@@ -184,58 +222,47 @@ Report templates live in `reports/`. Final output written to `reports/final-repo
 
 Six specialized agents in `.claude/agents/`:
 
-| Agent | Role | Domain | Model |
-|-------|------|--------|-------|
-| `orchestrator` | Decomposes requests, coordinates pipeline stages | META | opus |
-| `researcher` | Retrieves and synthesizes evidence (internal + external) | DATA | opus |
-| `ontologist` | Maps findings to ontology concepts, maintains world model | LOGIC | opus |
-| `simulator` | Generates scenarios, runs counterfactual analysis | LOGIC/ACTION | opus |
-| `evaluator` | Validates findings, checks contradictions, adversarial testing | VERIFY | opus |
-| `reporter` | Produces structured decision-support outputs | OUTPUT | opus |
+| Agent | Role | Model | Domain |
+|-------|------|-------|--------|
+| `orchestrator` | Decomposes requirements into ProjectOntologyScope | opus | META |
+| `researcher` | Retrieves tech stack evidence (internal + external) | sonnet | DATA |
+| `ontologist` | Maps findings to D/L/A, selects primitives | opus | LOGIC |
+| `simulator` | Generates architecture scenarios (10 dimensions) | opus | LOGIC/ACTION |
+| `evaluator` | Validates with R1-R13 gates, adversarial testing | opus | VERIFY |
+| `reporter` | Produces Blueprint + 13-section report | sonnet | OUTPUT |
 
 ### Agent Coordination Flow
 
 ```
 User Request
     ↓
-[orchestrator] — decomposes → ResearchQuestion[]
+[orchestrator] — decomposes → ProjectOntologyScope + ResearchQuestion[]
     ↓
 [researcher] — retrieves → SourceDocument[], Claim[], Evidence[]
     ↓
-[ontologist] — normalizes → world-model.json update
+[ontologist] — normalizes → D/L/A mapping, primitives, ForwardProp/BackwardProp
     ↓
-[simulator] — generates → Scenario[], SimulationRun[]
+[simulator] — generates → Scenario[] (10 dimensions), SimulationRun[]
     ↓
-[evaluator] — validates → verified findings, Risk[]
+[evaluator] — validates → R1-R13 gates, Risk[]
     ↓
-[reporter] — produces → final-report.md, scenario-matrix.md
+[reporter] — produces → blueprint.json + final-report.md
     ↓
 Lead synthesizes → Decision Support Output to user
 ```
-
-### Agent Spawn Rules
-
-- Orchestrator runs first, always. Other agents wait for its output.
-- Researcher and external research can run in parallel.
-- Ontologist waits for researcher output.
-- Simulator waits for ontologist output.
-- Evaluator and reporter can run after simulator.
-- Lead synthesizes all agent outputs into the final answer.
 
 ---
 
 ## Behavioral Constraints
 
-- Do NOT stop at explanation — always produce actionable decision support
-- Do NOT return only one answer when multiple viable options exist
-- Do NOT collapse uncertainty prematurely — maintain competing hypotheses
-- Do NOT recommend a stack without comparing alternatives
-- Do NOT skip security, governance, or validation implications
-- Do NOT blur `[Official]`, `[Synthesis]`, and `[Inference]` provenance tags
-- Do NOT treat the internal research library as something to read exhaustively
-- Do NOT start implementation before completing ontology normalization
-- Do NOT generate scenarios without evidence base citations
-- Do NOT mark a research task complete without updating world-model.json
+- Do NOT research non-technical topics (legal, regulatory, compliance, pricing strategy)
+- Do NOT recommend a stack without D/L/A classification
+- Do NOT skip DevCon 5 principles (DDD/DRY/OCP/PECS)
+- Do NOT produce a Blueprint without ForwardProp/BackwardProp paths
+- Do NOT collapse to a single hypothesis before simulation
+- Do NOT blur provenance: `[Official]`, `[Synthesis]`, `[Inference]`
+- Do NOT mark a research task complete without updating ontology-state/ files
+- Do NOT generate scenarios without all 10 evaluation dimensions
 
 ---
 
@@ -245,83 +272,81 @@ The `ontology-state/` directory maintains runtime state across sessions:
 
 | File | Purpose | Updated By |
 |------|---------|-----------|
-| `world-model.json` | Current ontology graph (objects, properties, links) | ontologist |
+| `world-model.json` | D/L/A ontology graph | ontologist |
 | `source-map.json` | All retrieved sources with provenance | researcher |
-| `scenarios.json` | All generated scenarios | simulator |
-| `decision-log.json` | All decisions made with reasoning trace | orchestrator, evaluator |
-
-State files are updated incrementally. Every update must include:
-- `timestamp` (ISO 8601)
-- `updatedBy` (agent name)
-- `sessionId` (current session identifier)
+| `scenarios.json` | All generated scenarios (10 dimensions) | simulator |
+| `decision-log.json` | Decomposition + routing decisions | orchestrator |
+| `blueprint.json` | TechBlueprint output | reporter |
 
 ---
 
-## Enforcement Hooks (Phase 3 — Portable + Blocking)
-
-Four hooks in `.claude/hooks/`, all using `KOSMOS_PROJECT_ROOT` env var:
+## Enforcement Hooks (7 hooks)
 
 | Hook | Event | Mode | Enforces |
 |------|-------|------|----------|
-| `enforce-browse-protocol.ts` | PreToolUse (Grep/Read) | **BLOCKING** | No broad scanning of research library |
-| `validate-stop.ts` | Stop | **BLOCKING** (research sessions) | State files must be updated |
-| `normalize-research-question.ts` | PreToolUse (Agent) | Advisory | Structured questions check |
+| `inject-prior-state.ts` | SessionStart | Advisory | Loads prior session state into context |
+| `enforce-browse-protocol.ts` | PreToolUse (Grep/Read) | **BLOCKING** | No broad scanning; §DC5 markers allowed |
+| `normalize-research-question.ts` | PreToolUse (Agent) | Advisory | Structured questions with D/L/A tags |
 | `post-subagent-worldmodel-check.ts` | PostToolUse (Agent) | **BLOCKING** (ontologist) | world-model.json must be updated |
-
-**Portability**: All hooks resolve paths via `process.env.KOSMOS_PROJECT_ROOT || process.cwd()`.
-No hardcoded absolute paths. See `docs/setup.md` for environment configuration.
+| `validate-agent-output.ts` | PostToolUse (Agent) | **BLOCKING** (ontologist/reporter) | D/L/A coverage + blueprint output |
+| `reinject-state-after-compact.ts` | PostCompact | Advisory | Re-injects state summary after compaction |
+| `validate-stop.ts` | Stop | **BLOCKING** | State files + blueprint.json must exist |
 
 ---
 
-## Schema Enforcement (Phase 3 — Lifecycle + Quality Gates)
+## Evaluator Hard Gate (13 rejection criteria)
 
-### Core Types (17 types + validators)
-- 17 domain types with lifecycle state tracking
-- Runtime type guards + lifecycle validators
+| # | Rule | Blocks When |
+|---|------|-------------|
+| R1 | Low-tier dependency | Critical claims on tier-4/5 only |
+| R2 | Unresolved contradictions | Scenario has contradictionStatus "detected" |
+| R3 | Missing scenario link | scenarioIds < 1 |
+| R4 | Missing risk link | riskIds < 1 |
+| R5 | Stale evidence | >50% critical claims are "stale" |
+| R6 | Blurred provenance | Mixed [Official]/[Synthesis]/[Inference] without tags |
+| R7 | Missing win rationale | winRationale empty or generic |
+| R8 | No alternatives | alternatives < 1 |
+| R9 | Insufficient evidence | Scenario evidenceSufficiency "insufficient" |
+| R10 | Missing reversal conditions | whatWouldChangeDecision < 1 |
+| R11 | **D/L/A classification missing** | Findings without D/L/A domain tags |
+| R12 | **DevCon 5 principles not applied** | No DDD/DRY/OCP/PECS analysis |
+| R13 | **ForwardProp/BackwardProp broken** | Propagation path has healthStatus "broken" |
+
+---
+
+## Schema Types
+
+17 core types + TechBlueprint in `schemas/types.ts`.
+Runtime validators + lifecycle guards in `schemas/validators.ts`.
+Key lifecycle validators:
 - `isCompleteRecommendation()` — blocks incomplete recommendations
 - `isScenarioReportReady()` — blocks scenarios with unresolved contradictions
-
-### Enforced Invariants
-- Every `ResearchQuestion` MUST have `scope`, `successCriteria`, explicit state transitions
-- Every `SourceDocument` MUST have `tier` (5-level hierarchy) and `freshnessDate`
-- Every `Claim` MUST be atomic with `retrievedDate` and `freshnessStatus`
-- Every `Scenario` MUST have `contradictionStatus`, `evidenceSufficiency`, `evaluationScores`
-- Every `DecisionRecommendation` MUST have `winRationale`, >= 1 Scenario, >= 1 Risk
-
-### Evaluator Hard Gate (10 rejection criteria)
-The evaluator is the ONLY agent that can set `isComplete: true`. Rules R1-R10
-enforce: no low-tier-only evidence, no unresolved contradictions, no missing links,
-no stale evidence, no blurred provenance, no missing rationale. See `.claude/agents/evaluator.md`.
-
-### Simulation Policy Separation
-- Scoring rubric: `docs/scoring-rubric.md` (standalone, 7 dimensions with 1-5 definitions)
-- Contradiction classification: resolvable / evidence-gap / irreconcilable
-- Revision triggers, split/discard criteria, stopping conditions — all in rubric
-- Simulator references rubric; does not embed policy
+- `isBlueprintReady()` — blocks blueprints that failed evaluator gate
 
 ---
 
-## Report Templates
+## DevCon 5 Principles (Mandatory Application)
 
-Templates in `reports/` provide consistent output structure:
+Every research session must apply these principles from §DC5-05:
 
-| Template | Purpose |
-|----------|---------|
-| `final-report.md` | Complete 13-section decision-support output |
-| `scenario-matrix.md` | Side-by-side scenario comparison table |
-| `tradeoff-analysis.md` | Dimension-by-dimension option comparison |
-| `next-experiments.md` | Prioritized list of experiments to reduce uncertainty |
+### 1. Domain-Driven Design (DDD)
+- Objects represent real-world things 1:1 (virtual twin of reality, not datasets)
+- API names must make sense to both humans and agents
+- Ontology should feel intuitive to navigate
 
----
+### 2. Don't Repeat Yourself (DRY, Rule of Three)
+- If built 3 times, refactor into shared interface or contract
+- Helps both human and agent context management
 
-## Documentation
+### 3. Open for Extension, Closed for Modification (OCP)
+- Core workflows locked; extension points open
+- Composition over inheritance (multi-inheritance interfaces)
 
-Architecture and methodology docs in `docs/`:
+### 4. Producer Extends, Consumer Super (PECS)
+- Plug-and-play ontology through covariant/contravariant interfaces
+- Flexibility in workflows and functions
 
-| Doc | Covers |
-|-----|--------|
-| `architecture.md` | System architecture, pipeline flow, agent coordination |
-| `browse-workflow.md` | Detailed browse protocol with examples |
-| `ontology-mapping-rules.md` | How to map research findings to ontology concepts |
-| `simulation-methodology.md` | Scenario generation, revision rounds, scoring |
-| `governance-security.md` | Provenance, access control, validation governance |
+### 3-Phase Implementation Journey (§DC5-04)
+1. **Golden Tables** — data integration, get sources right
+2. **Operational Decision-Making** — encode kinetics via D/L/A
+3. **AI-First** — layer LLMs and automation atop captured kinetics

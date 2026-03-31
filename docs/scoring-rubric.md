@@ -85,6 +85,39 @@ How stable and well-supported is the technology stack?
 | 2 | Early — limited production use, API may change |
 | 1 | Experimental — pre-1.0, no stability guarantees |
 
+### 8. D/L/A Fit
+How clean is the DATA/LOGIC/ACTION domain classification?
+
+| Score | Definition |
+|-------|-----------|
+| 5 | All concepts cleanly assigned; no transition-zone ambiguity; all 5 domains covered |
+| 4 | Most concepts clear; minor transition-zone items flagged; 4+ domains covered |
+| 3 | Core D/L/A is clear but Security or Learn domains missing or thin |
+| 2 | Significant domain confusion; objects misclassified or untagged |
+| 1 | No D/L/A classification attempted; ontology mapping missing |
+
+### 9. ForwardProp Health
+Is the ontology→contract→backend→frontend propagation chain healthy?
+
+| Score | Definition |
+|-------|-----------|
+| 5 | Full chain documented; runtime names match ontology; APIs match query/action surfaces |
+| 4 | Chain mostly complete; minor gaps in frontend binding |
+| 3 | Backend propagation healthy; frontend derivation unclear |
+| 2 | Significant gaps; runtime names diverge from ontology |
+| 1 | No propagation chain designed; ontology disconnected from runtime |
+
+### 10. Agent Composability
+Can agents compose ontology-based tools for this architecture?
+
+| Score | Definition |
+|-------|-----------|
+| 5 | Actions, functions, queries all composable by agents; security applies uniformly |
+| 4 | Most operations agent-composable; minor manual-only gaps |
+| 3 | Core operations composable; complex workflows require human orchestration |
+| 2 | Limited composability; agents need custom integration per operation |
+| 1 | No agent composability considered; all operations require human execution |
+
 ---
 
 ## Contradiction Classification
