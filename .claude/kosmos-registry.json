@@ -1,0 +1,70 @@
+{
+  "version": "2.0.0",
+  "description": "Kosmos Agent Registry — SSoT for all enforcement hooks. Add agents/phases here, zero hook code changes.",
+  "phases": [
+    { "tag": "INTAKE",       "order": 1, "dependsOn": [] },
+    { "tag": "RESEARCH-INT", "order": 2, "dependsOn": ["INTAKE"] },
+    { "tag": "RESEARCH-EXT", "order": 2, "dependsOn": ["INTAKE"] },
+    { "tag": "ONTOLOGY",     "order": 3, "dependsOn": ["RESEARCH-INT", "RESEARCH-EXT"] },
+    { "tag": "HYPOTHESIS",   "order": 4, "dependsOn": ["ONTOLOGY"] },
+    { "tag": "SIMULATION",   "order": 5, "dependsOn": ["HYPOTHESIS"] },
+    { "tag": "PROTOTYPE",    "order": 6, "dependsOn": ["SIMULATION"] },
+    { "tag": "EVAL-GATE",    "order": 7, "dependsOn": ["PROTOTYPE"] },
+    { "tag": "EVALUATE",     "order": 8, "dependsOn": ["EVAL-GATE"] },
+    { "tag": "BLUEPRINT",    "order": 9, "dependsOn": ["EVALUATE"] },
+    { "tag": "REPORT",       "order": 9, "dependsOn": ["EVALUATE"] }
+  ],
+  "agents": {
+    "researcher": {
+      "allowedTags": ["RESEARCH-INT", "RESEARCH-EXT"],
+      "writablePaths": ["ontology-state/source-map.json"],
+      "notifyOnComplete": ["ontologist"],
+      "model": "sonnet"
+    },
+    "ontologist": {
+      "allowedTags": ["ONTOLOGY"],
+      "writablePaths": ["ontology-state/world-model.json"],
+      "notifyOnComplete": ["simulator"],
+      "model": "sonnet"
+    },
+    "simulator": {
+      "allowedTags": ["HYPOTHESIS", "SIMULATION"],
+      "writablePaths": ["ontology-state/scenarios.json"],
+      "notifyOnComplete": ["prototyper"],
+      "model": "sonnet"
+    },
+    "prototyper": {
+      "allowedTags": ["PROTOTYPE"],
+      "writablePaths": ["prototype/**", "ontology-state/eval-results.json"],
+      "notifyOnComplete": ["eval-runner"],
+      "model": "sonnet"
+    },
+    "eval-runner": {
+      "allowedTags": ["EVAL-GATE"],
+      "writablePaths": ["prototype/tests/**", "ontology-state/eval-results.json"],
+      "notifyOnComplete": ["evaluator"],
+      "model": "sonnet"
+    },
+    "evaluator": {
+      "allowedTags": ["EVALUATE"],
+      "writablePaths": ["ontology-state/decision-log.json", "ontology-state/eval-results.json"],
+      "notifyOnComplete": ["reporter"],
+      "debateParticipants": ["simulator", "ontologist"],
+      "model": "opus"
+    },
+    "reporter": {
+      "allowedTags": ["BLUEPRINT", "REPORT"],
+      "writablePaths": ["ontology-state/blueprint.json", "reports/**"],
+      "notifyOnComplete": [],
+      "model": "sonnet"
+    }
+  },
+  "stateFiles": {
+    "decision-log":  { "path": "ontology-state/decision-log.json",  "requiredAfter": ["INTAKE"] },
+    "source-map":    { "path": "ontology-state/source-map.json",    "requiredAfter": ["RESEARCH-INT", "RESEARCH-EXT"] },
+    "world-model":   { "path": "ontology-state/world-model.json",   "requiredAfter": ["ONTOLOGY"] },
+    "scenarios":     { "path": "ontology-state/scenarios.json",     "requiredAfter": ["SIMULATION"] },
+    "eval-results":  { "path": "ontology-state/eval-results.json",  "requiredAfter": ["PROTOTYPE", "EVAL-GATE"] },
+    "blueprint":     { "path": "ontology-state/blueprint.json",     "requiredAfter": ["BLUEPRINT"] }
+  }
+}

@@ -32,6 +32,12 @@ import type {
   ScenarioType,
   RevisionRound,
   TechBlueprint,
+  PrototypeResult,
+  EvalType,
+  EvalCase,
+  EvalSuite,
+  FailureMode,
+  DebateRound,
 } from "./types.ts";
 
 // ─── Primitive Validators ────────────────────────────────────
@@ -49,6 +55,9 @@ const CONTRADICTION_STATUSES: ContradictionStatus[] = ["none", "detected", "reso
 const EVIDENCE_SUFFICIENCY: EvidenceSufficiency[] = ["sufficient", "partial", "insufficient"];
 const FRESHNESS_STATUSES: FreshnessStatus[] = ["current", "aging", "stale"];
 const EVIDENCE_FIT = ["strong", "moderate", "weak", "none"] as const;
+const BUILD_STATUSES = ["success", "fail", "partial"] as const;
+const EVAL_TYPES: EvalType[] = ["deterministic", "heuristic", "llm-as-judge", "runtime", "integration"];
+const DEBATE_RESOLUTIONS = ["consensus", "majority", "lead-decision", "unresolved"] as const;
 
 function isString(v: unknown): v is string {
   return typeof v === "string";
@@ -367,6 +376,85 @@ export function isRevisionRound(v: unknown): v is RevisionRound {
   );
 }
 
+// ─── Prototype / Eval / Debate Validators ───────────────
+
+export function isPrototypeResult(v: unknown): v is PrototypeResult {
+  if (typeof v !== "object" || v === null) return false;
+  const obj = v as Record<string, unknown>;
+  return (
+    hasTimestamped(obj) &&
+    isString(obj.hypothesisId) &&
+    isString(obj.worktreeBranch) &&
+    isStringArray(obj.implementedFiles) &&
+    isNumber(obj.linesOfCode) &&
+    isInEnum(obj.buildStatus, BUILD_STATUSES) &&
+    isStringArray(obj.buildErrors) &&
+    isNumber(obj.tscErrors) &&
+    isString(obj.notes)
+  );
+}
+
+export function isEvalCase(v: unknown): v is EvalCase {
+  if (typeof v !== "object" || v === null) return false;
+  const obj = v as Record<string, unknown>;
+  return (
+    hasTimestamped(obj) &&
+    isString(obj.suiteId) &&
+    isString(obj.input) &&
+    isString(obj.expectedBehavior) &&
+    (obj.actualBehavior === null || isString(obj.actualBehavior)) &&
+    typeof obj.passed === "boolean" &&
+    isInEnum(obj.evalType, EVAL_TYPES) &&
+    (obj.failureMode === null || isString(obj.failureMode))
+  );
+}
+
+export function isEvalSuite(v: unknown): v is EvalSuite {
+  if (typeof v !== "object" || v === null) return false;
+  const obj = v as Record<string, unknown>;
+  return (
+    hasTimestamped(obj) &&
+    isString(obj.hypothesisId) &&
+    isString(obj.prototypeResultId) &&
+    Array.isArray(obj.cases) &&
+    isNumber(obj.passRate) &&
+    (obj.passRate as number) >= 0 &&
+    (obj.passRate as number) <= 1 &&
+    isNumber(obj.totalCases) &&
+    Array.isArray(obj.failureModes)
+  );
+}
+
+export function isFailureMode(v: unknown): v is FailureMode {
+  if (typeof v !== "object" || v === null) return false;
+  const obj = v as Record<string, unknown>;
+  return (
+    hasTimestamped(obj) &&
+    isString(obj.pattern) &&
+    isStringArray(obj.affectedCaseIds) &&
+    isInEnum(obj.severity, SEVERITIES) &&
+    isString(obj.rootCause) &&
+    isString(obj.suggestedFix) &&
+    isInEnum(obj.domainClassification, ["data", "logic", "action", "security", "learn", "cross-cutting"])
+  );
+}
+
+export function isDebateRound(v: unknown): v is DebateRound {
+  if (typeof v !== "object" || v === null) return false;
+  const obj = v as Record<string, unknown>;
+  return (
+    hasTimestamped(obj) &&
+    isString(obj.topic) &&
+    isStringArray(obj.hypothesisIds) &&
+    isNumber(obj.round) &&
+    (obj.round as number) >= 1 &&
+    Array.isArray(obj.positions) &&
+    isInEnum(obj.resolution, DEBATE_RESOLUTIONS) &&
+    isString(obj.resolutionSummary) &&
+    typeof obj.triggeredRevision === "boolean"
+  );
+}
+
 /**
  * Strict validator: ensures a DecisionRecommendation is complete
  * and ready for final output. Incomplete recommendations MUST NOT
@@ -467,6 +555,11 @@ export type ValidatorMap = {
   OntologyObject: typeof isOntologyObject;
   RevisionRound: typeof isRevisionRound;
   TechBlueprint: typeof isTechBlueprint;
+  PrototypeResult: typeof isPrototypeResult;
+  EvalCase: typeof isEvalCase;
+  EvalSuite: typeof isEvalSuite;
+  FailureMode: typeof isFailureMode;
+  DebateRound: typeof isDebateRound;
 };
 
 export const validators: ValidatorMap = {
@@ -487,4 +580,9 @@ export const validators: ValidatorMap = {
   OntologyObject: isOntologyObject,
   RevisionRound: isRevisionRound,
   TechBlueprint: isTechBlueprint,
+  PrototypeResult: isPrototypeResult,
+  EvalCase: isEvalCase,
+  EvalSuite: isEvalSuite,
+  FailureMode: isFailureMode,
+  DebateRound: isDebateRound,
 };

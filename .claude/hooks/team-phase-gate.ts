@@ -52,6 +52,69 @@ async function main() {
     process.exit(0);
   }
 
+  // --- REGISTRY: Load registry for role-tag + dependency checks ---
+  const registryPath = resolve(PROJECT_ROOT, ".claude/kosmos-registry.json");
+  let registry: any = null;
+  try {
+    registry = JSON.parse(readFileSync(registryPath, "utf-8"));
+  } catch { /* registry not found — skip validation */ }
+
+  // --- REGISTRY: Role-tag matching ---
+  const teammateName = input.teammate_name;
+  if (registry && teammateName) {
+    const agent = registry.agents?.[teammateName];
+    if (agent) {
+      const allowedTags: string[] = agent.allowedTags || [];
+      const tagMatch = (input.task_subject || "").match(/\[([A-Z_-]+)\]/i);
+      if (tagMatch) {
+        const tag = tagMatch[1].toUpperCase();
+        if (!allowedTags.map((t: string) => t.toUpperCase()).includes(tag)) {
+          fail(
+            `Role mismatch: ${teammateName} can only complete [${allowedTags.join(", ")}] tasks, not [${tag}]`
+          );
+        }
+      }
+    }
+  }
+
+  // --- REGISTRY: Dependency chain verification ---
+  if (registry) {
+    const tagMatch = (input.task_subject || "").match(/\[([A-Z_-]+)\]/i);
+    if (tagMatch) {
+      const tag = tagMatch[1].toUpperCase();
+      const phase = (registry.phases || []).find(
+        (p: any) => p.tag.toUpperCase() === tag
+      );
+      if (phase && Array.isArray(phase.dependsOn)) {
+        const stateFiles = registry.stateFiles || {};
+        for (const depTag of phase.dependsOn as string[]) {
+          for (const fileInfo of Object.values(stateFiles)) {
+            const info = fileInfo as any;
+            if (
+              Array.isArray(info.requiredAfter) &&
+              (info.requiredAfter as string[]).map((t) => t.toUpperCase()).includes(depTag.toUpperCase())
+            ) {
+              const filePath = resolve(PROJECT_ROOT, info.path);
+              if (!existsSync(filePath)) {
+                fail(
+                  `Dependency chain BLOCKED: [${tag}] depends on [${depTag}], ` +
+                  `but required state file "${info.path}" does not exist.`
+                );
+              }
+              const content = readFileSync(filePath, "utf-8").trim();
+              if (!content) {
+                fail(
+                  `Dependency chain BLOCKED: [${tag}] depends on [${depTag}], ` +
+                  `but required state file "${info.path}" is empty.`
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   // --- RESEARCHER phase gate ---
   if (subject.includes("[research")) {
     const sourceMapPath = resolve(STATE_DIR, "source-map.json");
@@ -106,10 +169,18 @@ async function main() {
     const scenarioList = (scenarios as any).scenarios;
     if (Array.isArray(scenarioList)) {
       for (const s of scenarioList) {
-        if (!Array.isArray(s.evaluationScores) || s.evaluationScores.length < 10) {
+        // evaluationScores may be an array [{dimension, score}] (new format)
+        // or an object {dimensionKey: score} (legacy format) — accept both
+        const scores = s.evaluationScores;
+        const scoreCount = Array.isArray(scores)
+          ? scores.length
+          : scores && typeof scores === "object"
+          ? Object.keys(scores).length
+          : 0;
+        if (scoreCount < 10) {
           fail(
             `Phase gate BLOCKED: Scenario "${s.name || s.id}" has ` +
-            `${s.evaluationScores?.length || 0}/10 evaluation dimensions. ` +
+            `${scoreCount}/10 evaluation dimensions. ` +
             "All 10 dimensions are required (including D/L/A Fit, ForwardProp Health, Agent Composability)."
           );
         }
@@ -133,6 +204,59 @@ async function main() {
         "Phase gate BLOCKED: decision-log.json must have evaluatorGateResult " +
         "set to 'ACCEPT' or 'REJECT'. Run all R1-R13 criteria before completing."
       );
+    }
+  }
+
+  // --- PROTOTYPER phase gate ---
+  if (subject.includes("[prototype")) {
+    const evalResultsPath = resolve(STATE_DIR, "eval-results.json");
+    const evalResults = readJSON(evalResultsPath);
+    if (!evalResults) {
+      fail(
+        "Phase gate BLOCKED: eval-results.json must exist after prototype tasks. " +
+        "Write PrototypeResult entries to ontology-state/eval-results.json."
+      );
+    }
+    const prototypes = (evalResults as any).prototypes;
+    if (!Array.isArray(prototypes) || prototypes.length === 0) {
+      fail(
+        "Phase gate BLOCKED: eval-results.json must have at least 1 prototype entry " +
+        "with hypothesisId, buildStatus, and implementedFiles."
+      );
+    }
+    const hasNonFail = prototypes.some((p: any) => p.buildStatus !== "fail");
+    if (!hasNonFail) {
+      fail(
+        "Phase gate BLOCKED: All prototypes have buildStatus='fail'. " +
+        "At least 1 prototype must build successfully (status 'success' or 'partial')."
+      );
+    }
+  }
+
+  // --- EVAL-GATE phase gate ---
+  if (subject.includes("[eval-gate") || subject.includes("[eval_gate")) {
+    const evalResultsPath = resolve(STATE_DIR, "eval-results.json");
+    const evalResults = readJSON(evalResultsPath);
+    if (!evalResults) {
+      fail(
+        "Phase gate BLOCKED: eval-results.json must exist after eval tasks. " +
+        "Write EvalSuite entries to ontology-state/eval-results.json."
+      );
+    }
+    const suites = (evalResults as any).evalSuites;
+    if (!Array.isArray(suites) || suites.length === 0) {
+      fail(
+        "Phase gate BLOCKED: eval-results.json must have at least 1 evalSuite " +
+        "with cases[], passRate, and totalCases."
+      );
+    }
+    for (const suite of suites) {
+      if (!suite.totalCases || suite.totalCases < 3) {
+        fail(
+          `Phase gate BLOCKED: EvalSuite "${suite.id || 'unknown'}" has ` +
+          `${suite.totalCases || 0} cases. Minimum 3 test cases required per suite.`
+        );
+      }
     }
   }
 

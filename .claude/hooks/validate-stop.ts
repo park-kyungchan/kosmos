@@ -30,6 +30,7 @@ const stateFiles = {
   sourceMap: `${PROJECT_ROOT}/ontology-state/source-map.json`,
   scenarios: `${PROJECT_ROOT}/ontology-state/scenarios.json`,
   decisionLog: `${PROJECT_ROOT}/ontology-state/decision-log.json`,
+  evalResults: `${PROJECT_ROOT}/ontology-state/eval-results.json`,
 };
 
 // Detect research session: decision-log.json must have been modified
@@ -68,7 +69,9 @@ for (const filePath of Object.values(stateFiles)) {
       (data.sources && data.sources.length > 0) ||
       (data.scenarios && data.scenarios.length > 0) ||
       (data.entries && data.entries.length > 0) ||
-      (data.questions && data.questions.length > 0);
+      (data.questions && data.questions.length > 0) ||
+      (data.prototypes && data.prototypes.length > 0) ||
+      (data.evalSuites && data.evalSuites.length > 0);
     if (hasContent) { anyStateUpdated = true; break; }
   } catch { /* skip */ }
 }
@@ -87,9 +90,10 @@ let blueprintValid = false;
 if (existsSync(blueprintPath)) {
   try {
     const bpData = JSON.parse(await Bun.file(blueprintPath).text());
+    // Accept both nested ({ blueprint: {...} }) and flat ({ projectScope: {...} }) formats
     if (
-      bpData.blueprint !== null &&
-      bpData.blueprint !== undefined
+      (bpData.blueprint !== null && bpData.blueprint !== undefined) ||
+      (bpData.projectScope !== null && bpData.projectScope !== undefined)
     ) {
       blueprintValid = true;
     }

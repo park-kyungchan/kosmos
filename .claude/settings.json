@@ -6,7 +6,20 @@
           {
             "type": "command",
             "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/inject-prior-state.ts",
-            "timeout": 5000
+            "timeout": 10,
+            "statusMessage": "Loading prior session state..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/pipeline-status-inject.ts",
+            "timeout": 5,
+            "statusMessage": "Loading pipeline status..."
           }
         ]
       }
@@ -18,7 +31,7 @@
           {
             "type": "command",
             "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/enforce-browse-protocol.ts",
-            "timeout": 5000
+            "timeout": 5
           }
         ]
       },
@@ -28,7 +41,8 @@
           {
             "type": "command",
             "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/normalize-research-question.ts",
-            "timeout": 5000
+            "timeout": 5,
+            "async": true
           }
         ]
       }
@@ -40,34 +54,33 @@
           {
             "type": "command",
             "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/post-subagent-worldmodel-check.ts",
-            "timeout": 5000
+            "timeout": 5
           },
           {
             "type": "command",
             "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/validate-agent-output.ts",
-            "timeout": 5000
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/enforce-file-ownership.ts",
+            "timeout": 5
           }
         ]
       }
     ],
-    "PostCompact": [
+    "TaskCreated": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/reinject-state-after-compact.ts",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/validate-stop.ts",
-            "timeout": 5000
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/validate-task-naming.ts",
+            "timeout": 5
           }
         ]
       }
@@ -78,7 +91,73 @@
           {
             "type": "command",
             "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/team-phase-gate.ts",
-            "timeout": 10000
+            "timeout": 15,
+            "statusMessage": "Validating phase gate..."
+          },
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/validate-teammate-comms.ts",
+            "timeout": 5,
+            "statusMessage": "Verifying downstream notification..."
+          },
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/auto-shutdown-completed.ts",
+            "timeout": 5,
+            "statusMessage": "Checking agent remaining tasks..."
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/lead-inbox-monitor.ts",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/idle-cost-guard.ts",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "prototyper",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/validate-prototype-stop.ts",
+            "timeout": 10,
+            "statusMessage": "Validating prototype artifacts..."
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/reinject-state-after-compact.ts",
+            "timeout": 10,
+            "statusMessage": "Re-injecting session state..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/validate-stop.ts",
+            "timeout": 10,
+            "statusMessage": "Validating session completeness..."
           }
         ]
       }

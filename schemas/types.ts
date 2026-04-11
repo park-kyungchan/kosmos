@@ -305,6 +305,76 @@ export interface OntologyObject extends Timestamped {
   relatedObjectIds: string[];
 }
 
+// ─── Stage 7: Prototype ─────────────────────────────────
+
+export interface PrototypeResult extends Timestamped {
+  hypothesisId: string;
+  worktreeBranch: string;
+  implementedFiles: string[];
+  linesOfCode: number;
+  buildStatus: "success" | "fail" | "partial";
+  buildErrors: string[];
+  tscErrors: number;
+  notes: string;
+}
+
+// ─── Stage 8: Eval ──────────────────────────────────────
+
+export type EvalType =
+  | "deterministic"
+  | "heuristic"
+  | "llm-as-judge"
+  | "runtime"
+  | "integration";
+
+export interface EvalCase extends Timestamped {
+  suiteId: string;
+  input: string;
+  expectedBehavior: string;
+  actualBehavior: string | null;
+  passed: boolean;
+  evalType: EvalType;
+  failureMode: string | null;
+}
+
+export interface EvalSuite extends Timestamped {
+  hypothesisId: string;
+  prototypeResultId: string;
+  cases: EvalCase[];
+  passRate: number; // 0.0 - 1.0
+  totalCases: number;
+  failureModes: FailureMode[];
+}
+
+export interface FailureMode extends Timestamped {
+  pattern: string;
+  affectedCaseIds: string[];
+  severity: Severity;
+  rootCause: string;
+  suggestedFix: string;
+  domainClassification: OntologyDomain;
+}
+
+// ─── Stage 9: Debate ────────────────────────────────────
+
+export interface DebatePosition {
+  agentName: string;
+  stance: "support" | "oppose" | "modify";
+  argument: string;
+  evidenceIds: string[];
+  proposedChange: string | null;
+}
+
+export interface DebateRound extends Timestamped {
+  topic: string;
+  hypothesisIds: string[];
+  round: number;
+  positions: DebatePosition[];
+  resolution: "consensus" | "majority" | "lead-decision" | "unresolved";
+  resolutionSummary: string;
+  triggeredRevision: boolean;
+}
+
 // ─── Blueprint Output ───────────────────────────────────
 
 export interface DesignPrinciples {

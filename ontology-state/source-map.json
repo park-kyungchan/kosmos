@@ -1,255 +1,541 @@
 {
-  "version": "0.3.1",
-  "lastUpdated": "2026-04-11T00:00:00Z",
-  "sessionId": "smoke-001",
+  "version": "0.6.0",
+  "lastUpdated": "2026-04-11T15:30:00Z",
+  "sessionId": "jsxgraph-sequencer-001",
   "sources": [
-    { "id": "src-rt-01", "title": "R3F Introduction (carried from bench-002)", "url": "https://r3f.docs.pmnd.rs/getting-started/introduction", "retrievedAt": "2026-03-23T14:05:00Z", "provenance": "official", "tier": "tier-1-official-docs", "domain": "technology", "summary": "R3F v9.5.0 for React 19, native reconciler, WebGL2 default", "markers": [], "reliability": "high", "freshnessDate": "2026-03-01" },
-    { "id": "src-rt-02", "title": "COPPA Rule (16 CFR Part 312)", "url": "https://www.ftc.gov/legal-library/browse/rules/childrens-online-privacy-protection-rule-coppa", "retrievedAt": "2026-03-23T14:10:00Z", "provenance": "official", "tier": "tier-1-official-docs", "domain": "governance", "summary": "COPPA applies to operators collecting personal info from under-13. Amended 2025, compliance deadline April 22, 2026.", "markers": [], "reliability": "high", "freshnessDate": "2025-04-22" },
-    { "id": "src-rt-03", "title": "COPPA 2025 Amendment (Federal Register)", "url": "https://www.federalregister.gov/documents/2025/04/22/2025-05904/childrens-online-privacy-protection-rule", "retrievedAt": "2026-03-23T17:05:00Z", "provenance": "official", "tier": "tier-1-official-docs", "domain": "governance", "summary": "Major COPPA overhaul: expanded PI definition, data retention limits, enhanced Internal Operations Exception disclosure. Compliance deadline April 22, 2026.", "markers": [], "reliability": "high", "freshnessDate": "2025-04-22" },
-    { "id": "src-rt-04", "title": "Palantir Digital Twin — LEARN Mechanisms", "url": null, "filePath": "~/.claude/research/palantir/philosophy/digital-twin.md", "retrievedAt": "2026-03-23T17:05:00Z", "provenance": "official", "tier": "tier-1-official-docs", "domain": "architecture", "summary": "§PHIL.DT-07: LEARN-01 (write-back), LEARN-02 (eval feedback), LEARN-03 (outcome tracking). LEARN stores outcomes as DATA — in this context, regulated children's data.", "markers": ["§PHIL.DT-07"], "reliability": "high", "freshnessDate": "2026-03-22" },
-    { "id": "src-rt-05", "title": "Palantir Security — Four-Layer Model", "url": null, "filePath": "~/.claude/research/palantir/security/README.md", "retrievedAt": "2026-03-23T17:05:00Z", "provenance": "official", "tier": "tier-1-official-docs", "domain": "architecture", "summary": "§SEC.R-02: RBAC (Layer 1) + Markings (Layer 2) + Object-Level (Layer 3) + Policies (Layer 4). Maps to teacher/student role separation.", "markers": ["§SEC.R-02"], "reliability": "high", "freshnessDate": "2026-03-22" },
-    { "id": "src-rt-06", "title": "16 CFR 312.2 — COPPA Personal Information Definition", "url": "https://www.law.cornell.edu/cfr/text/16/312.2", "retrievedAt": "2026-03-23T17:30:00Z", "provenance": "official", "tier": "tier-1-official-docs", "domain": "governance", "summary": "11 categories of personal information. Student name (Cat 1) + persistent identifier/login (Cat 7) + scores combined with identifier (Cat 11) = PI.", "markers": [], "reliability": "high", "freshnessDate": "2025-04-22" },
-    { "id": "src-rt-07", "title": "34 CFR 99.31 — FERPA School Official Exception", "url": "https://www.law.cornell.edu/cfr/text/34/99.31", "retrievedAt": "2026-03-23T17:30:00Z", "provenance": "official", "tier": "tier-1-official-docs", "domain": "governance", "summary": "EdTech vendor qualifies as school official if: (1) performs institutional service, (2) under direct control of school re: records, (3) subject to redisclosure restrictions. 'Direct control' not precisely defined.", "markers": [], "reliability": "high", "freshnessDate": "2025-04-22" },
-    { "id": "src-rt-08", "title": "Wiley Law — COPPA 2025 Final Rule Analysis", "url": "https://www.wiley.law/alert-FTC-Adopts-Amended-Childrens-Online-Protection-Act-Rule", "retrievedAt": "2026-03-23T17:30:00Z", "provenance": "official", "tier": "tier-2-release-notes", "domain": "governance", "summary": "CRITICAL: School consent provisions were proposed in Dec 2023 NPRM but NOT codified in 2025 final rule. FTC deferred to anticipated DOE FERPA updates.", "markers": [], "reliability": "high", "freshnessDate": "2025-05-01" },
-    { "id": "src-rt-09", "title": "Clever — Compliance Documentation", "url": "https://www.clever.com/trust/compliance", "retrievedAt": "2026-03-23T17:30:00Z", "provenance": "official", "tier": "tier-1-official-docs", "domain": "technology", "summary": "Clever holds COPPA Safe Harbor certification from iKeepSafe. Operates as FERPA school official. Places consent responsibility on school.", "markers": [], "reliability": "high", "freshnessDate": "2026-03-01" },
-    { "id": "src-rt-10", "title": "Google Workspace for Education — Privacy FAQ", "url": "https://edu.google.com/intl/ALL_us/our-values/privacy-security/frequently-asked-questions/", "retrievedAt": "2026-03-23T17:30:00Z", "provenance": "official", "tier": "tier-1-official-docs", "domain": "technology", "summary": "Google claims COPPA+FERPA support for Core Services. School provides consent on parents' behalf. But third-party apps using Firebase are NOT covered by Google's compliance.", "markers": [], "reliability": "high", "freshnessDate": "2026-01-01" },
-    { "id": "src-rt-11", "title": "Convex Pricing + Compliance", "url": "https://www.convex.dev/pricing", "retrievedAt": "2026-03-23T17:40:00Z", "provenance": "official", "tier": "tier-1-official-docs", "domain": "technology", "summary": "Free tier: 1M calls/mo, 0.5GB DB. SOC 2 Type II: YES. COPPA: NO explicit certification or documentation. Startup program: up to 1yr free Professional.", "markers": [], "reliability": "high", "freshnessDate": "2026-03-01" },
-    { "id": "src-rt-12", "title": "Firebase COPPA Configuration", "url": "https://cloud.google.com/security/compliance/coppa", "retrievedAt": "2026-03-23T17:40:00Z", "provenance": "official", "tier": "tier-1-official-docs", "domain": "technology", "summary": "Firebase is the ONLY BaaS with explicit COPPA documentation. Developers MUST disable Analytics/Crashlytics/AdID for child-directed apps. Firebase SDK does NOT automatically make app COPPA-compliant.", "markers": [], "reliability": "high", "freshnessDate": "2026-03-01" },
     {
-      "id": "src-s1-01",
-      "title": "Palantir DevCon 5 — §DC5-05 Four Ontology Design Principles",
-      "url": null,
-      "filePath": "~/.claude/research/palantir/platform/devcon.md",
-      "retrievedAt": "2026-04-11T00:00:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "architecture",
-      "summary": "§DC5-05: Four design principles for ontology (= software for the organization): DDD, DRY (rule of three), OCP (open-closed), PECS. Applicable to state schema design.",
-      "markers": ["§DC5-05"],
-      "reliability": "high",
-      "freshnessDate": "2026-03-22"
-    },
-    {
-      "id": "src-s1-02",
-      "title": "Palantir DevCon 5 — §DC5-06 Ontology Primitives That Matter",
-      "url": null,
-      "filePath": "~/.claude/research/palantir/platform/devcon.md",
-      "retrievedAt": "2026-04-11T00:00:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "architecture",
-      "summary": "§DC5-06: Primitives — Interfaces (polymorphism), Structs (compound data), Reducers (canonical focus value + history), Derived Properties (business logic near ontology), Object-backed Link Types. Reducers directly model stateful aggregation.",
-      "markers": ["§DC5-06"],
-      "reliability": "high",
-      "freshnessDate": "2026-03-22"
-    },
-    {
-      "id": "src-s1-03",
-      "title": "Bun Official Docs — File I/O APIs (Bun.file, Bun.write, FileSink)",
-      "url": "https://context7.com/oven-sh/bun/llms.txt",
-      "retrievedAt": "2026-04-11T00:00:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "technology",
-      "summary": "Bun.file(path) returns lazy BunFile (Blob subtype). Bun.write() writes via optimized syscalls. FileSink API for incremental writes. JSON importable as module or via .json(). All APIs natively TypeScript without transpilation.",
-      "markers": [],
-      "reliability": "high",
-      "freshnessDate": "2026-04-01"
-    },
-    {
-      "id": "src-s1-04",
-      "title": "TypeScript Schema Validation Comparison 2026 — Zod vs Valibot vs TypeBox",
-      "url": "https://pockit.tools/blog/zod-valibot-arktype-comparison-2026/",
-      "retrievedAt": "2026-04-11T00:00:00Z",
-      "provenance": "synthesis",
-      "tier": "tier-3-vendor-blogs",
-      "domain": "technology",
-      "summary": "TypeBox+Ajv ~8ms, Valibot ~85ms, Zod v4 ~180ms for 100k iterations. Valibot bundle ~1.37KB vs Zod ~17.7KB for simple schemas. TypeBox outputs JSON Schema (OpenAPI-compatible). Zod most ergonomic for simple cases.",
-      "markers": [],
-      "reliability": "medium",
-      "freshnessDate": "2026-01-01"
-    }
-  ],
-  "claims": [
-    { "id": "c-rt-01", "text": "Student name/ID + scores + session data stored server-side = personal information under COPPA", "isAtomic": true, "sourceId": "src-rt-02", "provenance": "official", "confidence": 0.99, "domain": "governance", "contradictedBy": [], "supportedBy": [], "retrievedDate": "2026-03-23", "freshnessStatus": "current" },
-    { "id": "c-rt-02", "text": "COPPA 2025 compliance deadline is April 22, 2026 (~1 month from now)", "isAtomic": true, "sourceId": "src-rt-03", "provenance": "official", "confidence": 0.99, "domain": "governance", "contradictedBy": [], "supportedBy": [], "retrievedDate": "2026-03-23", "freshnessStatus": "current" },
-    { "id": "c-rt-03", "text": "Schools MAY provide COPPA consent on behalf of parents for educational purposes — but exact conditions and limitations are unclear without legal review", "isAtomic": true, "sourceId": "src-rt-02", "provenance": "inference", "confidence": 0.60, "domain": "governance", "contradictedBy": [], "supportedBy": [], "retrievedDate": "2026-03-23", "freshnessStatus": "current" },
-    { "id": "c-rt-04", "text": "FERPA likely applies to EdTech vendors storing student education records — requires data use agreement with school", "isAtomic": true, "sourceId": "src-rt-02", "provenance": "inference", "confidence": 0.70, "domain": "governance", "contradictedBy": [], "supportedBy": [], "retrievedDate": "2026-03-23", "freshnessStatus": "current" },
-    { "id": "c-rt-05", "text": "Developer/operator of EdTech app is the COPPA operator regardless of which BaaS is used — BaaS is processor only", "isAtomic": true, "sourceId": "src-rt-02", "provenance": "inference", "confidence": 0.85, "domain": "governance", "contradictedBy": [], "supportedBy": [], "retrievedDate": "2026-03-23", "freshnessStatus": "current" },
-    { "id": "c-rt-06", "text": "COPPA compliance for EdTech collecting children's data requires AT MINIMUM: privacy policy, consent mechanism, data retention limits, data deletion capability, breach notification plan", "isAtomic": true, "sourceId": "src-rt-02", "provenance": "inference", "confidence": 0.80, "domain": "governance", "contradictedBy": [], "supportedBy": [], "retrievedDate": "2026-03-23", "freshnessStatus": "current" },
-    {
-      "id": "c-s1-01",
-      "text": "Palantir DevCon 5 defines four ontology design principles: DDD (Domain-Driven Design), DRY (rule of three), OCP (Open-Closed), PECS (Producer Extends Consumer Super)",
-      "isAtomic": true,
-      "sourceId": "src-s1-01",
-      "provenance": "official",
-      "confidence": 0.99,
-      "domain": "LOGIC",
-      "domainTag": "L",
-      "contradictedBy": [],
-      "supportedBy": [],
-      "retrievedDate": "2026-04-11",
-      "freshnessStatus": "current",
-      "markerCitations": ["§DC5-05"]
-    },
-    {
-      "id": "c-s1-02",
-      "text": "DRY principle in ontology design = 'rule of three' — abstract a pattern only after it has been repeated at least 3 times",
-      "isAtomic": true,
-      "sourceId": "src-s1-01",
-      "provenance": "official",
-      "confidence": 0.95,
-      "domain": "LOGIC",
-      "domainTag": "L",
-      "contradictedBy": [],
-      "supportedBy": [],
-      "retrievedDate": "2026-04-11",
-      "freshnessStatus": "current",
-      "markerCitations": ["§DC5-05"]
-    },
-    {
-      "id": "c-s1-03",
-      "text": "Reducers are an ontology primitive that collapse multi-value property histories into a canonical focus value while preserving full history",
-      "isAtomic": true,
-      "sourceId": "src-s1-02",
-      "provenance": "official",
-      "confidence": 0.97,
-      "domain": "LOGIC",
-      "domainTag": "L",
-      "contradictedBy": [],
-      "supportedBy": [],
-      "retrievedDate": "2026-04-11",
-      "freshnessStatus": "current",
-      "markerCitations": ["§DC5-06"],
-      "note": "Directly applicable to file-based state management: current state (focus value) + audit log (preserved history)"
-    },
-    {
-      "id": "c-s1-04",
-      "text": "Bun.file(path) returns a BunFile (extends Blob) that is lazily loaded — no disk read occurs until .text(), .json(), .arrayBuffer(), .bytes(), or .stream() is called",
-      "isAtomic": true,
-      "sourceId": "src-s1-03",
-      "provenance": "official",
-      "confidence": 0.99,
-      "domain": "DATA",
-      "domainTag": "D",
-      "contradictedBy": [],
-      "supportedBy": [],
-      "retrievedDate": "2026-04-11",
-      "freshnessStatus": "current"
-    },
-    {
-      "id": "c-s1-05",
-      "text": "Bun.write(path, data) writes to file system using optimized system calls and supports strings, JSON-serialized objects, Blob instances, and HTTP Response bodies",
-      "isAtomic": true,
-      "sourceId": "src-s1-03",
-      "provenance": "official",
-      "confidence": 0.99,
+      "id": "src-jxg-api-docs",
+      "title": "JSXGraph 1.12.2 API Reference",
+      "url": "https://jsxgraph.org/docs/index.html",
+      "tier": "tier-1",
       "domain": "ACTION",
-      "domainTag": "A",
-      "contradictedBy": [],
-      "supportedBy": [],
-      "retrievedDate": "2026-04-11",
-      "freshnessStatus": "current"
+      "provenance": "[Official]",
+      "summary": "Full API reference for JSXGraph 1.12.2. Confirms element types: CurveIntersection, Derivative, Tracecurve, Intersection, Functiongraph, Glider. JXG.Math.Numerics contains generalizedNewton and chandrupatla root-finding algorithms used internally.",
+      "markers": ["jxg-api-v1.12.2"],
+      "claims": [
+        {
+          "id": "claim-001",
+          "text": "JSXGraph 1.12.2 has a Derivative element that computes the numerical derivative of any JXG.Curve, including functiongraph. Usage: board.create('derivative', [curve], {dash: 2})",
+          "confidence": 0.99,
+          "domain": "DATA"
+        },
+        {
+          "id": "claim-002",
+          "text": "JSXGraph CurveIntersection creates the REGION intersection of two closed paths (Curve/Polygon/Circle), not individual intersection points. Usage: board.create('curveintersection', [curve1, curve2], {fillColor: 'yellow', fillOpacity: 0.6})",
+          "confidence": 0.99,
+          "domain": "DATA"
+        },
+        {
+          "id": "claim-003",
+          "text": "JSXGraph Tracecurve traces the locus of a point as a Glider sweeps its constraint. Usage: board.create('tracecurve', [glider, tracedPoint]). numberPoints field controls curve resolution. LIMITATION: mover must be a Glider, not a freely dragged functiongraph.",
+          "confidence": 0.99,
+          "domain": "DATA"
+        },
+        {
+          "id": "claim-004",
+          "text": "JXG.Math.Numerics provides: generalizedNewton(c1, c2, t1ini, t2ini), generalizedDampedNewtonCurves(c1, c2, t1ini, t2ini, gamma, eps), root(f, x) as chandrupatla alias, Newton(f, x) for single-variable root-finding. JSXGraph uses these internally for the intersection element.",
+          "confidence": 0.99,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-005",
+          "text": "board.reducedUpdate property: 'If reducedUpdate is set to true then only the dragged element and few (dependent) elements are updated.' Critical for 60fps with 10+ elements.",
+          "confidence": 0.99,
+          "domain": "ACTION"
+        },
+        {
+          "id": "claim-006",
+          "text": "board.minimizeReflow attribute changes the redraw strategy in the SVG rendering engine. Available as board-level configuration for performance tuning.",
+          "confidence": 0.95,
+          "domain": "ACTION"
+        },
+        {
+          "id": "claim-007",
+          "text": "board.isSuspendedRedraw: flag set to true when suspendUpdate() is active, skipping all redraws until unsuspendUpdate() is called.",
+          "confidence": 0.99,
+          "domain": "ACTION"
+        },
+        {
+          "id": "claim-008",
+          "text": "Board modes: BOARD_MODE_DRAG (during drag, objects not highlighted), BOARD_MODE_NONE (normal), BOARD_MODE_MOVE_ORIGIN (panning). board.mouse references the currently dragged object.",
+          "confidence": 0.99,
+          "domain": "ACTION"
+        }
+      ]
     },
     {
-      "id": "c-s1-06",
-      "text": "Bun.file(path).writer() returns a FileSink with .write(), .flush(), .end() for incremental/streaming writes — suitable for append-only state logs",
-      "isAtomic": true,
-      "sourceId": "src-s1-03",
-      "provenance": "official",
-      "confidence": 0.97,
+      "id": "src-jxg-releases",
+      "title": "JSXGraph GitHub Releases (v1.9.0-v1.12.2)",
+      "url": "https://github.com/jsxgraph/jsxgraph/releases",
+      "tier": "tier-1",
       "domain": "ACTION",
-      "domainTag": "A",
-      "contradictedBy": [],
-      "supportedBy": [],
-      "retrievedDate": "2026-04-11",
-      "freshnessStatus": "current"
+      "provenance": "[Official]",
+      "summary": "Release notes confirm: v1.12.1 increased precision for intersections of curves with curves or lines (BREAKING CHANGE WARNING). v1.11.0 added CSS class binding to elements enabling SVG filters. v1.9.0 overhauled otherintersection to support forbidden intersection arrays.",
+      "markers": ["jxg-releases"],
+      "claims": [
+        {
+          "id": "claim-009",
+          "text": "JSXGraph v1.12.1 release: 'Increased precision for intersections (points) of curves with curves or lines.' The intersection algorithm for curves was changed — may affect existing constructions. This confirms the Intersection element supports functiongraph inputs with individual POINTS.",
+          "confidence": 0.99,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-010",
+          "text": "JSXGraph v1.11.0: 'ability to pass the hosting element as a parameter to functions given as values of attributes' — enables context-aware attribute callbacks on any element. Also: CSS classes can now be bound to all JSXGraph elements, enabling SVG filter integration.",
+          "confidence": 0.99,
+          "domain": "ACTION"
+        },
+        {
+          "id": "claim-011",
+          "text": "JSXGraph v1.9.0: otherintersection element overhauled — 'Now it is possible to supply an array of points as forbidden intersection points. This makes it very convenient to visualize situations where more than two intersections arise.' Relevant for multiple functiongraph intersections.",
+          "confidence": 0.99,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-012",
+          "text": "JSXGraph v1.12.2 is identical to v1.12.1, only removing zip files for CDN (jsdelivr) size limits. Functional API is v1.12.1.",
+          "confidence": 0.99,
+          "domain": "DATA"
+        }
+      ]
     },
     {
-      "id": "c-s1-07",
-      "text": "TypeBox+Ajv achieves ~8ms for 100,000 iterations on complex object schemas; Valibot ~85ms; Zod v4 ~180ms; Zod v3 ~400ms",
-      "isAtomic": true,
-      "sourceId": "src-s1-04",
-      "provenance": "synthesis",
-      "confidence": 0.75,
-      "domain": "DATA",
-      "domainTag": "D",
-      "contradictedBy": [],
-      "supportedBy": [],
-      "retrievedDate": "2026-04-11",
-      "freshnessStatus": "current",
-      "note": "Benchmark source is tier-3 blog — treat as directional, not definitive"
+      "id": "src-jxg-board-events",
+      "title": "JSXGraph board.on('update') Event Pattern",
+      "url": "https://github.com/jsxgraph/jsxgraph/blob/main/examples/hypotrochoid.html",
+      "tier": "tier-1",
+      "domain": "ACTION",
+      "provenance": "[Official]",
+      "summary": "Confirmed board.on('update', callback) fires on every board update including drag operations. Can update external HTML elements with coordinate values. Also confirmed element.on('drag/move/up/down') event system from GeometryElement.",
+      "markers": ["jxg-events"],
+      "claims": [
+        {
+          "id": "claim-013",
+          "text": "board.on('update', function(){ /* read element coords, update labels */ }) fires on every board update. Inside callback, p.X() and p.Y() return current coordinates. Example: board.on('update', function(){ document.getElementById('D').value = g4.X(); })",
+          "confidence": 0.99,
+          "domain": "ACTION"
+        },
+        {
+          "id": "claim-014",
+          "text": "GeometryElement events: 'attribute', 'attribute:key', 'down', 'drag', 'move', 'up', 'over', 'out'. All elements including functiongraph inherit these via JXG.EventEmitter.",
+          "confidence": 0.99,
+          "domain": "ACTION"
+        },
+        {
+          "id": "claim-015",
+          "text": "JXG.addEvent(element.rendNode, 'mouseover', callback, element) works with SVG/VML renderer only. JSXGraph's native .on() system works with Canvas renderer too.",
+          "confidence": 0.99,
+          "domain": "ACTION"
+        }
+      ]
     },
     {
-      "id": "c-s1-08",
-      "text": "Valibot bundle size ~1.37KB vs Zod ~17.7KB for a simple login-form schema — ~90% reduction due to modular tree-shaking architecture",
-      "isAtomic": true,
-      "sourceId": "src-s1-04",
-      "provenance": "synthesis",
-      "confidence": 0.80,
+      "id": "src-jxg-dynamic-text",
+      "title": "JSXGraph Dynamic Text and Draggable Function Patterns",
+      "url": "https://jsxgraph.uni-bayreuth.de/wiki/index.php/Draggable_exponential_function",
+      "tier": "tier-1",
       "domain": "DATA",
-      "domainTag": "D",
-      "contradictedBy": [],
-      "supportedBy": [],
-      "retrievedDate": "2026-04-11",
-      "freshnessStatus": "current"
+      "provenance": "[Official]",
+      "summary": "Dynamic text bound to function coordinates: board.create('text', [xFn, y, contentFn]). Draggable functiongraph defined as function of draggable point's coordinates: auto-updates all dependents via JSXGraph's native dependency system.",
+      "markers": ["jxg-dynamic-text", "jxg-drag-pattern"],
+      "claims": [
+        {
+          "id": "claim-016",
+          "text": "Dynamic text pattern: board.create('text', [function(){ return p.X() - 0.17; }, 2, function(){ return '$' + Math.floor(p.X() * 10) / 10 + '$'; }]) creates text that auto-updates when point p is dragged.",
+          "confidence": 0.99,
+          "domain": "DATA"
+        },
+        {
+          "id": "claim-017",
+          "text": "Draggable functiongraph via parent point: define functiongraph as function using A.X() and A.Y(), then create text reading same values. When A is dragged, JSXGraph's native dependency chain auto-updates graph + text + all dependents without manual board.update() calls.",
+          "confidence": 0.99,
+          "domain": "ACTION"
+        },
+        {
+          "id": "claim-018",
+          "text": "Opacity as a function pattern: board.create('text', [x, y, msg], { opacity: function(){ return condition ? 1 : 0; }}) enables conditional element visibility triggered by drag state.",
+          "confidence": 0.95,
+          "domain": "DATA"
+        }
+      ]
     },
     {
-      "id": "c-s1-09",
-      "text": "TypeBox generates JSON Schema-compatible output, making it the preferred choice when OpenAPI spec generation or Fastify schema integration is required",
-      "isAtomic": true,
-      "sourceId": "src-s1-04",
-      "provenance": "synthesis",
-      "confidence": 0.85,
+      "id": "src-jxg-suspend-update",
+      "title": "JSXGraph suspendUpdate/unsuspendUpdate + Locus Pattern",
+      "url": "https://jsxgraph.org/about/releases/",
+      "tier": "tier-1",
+      "domain": "ACTION",
+      "provenance": "[Official]",
+      "summary": "board.suspendUpdate() / board.unsuspendUpdate() batch update pattern confirmed in watts_curve tracecurve example. Locus element: board.createElement('locus', [point]) creates geometric locus. Intersection of geometric elements: board.createElement('intersection', [c2,c3,0]) selects index 0 of two intersection points.",
+      "markers": ["jxg-batch-update"],
+      "claims": [
+        {
+          "id": "claim-019",
+          "text": "batch update pattern: board.suspendUpdate() before creating/mutating multiple elements, board.unsuspendUpdate() after. Prevents N intermediate redraws during construction. Example from watts_curve: suspendUpdate() before 7 element creations, unsuspendUpdate() after.",
+          "confidence": 0.99,
+          "domain": "ACTION"
+        },
+        {
+          "id": "claim-020",
+          "text": "Native intersection of two circles with index selection: board.createElement('intersection', [c2, c3, 0]) returns the first intersection point, board.createElement('intersection', [c2, c3, 1]) returns the second. Index is the third argument.",
+          "confidence": 0.99,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-021",
+          "text": "Locus element: board.createElement('locus', [midpoint], {strokeColor: 'red'}) traces the geometric locus of a point as a glider moves. Different from Tracecurve: locus is computed analytically, tracecurve is sampled numerically.",
+          "confidence": 0.95,
+          "domain": "DATA"
+        }
+      ]
+    },
+    {
+      "id": "src-jxg-curve-intersection-wiki",
+      "title": "JSXGraph Wiki: Intersection of functiongraphs",
+      "url": "https://jsxgraph.uni-bayreuth.de/wiki/index.php/Intersection_of_functiongraphs",
+      "tier": "tier-1",
+      "domain": "LOGIC",
+      "provenance": "[Official]",
+      "summary": "Official wiki example shows CurveIntersection (region) for functiongraphs, NOT individual points. To get actual intersection POINTS with coordinates, must use JXG.Math.Numerics.root() with f(x)-g(x)=0, or rely on board.create('intersection', ...) which v1.12.1 improved for curve-curve.",
+      "markers": ["jxg-fg-intersection"],
+      "claims": [
+        {
+          "id": "claim-022",
+          "text": "CurveIntersection of functiongraphs creates filled intersection REGION, not POINTS. Example: board.create('curveintersection', [curve1, curve2], {fillColor:'yellow', fillOpacity:0.3}). This is useful for teaching |f(x)| fold regions or showing overlap between curves visually.",
+          "confidence": 0.99,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-023",
+          "text": "There is NO official JSXGraph wiki example for intersection POINTS of two functiongraphs. The standard approach is: (1) JXG.Math.Numerics.root(function(x){ return f(x)-g(x); }, initialGuess) to find x, then create a dependent JXG point at (x, f(x)). Or use board.create('intersection', [fg1, fg2, 0]) which v1.12.1 improved.",
+          "confidence": 0.90,
+          "domain": "LOGIC"
+        }
+      ]
+    },
+    {
+      "id": "src-jxg-glider",
+      "title": "JSXGraph Glider Element with snap and animation",
+      "url": "https://github.com/jsxgraph/jsxgraph/blob/main/examples/construct.html",
+      "tier": "tier-1",
+      "domain": "ACTION",
+      "provenance": "[Official]",
+      "summary": "Glider is a movable point constrained to a curve/line. Supports: snap-to-grid (snapsizex/snapsizey), snap-to-points (snaptopoints), animation (animateanimated, animatespeed, animatestart/stop/loop/direction), fixed mode. Can serve as drag handle for functiongraph translation.",
+      "markers": ["jxg-glider"],
+      "claims": [
+        {
+          "id": "claim-024",
+          "text": "Glider elements support snap-to-grid: snapsizex/snapsizey parameters. snaptopoints: true snaps to existing points. These behaviors make gliders suitable as constrained drag handles for teaching demonstrations.",
+          "confidence": 0.99,
+          "domain": "ACTION"
+        },
+        {
+          "id": "claim-025",
+          "text": "Glider infobox: showinfobox: true displays coordinate info. infoboxdigits: 'auto' controls decimal precision. This enables automatic coordinate readout during drag without custom text elements.",
+          "confidence": 0.95,
+          "domain": "DATA"
+        }
+      ]
+    },
+    {
+      "id": "src-jxg-numerics",
+      "title": "JSXGraph JXG.Math.Numerics API Reference",
+      "url": "https://jsxgraph.org/docs/symbols/JXG.Math.Numerics.html",
+      "tier": "tier-1",
+      "domain": "LOGIC",
+      "provenance": "[Official]",
+      "summary": "Full numerics API. Root-finding: chandrupatla (via root()), Newton(), fzero(). Curve intersection: generalizedNewton(c1,c2,t1ini,t2ini), generalizedDampedNewtonCurves(c1,c2,t1ini,t2ini,gamma,eps). Integration: GaussLegendre, Romberg, NewtonCotes, Qag. Path simplification: RamerDouglasPeucker.",
+      "markers": ["jxg-numerics"],
+      "claims": [
+        {
+          "id": "claim-026",
+          "text": "JXG.Math.Numerics.generalizedNewton(c1, c2, t1ini, t2ini): Compute intersection of curves c1 and c2 using generalized Newton-Raphson. t1ini, t2ini are initial parameter guesses. Returns intersection point.",
+          "confidence": 0.99,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-027",
+          "text": "JXG.Math.Numerics.root(f, x, context): abstract method for univariate root finding, alias for chandrupatla. Chandrupatla combines bisection, secant, and inverse quadratic interpolation — more robust than Newton for functions without derivatives. maxIterationsRoot configures max iterations.",
+          "confidence": 0.99,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-028",
+          "text": "For real-time functiongraph intersection during drag: use JXG.Math.Numerics.root(function(x){ return f(x) - g(x); }, lastKnownX) where lastKnownX is the previous intersection x-coordinate as warm start. This enables efficient re-rooting near the previous position.",
+          "confidence": 0.85,
+          "domain": "LOGIC",
+          "note": "[Inference] — derived from API capability, not from an official usage example for this exact pattern"
+        }
+      ]
+    },
+    {
+      "id": "src-dc5-principles",
+      "title": "DevCon 5 Ontology Design Principles and 3-Phase Journey",
+      "url": "internal://research/palantir/platform/devcon.md",
+      "tier": "tier-1",
+      "domain": "LOGIC",
+      "provenance": "[Official]",
+      "summary": "DevCon 5 (March 2026): Four design principles (DDD/DRY/OCP/PECS). 3-phase product journey: Golden Tables → Operational Decision-Making → AI-First. palantir-math Sequencer is at Phase 2. Key primitives: Interfaces, Structs, Reducers, Derived Properties, Object-Backed Link Types.",
+      "markers": ["§DC5-04", "§DC5-05", "§DC5-06"],
+      "claims": [
+        {
+          "id": "claim-029",
+          "text": "[§DC5-05] Four ontology design principles: (1) Domain-Driven Design, (2) Don't Repeat Yourself (rule of three), (3) Open for extension, closed for modification, (4) Producer Extends, Consumer Super (PECS). These ARE software design principles applied to ontology.",
+          "confidence": 0.99,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-030",
+          "text": "[§DC5-04] palantir-math Sequencer JSXGraph enhancement is at Phase 2 — Operational Decision-Making: data shapes (JSXGraphScene) exist, now encoding kinetics (real-time intersection logic, drag cascade, dependent element chain) and interactive actions (drag → update → redraw).",
+          "confidence": 0.99,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-031",
+          "text": "[§DC5-03] Real-time decision space encoding: 'fragmented enterprise data must be represented at maximum fidelity.' Applied to canvas: drag position + intersection coordinates + annotation state must be captured at every drag frame for teaching-grade fidelity.",
+          "confidence": 0.95,
+          "domain": "ACTION"
+        },
+        {
+          "id": "claim-032",
+          "text": "[§DC5-06] Key ontology primitives for canvas enhancement: Reducers (collapse multi-value drag history into canonical drag state), Derived Properties (intersection coordinates derived from functiongraph positions), Interfaces (polymorphic drag behavior across Linear/Quadratic/Abs graph families).",
+          "confidence": 0.95,
+          "domain": "LOGIC"
+        }
+      ]
+    },
+    {
+      "id": "src-arch-ontology-model",
+      "title": "Palantir Ontology Model — SENSE→DECIDE→ACT→LEARN Digital Twin",
+      "url": "internal://research/palantir/architecture/ontology-model.md",
+      "tier": "tier-1",
+      "domain": "LOGIC",
+      "provenance": "[Official]",
+      "summary": "ARCH-05: Digital Twin = SENSE → DECIDE → ACT → LEARN loop. ARCH-14/15/16: DATA/LOGIC/ACTION domain classification. ARCH-21: Schema = Contract + Instruction + Verification.",
+      "markers": ["§ARCH-05", "§ARCH-14", "§ARCH-15", "§ARCH-16"],
+      "claims": [
+        {
+          "id": "claim-033",
+          "text": "[§ARCH-05] Digital Twin: SENSE = capture drag event (element position, delta), DECIDE = compute intersection (Newton-Raphson), ACT = update canvas (label coords, ghost curve, derivative), LEARN = record interaction telemetry (drag path, intersection events). All four phases must be covered for complete JSXGraph enhancement.",
+          "confidence": 0.95,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-034",
+          "text": "[§ARCH-15] LOGIC domain = reasoning layer. IntersectionSolver, AbsValueFoldComputer, DependencyGraph, DragSemanticResolver all belong to LOGIC. They derive facts from DATA but do not persist state directly.",
+          "confidence": 0.99,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-035",
+          "text": "[§ARCH-16] ACTION domain = mutations. DragCascadeUpdate, BatchBoardUpdate, AnnotationToggle, TraceCurveRecord are ACTION-domain operations — they change the canvas reality when executed.",
+          "confidence": 0.99,
+          "domain": "ACTION"
+        }
+      ]
+    },
+    {
+      "id": "src-jxg-abs-value-fold",
+      "title": "Absolute Value Fold Visualization via Ghost Curve Pattern",
+      "url": "https://jsxgraph.org/docs/symbols/Functiongraph.html",
+      "tier": "tier-2",
+      "domain": "LOGIC",
+      "provenance": "[Synthesis]",
+      "summary": "Synthesized from JSXGraph functiongraph + CurveDifference/CurveIntersection API. |f(x)| fold visualization: create ghost curve as y = -f(x) for x where f(x)<0. Fold line at y=0. Highlight with CurveDifference for region below axis. Dynamic update via translationVector on functiongraph.",
+      "markers": ["jxg-abs-fold"],
+      "claims": [
+        {
+          "id": "claim-036",
+          "text": "[Synthesis] Absolute value visualization approach: (A) Primary curve f(x), (B) Ghost curve |f(x)| = Math.abs(f(x)), (C) Reflection guide: curve y = -f(x) for negative region (shown dashed), (D) Fold boundary: line at y=0 highlighted between x-intercepts. When f(x) translates vertically (ty parameter), all four update via shared ty closure.",
+          "confidence": 0.85,
+          "domain": "LOGIC"
+        },
+        {
+          "id": "claim-037",
+          "text": "[Synthesis] Real-time absolute value fold during drag: define absGraph = board.create('functiongraph', [function(x){ return Math.abs(f_raw(x) + ty); }]). When ty changes via drag, both f(x)+ty and |f(x)+ty| update simultaneously if both read the same ty variable.",
+          "confidence": 0.90,
+          "domain": "ACTION"
+        }
+      ]
+    },
+    {
+      "id": "src-jxg-performance",
+      "title": "JSXGraph SVG Performance: minimizeReflow + reducedUpdate",
+      "url": "https://jsxgraph.org/docs/symbols/JXG.Board.html",
+      "tier": "tier-1",
+      "domain": "ACTION",
+      "provenance": "[Official]",
+      "summary": "Board-level performance controls: reducedUpdate (only update dragged element + direct deps), minimizeReflow (SVG reflow reduction), isSuspendedRedraw (skip all redraws). Critical for 60fps with 10+ interactive elements.",
+      "markers": ["jxg-performance"],
+      "claims": [
+        {
+          "id": "claim-038",
+          "text": "JSXGraph SVG renderer performance controls: (1) board.reducedUpdate — only recompute dragged element chain, (2) board.suspendUpdate() / board.unsuspendUpdate() — batch mutations, (3) board.minimizeReflow — SVG-specific reflow reduction. All three must be considered for 10+ element 60fps target.",
+          "confidence": 0.95,
+          "domain": "ACTION"
+        },
+        {
+          "id": "claim-039",
+          "text": "[Inference] For real-time drag with 10+ elements: the critical bottleneck is the intersection recomputation on each mouse-move event. Newton-Raphson with warm start (previous intersection x as initial guess) should complete in <1ms for smooth polynomials, well within 16ms frame budget.",
+          "confidence": 0.80,
+          "domain": "ACTION"
+        }
+      ]
+    },
+    {
+      "id": "src-jxg-tracecurve-glider-constraint",
+      "title": "JSXGraph Trace Curve and Locus Patterns",
+      "url": "https://jsxgraph.uni-bayreuth.de/wiki/index.php/Trace_curve",
+      "tier": "tier-1",
       "domain": "DATA",
-      "domainTag": "D",
-      "contradictedBy": [],
-      "supportedBy": [],
-      "retrievedDate": "2026-04-11",
-      "freshnessStatus": "current"
+      "provenance": "[Official]",
+      "summary": "Tracecurve requires Glider as mover. Not directly applicable to functiongraph drag. Alternative for drag-path recording: use board.on('update') to push current position to a data array, then update a curve.dataX/dataY manually.",
+      "markers": ["jxg-trace"],
+      "claims": [
+        {
+          "id": "claim-040",
+          "text": "Tracecurve: board.create('tracecurve', [C_glider, S_dependent]) where C_glider is a Glider element and S_dependent is a point whose locus is traced. LIMITATION: C must be a Glider on a constraint. Cannot use for free drag of functiongraphs.",
+          "confidence": 0.99,
+          "domain": "DATA"
+        },
+        {
+          "id": "claim-041",
+          "text": "[Synthesis] For functiongraph drag-path recording: create a curve with empty dataX/dataY, then in board.on('update') or element.on('drag'), push current graph position to dataX/dataY arrays and call curve.update(). This gives a hand-drawn trace effect without JSXGraph-native tracecurve.",
+          "confidence": 0.85,
+          "domain": "ACTION"
+        }
+      ]
+    },
+    {
+      "id": "src-orchestration-surfaces",
+      "title": "Palantir Builder Surface Principles from Orchestration Map",
+      "url": "internal://research/palantir/architecture/orchestration-map.md",
+      "tier": "tier-1",
+      "domain": "ACTION",
+      "provenance": "[Official]",
+      "summary": "ORCH-03/ORCH-10: Builder surfaces must be explicit, not implicit. ORCH-10 rule: 'Builder surfaces are explicit, not implicit.' Applies to JSXGraph canvas: teaching annotation overlay, coordinate labels, and interaction affordances must be declared elements, not side effects.",
+      "markers": ["§ORCH-03", "§ORCH-10"],
+      "claims": [
+        {
+          "id": "claim-042",
+          "text": "[§ORCH-10] Rule: 'Builder surfaces are explicit, not implicit.' Applied to JSXGraph teaching canvas: every annotation element (coordinate label, fold line, derivative display, trace overlay) must be a declared board element with explicit lifecycle, not an ad-hoc DOM mutation.",
+          "confidence": 0.90,
+          "domain": "ACTION"
+        }
+      ]
     }
   ],
   "evidence": [
-    { "id": "ev-rt-01", "claim": "COPPA triggered by student data persistence", "sourceId": "src-rt-02", "provenance": "official", "direction": "supports", "strength": "strong", "quote": "COPPA applies to operators of websites or online services directed to children under 13 that collect personal information", "interpretation": "Name/ID + scores + timestamps = personal information. Server-side storage = collection. COPPA is certainly triggered." },
-    { "id": "ev-rt-02", "claim": "LEARN loop stores regulated data", "sourceId": "src-rt-04", "provenance": "official", "direction": "supports", "strength": "strong", "quote": "ACTION outcomes are written back as new DATA entities... feedback captured as DATA in the ontology", "interpretation": "§PHIL.DT-07: LEARN-01 and LEARN-02 store student outcomes. In EdTech context, this is children's personal information." },
     {
-      "id": "ev-s1-01",
-      "claim": "Reducers model state management with canonical current value + history",
-      "sourceId": "src-s1-02",
-      "provenance": "official",
+      "id": "ev-001",
+      "claim": "claim-009",
+      "question_id": "q-jg-02",
       "direction": "supports",
-      "strength": "strong",
-      "quote": "Reducers — collapse multi-value property histories into a canonical focus value while preserving history",
-      "interpretation": "§DC5-06: Reducer pattern directly maps to file-based state: write current state to state.json, preserve history in append log."
+      "quote": "Increased precision for intersections (points) of curves with curves or lines",
+      "source": "src-jxg-releases",
+      "note": "v1.12.1 improved native Intersection element for curve-curve — palantir-math already at 1.12.2"
     },
     {
-      "id": "ev-s1-02",
-      "claim": "DRY rule of three prevents premature abstraction in state schema design",
-      "sourceId": "src-s1-01",
-      "provenance": "official",
+      "id": "ev-002",
+      "claim": "claim-026",
+      "question_id": "q-jg-02",
       "direction": "supports",
-      "strength": "moderate",
-      "quote": "Don't Repeat Yourself (rule of three)",
-      "interpretation": "§DC5-05: State schema fields should only be abstracted into shared types after appearing in 3+ state documents."
+      "quote": "generalizedNewton(c1, c2, t1ini, t2ini): Compute an intersection of the curves c1 and c2 with a generalized Newton method",
+      "source": "src-jxg-numerics",
+      "note": "Available as direct call for custom intersection solver"
+    },
+    {
+      "id": "ev-003",
+      "claim": "claim-013",
+      "question_id": "q-jg-01",
+      "direction": "supports",
+      "quote": "board.on('update', function(){ document.getElementById('D').value = g4.X(); })",
+      "source": "src-jxg-board-events",
+      "note": "board.on('update') fires during drag — can trigger intersection recompute"
+    },
+    {
+      "id": "ev-004",
+      "claim": "claim-019",
+      "question_id": "q-jg-06",
+      "direction": "supports",
+      "quote": "board.suspendUpdate() before N element creations, board.unsuspendUpdate() after",
+      "source": "src-jxg-suspend-update",
+      "note": "BatchBoardUpdate pattern for dependent cascade mutation"
+    },
+    {
+      "id": "ev-005",
+      "claim": "claim-005",
+      "question_id": "q-jg-06",
+      "direction": "supports",
+      "quote": "reducedUpdate: If reducedUpdate is set to true then only the dragged element and few dependent elements are updated",
+      "source": "src-jxg-api-docs",
+      "note": "Critical performance flag for drag scenarios"
+    },
+    {
+      "id": "ev-006",
+      "claim": "claim-036",
+      "question_id": "q-jg-03",
+      "direction": "supports",
+      "quote": "[Synthesis] Ghost curve |f(x)| via Math.abs wrapper + reflection guide at y=0",
+      "source": "src-jxg-abs-value-fold",
+      "note": "Absolute value fold teaching pattern"
+    },
+    {
+      "id": "ev-007",
+      "claim": "claim-016",
+      "question_id": "q-jg-05",
+      "direction": "supports",
+      "quote": "board.create('text', [function(){ return p.X()-0.17; }, 2, function(){ return '$' + pos + '$'; }])",
+      "source": "src-jxg-dynamic-text",
+      "note": "Dynamic coordinate labels for teaching annotation"
+    },
+    {
+      "id": "ev-008",
+      "claim": "claim-001",
+      "question_id": "q-jg-04",
+      "direction": "supports",
+      "quote": "board.create('derivative', [curve], {dash: 2})",
+      "source": "src-jxg-api-docs",
+      "note": "Native derivative element — unused in current palantir-math"
+    },
+    {
+      "id": "ev-009",
+      "claim": "claim-040",
+      "question_id": "q-jg-04",
+      "direction": "neutral",
+      "quote": "Tracecurve: board.create('tracecurve', [C_glider, S_dependent]). LIMITATION: mover must be a Glider.",
+      "source": "src-jxg-tracecurve-glider-constraint",
+      "note": "Tracecurve cannot be used directly for functiongraph drag history — needs custom array approach"
     }
   ],
-  "evidenceGaps": [
-    { "id": "gap-rt-01", "description": "COPPA school consent mechanism: exact conditions under which schools can act as parental consent agent for EdTech. FTC guidance exists but has not been reviewed by legal counsel for THIS specific scenario.", "severity": "critical", "resolvableBy": "Legal review by education privacy attorney" },
-    { "id": "gap-rt-02", "description": "FERPA applicability: whether this specific EdTech vendor scenario requires a FERPA data use agreement. DOE guidance exists but application to a solo developer is unclear.", "severity": "critical", "resolvableBy": "Legal review" },
-    { "id": "gap-rt-03", "description": "Convex COPPA posture: whether Convex offers a Data Processing Agreement suitable for children's educational data. Not verified.", "severity": "high", "resolvableBy": "Direct inquiry to Convex" },
-    { "id": "gap-rt-04", "description": "Firebase children's privacy: exact scope of Firebase's children's privacy controls and whether they extend to third-party app developers.", "severity": "high", "resolvableBy": "Firebase documentation review + legal analysis" },
-    { "id": "gap-rt-05", "description": "District vendor assessment requirements: whether target school districts require SOC 2 or equivalent. Varies by district.", "severity": "high", "resolvableBy": "Direct inquiry to target district IT" },
-    {
-      "id": "gap-s1-01",
-      "description": "Bun FileSink atomicity: whether Bun.file().writer() provides atomic write guarantees or risks partial writes on process termination. Not confirmed in docs reviewed.",
-      "severity": "medium",
-      "resolvableBy": "Bun GitHub issues / official docs deep read"
+  "researchQuestionStatus": {
+    "q-jg-01": {
+      "status": "answered",
+      "summary": "board.on('update', cb) fires every drag frame. element.on('drag', cb) at element level. board.suspendUpdate()/unsuspendUpdate() for batch. board.reducedUpdate=true for performance. Native dependency chain: functiongraph defined as function(x){...using A.X()/A.Y()...} auto-updates all dependents when A is dragged."
     },
-    {
-      "id": "gap-s1-02",
-      "description": "TypeBox vs Valibot for CLI-first (no browser) TypeScript: benchmark source is tier-3 blog. No Bun-specific runtime benchmarks found.",
-      "severity": "low",
-      "resolvableBy": "Run bun bench locally with representative state schema"
+    "q-jg-02": {
+      "status": "answered",
+      "summary": "Two approaches: (A) JSXGraph native Intersection element: board.create('intersection', [fg1, fg2, 0]) — v1.12.1 improved precision for curve-curve. Auto-updates as functions change IF functiongraphs are defined with JSXGraph-native dependency (via parent point). (B) Custom solver: JXG.Math.Numerics.root(function(x){return f(x)-g(x);}, warmStart) called in board.on('update'). Warm start (previous intersection x) is critical for <1ms performance."
+    },
+    "q-jg-03": {
+      "status": "answered",
+      "summary": "Three visual layers: (1) primary f(x)+ty curve, (2) |f(x)+ty| abs curve via Math.abs wrapper sharing ty variable, (3) reflection guide: dashed y=-f(x) for negative fold region, (4) fold boundary: line at y=0 between x-intercepts. All four share ty closure — update together on drag."
+    },
+    "q-jg-04": {
+      "status": "answered",
+      "summary": "Unused native elements: Derivative (numerical derivative curve), OtherIntersection (forbidden-point intersection), CurveDifference/CurveUnion (set operations for curve regions), Transform elements, Integral (area under curve). Tracecurve requires Glider mover — not directly applicable."
+    },
+    "q-jg-05": {
+      "status": "answered",
+      "summary": "Dynamic text: board.create('text', [xFn, y, contentFn]) — auto-updates on every board.update(). Coordinate labels bound to intersection point: board.create('text', [function(){return intersectPt.X();}, function(){return intersectPt.Y()+0.3;}, function(){return '('+intersectPt.X().toFixed(2)+', '+intersectPt.Y().toFixed(2)+')';}]). Glider infobox (showinfobox:true) for built-in coordinate display."
+    },
+    "q-jg-06": {
+      "status": "answered",
+      "summary": "Performance stack: (1) board.reducedUpdate=true during drag, (2) batch mutations with suspendUpdate/unsuspendUpdate, (3) board.minimizeReflow for SVG, (4) Newton warm start for intersection (<1ms for polynomials), (5) throttle board.on('update') to requestAnimationFrame if needed."
+    },
+    "q-jg-07": {
+      "status": "partial",
+      "summary": "graphFamily.ts extension: DDD principle suggests new Interface for DragBehavior per graph family (Linear/Quadratic/Cubic/Abs/Piecewise/Parametric). OCP: open for new families without modifying existing drag semantics. Parametric drag needs separate x(t)/y(t) drag model. Piecewise needs segment-aware drag constraint."
     }
-  ]
+  }
 }

@@ -309,3 +309,42 @@ revision round. Re-notify the evaluator after revision.
 ### Task claiming
 After completing simulation tasks, call `TaskList()` to check for
 additional unclaimed work.
+
+---
+
+## Prototype-Aware Revision (v2)
+
+When prototype results and eval suites become available (T7-T8 complete),
+the simulator MAY be asked to revise hypotheses based on empirical evidence.
+
+### Revision Protocol
+
+1. Read `ontology-state/eval-results.json` for:
+   - PrototypeResult[]: build success/failure per hypothesis
+   - EvalSuite[]: pass rates and failure patterns
+   - FailureMode[]: structured failure classifications
+
+2. For each hypothesis with prototype results:
+   - If buildStatus = "fail": Mark hypothesis as "refuted" or revise statement
+   - If passRate < 0.5: Investigate failure modes, revise architecture implications
+   - If passRate > 0.8: Strengthen confidence, mark supporting evidence
+
+3. Update `ontology-state/scenarios.json` with:
+   - New evaluationScores including dimension 11 (Prototype Validation)
+   - Revised confidence levels based on empirical evidence
+   - Updated contradictions from eval failure modes
+
+4. If a debate is triggered by the evaluator:
+   - Respond via SendMessage with a DebatePosition (support/oppose/modify)
+   - Cite specific eval results and failure modes as evidence
+   - Propose concrete architectural modifications if opposing
+
+### Scoring Dimension 11: Prototype Validation
+
+| Score | Condition |
+|-------|-----------|
+| 5 | buildStatus=success, passRate=1.0, failureModes=[] |
+| 4 | buildStatus=success, passRate>0.8, minor failureModes |
+| 3 | buildStatus=partial OR passRate 0.5-0.8 |
+| 2 | buildStatus=partial AND passRate<0.5 |
+| 1 | buildStatus=fail OR passRate<0.2 |
