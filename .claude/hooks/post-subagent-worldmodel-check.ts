@@ -28,19 +28,20 @@ interface HookPayload {
 let payload: HookPayload;
 try { payload = JSON.parse(input); } catch { process.exit(0); }
 
-const prompt = payload.tool_input?.prompt || "";
 const agentType = payload.tool_input?.subagent_type || "";
 
+// Only match on explicit agent names, not prompt keywords (avoids false positives)
+const desc = (payload.tool_input?.description || "").toLowerCase();
+
 const isOntologist =
-  agentType.includes("ontologist") ||
-  prompt.toLowerCase().includes("world model") ||
-  prompt.toLowerCase().includes("world-model") ||
-  prompt.toLowerCase().includes("ontology normalization");
+  agentType === "ontologist" ||
+  desc === "ontology normalization" ||
+  desc.startsWith("ontologist");
 
 const isResearcher =
-  agentType.includes("researcher") ||
-  prompt.toLowerCase().includes("retrieve evidence") ||
-  prompt.toLowerCase().includes("source-map");
+  agentType === "researcher" ||
+  desc === "evidence retrieval" ||
+  desc.startsWith("researcher");
 
 if (!isOntologist && !isResearcher) {
   process.exit(0);

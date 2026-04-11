@@ -1,5 +1,16 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/inject-prior-state.ts",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Grep|Read",
@@ -30,6 +41,22 @@
             "type": "command",
             "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/post-subagent-worldmodel-check.ts",
             "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/validate-agent-output.ts",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/reinject-state-after-compact.ts",
+            "timeout": 5000
           }
         ]
       }
@@ -44,10 +71,22 @@
           }
         ]
       }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/team-phase-gate.ts",
+            "timeout": 10000
+          }
+        ]
+      }
     ]
   },
   "env": {
     "KOSMOS_PROJECT_ROOT": "/home/palantirkc/kosmos",
-    "KOSMOS_RESEARCH_BASE": "/home/palantirkc/.claude/research"
+    "KOSMOS_RESEARCH_BASE": "/home/palantirkc/.claude/research",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   }
 }

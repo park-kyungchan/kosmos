@@ -4,7 +4,7 @@
 
 - **Bun** >= 1.0 (TypeScript runtime)
 - **Claude Code** with MCP tools (scrapling, context7)
-- Access to `~/.claude/research/` Palantir research library (81 files, ~1,205 markers)
+- Access to `~/.claude/research/` Palantir research library (~61 files)
 
 ## Environment Variables
 
@@ -14,6 +14,7 @@ Set these in `.claude/settings.json` `env` section, or export in your shell:
 |----------|---------|-----------------|
 | `KOSMOS_PROJECT_ROOT` | Absolute path to this repo | `process.cwd()` |
 | `KOSMOS_RESEARCH_BASE` | Absolute path to `~/.claude/research/` | `$HOME/.claude/research` |
+| `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` | Enable Agent Teams (set to `"1"`) | disabled |
 
 ### Setting env vars
 
@@ -60,20 +61,26 @@ bun run .claude/hooks/enforce-browse-protocol.ts <<< '{}'
 
 ```
 kosmos/
-├── CLAUDE.md                    # Project constitution (7-stage pipeline)
+├── CLAUDE.md                    # Claude Code per-turn instructions
+├── AGENTS.md                    # Codex-native per-turn instructions
+├── GEMINI.md                    # Gemini-native per-turn instructions
+├── BROWSE.md                    # AI agent query interface (start here)
+├── INDEX.md                     # Structural reference
 ├── .claude/
-│   ├── agents/                  # 6 specialized agents
-│   ├── hooks/                   # 4 enforcement hooks (TypeScript + Bun)
-│   └── settings.json            # Hook config + env vars
+│   ├── agents/                  # 6 agent definitions (5 active + 1 legacy)
+│   ├── hooks/                   # 8 enforcement hooks (TypeScript + Bun)
+│   ├── skills/kosmos-research/  # /kosmos-research Agent Teams pipeline skill
+│   └── settings.json            # Hook config + env vars + Agent Teams flag
 ├── schemas/                     # TypeScript type definitions + validators
-│   ├── types.ts                 # 15+ domain types
-│   ├── validators.ts            # Runtime type guards
+│   ├── types.ts                 # 17 domain types + TechBlueprint
+│   ├── validators.ts            # Runtime type guards + lifecycle validators
 │   └── index.ts                 # Public API
 ├── ontology-state/              # Runtime state (JSON, updated by agents)
-│   ├── world-model.json
-│   ├── source-map.json
-│   ├── scenarios.json
-│   └── decision-log.json
+│   ├── world-model.json         # D/L/A ontology graph (ontologist)
+│   ├── source-map.json          # Sources + claims (researcher)
+│   ├── scenarios.json           # Scenarios + runs (simulator)
+│   ├── decision-log.json        # Decisions + routing (orchestrator)
+│   └── blueprint.json           # TechBlueprint output (reporter)
 ├── reports/                     # Output templates + benchmark artifacts
 ├── docs/                        # Architecture, methodology, governance docs
 ├── package.json

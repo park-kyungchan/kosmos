@@ -43,6 +43,13 @@ export type {
   // Ontology mapping
   OntologyObject,
   SessionState,
+  // Blueprint output
+  DesignPrinciples,
+  PropagationPath,
+  ImplementationPhase,
+  OntologyLayerMapping,
+  StackRecommendation,
+  TechBlueprint,
 } from "./types.ts";
 
 // All validators
@@ -65,5 +72,7 @@ export {
   isRevisionRound,
   isCompleteRecommendation,
   isScenarioReportReady,
+  isTechBlueprint,
+  isBlueprintReady,
   validators,
 } from "./validators.ts";

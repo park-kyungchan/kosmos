@@ -1,99 +1,102 @@
-# Benchmark Next Experiments — 3D Math Learning Experience
+# Benchmark Next Experiments — bench-003 (Red-Team)
 
 > Generated: 2026-03-23
-> Session: bench-001
-> Total experiments: 5
-> Blocking experiments (p0): 3
+> Session: bench-003 (RED-TEAM)
+> Gate Decision: REJECT — experiments below are PREREQUISITES for re-evaluation
+> Total experiments: 6
+> Blocking experiments: 2 (ABSOLUTE — no re-evaluation possible without these)
 
 ---
 
-## P0 — Blocking (must resolve before production commitment)
+## BLOCKING — Must Complete Before Re-Running bench-003
 
-### Exp-01: Chromebook GPU Performance Benchmark
-- **Objective**: Verify 30fps rendering with R3F + physics on school Chromebooks
-- **Hypothesis**: Three.js r168 with WebGL2 fallback achieves >= 30fps with 50 draw calls
-- **Method**: Deploy test scene (100 objects, physics, particles) to Vercel, test on 2023 Intel Celeron and ARM Chromebooks
-- **Expected Outcome**: FPS data at 50/100/200 draw calls, memory usage
+### Exp-rt-01: Education Privacy Legal Review (COPPA + FERPA)
+- **Objective**: Obtain legal determination on COPPA/FERPA compliance path for THIS specific EdTech app
+- **Hypothesis**: School consent mechanism is valid for educational app collecting student scores, OR VPC is required
+- **Method**: Engage attorney specializing in COPPA/FERPA for educational technology. Provide: app description, data flow diagram, student data elements, teacher dashboard functionality
+- **Expected Outcome**: Legal opinion covering: (1) COPPA applicability determination, (2) school consent validity, (3) VPC requirement, (4) FERPA data use agreement requirements, (5) minimum privacy policy requirements
+- **Prerequisites**: None — can start immediately
+- **Estimated Effort**: 2-4 weeks + $2,000-$5,000 legal fees
+- **Status**: proposed
+- **Impact if skipped**: **BENCH-003 CANNOT BE RE-EVALUATED. No technology recommendation possible.**
+
+### Exp-rt-02: Target District Vendor Assessment Requirements
+- **Objective**: Determine what compliance certifications and agreements the target school district requires
+- **Hypothesis**: District requires some combination of: SOC 2, COPPA certification, FERPA DUA, student privacy pledge
+- **Method**: Contact district IT department, request vendor assessment checklist
+- **Expected Outcome**: Specific requirements list that constrains BaaS choice (e.g., "SOC 2 required" eliminates self-hosted)
+- **Prerequisites**: None — can start immediately
+- **Estimated Effort**: 1-2 weeks (depends on district responsiveness)
+- **Status**: proposed
+- **Impact if skipped**: **Architecture choice may be rejected by district review**
+
+---
+
+## Important — Run After Blocking Experiments
+
+### Exp-rt-03: Convex DPA and Children's Data Documentation
+- **Objective**: Determine if Convex offers a Data Processing Agreement suitable for children's educational data
+- **Hypothesis**: Convex provides or will negotiate a DPA for EdTech use cases
+- **Method**: Contact Convex sales/support, request DPA template, children's data handling documentation
+- **Expected Outcome**: DPA availability + terms, or confirmation that no DPA exists
+- **Prerequisites**: Exp-rt-01 (need to know what DPA must contain)
+- **Estimated Effort**: 1 week
+- **Status**: proposed
+
+### Exp-rt-04: Firebase Children's Privacy Scope Verification
+- **Objective**: Determine exact scope of Firebase's children's privacy controls for third-party app developers
+- **Hypothesis**: Firebase provides some compliance infrastructure but developer remains COPPA operator
+- **Method**: Read Firebase ToS in detail, review children's privacy page, contact Firebase support if needed
+- **Expected Outcome**: Clear determination of what Firebase provides vs what developer must implement
+- **Prerequisites**: Exp-rt-01 (need to know what compliance means specifically)
+- **Estimated Effort**: 2-3 days
+- **Status**: proposed
+
+---
+
+## Non-Blocking — Can Run In Parallel
+
+### Exp-rt-05: Technology Prototype with Synthetic Data
+- **Objective**: Build a working R3F 3D math scene with mock backend, using synthetic (non-real) student data
+- **Hypothesis**: The technology layer works regardless of compliance outcome
+- **Method**: R3F + selected BaaS (Convex or Firebase), fake student accounts, teacher dashboard with mock data
+- **Expected Outcome**: Working demo that demonstrates the 3D experience without touching real student data
+- **Prerequisites**: None — synthetic data avoids all compliance triggers
+- **Estimated Effort**: 2-3 weeks (1-2 devs)
+- **Status**: proposed
+- **Note**: This prototype is SAFE to build because it uses no real children's data. It demonstrates technology feasibility for the pilot proposal while legal review proceeds in parallel.
+
+### Exp-rt-06: Chromebook + Tablet WebGL2 Benchmark (carried from bench-002)
+- **Objective**: Verify 30fps on target devices
+- **Hypothesis**: R3F with WebGL2 achieves >= 30fps on school Chromebooks
+- **Method**: Deploy test scene, measure on actual hardware
+- **Expected Outcome**: FPS data
 - **Prerequisites**: None
 - **Estimated Effort**: 1 day
 - **Status**: proposed
-- **Impact if skipped**: Chromebook perf risk remains HIGH — could block project
-
-### Exp-02: Colyseus vs PartyKit Latency Comparison
-- **Objective**: Measure round-trip latency for classroom-scale real-time sync
-- **Hypothesis**: Both achieve < 100ms RTT for 30 concurrent users
-- **Method**: Deploy echo server on Colyseus (Railway) and PartyKit (Cloudflare), measure with k6 load test
-- **Expected Outcome**: P50/P95/P99 latency at 10/30/50 users, connection stability
-- **Prerequisites**: None (independent)
-- **Estimated Effort**: 2 days
-- **Status**: proposed
-- **Impact if skipped**: Multiplayer choice based on inference, not data
-
-### Exp-03: COPPA Compliance Legal Audit
-- **Objective**: Determine whether student progress tracking triggers COPPA
-- **Hypothesis**: Client-side-only rendering with no server-stored PII avoids COPPA
-- **Method**: Map all data flows, identify collection points, review with education attorney
-- **Expected Outcome**: Compliance matrix: pass/fail per COPPA requirement
-- **Prerequisites**: Architecture decision (which data is stored where)
-- **Estimated Effort**: 1-2 days (internal) + legal review time
-- **Status**: proposed
-- **Impact if skipped**: COPPA non-compliance = regulatory action, project shutdown (CRITICAL)
 
 ---
 
-## P1 — Important (significantly reduces uncertainty)
-
-### Exp-04: Educational UX Prototype Test
-- **Objective**: Validate engagement patterns with actual elementary students
-- **Hypothesis**: Immediate visual feedback + progressive difficulty sustains > 10 min engagement
-- **Method**: Build minimal 3D math scene (addition/multiplication), test with 5 students ages 6-8
-- **Expected Outcome**: Session duration, error rate, qualitative feedback
-- **Prerequisites**: Exp-01 (need working prototype)
-- **Estimated Effort**: 3 days (build) + 1 day (test)
-- **Status**: proposed
-- **Impact if skipped**: Engagement risk remains HIGH — educational value unvalidated
-
----
-
-## P2 — Useful (improves confidence in secondary decisions)
-
-### Exp-05: Vercel Edge Function Cold Start Measurement
-- **Objective**: Measure cold start latency impact on game feel
-- **Hypothesis**: Edge runtime cold start < 500ms for game state API
-- **Method**: Deploy test API, measure P50/P95 under cold + warm conditions
-- **Expected Outcome**: Latency data for game state read/write operations
-- **Prerequisites**: None
-- **Estimated Effort**: 0.5 days
-- **Status**: proposed
-- **Impact if skipped**: Minor — cold start mainly affects first load
-
----
-
-## Dependency Graph
+## Experiment Dependency Graph
 
 ```
-Exp-01 ──→ Exp-04 (need working prototype for UX test)
-           Exp-02 (perf baseline informs multiplayer choice)
-Exp-03 (independent — parallel with all)
-Exp-05 (independent — parallel with all)
+Exp-rt-01 (Legal Review) ─┬──→ Exp-rt-03 (Convex DPA)
+                          ├──→ Exp-rt-04 (Firebase Scope)
+                          └──→ RE-RUN BENCH-003 with resolved evidence
+
+Exp-rt-02 (District IT) ──→ Constrains BaaS choice → RE-RUN BENCH-003
+
+Exp-rt-05 (Prototype) ────→ Runs in parallel — no compliance dependency
+Exp-rt-06 (Perf test) ────→ Runs in parallel — no compliance dependency
 ```
 
-## Experiment-to-Risk Mapping
+## Key Difference from Previous Benchmarks
 
-| Experiment | Reduces Risk | Current Severity | Expected After |
-|-----------|-------------|-----------------|----------------|
-| Exp-01 | Chromebook GPU performance | **high** | low (if >= 30fps) |
-| Exp-02 | Multiplayer scaling + latency | medium | low |
-| Exp-03 | COPPA non-compliance | **critical** | low (if zero-PII confirmed) |
-| Exp-04 | Low student engagement | **high** | medium (small sample) |
-| Exp-05 | API cold start affecting UX | medium | low |
+| | bench-001 | bench-002 | bench-003 |
+|---|-----------|-----------|-----------|
+| Blocking experiments | 3 (tech) | 2 (tech) | **2 (legal/institutional)** |
+| Tech experiments | 5 | 5 | 2 (non-blocking) |
+| Legal experiments | 0 | 0 | **2 (BLOCKING)** |
+| Can prototype proceed? | After perf test | Immediately | **Yes — with synthetic data** |
 
-## Experiment-to-Evidence-Gap Mapping
-
-| Experiment | Resolves Evidence Gap In |
-|-----------|------------------------|
-| Exp-01 | sc-a-worst (Chromebook perf), sc-a-best (WebGPU on Chromebook) |
-| Exp-02 | sc-a-adv (Colyseus scaling), all Option B scenarios (PartyKit latency) |
-| Exp-03 | sc-a-adv (COPPA audit), all scenarios (governance dimension) |
-| Exp-04 | Q7 (educational UX — currently tier-3/4 only) |
-| Exp-05 | Q3 (Vercel cold start — supplementary data) |
+The fundamental shift: **the blocking work is no longer technical — it is legal and institutional.** Technology prototyping can proceed in parallel with legal review, but no real student data can be used until legal review is complete.

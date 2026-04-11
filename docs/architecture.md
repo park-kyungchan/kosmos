@@ -1,166 +1,151 @@
-# Kosmos Architecture
+# Kosmos v2 Architecture
 
 ## System Overview
 
-Kosmos is a Claude Code project operating system — not an application,
-but a structured environment that transforms how Claude Code sessions
-handle research and decision-support tasks.
+Kosmos is a Claude Code research engine that produces TechBlueprints
+for ontology-first technical implementation. It runs exclusively in
+Claude Code's native runtime using file-based state, subagent delegation,
+and enforcement hooks.
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │                    User Request                      │
+│         "이런 앱 만들어줘" / tech implementation      │
 └──────────────────────┬──────────────────────────────┘
                        ▼
 ┌──────────────────────────────────────────────────────┐
-│  Stage 1: INTAKE (orchestrator)                       │
-│  Decompose → ResearchQuestion[] + UserRequirement[]   │
+│  Stage 1: INTAKE (orchestrator — opus)                │
+│  Decompose → ProjectOntologyScope                     │
+│  BackendOntology(D/L/A/Security/Learn)               │
+│  FrontendOntology(views/agents/scenarios)             │
 └──────────────────────┬───────────────────────────────┘
                        ▼
 ┌──────────────────────────────────────────────────────┐
-│  Stage 2-3: EVIDENCE (researcher)                     │
-│  Internal Browse (BROWSE.md) + External Fetch          │
+│  Stage 2-3: EVIDENCE (researcher — sonnet)            │
+│  Internal: §DC5 markers + BROWSE.md protocol          │
+│  External: Tech stack via scrapling/context7           │
 │  → SourceDocument[] + Claim[] + Evidence[]             │
 └──────────────────────┬───────────────────────────────┘
                        ▼
 ┌──────────────────────────────────────────────────────┐
-│  Stage 4: NORMALIZATION (ontologist)                  │
-│  Map findings → ontology concepts                      │
-│  Update world-model.json                               │
+│  Stage 4: NORMALIZATION (ontologist — opus)           │
+│  D/L/A + Security + Learn domain mapping              │
+│  DevCon 5 primitives + DDD/DRY/OCP/PECS              │
+│  ForwardProp + BackwardProp path design               │
+│  → world-model.json update                            │
 └──────────────────────┬───────────────────────────────┘
                        ▼
 ┌──────────────────────────────────────────────────────┐
-│  Stage 5-6: REASONING (simulator)                     │
-│  Hypothesis generation → Scenario simulation           │
-│  ≥4 scenarios × ≥2 revision rounds                    │
+│  Stage 5-6: REASONING (simulator — opus)              │
+│  Hypothesis → Scenario (10 dimensions)                │
+│  3-phase implementation simulation                    │
+│  ≥4 scenarios × ≥2 revision rounds                   │
 └──────────────────────┬───────────────────────────────┘
                        ▼
 ┌──────────────────────────────────────────────────────┐
-│  VERIFICATION (evaluator)                             │
-│  Provenance check + Contradiction detection            │
-│  + Adversarial testing + Risk identification           │
+│  VERIFICATION (evaluator — opus)                      │
+│  R1-R13 hard gates                                    │
+│  D/L/A coverage + DevCon 5 compliance + PropHealth    │
 └──────────────────────┬───────────────────────────────┘
                        ▼
 ┌──────────────────────────────────────────────────────┐
-│  Stage 7: OUTPUT (reporter)                           │
-│  13-section report + scenario matrix + tradeoffs       │
+│  Stage 7: OUTPUT (reporter — sonnet)                  │
+│  Output A: blueprint.json (TechBlueprint)             │
+│  Output B: final-report.md (13 sections)              │
 └──────────────────────┬───────────────────────────────┘
                        ▼
 ┌──────────────────────────────────────────────────────┐
 │  LEAD SYNTHESIS                                       │
-│  Cross-reference all outputs → Decision Support        │
+│  Cross-reference → Decision Support to user           │
 └──────────────────────────────────────────────────────┘
 ```
 
-## Three-Layer Ontology Model
+## Ontology Model (D/L/A + Security + Learn)
 
-Findings are organized into three conceptual layers,
-inspired by Palantir's ontology architecture:
-
-### Semantic Layer (what exists)
-- **Object Types**: entities discovered during research
-- **Properties**: attributes of entities (typed, constrained)
-- **Shared Properties**: reusable across 3+ object types
-- **Value Types**: branded/constrained primitives
-- **Link Types**: relationships between objects (→ LOGIC domain)
-- **Interfaces**: shared contracts for polymorphic behavior
-
-### Kinetic Layer (what happens)
-- **Action Types**: operations that change reality
-- **Functions**: computations, derivations, transformations
-- **Security**: access control, classification, governance
-- **Validation**: cross-domain contract enforcement
-
-### Decision Support Layer (what to do)
-- **Scenarios**: base / best / worst / adversarial projections
-- **Risks**: identified threats with severity and mitigations
-- **Recommendations**: ranked options with confidence levels
-- **Experiments**: next steps to reduce uncertainty
+| Domain | Question | Examples |
+|--------|----------|---------|
+| **DATA** | What exists? | Entities, properties, value types |
+| **LOGIC** | How to reason? | Links, interfaces, derived props, functions |
+| **ACTION** | What changes reality? | Mutations, webhooks, automations |
+| **SECURITY** | Who governs? | RBAC, OSP, policies, approvals |
+| **LEARN** | What feedback is recorded? | Evaluations, lineage, outcomes, drift |
 
 ## Agent Architecture
 
-Six agents with strictly separated concerns:
-
 ```
-         ┌── researcher (evidence retrieval)
+         ┌── researcher (sonnet, evidence retrieval)
          │
-orchestrator ─┤── ontologist (world model)
-(decomposition) │
-         ├── simulator (scenarios)
+orchestrator ─┤── ontologist (opus, D/L/A mapping)
+(opus, decomposition) │
+         ├── simulator (opus, architecture scenarios)
          │
-         ├── evaluator (verification)
+         ├── evaluator (opus, R1-R13 gates)
          │
-         └── reporter (output production)
+         └── reporter (sonnet, Blueprint + report)
 ```
-
-### Data Flow Between Agents
-
-| From | To | Data Type |
-|------|----|-----------|
-| orchestrator | researcher | ResearchQuestion[] |
-| researcher | ontologist | SourceDocument[], Claim[], Evidence[] |
-| ontologist | simulator | world-model.json (updated) |
-| simulator | evaluator | Hypothesis[], Scenario[], SimulationRun[] |
-| evaluator | reporter | Risk[], validation report |
-| reporter | Lead | final-report.md, scenario-matrix.md |
-
-### Model Assignment
-
-All agents use Opus for maximum reasoning depth. This is a research
-system where accuracy matters more than speed.
 
 ## State Management
 
 ### Runtime State (ontology-state/)
 
-Four JSON files maintain state across the pipeline:
+| File | Writer | Contains |
+|------|--------|----------|
+| `world-model.json` | ontologist | D/L/A ontology graph |
+| `source-map.json` | researcher | Sources + claims |
+| `scenarios.json` | simulator | Scenarios + runs |
+| `decision-log.json` | orchestrator | Decisions + routing |
+| `blueprint.json` | reporter | TechBlueprint output |
 
-| File | Writer | Reader | Contains |
-|------|--------|--------|----------|
-| `world-model.json` | ontologist | simulator, evaluator | Ontology graph |
-| `source-map.json` | researcher | ontologist, evaluator | All sources + claims |
-| `scenarios.json` | simulator | evaluator, reporter | Scenarios + runs |
-| `decision-log.json` | orchestrator | all agents | Decisions + reasoning |
+### Claude Code Native Runtime
 
-### Schema Validation (schemas/)
+| Mechanism | Purpose |
+|-----------|---------|
+| `.claude/agents/*.md` | 6 agent definitions (5 active in Agent Teams + 1 legacy orchestrator) |
+| `.claude/hooks/*.ts` | 8 enforcement hooks |
+| `.claude/settings.json` | Hook config + env vars + Agent Teams flag |
+| `.claude/skills/kosmos-research/` | /kosmos-research skill — launches Agent Teams pipeline |
+| `CLAUDE.md` | Project constitution |
+| `ontology-state/*.json` | Shared world model (cross-agent state) |
 
-All state files conform to TypeScript types in `schemas/types.ts`.
-Validators in `schemas/validators.ts` provide runtime type guards.
-
-## Hook Architecture
-
-Hooks enforce quality gates at tool boundaries:
+## Hook Architecture (8 hooks)
 
 ```
-PreToolUse(Grep|Read) → enforce-browse-protocol.ts
-  → Blocks broad scanning of research library
+SessionStart → inject-prior-state.ts (advisory)
+  → Loads prior session state summary
 
-PreToolUse(Agent) → normalize-research-question.ts
-  → Advisory: checks for structured research questions
+PreToolUse(Grep|Read) → enforce-browse-protocol.ts (BLOCKING)
+  → No broad scanning; §DC5 markers allowed
 
-PostToolUse(Agent) → post-subagent-worldmodel-check.ts
-  → Advisory: checks world-model.json was updated
+PreToolUse(Agent) → normalize-research-question.ts (advisory)
+  → Checks for D/L/A domain tags
 
-Stop → validate-stop.ts
-  → Advisory: checks for required report sections
+PostToolUse(Agent) → post-subagent-worldmodel-check.ts (BLOCKING)
+                   → validate-agent-output.ts (BLOCKING)
+  → Verifies ontologist/reporter outputs
+
+PostCompact → reinject-state-after-compact.ts (advisory)
+  → Re-injects state summary after compaction
+
+Stop → validate-stop.ts (BLOCKING)
+  → State files + blueprint.json must exist
+
+TaskCompleted → team-phase-gate.ts (BLOCKING)
+  → Validates ontology-state files at each Agent Teams phase gate
 ```
 
-## MCP Tool Integration Points
+## Evaluation Dimensions (10)
+
+| # | Dimension | Source |
+|---|-----------|--------|
+| 1-7 | Evidence, Difficulty, Risk, Reversibility, Time, Governance, Ecosystem | v1 (retained) |
+| 8 | D/L/A Fit | v2 (DevCon 5 §DC5-05) |
+| 9 | ForwardProp Health | v2 (authority chain) |
+| 10 | Agent Composability | v2 (§DC5-02) |
+
+## MCP Tool Integration
 
 | MCP Server | Purpose | Used By |
 |-----------|---------|---------|
-| scrapling | Web page fetching | researcher (external) |
-| context7 | Library documentation | researcher (external) |
-| sequential-thinking | Observable reasoning | orchestrator, Lead |
+| scrapling | Web page fetching | researcher |
+| context7 | Library documentation | researcher |
 | playwright | Runtime verification | evaluator (optional) |
-
-## Extension Points
-
-### Future MCP Connections
-- **Tavily** `/research` → deep web research for complex queries
-- **Database MCP** → persistent state beyond JSON files
-- **Slack MCP** → team notification of research findings
-
-### Future Agent Additions
-- **strategist** → long-term planning across multiple research sessions
-- **archivist** → cross-session knowledge management
-- **presenter** → interactive visualization of findings

@@ -65,7 +65,14 @@ if (tool_name === "Grep") {
     normalized.endsWith("/research") ||
     normalized.endsWith("/research/palantir");
 
-  if (isBroadPattern && isRootScan) {
+  // Allow DevCon marker searches across the root (§DC5, DC4, DC3)
+  const isDevConPattern =
+    pattern.includes("§DC") ||
+    pattern.includes("DC5") ||
+    pattern.includes("DC4") ||
+    pattern.includes("DC3");
+
+  if (isBroadPattern && isRootScan && !isDevConPattern) {
     process.stderr.write(
       "BLOCKED: Broad unbounded scan of research library.\n" +
       "Use BROWSE.md protocol: Question -> Recipe -> Grep (specific markers) -> Compose -> Reason.\n" +
@@ -75,13 +82,21 @@ if (tool_name === "Grep") {
     process.exit(2);
   }
 
-  if (isRootScan && !pattern.includes("§")) {
+  // Allow palantir/platform/ directory without marker patterns (DevCon content)
+  const isPlatformPath = targetPath.includes("palantir/platform");
+
+  if (isRootScan && !pattern.includes("§") && !isDevConPattern) {
     process.stderr.write(
       "BLOCKED: Root-level grep on research library without marker pattern.\n" +
       "Scope your grep to a domain directory (e.g., palantir/data/, palantir/logic/).\n" +
       "Or use §-marker patterns to target specific sections."
     );
     process.exit(2);
+  }
+
+  // Allow grep on palantir/platform/ without marker patterns
+  if (isPlatformPath) {
+    process.exit(0);
   }
 }
 
