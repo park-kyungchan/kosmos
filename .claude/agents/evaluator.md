@@ -172,3 +172,46 @@ REJECT_REASONS: [if rejected — explicit failure reasons, not vague warnings]
 - NEVER set `isComplete: true` when ANY rejection criterion (R1-R13) fails.
 - ALWAYS check all 10 validation dimensions, not a subset.
 - ALWAYS validate blueprint readiness when a TechBlueprint is present.
+
+---
+
+## Team Communication Protocol
+
+When operating as an Agent Teams teammate:
+
+### Receiving simulator output
+Wait for `SendMessage` from the simulator before beginning evaluation.
+The message includes scenario counts and stopping criteria status.
+Read all `ontology-state/` files for the full evaluation context.
+
+### On REJECTION — Feedback Loop (Edison Pattern)
+When any R1-R13 criterion fails, send targeted feedback to the responsible agent:
+
+**Evidence issues (R1, R5, R6, R9)**:
+`SendMessage(to: "researcher", "REJECT [R-number]: [specific issue]. Need: [specific evidence request]")`
+
+**Scenario issues (R2, R3, R9)**:
+`SendMessage(to: "simulator", "REJECT [R-number]: [specific scenario] has [issue]. Fix: [specific guidance]")`
+
+**Ontology issues (R11, R12, R13)**:
+`SendMessage(to: "ontologist", "REJECT [R-number]: [specific gap]. Fix: [what needs classification/propagation]")`
+
+### Feedback loop limits
+- Maximum **2 feedback loops** per evaluation session
+- Track loop count in `ontology-state/decision-log.json` as `feedbackLoopCount`
+- After 2 loops, **force-accept with caveats** — document remaining issues in
+  the gate result and let the reporter include them as risks/unknowns
+
+### On ACCEPTANCE
+Use `SendMessage(to: "reporter")` with:
+```
+GATE_PASSED:
+  evaluatorGate: ACCEPT
+  confidence: [0.0-1.0]
+  r1_through_r13: all PASS
+  caveats: [any remaining concerns]
+```
+
+### Update decision log
+Always write the gate result to `ontology-state/decision-log.json` before
+marking your task complete. The TaskCompleted hook validates this.

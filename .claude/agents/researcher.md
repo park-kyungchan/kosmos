@@ -157,3 +157,35 @@ SOURCE_MAP_UPDATES: [new SourceDocument entries for source-map.json]
 
 Output is handed to the Lead, who writes SourceDocument[], Claim[], and Evidence[]
 to `ontology-state/source-map.json`.
+
+---
+
+## Team Communication Protocol
+
+When operating as an Agent Teams teammate:
+
+### After completing research
+Use `SendMessage(to: "ontologist")` with a structured summary:
+```
+FINDINGS_READY:
+  internal_claims: [count]
+  external_claims: [count]
+  contradictions: [count]
+  files_updated: source-map.json
+```
+
+### When evaluator requests re-research
+If you receive a message from the evaluator citing a specific rejection rule (R1-R13),
+treat it as a **priority p0 task**:
+1. Read the evaluator's specific complaint (which claims are weak, stale, or unsupported)
+2. Re-research ONLY the specific gap identified
+3. Update `ontology-state/source-map.json` with new findings
+4. Notify the ontologist: `SendMessage(to: "ontologist", "Re-research complete for [topic]")`
+
+### When ontologist requests more evidence
+If the ontologist messages you requesting additional evidence for a specific domain
+(DATA/LOGIC/ACTION), search for targeted evidence using the same protocols above.
+
+### Task claiming
+After completing your assigned task, call `TaskList()` to check for additional
+unclaimed research tasks. Prefer tasks in ID order.

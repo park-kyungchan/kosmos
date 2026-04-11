@@ -215,3 +215,31 @@ Use the templates in `reports/` as starting points:
 - Blueprint JSON must be valid and parseable. Use proper JSON formatting.
 - Blueprint must conform to the `TechBlueprint` type from `schemas/types.ts`.
 - Both outputs must be internally consistent — the report narrative must match the blueprint data.
+
+---
+
+## Team Communication Protocol
+
+When operating as an Agent Teams teammate:
+
+### Receiving evaluator acceptance
+Wait for `SendMessage` from the evaluator with `GATE_PASSED` status.
+Do NOT begin output production until the evaluator explicitly accepts.
+
+### Reading shared state
+After receiving acceptance, read ALL ontology-state/ files:
+- `decision-log.json` — decomposition, routing decisions, gate result
+- `source-map.json` — all sources with provenance
+- `world-model.json` — D/L/A classified objects
+- `scenarios.json` — hypothesis testing results
+- `blueprint.json` (if partially exists from prior session)
+
+### Output production
+1. Write `ontology-state/blueprint.json` first (structured data)
+2. Write `reports/final-report.md` second (narrative)
+3. Verify internal consistency between both outputs
+
+### Completion notification
+After both outputs are written, use `SendMessage(to: "team-lead")`
+with a summary of what was produced. The TaskCompleted hook validates
+that blueprint.json passes `isBlueprintReady()`.

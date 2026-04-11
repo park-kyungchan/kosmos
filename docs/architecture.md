@@ -100,13 +100,14 @@ orchestrator ─┤── ontologist (opus, D/L/A mapping)
 
 | Mechanism | Purpose |
 |-----------|---------|
-| `.claude/agents/*.md` | 6 subagent definitions |
-| `.claude/hooks/*.ts` | 7 enforcement hooks |
-| `.claude/settings.json` | Hook config + env vars |
+| `.claude/agents/*.md` | 6 agent definitions (5 active in Agent Teams + 1 legacy orchestrator) |
+| `.claude/hooks/*.ts` | 8 enforcement hooks |
+| `.claude/settings.json` | Hook config + env vars + Agent Teams flag |
+| `.claude/skills/kosmos-research/` | /kosmos-research skill — launches Agent Teams pipeline |
 | `CLAUDE.md` | Project constitution |
-| `ontology-state/*.json` | Cross-session persistence |
+| `ontology-state/*.json` | Shared world model (cross-agent state) |
 
-## Hook Architecture (7 hooks)
+## Hook Architecture (8 hooks)
 
 ```
 SessionStart → inject-prior-state.ts (advisory)
@@ -127,6 +128,9 @@ PostCompact → reinject-state-after-compact.ts (advisory)
 
 Stop → validate-stop.ts (BLOCKING)
   → State files + blueprint.json must exist
+
+TaskCompleted → team-phase-gate.ts (BLOCKING)
+  → Validates ontology-state files at each Agent Teams phase gate
 ```
 
 ## Evaluation Dimensions (10)

@@ -220,3 +220,36 @@ WORLD_MODEL_SUMMARY: [current object count by domain and type]
 - EVERY structural decision MUST document which design principles were checked.
 - EVERY object MUST have both a ForwardPropagation path and a BackwardPropagation path documented (even if incomplete with noted gaps).
 - Do NOT collapse SECURITY and LEARN concepts into D/L/A. They are distinct domains.
+
+---
+
+## Team Communication Protocol
+
+When operating as an Agent Teams teammate:
+
+### Receiving researcher findings
+Wait for `SendMessage` from the researcher before beginning classification.
+The message will include claim counts and contradiction alerts.
+Read `ontology-state/source-map.json` for the full evidence after notification.
+
+### After updating the world model
+Use `SendMessage(to: "simulator")` with a domain summary:
+```
+WORLD_MODEL_UPDATED:
+  data_objects: [count]
+  logic_objects: [count]
+  action_objects: [count]
+  security_objects: [count]
+  learn_objects: [count]
+  forward_prop_status: healthy|partial|broken
+  backward_prop_status: healthy|partial|broken
+```
+
+### When evidence is insufficient
+If findings lack sufficient evidence for a domain, message the researcher:
+`SendMessage(to: "researcher", "Need additional [tier-1/tier-2] evidence for [domain]: [specific gap]")`
+
+### Evaluator feedback loop
+If the evaluator rejects and requests re-classification, re-read updated
+source-map.json and revise world-model.json accordingly. Notify simulator
+after revision.

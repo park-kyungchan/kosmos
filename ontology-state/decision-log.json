@@ -1,117 +1,75 @@
 {
-  "version": "0.4.0",
-  "lastUpdated": "2026-03-28T10:00:00Z",
-  "sessionId": "mathcrew-deep-dive-001",
-  "previousBenchmarks": ["bench-001", "bench-002", "bench-003"],
+  "version": "0.5.0",
+  "lastUpdated": "2026-04-11T10:00:00Z",
+  "sessionId": "smoke-test-001",
+  "previousBenchmarks": ["bench-001", "bench-002", "bench-003", "mathcrew-deep-dive-001"],
   "entries": [
     {
       "type": "decomposition",
-      "timestamp": "2026-03-28T10:00:00Z",
+      "timestamp": "2026-04-11T10:00:00Z",
       "agent": "orchestrator",
-      "objective": "DEEP DIVE: mathcrew Frontend/Ontology/Backend full audit + revolutionary improvement research. Focus areas: (1) 3D rendering quality breakthrough, (2) education-specialized tech stack, (3) content delivery paradigm shift, (4) component architecture revolution, (5) interaction paradigm innovation.",
-      "rationale": "mathcrew has a solid ontology-first foundation (BackendOntology + FrontendOntology, 5 islands, 7 interaction primitives, LEARN infrastructure). But the frontend 3D rendering is classroom-basic (shadows off, no post-processing), interaction is keyboard-only (E/Q), content delivery is chalkboard-centric. The gap between ontology sophistication and frontend execution quality is the primary concern."
-    },
-    {
-      "type": "current-state-audit",
-      "timestamp": "2026-03-28T10:00:01Z",
-      "agent": "orchestrator",
-      "findings": {
-        "ontology": {
-          "strength": "Well-structured BackendOntology (12 DATA entities, 17 link types, 6 derived properties, 5 decision rules) + FrontendOntology (4 views, 2 agent surfaces, 7 interaction primitives, 5 object types)",
-          "gap": "FrontendOntology declarations are rich but runtime rendering does not reflect the declared sophistication. Ontology declares 'teaching surface' but runtime delivers basic geometry."
-        },
-        "rendering": {
-          "current": "R3F 9.5 + Three.js 0.183 + WebGPU/WebGL fallback. ProceduralSky (basic gradient + points), TSL fog, PostProcessing (MRT bloom/GTAO/vignette/FXAA — mostly disabled). Quality presets: classroom (everything off) vs immersive (vignette+FXAA only).",
-          "gap": "No stylized shading (toon/cel), no water/ocean, no weather, no dynamic lighting for learning phases, no particle effects for math visualization. Islands are flat cylinders with solid colors."
-        },
-        "interaction": {
-          "current": "Keyboard-only: WASD movement, E pickup/interact, Q drop, R reset, Enter advance. 7 interaction primitives registered but 3 still 'designed' or 'undesigned'.",
-          "gap": "No touch support, no gamepad, no gesture recognition, no accessibility (screen reader + 3D), no multi-modal feedback (audio/haptic). Mobile/tablet unusable."
-        },
-        "contentDelivery": {
-          "current": "5-phase Kolb cycle per scene (motivate→explain→demonstrate→practice→assess). NPC narration via Board3D chalkboard. Step-by-step linear progression.",
-          "gap": "No adaptive branching within scenes, no multi-representation (CRA: concrete→representational→abstract), no animated math explanations (3Blue1Brown-style), no audio narration, no hint escalation system."
-        },
-        "components": {
-          "current": "MathWorld.tsx (770 lines) orchestrates everything. Per-scene components (PetShareScene, DualPetShareScene, etc). State managed via useState chains.",
-          "gap": "No state machine for scene flow, no ECS, no lazy scene loading, no micro-scene architecture. MathWorld.tsx is becoming a God component."
-        },
-        "stack": {
-          "current": "NestJS + MongoDB + React + R3F + Rapier. No xAPI, no LRS, no adaptive engine, no spaced repetition, no IRT calibration.",
-          "gap": "Backend stores attempts but doesn't do adaptive computation beyond simple mastery%. No learning analytics beyond basic counts."
-        }
-      }
+      "objective": "SMOKE TEST: Research optimal file-based state management patterns for Bun + TypeScript CLI applications. Focus: JSON persistence, atomic writes, schema validation, session state across agent teams.",
+      "rationale": "Minimal research topic chosen to validate the full Kosmos Agent Teams pipeline (7 stages, 6 agents, 9 tasks). The topic is self-referential — Kosmos itself uses file-based state (ontology-state/*.json) and this research validates that pattern."
     },
     {
       "type": "routing",
-      "timestamp": "2026-03-28T10:00:02Z",
+      "timestamp": "2026-04-11T10:00:01Z",
       "agent": "orchestrator",
       "decisions": {
-        "RQ1": "external+context7 — 3D rendering: TSL toon shading, procedural terrain/water, WebGPU compute for math viz, R3F v9 patterns",
-        "RQ2": "external — Interaction: embodied cognition, touch/gesture, accessibility-first 3D, multi-modal feedback",
-        "RQ3": "external — Pedagogy: CRA digital implementation, scaffolding patterns, game-based learning evidence, Korean math curriculum",
-        "RQ4": "external — Edu-tech: xAPI/LRS, BKT/IRT/FSRS adaptive engines, AI tutoring patterns, learning analytics",
-        "RQ5": "external+context7 — Architecture: ECS for R3F, XState scene flow, micro-scenes, diegetic UI, R3F v9 advanced",
-        "internal-01": "§DC5-05 design principles (DDD/DRY/OCP/PECS) — applied to component architecture revolution",
-        "internal-02": "§DC5-06 ontology primitives — applied to interaction primitive plugin system",
-        "internal-03": "§DC5-04 3-phase journey — applied to implementation roadmap (Golden Tables→Kinetics→AI-First)",
-        "internal-04": "§DC-SIG-03 builder scope — frontend ontology must include application+agent+scenario surfaces",
-        "internal-05": "§FDE-09 expanded builder surfaces — agent-driven content creation and evaluation"
+        "RQ1": "external+context7 — Bun file I/O APIs (Bun.file, Bun.write, atomics)",
+        "RQ2": "internal — §DC5-05 design principles applied to state management (DDD for state shape, DRY for shared schemas)",
+        "RQ3": "external — TypeScript schema validation libraries (zod, valibot, typebox) for runtime state validation"
       }
     }
   ],
   "requirements": [
-    { "id": "req-dd-01", "description": "3D rendering quality leap: stylized shading, procedural environments, math-specific visualization", "category": "functional", "priority": "p0", "domain": "FRONTEND" },
-    { "id": "req-dd-02", "description": "Multi-device interaction: touch + keyboard + gamepad + accessibility", "category": "functional", "priority": "p0", "domain": "FRONTEND" },
-    { "id": "req-dd-03", "description": "Evidence-based content delivery: CRA progression, scaffolding, multi-modal", "category": "functional", "priority": "p0", "domain": "LOGIC" },
-    { "id": "req-dd-04", "description": "Adaptive learning engine: BKT/IRT/FSRS beyond simple mastery%", "category": "functional", "priority": "p1", "domain": "LOGIC" },
-    { "id": "req-dd-05", "description": "Component architecture overhaul: decompose MathWorld.tsx God component", "category": "architecture", "priority": "p0", "domain": "FRONTEND" },
-    { "id": "req-dd-06", "description": "Learning analytics: xAPI traces, teacher dashboard with actionable insights", "category": "functional", "priority": "p1", "domain": "LEARN" },
-    { "id": "req-dd-07", "description": "Performance: 30fps on Chromebooks with new rendering features", "category": "non-functional", "priority": "p0", "domain": "FRONTEND" },
-    { "id": "req-dd-08", "description": "Preserve ontology-first authority chain through all changes", "category": "constraint", "priority": "p0", "domain": "META" }
+    { "id": "req-st-01", "description": "Atomic JSON file writes that survive process crashes", "category": "functional", "priority": "p0", "domain": "ACTION" },
+    { "id": "req-st-02", "description": "TypeScript-first schema validation for state files", "category": "functional", "priority": "p0", "domain": "DATA" },
+    { "id": "req-st-03", "description": "State file versioning and migration strategy", "category": "functional", "priority": "p1", "domain": "LOGIC" }
   ],
   "questions": [
     {
-      "id": "q-dd-01",
-      "text": "What TSL/WebGPU techniques achieve Pixar-quality stylized rendering while maintaining 30fps on Chromebooks?",
-      "domain": "FRONTEND/RENDERING",
+      "id": "q-st-01",
+      "text": "What Bun-native APIs provide atomic file writes for JSON state persistence?",
+      "domain": "ACTION",
       "priority": "p0",
       "route": "external+context7",
-      "status": "researching"
+      "status": "pending"
     },
     {
-      "id": "q-dd-02",
-      "text": "What interaction paradigms beyond keyboard E/Q enable embodied math learning in 3D?",
-      "domain": "FRONTEND/INTERACTION",
+      "id": "q-st-02",
+      "text": "Which design principles (DDD/DRY/OCP) best govern the shape of shared state files in an agent-team architecture?",
+      "domain": "LOGIC",
       "priority": "p0",
-      "route": "external",
-      "status": "researching"
+      "route": "internal",
+      "status": "pending"
     },
     {
-      "id": "q-dd-03",
-      "text": "How to implement CRA (Concrete-Representational-Abstract) progression in a digital 3D math environment?",
-      "domain": "LOGIC/CONTENT",
-      "priority": "p0",
-      "route": "external",
-      "status": "researching"
-    },
-    {
-      "id": "q-dd-04",
-      "text": "What education-specialized tech components (xAPI, BKT, IRT, FSRS) integrate with TypeScript/Bun stack?",
-      "domain": "DATA/TECH",
+      "id": "q-st-03",
+      "text": "What TypeScript schema validation library (zod/valibot/typebox) is optimal for Bun runtime state validation?",
+      "domain": "DATA",
       "priority": "p1",
       "route": "external",
-      "status": "researching"
-    },
-    {
-      "id": "q-dd-05",
-      "text": "What component architecture patterns (ECS, state machines, micro-scenes) best decompose a 3D educational world?",
-      "domain": "FRONTEND/ARCHITECTURE",
-      "priority": "p0",
-      "route": "external+context7",
-      "status": "researching"
+      "status": "pending"
     }
   ],
+  "projectScope": {
+    "backend": {
+      "data": ["StateFile (JSON persistence unit)", "StateSchema (validation contract)", "SessionContext (runtime session)"],
+      "logic": ["VersionMigrator (schema evolution)", "MergeResolver (concurrent write resolution)", "SchemaValidator (runtime type check)"],
+      "action": ["AtomicWrite (crash-safe persistence)", "StateLoad (file read + validate)", "StateMerge (multi-agent state reconciliation)"],
+      "security": ["FilePermission (OS-level access control)"],
+      "learn": ["WriteLatency (perf tracking)", "MigrationSuccess (schema evolution outcomes)"]
+    },
+    "frontend": {
+      "views": [],
+      "agentSurfaces": [],
+      "scenarioFlows": [],
+      "interaction": [],
+      "rendering": []
+    }
+  },
+  "devconPhase": "Phase 1 — Golden Tables: establishing the correct data shape and persistence pattern before layering logic or AI",
   "recommendations": [],
   "experiments": []
 }

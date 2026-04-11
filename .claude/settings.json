@@ -71,10 +71,22 @@
           }
         ]
       }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/team-phase-gate.ts",
+            "timeout": 10000
+          }
+        ]
+      }
     ]
   },
   "env": {
     "KOSMOS_PROJECT_ROOT": "/home/palantirkc/kosmos",
-    "KOSMOS_RESEARCH_BASE": "/home/palantirkc/.claude/research"
+    "KOSMOS_RESEARCH_BASE": "/home/palantirkc/.claude/research",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   }
 }

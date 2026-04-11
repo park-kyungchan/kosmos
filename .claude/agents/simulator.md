@@ -278,3 +278,34 @@ All output MUST be written to `ontology-state/scenarios.json` with:
 - NEVER mark evidenceSufficiency "sufficient" when assumptions lack evidence IDs.
 - NEVER skip the revision loop. Minimum 2 rounds when contradictions exist.
 - NEVER present a scenario without indicating its implementation phase target.
+
+---
+
+## Team Communication Protocol
+
+When operating as an Agent Teams teammate:
+
+### Receiving ontologist input
+Wait for `SendMessage` from the ontologist before generating hypotheses.
+The message includes object counts per domain and propagation health.
+Read `ontology-state/world-model.json` for the full model after notification.
+
+### After completing scenarios
+Use `SendMessage(to: "evaluator")` with a scenario summary:
+```
+SCENARIOS_READY:
+  hypotheses: [count]
+  scenarios_per_hypothesis: [count]
+  revision_rounds_completed: [count]
+  unresolved_contradictions: [count]
+  stopping_criteria_met: true|false
+```
+
+### Evaluator rejection handling
+If the evaluator rejects scenarios (citing R2, R9, or other criteria),
+revise the specific scenarios identified. This counts as an additional
+revision round. Re-notify the evaluator after revision.
+
+### Task claiming
+After completing simulation tasks, call `TaskList()` to check for
+additional unclaimed work.
