@@ -1,386 +1,1316 @@
 {
-  "version": "0.3.0",
-  "lastUpdated": "2026-03-23T17:30:00Z",
-  "sessionId": "bench-003",
-  "benchmarkType": "red-team",
+  "version": "0.6.0",
+  "lastUpdated": "2026-04-11T15:00:00Z",
+  "sessionId": "jsxgraph-sequencer-001",
+  "previousSessionId": "smoke-001",
+  "updatedBy": "simulator",
+  "researchObjective": "JSXGraph canvas enhancement for palantir-math Sequencer — real-time functiongraph drag, intersection tracking, absolute value fold visualization, teaching annotations",
+
   "hypotheses": [
     {
-      "id": "hyp-rt-01",
-      "statement": "R3F + Convex (BaaS) is the best stack for a pilot-proposal-level educational app with data persistence and teacher dashboard",
-      "domain": "technology",
-      "supportingEvidenceIds": ["ev-v2-01"],
-      "contradictingEvidenceIds": [],
-      "testCriteria": ["Convex provides COPPA-compliant data handling", "Authentication for under-13 is solved", "Cost within budget"],
-      "status": "testing",
-      "confidence": 0.35,
-      "architectureImplications": ["Server-side data = COPPA triggered", "Auth required for children", "DPA with school required"]
+      "id": "hyp-s1-01",
+      "session": "smoke-001",
+      "statement": "AtomicWrite-first + StateReducer (DC5-06) + TypeBox (SchemaValidatorInterface) is the optimal architecture for this DATA/LOGIC/ACTION structure because the snapshot model centers BunStateFile as the canonical DATA artifact, TypeBox propagates to JSON Schema/OpenAPI surfaces via ForwardProp, and StateReducer preserves history for LEARN via BackwardProp.",
+      "dlaJustification": "DATA-dominant: BunStateFile and StateSchemaDefinition (TypeBox) are primary runtime artifacts. LOGIC: StateReducer reads snapshots to compute derived values without log replay. ACTION: AtomicWriteAction is the single mutation path. SECURITY: FileSystemAccessPolicy governs snapshot directory. LEARN: StateChangeAuditLog captures write events independently.",
+      "supportingEvidenceIds": ["c-s1-05", "c-s1-09", "c-s1-03", "c-s1-01", "ev-s1-01"],
+      "contradictingEvidenceIds": ["c-s1-07", "gap-s1-01"],
+      "testCriteria": [
+        "Process kill during Bun.write() does not produce a corrupt state.json",
+        "TypeBox schema integrates with CLI help text generation without additional tooling",
+        "StateReducer can compute derived properties from snapshot chain without replaying all history"
+      ],
+      "architectureImplications": [
+        "State is always a consistent snapshot — reads are fast (no log replay needed)",
+        "Crash during write may corrupt snapshot — requires temp-file rename pattern or post-crash repair",
+        "TypeBox JSON Schema output enables OpenAPI binding (ForwardProp to API contract layer)",
+        "StateChangeAuditLog tracks write events separately from the snapshot itself"
+      ],
+      "devcon5Alignment": {
+        "DDD": "BunStateFile/AtomicWriteAction named per Bun domain vocabulary. TypeBox schema 'StateSchemaDefinition' per state domain concept. No violations.",
+        "DRY": "Single write path (AtomicWriteAction). SchemaValidatorInterface abstracts TypeBox/Valibot/Zod.",
+        "OCP": "SchemaValidatorInterface open for new validators. AtomicWriteAction extensible (path/format) without modifying core.",
+        "PECS": "SchemaValidatorInterface: consumes unknown (super) → produces T (extends). Correct."
+      },
+      "propagation": {
+        "forward": "BunStateFile (ontology) → StateFileContract (contract) → Bun.file().json() adapter (backend) → CLI 'state read' command | status: partial",
+        "backward": "write() call → StateChangeAuditLog entry (lineage) → write success/latency evaluation → retry strategy refinement | status: partial"
+      }
     },
     {
-      "id": "hyp-rt-02",
-      "statement": "R3F + Firebase is better because Firebase has documented children's privacy controls",
-      "domain": "technology",
-      "supportingEvidenceIds": [],
-      "contradictingEvidenceIds": [],
-      "testCriteria": ["Firebase children's privacy controls are COPPA-sufficient", "Firebase Auth supports school-managed accounts", "Pricing is within budget"],
-      "status": "testing",
-      "confidence": 0.30,
-      "architectureImplications": ["Google dependency", "Firebase Auth + school SSO", "Firebase ToS compliance"]
+      "id": "hyp-s1-02",
+      "session": "smoke-001",
+      "statement": "AppendLog-first + StateReducer (DC5-06 event sourcing) + Zod (SchemaValidatorInterface) is the optimal architecture for this DATA/LOGIC/ACTION structure because the event-sourcing model makes StateChangeAuditLog the primary LEARN artifact, provides inherent crash safety (log entries are immutable once flushed), and TypeScript-ergonomic Zod validation fits CLI-first development.",
+      "dlaJustification": "LEARN-dominant: StateChangeAuditLog (AppendLogAction's output) is the primary source of truth. LOGIC: StateReducer replays log entries to derive current state. ACTION: AppendLogAction is the only mutation path — no state file is ever overwritten. SECURITY: FileSystemAccessPolicy governs log directory. DATA: BunStateFile is a compaction artifact, not primary.",
+      "supportingEvidenceIds": ["c-s1-06", "c-s1-03", "c-s1-01", "ev-s1-01", "c-s1-08"],
+      "contradictingEvidenceIds": ["c-s1-07", "gap-s1-01", "c-s1-09"],
+      "testCriteria": [
+        "Log replay from 1000 mutation events produces correct current state",
+        "Log growth does not cause unacceptable startup latency (< 100ms for 10,000 entries)",
+        "FileSink .flush() call guarantees no entries lost on process termination"
+      ],
+      "architectureImplications": [
+        "Inherently crash-safe: appended entries are immutable — no partial-write corruption risk for existing entries",
+        "Read path requires log replay via StateReducer — latency grows with log size without compaction",
+        "Compaction snapshots (AtomicWriteAction) needed periodically to bound startup latency",
+        "StateChangeAuditLog doubles as both primary data store and LEARN artifact — LEARN domain becomes central"
+      ],
+      "devcon5Alignment": {
+        "DDD": "AppendLogAction named per event-sourcing vocabulary. Zod 'StateSchemaDefinition' accurate but less aligned with OpenAPI surfaces than TypeBox.",
+        "DRY": "Single append path (AppendLogAction). Compaction reuses AtomicWriteAction — DRY by composition.",
+        "OCP": "StateReducer replay logic closed to log format changes. AppendLogAction open for new event types via event.type discriminator.",
+        "PECS": "SchemaValidatorInterface still applies. StateReducer: produces T (focus value) from LogEntry[] (preserved history) — Producer pattern."
+      },
+      "propagation": {
+        "forward": "StateChangeAuditLog (ontology) → AuditContract (contract) → FileSink adapter (backend) → CLI 'state history' query surface | status: partial",
+        "backward": "append() call → StateChangeAuditLog record (lineage) → log completeness evaluation → flush strategy refinement | status: partial"
+      }
     },
+
     {
-      "id": "hyp-rt-03",
-      "statement": "Self-hosted (PocketBase/SQLite) gives maximum control over data handling, enabling COPPA compliance by design",
-      "domain": "technology",
-      "supportingEvidenceIds": [],
-      "contradictingEvidenceIds": [],
-      "testCriteria": ["Self-hosting reduces vendor dependency for compliance", "PocketBase provides auth + DB in single binary", "Ops manageable for 1-2 devs"],
-      "status": "testing",
-      "confidence": 0.25,
-      "architectureImplications": ["Full control over data residence and retention", "Ops burden on small team", "No managed compliance certifications"]
+      "id": "hyp-jxg-A",
+      "session": "jsxgraph-sequencer-001",
+      "userPreference": "PREFERRED — user direction: maximize JSXGraph native APIs. Custom code ONLY for what JSXGraph cannot natively provide.",
+      "pr90Context": "PR #90 merged: AbsDragBehavior (translate-source-before-outer-abs) is partially implemented. This H-A hypothesis extends that work with native intersection, native derivative, native dynamic text elements, and native reducedUpdate optimization.",
+      "statement": "Maximize JSXGraph native APIs across all enhanced features — use native Intersection element (v1.12.1 improved), native Derivative element, native dynamic Text (auto-updating), native OtherIntersection (multiple points), board.reducedUpdate=true (60fps), board.suspendUpdate/unsuspendUpdate (batch repaint). Custom code ONLY for the three gaps JSXGraph cannot handle natively: (1) |f(x)| fold visualization ghost curve + fold boundary (no native abs-fold element), (2) teaching annotation toggle overlay, (3) piecewise/parametric drag semantics. Builds directly on PR #90's translate-source-before-outer-abs foundation.",
+      "dlaJustification": "DATA-dominant: IntersectionPoint and CoordinateLabel auto-derive from parentPoint.Y() position — zero manual sync needed. LOGIC: DependencyGraph IS JSXGraph's native _dep system — NativeDependencyChain maps directly to JSXGraph element graph, no custom reasoning layer. ACTION: DragCascadeUpdate is reduced to parentPoint.on('drag') handler — all cascade is JSXGraph-internal. LEARN: element.on('drag') provides a clean event boundary for InteractionTelemetry capture with per-element granularity.",
+      "supportingEvidenceIds": ["ev-001", "ev-003", "ev-005", "ev-007", "ev-008", "claim-009", "claim-011", "claim-016", "claim-017"],
+      "contradictingEvidenceIds": ["ev-009", "claim-023"],
+      "pr90Context": "PR #90 MERGED: AbsDragBehavior (translate-source-before-outer-abs) now implemented in functiongraphDragSemantics.ts. GraphFamilyProfile outer-abs recognition added to graphFamily.ts. AbsFoldVisualizationUpdate (ACTION) added to jsxGraphRenderer.ts. H-A builds DIRECTLY on this foundation — migration for outer-abs drag semantics is COMPLETE, remaining work is: fold LINE visualization, IntersectionPoint real-time recompute, dynamic CoordinateLabels.",
+      "testCriteria": [
+        "board.create('intersection', [fg1, fg2, 0]) returns a live-updating IntersectionPoint as fg1's parentPoint is dragged — no manual board.update() needed",
+        "board.reducedUpdate=true maintains >= 60fps with 10 active dependent elements during functiongraph drag",
+        "CoordinateLabel text updates in real time (<16ms) when parentPoint.Y() changes during drag",
+        "Absolute value ghost curve (Math.abs(f_raw(x)+parentPoint.Y())) re-renders correctly on each drag frame",
+        "TracePath custom dataX/dataY array update works via board.on('update') even under native dependency cascade"
+      ],
+      "architectureImplications": [
+        "All dependent elements declared at board creation time with JSXGraph-native closures over parentPoint — zero manual wiring needed",
+        "board.reducedUpdate=true enables significant performance optimization: only parentPoint + direct dependents recomputed per frame",
+        "Migration required: current raw DOM addEventListener must be replaced with JSXGraph parentPoint pattern in functiongraphDragSemantics.ts",
+        "Intersection element (board.create('intersection')) auto-updates — no custom solver needed as primary path; JXG.Math.Numerics as fallback for complex intersections",
+        "ORCH-10 compliance: all annotation elements are explicitly declared board elements, not ad-hoc DOM mutations",
+        "Tracecurve (native) not directly usable (requires Glider mover) — custom board.on('update') push to dataX/dataY still needed for TracePath"
+      ],
+      "devcon5Alignment": {
+        "DDD": "parentPoint named per JSXGraph domain vocabulary (JXG.Point). functiongraph → parentPoint.Y() follows JSXGraph draggable exponential function wiki pattern exactly. No invented abstractions — pure JSXGraph idioms.",
+        "DRY": "Single drag handler on parentPoint — zero manual element.update() calls in cascade. board.reducedUpdate=true eliminates all N-element manual update duplication.",
+        "OCP": "Add new dependent elements (integral display, second derivative, tangent line) without modifying drag handler or IntersectionResolverInterface — just declare with parentPoint closures. Fully open for extension.",
+        "PECS": "IntersectionResolverInterface: consumes [JXG.Curve, JXG.Curve] (super — abstract curve type), produces IntersectionCoordinate {x,y} (extends — specific result). DragBehaviorInterface: consumes DragEvent (super), produces DragState ty/tx (extends)."
+      },
+      "propagation": {
+        "forward": "IntersectionResolverInterface (ontology) → NativeIntersectionResolver: board.create('intersection', [fg1, fg2, 0]) (contract+backend) → JSXGraph _dep auto-cascade → CoordinateLabel auto-update → JSXGraphCanvas live display (frontend) | status: HEALTHY — native cascade handles all steps once board elements declared",
+        "backward": "parentPoint.on('drag') → drag frame timestamps + ty delta in InteractionTelemetry.dragFrames (lineage) → frame rate + reducedUpdate effectiveness evaluation → DragBehaviorInterface / board.reducedUpdate toggle refinement (refinement) → DragBehaviorInterface algorithm note update (ontology) | status: partial — telemetry capture hook not yet declared in jsxGraphRenderer.ts"
+      },
+      "architectureGapRisk": "MEDIUM — requires migration from raw DOM drag to JSXGraph parentPoint pattern. Risk: regression in existing drag behavior (snap-to-grid, tangency assist) during migration. Mitigation: incremental migration per graph family using DragBehaviorInterface."
+    },
+
+    {
+      "id": "hyp-jxg-B",
+      "session": "jsxgraph-sequencer-001",
+      "userPreference": "ALTERNATIVE — competing hypothesis, NOT the user's preferred direction. Present as rigorous alternative to Hypothesis A.",
+      "pr90Context": "PR #90 merged: raw DOM drag still in place (H-B preserves it). board.on('update') pattern adds observer on top of existing raw DOM drag. However PR #90's fold-aware rendering was done via jsxGraphRenderer.ts updates, not board.on('update') observer — H-B would need to retrofit into this pattern.",
+      "statement": "Keep raw DOM addEventListener for functiongraph drag; build explicit board observer architecture — board.on('update') fires every drag frame, triggering JXG.Math.Numerics.root() intersection solver (warm start from previous intersection x), explicit BatchBoardUpdate for all N dependent elements (CoordinateLabels, ghost curves, fold boundary), and custom TracePath array push. Maximum control over computation ordering, telemetry capture, and failure recovery. Zero migration cost. Trades JSXGraph-native elegance for explicit custom control.",
+      "dlaJustification": "LOGIC-dominant: IntersectionSolver (JXG.Math.Numerics.root) is the critical LOGIC layer — custom warm-start strategy enables <1ms re-rooting for polynomial graphs. DependencyGraph is explicit custom DAG — full control over update ordering. ACTION: DragCascadeUpdate = board.on('update') observer callback containing all N element updates. DATA: CoordinateLabel and IntersectionPoint explicitly populated by observer — full control over formatting and failure handling. LEARN: board.on('update') exposes every frame for fine-grained InteractionTelemetry capture (solver iteration counts, individual element update durations).",
+      "supportingEvidenceIds": ["ev-003", "ev-004", "ev-005"],
+      "contradictingEvidenceIds": ["ev-001", "ev-002"],
+      "testCriteria": [
+        "JXG.Math.Numerics.root(h, warmStart) where h(x)=f(x)-g(x) completes in <1ms for linear, quadratic, and abs functiongraph pairs during drag",
+        "board.on('update') callback completes full intersection recompute + label update + fold geometry update within 16ms frame budget",
+        "Warm start strategy (previous intersection x as initial guess) reduces solver iterations vs cold start by >= 50%",
+        "board.suspendUpdate() + unsuspendUpdate() reduces visible DOM flicker vs per-element update in 10+ element scenario",
+        "InteractionTelemetry captures solver iteration counts and frame durations with < 0.1ms overhead per frame"
+      ],
+      "architectureImplications": [
+        "board.on('update') observer grows as dependent element count increases — DRY risk at 5+ elements (rule of three triggered)",
+        "board.reducedUpdate=true CANNOT be used: reducedUpdate bypasses the update chain, suppressing the board.on('update') observer trigger — mutually exclusive with the H-B architecture",
+        "Zero migration cost: raw DOM addEventListener stays in place; board.on('update') is purely additive",
+        "Full telemetry control: solver iteration counts, individual element latency, and frame budget breakdowns accessible in observer callback",
+        "ORCH-10 compliance: all annotation elements must still be declared board elements, not DOM mutations — constraint applies equally to H-A and H-B",
+        "DDD partial violation: 'board observer architecture' is non-JSXGraph vocabulary — introduces custom concept not found in JSXGraph docs (§DC5-05 flag)"
+      ],
+      "devcon5Alignment": {
+        "DDD": "PARTIAL VIOLATION: 'board observer' and 'explicit dependency graph' introduce non-JSXGraph domain vocabulary (§DC5-05 flag). JXG.Math.Numerics.root is JSXGraph-native vocabulary. Raw DOM addEventListener is non-JSXGraph vocabulary already present in codebase (flagged in decision-log).",
+        "DRY": "RISK: board.on('update') observer accumulates element update calls as element count grows. Rule of three: at 3+ distinct element types in observer → abstraction required (DependencyGraph traversal). Without abstraction, observer becomes a DRY violation by element #5.",
+        "OCP": "VIOLATION for base case: adding new dependent elements REQUIRES modifying board.on('update') callback. Only resolved if DependencyGraph traversal is added (which pushes toward a hybrid H-A/H-B architecture).",
+        "PECS": "ANTI-PATTERN risk: board.on('update') mixes SENSE (read element positions) + DECIDE (run solver) + ACT (update labels) + LEARN (push telemetry) in one callback. Violates separation that PECS interfaces would enforce. Can be mitigated by decomposing the callback into typed handler functions."
+      },
+      "propagation": {
+        "forward": "IntersectionResolverInterface (ontology) → NewtonRaphsonResolver: JXG.Math.Numerics.root(h, warmStart) (contract+backend) → board.on('update') explicit call → CoordinateLabel.setText() mutation → JSXGraphCanvas SVG repaint (frontend) | status: PARTIAL — explicit contract layer between solver and observer not yet declared; observer callback is an implicit dependency hub",
+        "backward": "board.on('update') frame → explicit frame timestamp + solver iterations push to InteractionTelemetry (lineage) → solver performance + warmStart effectiveness evaluation → Newton warmStart initial guess strategy refinement → IntersectionResolverInterface algorithm note update (ontology) | status: partial — observation hook requires explicit declaration in architecture"
+      },
+      "architectureGapRisk": "HIGH — board.on('update') + raw DOM addEventListener creates an implicit coordination problem: DOM drag events and JSXGraph board updates may fire in different frames, creating potential race conditions in ty synchronization. This is an architectural fact, not an evidence gap."
     }
   ],
+
   "scenarios": [
     {
-      "id": "sc-rt-a-base", "type": "base", "name": "R3F + Convex Base: Managed BaaS with Auth",
-      "description": "R3F v9 for 3D rendering. Convex for backend (schema, queries, mutations). Convex Auth for teacher login. Student accounts managed by school. Dashboard as React pages with role-based views.",
-      "assumptions": ["A1: Convex provides SOC 2 compliance sufficient for EdTech", "A2: Convex Auth integrates with school SSO (Clever/Google)", "A3: COPPA school consent mechanism is legally valid for this use case", "A4: Cost within budget for 100-500 students"],
-      "evidenceBaseIds": ["ev-v2-01"],
-      "contradictions": ["COPPA school consent conditions are unclear without legal review", "Convex COPPA compliance posture not verified"],
+      "id": "sc-s1-01-base",
+      "hypothesisId": "hyp-s1-01",
+      "type": "base",
+      "session": "smoke-001",
+      "description": "Most likely outcome: Bun.write() + TypeBox + StateReducer provides a stable, performant CLI state management solution for typical usage (single-agent, < 1MB state files, infrequent writes).",
+      "assumptions": [
+        {"id": "a1", "text": "Bun.write() provides adequate write performance via optimized syscalls (not necessarily atomic, but fast)", "evidenceId": "c-s1-05"},
+        {"id": "a2", "text": "TypeBox validation at ~8ms/100k iterations is negligible overhead for CLI state files (< 1000 reads/writes per session)", "evidenceId": "c-s1-07"},
+        {"id": "a3", "text": "StateReducer (DC5-06) derives current state from snapshot without requiring log replay", "evidenceId": "c-s1-03"},
+        {"id": "a4", "text": "FileSystemAccessPolicy (POSIX chmod 600) provides sufficient access control for single-user CLI tool", "evidenceId": "src-s1-03"}
+      ],
+      "evidenceBaseIds": ["c-s1-05", "c-s1-07", "c-s1-03", "ev-s1-01", "src-s1-03"],
+      "contradictions": [
+        {
+          "id": "contra-s1-01-base-01",
+          "claim": "Bun.write() atomicity unconfirmed — 'optimized syscalls' does not explicitly guarantee atomic write behavior on process termination",
+          "evidenceId": "gap-s1-01",
+          "classification": "evidence-gap-driven",
+          "resolution": "ROUND 2: c-s1-05 'optimized syscalls' on POSIX Linux implies write() syscall which is atomic for small file writes. Resolved by POSIX inference. NextExperiment: confirm Bun.write() atomic behavior with kill -9 test."
+        }
+      ],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "sufficient",
+      "evaluationScores": {
+        "evidenceFit": 4,
+        "implementationDifficulty": 4,
+        "riskSeverity": 4,
+        "reversibility": 4,
+        "timeToValue": 5,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 4,
+        "dlaFit": 4,
+        "forwardPropHealth": 3,
+        "agentComposability": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Core assumptions backed by tier-1 Bun docs and official DC5-06; TypeBox performance from tier-3 blog only",
+        "implementationDifficulty": "Straightforward — proven Bun.write + TypeBox pattern, clear docs, ~1-2 weeks",
+        "riskSeverity": "Minor — Bun.write atomicity gap is low-probability; workaround via temp-file rename available",
+        "reversibility": "Mostly reversible — SchemaValidatorInterface swap in days; snapshot→log-first requires refactor but data preserved",
+        "timeToValue": "Days — working prototype with Bun.write + TypeBox + minimal StateReducer in < 1 week",
+        "governanceCompliance": "CLI tool, no regulated data, POSIX permissions sufficient",
+        "ecosystemMaturity": "Bun 1.x stable 2+ years; TypeBox actively maintained; both production-ready",
+        "dlaFit": "All 5 domains covered with classified objects; SECURITY based on inference from Bun path semantics",
+        "forwardPropHealth": "Backend propagation designed; CLI command surface not yet declared; TypeBox→JSON Schema path documented not implemented",
+        "agentComposability": "Core read/write operations composable by agents; concurrent multi-agent writes require custom locking or sequential protocol"
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationPhase": "Phase 1 — Golden Tables",
+      "revisionRound": 2
+    },
+
+    {
+      "id": "sc-s1-01-best",
+      "hypothesisId": "hyp-s1-01",
+      "type": "best",
+      "session": "smoke-001",
+      "description": "Optimistic outcome: gap-s1-01 resolved favorably for Bun.write(), TypeBox JSON Schema integrates seamlessly with CLI tooling, and AtomicWriteAction achieves true crash safety via OS-level guarantees.",
+      "assumptions": [
+        {"id": "a1", "text": "Bun.write() confirmed atomic: internally uses O_TMPFILE + rename or equivalent POSIX atomic write pattern", "evidenceId": "c-s1-05"},
+        {"id": "a2", "text": "TypeBox JSON Schema output integrates with CLI help text and OpenAPI surface without additional tooling", "evidenceId": "c-s1-09"},
+        {"id": "a3", "text": "StateReducer read-time derivation stays < 5ms for typical snapshot chains (< 100 versions)", "evidenceId": "c-s1-03"},
+        {"id": "a4", "text": "SchemaValidatorInterface enables seamless TypeBox→Valibot swap if bundle constraint emerges (OCP)", "evidenceId": "c-s1-01"}
+      ],
+      "evidenceBaseIds": ["c-s1-05", "c-s1-09", "c-s1-03", "c-s1-01"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 5,
+        "riskSeverity": 5,
+        "reversibility": 5,
+        "timeToValue": 5,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 4,
+        "dlaFit": 5,
+        "forwardPropHealth": 4,
+        "agentComposability": 4
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Assumption a3 (StateReducer latency < 5ms) is inference-only; a1 assumes gap-s1-01 resolved favorably without direct evidence",
+        "implementationDifficulty": "Trivial — existing patterns, clear Bun docs, TypeBox well-documented, < 1 week",
+        "riskSeverity": "Negligible — crash safety guaranteed if Bun.write atomic; TypeBox OCP enables risk-free validator swap",
+        "reversibility": "Fully reversible — SchemaValidatorInterface drop-in swap; snapshot format migration scripted via StateReducer",
+        "timeToValue": "Days — prototype achievable in < 1 week",
+        "governanceCompliance": "Full compliance — no regulated data",
+        "ecosystemMaturity": "Bun 1.x stable; TypeBox active community",
+        "dlaFit": "All 5 domains cleanly covered with evidence-backed objects; ForwardProp + BackwardProp paths declared",
+        "forwardPropHealth": "TypeBox→JSON Schema→OpenAPI chain documented; CLI command surface gap is minor (easily added)",
+        "agentComposability": "Most operations composable; concurrent write coordination is minor adapter (lock token pattern)"
+      },
+      "devcon5AlignmentScore": 5,
+      "implementationPhase": "Phase 3 — AI-First",
+      "revisionRound": 2
+    },
+
+    {
+      "id": "sc-s1-01-worst",
+      "hypothesisId": "hyp-s1-01",
+      "type": "worst",
+      "session": "smoke-001",
+      "description": "Pessimistic outcome: Bun.write() atomicity fails on SIGKILL, producing a corrupt state.json that breaks the entire CLI tool until manually repaired.",
+      "assumptions": [
+        {"id": "a1", "text": "Bun.write() uses in-place overwrite (not temp-file rename) — SIGKILL during write produces partial state.json", "evidenceId": "gap-s1-01"},
+        {"id": "a2", "text": "StateSchemaDefinition (TypeBox) validation correctly detects corrupt state.json on next load", "evidenceId": "c-s1-07"},
+        {"id": "a3", "text": "No automatic repair mechanism exists — user must manually delete and reinitialize state", "evidenceId": null},
+        {"id": "a4", "text": "Corruption occurs in production after 1000+ hours of use (low but non-zero probability)", "evidenceId": null}
+      ],
+      "evidenceBaseIds": ["gap-s1-01", "c-s1-07"],
+      "contradictions": [
+        {
+          "id": "contra-s1-01-worst-01",
+          "claim": "c-s1-05 says Bun.write uses 'optimized syscalls' — on Linux, write() to a file followed by fsync() is effectively atomic for power-failure scenarios, but not for SIGKILL",
+          "evidenceId": "c-s1-05",
+          "classification": "resolvable",
+          "resolution": "ROUND 2: POSIX write() is NOT atomic for SIGKILL — kernel may flush partial buffer. However, Bun.write() with small JSON (< 4KB) fits in a single write() syscall which IS atomic at the block level. Resolution: partial — small state files likely safe; large state files at risk. Downgrade severity for typical CLI use."
+        }
+      ],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 3,
+        "riskSeverity": 2,
+        "reversibility": 3,
+        "timeToValue": 3,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 4,
+        "dlaFit": 3,
+        "forwardPropHealth": 2,
+        "agentComposability": 2
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Assumptions a3 and a4 (no repair, corruption frequency) have no evidence IDs — scenario is partially speculative",
+        "implementationDifficulty": "Moderate — mitigations (temp-file rename, corruption detection, auto-repair) require custom code, ~2-4 weeks",
+        "riskSeverity": "Severe — state corruption = CLI tool fails until manual intervention; data loss for multi-agent sessions",
+        "reversibility": "Partial — can add temp-file pattern without full rewrite; but corrupted state files require manual recovery",
+        "timeToValue": "2-4 weeks to implement safe write-and-rename pattern",
+        "governanceCompliance": "No regulated data — corruption is user inconvenience, not compliance failure",
+        "ecosystemMaturity": "Bun ecosystem mature; but atomic write patterns not documented in Bun official docs",
+        "dlaFit": "Core D/L/A clear; crash recovery path crosses ACTION/DATA boundary — not cleanly classified",
+        "forwardPropHealth": "Corrupt state breaks StateFileContract → downstream propagation undefined; ForwardProp chain broken at DATA layer",
+        "agentComposability": "Agents cannot compose against a corrupt state tool without error recovery protocol; not composable by default"
+      },
+      "devcon5AlignmentScore": 2,
+      "implementationPhase": "Phase 1 — Golden Tables",
+      "revisionRound": 2
+    },
+
+    {
+      "id": "sc-s1-01-adv",
+      "hypothesisId": "hyp-s1-01",
+      "type": "adversarial",
+      "session": "smoke-001",
+      "description": "Adversarial: Two Kosmos agent threads write state simultaneously via AtomicWriteAction with no coordination protocol — last write wins, first write's data is silently lost. Discovered in Phase 3 when Kosmos Agent Teams adds concurrent agents.",
+      "assumptions": [
+        {"id": "a1", "text": "Multiple Kosmos agents run concurrently and call AtomicWriteAction simultaneously on the same state file path", "evidenceId": "c-s1-05"},
+        {"id": "a2", "text": "Bun.write() provides no built-in file locking — concurrent writes race at OS level", "evidenceId": "src-s1-03"},
+        {"id": "a3", "text": "Last-write-wins: second agent's write succeeds but silently overwrites first agent's state changes", "evidenceId": null},
+        {"id": "a4", "text": "TypeBox validation succeeds (valid schema) but semantics are wrong (stale or merged incorrectly)", "evidenceId": "c-s1-07"}
+      ],
+      "evidenceBaseIds": ["c-s1-05", "src-s1-03", "c-s1-07"],
+      "contradictions": [
+        {
+          "id": "contra-s1-01-adv-01",
+          "claim": "File locking at OS level (flock/fcntl) IS available to Bun via Bun.ffi or OS bindings — Bun just doesn't expose a high-level API for it",
+          "evidenceId": "src-s1-03",
+          "classification": "irreconcilable",
+          "resolution": "UNRESOLVABLE: While OS-level locking IS possible, the core claim stands — Bun.write() as called in AtomicWriteAction provides NO inherent locking. Implementing locking requires custom code (OS bindings, advisory lock file). This is an irreconcilable tension: the ontology's AtomicWriteAction as currently designed does not solve concurrent access. Split into two sub-scenarios would be: (a) without-locking (this scenario) and (b) with-locking (mitigation). For smoke test: keep as unresolvable since fixing this requires AtomicWriteAction redesign."
+        }
+      ],
+      "contradictionStatus": "unresolvable",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 2,
+        "riskSeverity": 1,
+        "reversibility": 3,
+        "timeToValue": 3,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 3,
+        "dlaFit": 2,
+        "forwardPropHealth": 1,
+        "agentComposability": 1
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Concurrent write failure mode is inference; core Bun.write behavior from official docs; locking absence inferred from docs",
+        "implementationDifficulty": "Difficult — adding file locking requires OS bindings or advisory lock file pattern; 1-2 months to implement safely",
+        "riskSeverity": "Critical — silent state corruption with no error until next validation; in multi-agent Kosmos, this is a production safety issue",
+        "reversibility": "Partial — can add locking layer without full architecture rewrite; but existing corrupted states unrecoverable",
+        "timeToValue": "Mitigation adds 2-4 weeks minimum",
+        "governanceCompliance": "No regulated data — data loss is user inconvenience, not compliance failure",
+        "ecosystemMaturity": "Bun file locking APIs not documented — emerging area; limited production examples",
+        "dlaFit": "Concurrent write failure crosses ACTION/SECURITY boundaries — D/L/A boundary ambiguity for race conditions",
+        "forwardPropHealth": "Race condition breaks StateFileContract atomicity assumption — ForwardProp chain disconnected at ACTION layer",
+        "agentComposability": "Agents competing for write access with no coordination protocol = not composable; architecture fails at Phase 3 (AI-First)"
+      },
+      "devcon5AlignmentScore": 1,
+      "implementationPhase": "Phase 3 — AI-First",
+      "revisionRound": 2
+    },
+
+    {
+      "id": "sc-s1-02-base",
+      "hypothesisId": "hyp-s1-02",
+      "type": "base",
+      "session": "smoke-001",
+      "description": "Most likely outcome: FileSink append + StateReducer replay + Zod validation provides reliable, crash-safe CLI state management with the StateChangeAuditLog as a first-class LEARN artifact.",
+      "assumptions": [
+        {"id": "a1", "text": "FileSink .flush() guarantees log entry durability before process exit when called explicitly", "evidenceId": "c-s1-06"},
+        {"id": "a2", "text": "StateReducer replay of log entries produces correct current state (Reducer property: reduce(events) = focus_value)", "evidenceId": "c-s1-03"},
+        {"id": "a3", "text": "Zod v4 validation at ~180ms/100k (~1.8μs/call) is negligible for CLI state files (< 100 validations per session)", "evidenceId": "c-s1-07"},
+        {"id": "a4", "text": "Log growth is bounded by periodic compaction via AtomicWriteAction (snapshot), resetting replay from compaction checkpoint", "evidenceId": "c-s1-05"}
+      ],
+      "evidenceBaseIds": ["c-s1-06", "c-s1-03", "ev-s1-01", "c-s1-07", "c-s1-05"],
+      "contradictions": [
+        {
+          "id": "contra-s1-02-base-01",
+          "claim": "gap-s1-01: FileSink flush guarantees not confirmed in docs reviewed — partial log entries possible on SIGKILL",
+          "evidenceId": "gap-s1-01",
+          "classification": "resolvable",
+          "resolution": "ROUND 1: c-s1-06 explicitly documents FileSink .flush() and .end() methods — developer MUST call flush() before exit to guarantee durability. If called, guarantee is provided. Contradiction RESOLVED: AppendLogAction must call .flush() before returning. This is a design requirement, not an inherent limitation."
+        },
+        {
+          "id": "contra-s1-02-base-02",
+          "claim": "c-s1-07: Zod v4 ~180ms/100k vs TypeBox ~8ms — H2 chose slower validator, which could matter at scale",
+          "evidenceId": "c-s1-07",
+          "classification": "resolvable",
+          "resolution": "ROUND 1: 180ms/100k = 1.8μs per call. CLI session with < 100 validations = < 180μs total validation overhead. This is negligible. For Zod's ergonomic TypeScript inference (key advantage for CLI-first dev), this trade-off is clearly justified. Contradiction RESOLVED: Zod performance is acceptable at CLI scale."
+        }
+      ],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "sufficient",
+      "evaluationScores": {
+        "evidenceFit": 4,
+        "implementationDifficulty": 3,
+        "riskSeverity": 4,
+        "reversibility": 3,
+        "timeToValue": 4,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 4,
+        "dlaFit": 5,
+        "forwardPropHealth": 3,
+        "agentComposability": 4
+      },
+      "evaluationRationale": {
+        "evidenceFit": "FileSink and Bun.write from official docs; StateReducer from official DC5-06; Zod perf from tier-3 blog; all core assumptions backed",
+        "implementationDifficulty": "Moderate — event sourcing + log replay adds architectural complexity; compaction strategy requires design; ~2-4 weeks",
+        "riskSeverity": "Minor — explicit .flush() resolves gap-s1-01; log entries immutable; primary risk is compaction timing",
+        "reversibility": "Partial — switching log-first to snapshot-first requires log migration script; data preserved but architecture refactor",
+        "timeToValue": "1-2 weeks — FileSink API simple; StateReducer replay straightforward for small logs",
+        "governanceCompliance": "No regulated data; POSIX sufficient",
+        "ecosystemMaturity": "Bun 1.x stable; Zod v4 released; FileSink API documented in official Bun docs",
+        "dlaFit": "All 5 domains explicitly mapped; StateChangeAuditLog as LEARN artifact is ideal DC5-06 alignment; cleanest D/L/A of all 8 scenarios",
+        "forwardPropHealth": "Audit log contract designed; CLI 'state history' surface documented; StateReducer read path not fully implemented",
+        "agentComposability": "AppendLogAction inherently safe for concurrent agents (append-only, no read-modify-write cycle); agents can append independently"
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationPhase": "Phase 2 — Operational",
+      "revisionRound": 2
+    },
+
+    {
+      "id": "sc-s1-02-best",
+      "hypothesisId": "hyp-s1-02",
+      "type": "best",
+      "session": "smoke-001",
+      "description": "Optimistic outcome: FileSink WAL semantics provide strong durability guarantees, StateReducer replay is fast (< 10ms for 10k entries on Bun), and the append-only log enables perfect agent composability without coordination overhead.",
+      "assumptions": [
+        {"id": "a1", "text": "FileSink .flush() + .end() provides WAL (Write-Ahead Log) semantics — entries durable before exit", "evidenceId": "c-s1-06"},
+        {"id": "a2", "text": "Bun StateReducer replay achieves < 10ms for 10,000 log entries (Bun runtime is ~3× faster than Node.js)", "evidenceId": "c-s1-03"},
+        {"id": "a3", "text": "Append-only log enables lock-free concurrent agent writes — two agents can append simultaneously without coordination", "evidenceId": "c-s1-06"},
+        {"id": "a4", "text": "Compaction runs automatically after every N entries, bounding startup latency to O(1) amortized", "evidenceId": "c-s1-05"}
+      ],
+      "evidenceBaseIds": ["c-s1-06", "c-s1-03", "c-s1-05"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 4,
+        "riskSeverity": 5,
+        "reversibility": 4,
+        "timeToValue": 4,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 4,
+        "dlaFit": 5,
+        "forwardPropHealth": 4,
+        "agentComposability": 5
+      },
+      "evaluationRationale": {
+        "evidenceFit": "a2 (Bun replay latency < 10ms for 10k) is inference only — no benchmark; a3 (lock-free concurrent appends) assumes POSIX append atomicity which may not hold for large writes",
+        "implementationDifficulty": "Straightforward once FileSink semantics confirmed; compaction is additional work but well-understood pattern",
+        "riskSeverity": "Negligible — append-only log has no overwrite risk; flush guarantees durability",
+        "reversibility": "Mostly reversible — log is self-documenting; can migrate to snapshot-first via StateReducer replay + final snapshot",
+        "timeToValue": "1-2 weeks — event sourcing pattern well-established in TypeScript ecosystem",
+        "governanceCompliance": "Full compliance",
+        "ecosystemMaturity": "Bun 1.x; Zod v4; FileSink documented; all stable",
+        "dlaFit": "All domains cleanly covered; StateChangeAuditLog as primary LEARN entity is ideal alignment with DC5-06 Reducer preserved history",
+        "forwardPropHealth": "AuditContract CLI surface documented; StateReducer as query surface exposable as agent tool; minor gap in CLI command schema",
+        "agentComposability": "Append-only = no coordination needed between agents; each agent appends independently; StateReducer handles aggregation; perfect Phase 3 alignment"
+      },
+      "devcon5AlignmentScore": 5,
+      "implementationPhase": "Phase 3 — AI-First",
+      "revisionRound": 2
+    },
+
+    {
+      "id": "sc-s1-02-worst",
+      "hypothesisId": "hyp-s1-02",
+      "type": "worst",
+      "session": "smoke-001",
+      "description": "Pessimistic outcome: Log replay latency degrades with log growth, compaction itself has atomicity risk, and Bun FileSink provides weaker-than-expected flush guarantees for high-frequency writes.",
+      "assumptions": [
+        {"id": "a1", "text": "FileSink flush latency is high under heavy load — explicit .flush() call blocks for > 100ms per write", "evidenceId": "gap-s1-01"},
+        {"id": "a2", "text": "StateReducer log replay exceeds 500ms startup latency for 50,000+ entries without compaction", "evidenceId": null},
+        {"id": "a3", "text": "Compaction snapshot (Bun.write) is not atomic — compaction failure produces a corrupt snapshot + truncated log", "evidenceId": "gap-s1-01"},
+        {"id": "a4", "text": "Zod v4 schema validation performance degrades at large state sizes (> 10MB) in ways not reflected in 100k simple iteration benchmark", "evidenceId": "c-s1-07"}
+      ],
+      "evidenceBaseIds": ["gap-s1-01", "c-s1-07"],
+      "contradictions": [
+        {
+          "id": "contra-s1-02-worst-01",
+          "claim": "c-s1-06 documents explicit .flush() as provided — this means flush behavior IS defined, suggesting guarantee IS available",
+          "evidenceId": "c-s1-06",
+          "classification": "resolvable",
+          "resolution": "ROUND 1: c-s1-06 shows .flush() exists and is documented. Flush latency concern is about implementation, not availability. PARTIALLY RESOLVED: flush exists; high-latency concern is evidence gap not an irreconcilable contradiction. Update: assumption a1 revised to 'flush latency under heavy write load is unconfirmed'."
+        },
+        {
+          "id": "contra-s1-02-worst-02",
+          "claim": "No evidence for StateReducer replay latency at 50,000 entries — this is a gap that NextExperiment should resolve",
+          "evidenceId": "gap-s1-02",
+          "classification": "evidence-gap-driven",
+          "resolution": "ROUND 2: Remains unresolved — no Bun replay benchmark available in smoke-001 session. NextExperiment created: 'bun bench with 50k StateReducer events'. Flags for evaluator."
+        }
+      ],
       "contradictionStatus": "detected",
-      "evidenceSufficiency": "insufficient",
-      "revisionRound": 2,
-      "architectureImplications": ["Managed infra reduces ops", "Vendor dependency for compliance", "Convex pricing at scale unknown"],
-      "implementationDifficulty": 3,
-      "deploymentImplications": ["Convex cloud hosting", "Vercel or similar for frontend", "Two providers"],
-      "governanceImplications": ["COPPA compliance depends on: (1) school consent mechanism validity, (2) Convex DPA, (3) privacy policy, (4) data retention policy — ALL UNVERIFIED"],
-      "safetyImplications": ["Children's data stored on third-party cloud — breach liability"],
-      "recommendedActions": ["Legal review of COPPA school consent", "Convex DPA negotiation", "Privacy policy drafting"],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 2, "evidenceFit": "weak", "rationale": "Convex COPPA posture not verified. School consent mechanism not confirmed with tier-1 evidence." },
-        { "dimension": "Implementation Difficulty", "score": 3, "evidenceFit": "moderate", "rationale": "Convex + R3F is technically feasible, well-documented stack" },
-        { "dimension": "Risk Severity", "score": 1, "evidenceFit": "strong", "rationale": "COPPA violation = FTC enforcement action. Children's data breach = catastrophic." },
-        { "dimension": "Reversibility", "score": 3, "evidenceFit": "moderate", "rationale": "Can switch BaaS but data migration + new DPA needed" },
-        { "dimension": "Time-to-Value", "score": 3, "evidenceFit": "moderate", "rationale": "Tech build 2-4 weeks, but legal review adds unknown timeline" },
-        { "dimension": "Governance Compliance", "score": 1, "evidenceFit": "weak", "rationale": "GOVERNANCE IS THE CRITICAL FAILURE POINT. COPPA + FERPA compliance CANNOT be determined without legal review. Score 1 = non-compliant until verified." },
-        { "dimension": "Ecosystem Maturity", "score": 4, "evidenceFit": "strong", "rationale": "R3F + Convex both mature stacks" }
-      ]
-    },
-    {
-      "id": "sc-rt-a-best", "type": "best", "name": "R3F + Convex Best: School Consent Works + SOC 2",
-      "description": "Legal review confirms school consent is valid. Convex provides DPA. Privacy policy approved. Teacher dashboard with per-student views. Adaptive difficulty via LEARN loop.",
-      "assumptions": ["A1: School consent mechanism validated by attorney", "A2: Convex DPA meets school district requirements", "A3: Privacy policy passes school/district review", "A4: Pilot approved by district IT"],
-      "evidenceBaseIds": ["ev-v2-01"],
-      "contradictions": [],
-      "contradictionStatus": "none",
-      "evidenceSufficiency": "insufficient",
-      "revisionRound": 2,
-      "architectureImplications": ["Full pilot deployment possible"],
-      "implementationDifficulty": 3,
-      "deploymentImplications": ["Production deployment with monitoring"],
-      "governanceImplications": ["All compliance verified — but this is the BEST CASE assumption"],
-      "safetyImplications": ["Data handling procedures documented and approved"],
-      "recommendedActions": ["This is the target state — all prerequisites must be met first"],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 1, "evidenceFit": "none", "rationale": "BEST CASE ONLY — none of these assumptions have evidence. Legal review has not occurred." },
-        { "dimension": "Implementation Difficulty", "score": 3, "evidenceFit": "moderate", "rationale": "Same tech stack" },
-        { "dimension": "Risk Severity", "score": 3, "evidenceFit": "weak", "rationale": "If all compliance verified, risk is manageable — but evidence is zero" },
-        { "dimension": "Reversibility", "score": 3, "evidenceFit": "moderate", "rationale": "Same as base" },
-        { "dimension": "Time-to-Value", "score": 2, "evidenceFit": "weak", "rationale": "Legal review timeline is unknown — could be weeks to months" },
-        { "dimension": "Governance Compliance", "score": 1, "evidenceFit": "none", "rationale": "Governance score cannot exceed 1 without completed legal review. This is an ASSUMPTION, not evidence." },
-        { "dimension": "Ecosystem Maturity", "score": 4, "evidenceFit": "strong", "rationale": "Same" }
-      ]
-    },
-    {
-      "id": "sc-rt-a-worst", "type": "worst", "name": "R3F + Convex Worst: Legal Review Blocks Deployment",
-      "description": "Legal review reveals school consent mechanism is insufficient for this use case. Verifiable parental consent (VPC) required. VPC implementation adds months and cost. Pilot proposal rejected by district.",
-      "assumptions": ["A1: School consent mechanism does NOT cover commercial EdTech vendors without specific DPA", "A2: District requires VPC for all under-13 data collection", "A3: VPC implementation requires identity verification service ($$$)", "A4: District IT rejects Convex as data processor without SOC 2 Type II + specific children's data addendum"],
-      "evidenceBaseIds": [],
-      "contradictions": [],
-      "contradictionStatus": "none",
       "evidenceSufficiency": "partial",
-      "revisionRound": 2,
-      "architectureImplications": ["Architecture is fine — compliance blocks deployment"],
-      "implementationDifficulty": 1,
-      "deploymentImplications": ["Cannot deploy until VPC + DPA resolved"],
-      "governanceImplications": ["Project blocked by compliance. This is the REALISTIC scenario without legal preparation."],
-      "safetyImplications": ["Attempting deployment without compliance = FTC enforcement risk"],
-      "recommendedActions": ["DO NOT deploy without completed legal review. This is not optional."],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 3, "evidenceFit": "moderate", "rationale": "District rejection of insufficient compliance is a documented pattern" },
-        { "dimension": "Implementation Difficulty", "score": 1, "evidenceFit": "moderate", "rationale": "VPC + DPA + legal review = months of non-technical work" },
-        { "dimension": "Risk Severity", "score": 1, "evidenceFit": "strong", "rationale": "FTC enforcement + district rejection = project death" },
-        { "dimension": "Reversibility", "score": 2, "evidenceFit": "moderate", "rationale": "Legal compliance work is not stack-specific — transferable" },
-        { "dimension": "Time-to-Value", "score": 1, "evidenceFit": "moderate", "rationale": "Blocked indefinitely by legal" },
-        { "dimension": "Governance Compliance", "score": 1, "evidenceFit": "strong", "rationale": "Non-compliant — deployment blocked" },
-        { "dimension": "Ecosystem Maturity", "score": 4, "evidenceFit": "strong", "rationale": "Tech is fine — compliance is the blocker" }
-      ]
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 2,
+        "riskSeverity": 2,
+        "reversibility": 2,
+        "timeToValue": 2,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 3,
+        "dlaFit": 3,
+        "forwardPropHealth": 2,
+        "agentComposability": 2
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Assumptions a2 and a3 have no evidence; a1 partially resolved; scenario is significantly speculative",
+        "implementationDifficulty": "Difficult — WAL-level guarantees, compaction atomicity, startup latency budget enforcement all require custom work",
+        "riskSeverity": "Severe — slow startup + potential compaction failure = user-visible system failure",
+        "reversibility": "Difficult — log-first is an architectural commitment; migration to snapshot-first requires tooling and could corrupt state",
+        "timeToValue": "1-2 months to implement production-safe log + compaction + latency bounds",
+        "governanceCompliance": "No regulated data",
+        "ecosystemMaturity": "FileSink at production scale for large logs: limited production examples in Bun ecosystem",
+        "dlaFit": "Compaction failure crosses ACTION/DATA boundary; crash recovery path not cleanly classified",
+        "forwardPropHealth": "Slow replay breaks StateReducer's implicit contract with CLI; ForwardProp chain stalls at startup",
+        "agentComposability": "Agents cannot compose against a slow-starting or compaction-failed state tool"
+      },
+      "devcon5AlignmentScore": 2,
+      "implementationPhase": "Phase 1 — Golden Tables",
+      "revisionRound": 2
     },
+
     {
-      "id": "sc-rt-a-adv", "type": "adversarial", "name": "R3F + Convex Adversarial: Data Breach of Children's Records",
-      "description": "Third-party BaaS (Convex) suffers a data breach. Student names, scores, and session data exposed. FTC enforcement action. Parents sue. School district terminates contract. Developer personally liable.",
-      "assumptions": ["A1: BaaS providers are breach targets", "A2: Children's data breach triggers enhanced FTC scrutiny", "A3: Developer as COPPA operator bears personal liability", "A4: School district has vicarious liability clauses in DPA"],
-      "evidenceBaseIds": [],
-      "contradictions": [],
-      "contradictionStatus": "none",
+      "id": "sc-s1-02-adv",
+      "hypothesisId": "hyp-s1-02",
+      "type": "adversarial",
+      "session": "smoke-001",
+      "description": "Adversarial: Log file grows to 1GB+ after a long-running Kosmos session with 100,000+ state mutations. StateReducer replay becomes a 30-second startup penalty. The compaction trigger itself fails (Bun.write not atomic), leaving a corrupted snapshot and a now-truncated log.",
+      "assumptions": [
+        {"id": "a1", "text": "A long-running Kosmos session produces 100,000+ state mutation events at ~1KB each = ~100MB log file", "evidenceId": "c-s1-06"},
+        {"id": "a2", "text": "StateReducer replay of 100,000 entries takes > 30 seconds on standard hardware", "evidenceId": null},
+        {"id": "a3", "text": "Compaction trigger fires during peak load — Bun.write() for compaction snapshot is interrupted by SIGKILL mid-write", "evidenceId": "gap-s1-01"},
+        {"id": "a4", "text": "After failed compaction: snapshot is corrupt, original log is partially truncated — no recovery path without manual intervention", "evidenceId": null}
+      ],
+      "evidenceBaseIds": ["c-s1-06", "c-s1-05", "gap-s1-01"],
+      "contradictions": [
+        {
+          "id": "contra-s1-02-adv-01",
+          "claim": "c-s1-03: DC5-06 Reducers aggregate 'efficiently' — but 'efficiently' not defined for unbounded history; 100k events may still be fast on Bun",
+          "evidenceId": "c-s1-03",
+          "classification": "evidence-gap-driven",
+          "resolution": "UNRESOLVABLE without benchmark: 'efficiently' is relative. Log-first architectures fundamentally require either bounded log size (via compaction) or fast replay. At 100k entries, the efficiency claim cannot be assumed without empirical data. This is an architectural fact: unbounded append-only logs require compaction strategies. Marked unresolvable for architecture selection purposes."
+        },
+        {
+          "id": "contra-s1-02-adv-02",
+          "claim": "Compaction strategy (Bun.write for snapshot) introduces the same atomicity concern as H1 (AtomicWrite-first)",
+          "evidenceId": "c-s1-05",
+          "classification": "irreconcilable",
+          "resolution": "UNRESOLVABLE: Both H1 and H2 require Bun.write() for snapshot persistence. H2's append-only nature makes the log safe, but compaction introduces H1's atomicity risk as a dependency. This is irreconcilable: any system that needs compaction inherits H1's worst-case risk. H2 is only strictly safer than H1 if compaction is never needed — which requires bounding log size to startup-time-acceptable levels without Bun.write."
+        }
+      ],
+      "contradictionStatus": "unresolvable",
       "evidenceSufficiency": "partial",
-      "revisionRound": 2,
-      "architectureImplications": ["Third-party data processor = shared liability"],
-      "implementationDifficulty": 1,
-      "deploymentImplications": ["Insurance, incident response plan, breach notification procedures all required"],
-      "governanceImplications": ["COPPA enforcement: FTC has imposed millions in fines for children's data violations"],
-      "safetyImplications": ["Children's data exposure = maximum severity safety event"],
-      "recommendedActions": ["Cyber liability insurance", "Incident response plan", "Data minimization"],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 3, "evidenceFit": "moderate", "rationale": "Data breaches of children's data are documented (VTech, Edmodo, etc.)" },
-        { "dimension": "Implementation Difficulty", "score": 1, "evidenceFit": "moderate", "rationale": "Breach preparation is a full compliance program" },
-        { "dimension": "Risk Severity", "score": 1, "evidenceFit": "strong", "rationale": "CATASTROPHIC — FTC fines + lawsuits + career damage" },
-        { "dimension": "Reversibility", "score": 1, "evidenceFit": "strong", "rationale": "Data breach cannot be reversed" },
-        { "dimension": "Time-to-Value", "score": 1, "evidenceFit": "moderate", "rationale": "Project terminated post-breach" },
-        { "dimension": "Governance Compliance", "score": 1, "evidenceFit": "strong", "rationale": "Complete compliance failure" },
-        { "dimension": "Ecosystem Maturity", "score": 4, "evidenceFit": "strong", "rationale": "Irrelevant in breach scenario" }
-      ]
+      "evaluationScores": {
+        "evidenceFit": 1,
+        "implementationDifficulty": 1,
+        "riskSeverity": 1,
+        "reversibility": 1,
+        "timeToValue": 2,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 2,
+        "dlaFit": 2,
+        "forwardPropHealth": 1,
+        "agentComposability": 1
+      },
+      "evaluationRationale": {
+        "evidenceFit": "a2 and a4 have zero evidence; a1 uses c-s1-06 as proxy for log growth rate (imprecise); scenario is mostly speculative",
+        "implementationDifficulty": "Extremely hard — requires log size monitoring, bounded compaction, corruption detection, manual recovery tooling, startup latency SLA enforcement",
+        "riskSeverity": "Critical — 30-second startup freeze + corrupted state after compaction failure = production system failure requiring manual intervention",
+        "reversibility": "Irreversible — log-first architecture commitment means migrating away requires significant tooling investment; existing data may be in log format only",
+        "timeToValue": "1-2 months before production-safe log management is implemented",
+        "governanceCompliance": "No regulated data but tool unavailability has operational consequences",
+        "ecosystemMaturity": "FileSink at GB scale: no documented production use cases in Bun ecosystem reviewed",
+        "dlaFit": "Log growth + compaction failure crosses all D/L/A boundaries — recovery path not classified; semantic drift in the architecture itself",
+        "forwardPropHealth": "Startup freeze and corrupt state break ForwardProp chain entirely — ontology → contract → backend → CLI all disconnected",
+        "agentComposability": "Agents cannot compose against a frozen CLI tool; no recovery protocol defined in ontology; Phase 3 complete failure"
+      },
+      "devcon5AlignmentScore": 1,
+      "implementationPhase": "Phase 3 — AI-First",
+      "revisionRound": 2
     },
+
     {
-      "id": "sc-rt-b-base", "type": "base", "name": "R3F + Firebase Base: Google Ecosystem with Children's Privacy",
-      "description": "R3F for 3D. Firebase (Firestore + Auth + Hosting). Firebase has documented children's privacy page. Google Workspace for Education SSO. Teacher dashboard as Firebase-hosted React app.",
-      "assumptions": ["A1: Firebase children's privacy controls satisfy COPPA", "A2: Google Workspace for Education SSO is COPPA-compliant for school use", "A3: Firestore security rules provide adequate row-level access control", "A4: Firebase free tier (Spark) covers 100-500 students"],
-      "evidenceBaseIds": [],
-      "contradictions": ["Firebase children's privacy page exists but specific COPPA compliance details need verification", "Google/Firebase ToS may require developer to independently ensure COPPA compliance"],
+      "id": "sc-jxg-A-base",
+      "hypothesisId": "hyp-jxg-A",
+      "type": "base",
+      "session": "jsxgraph-sequencer-001",
+      "description": "Standard adoption: migrate functiongraph drag to JSXGraph-native parentPoint + _dep chain. Native Intersection element auto-updates CoordinateLabels. board.reducedUpdate=true maintains 60fps for 8 dependent elements. TracePath handled via hybrid board.on('update') array push.",
+      "assumptions": [
+        {"id": "a1", "text": "board.create('intersection', [fg1, fg2, 0]) returns a live-updating IntersectionPoint auto-connected to functiongraph's native _dep system — no manual board.update() needed", "evidenceId": "ev-001"},
+        {"id": "a2", "text": "board.reducedUpdate=true limits per-frame computation to parentPoint + direct dependents only, maintaining 60fps with 8 dependent elements on SVG renderer", "evidenceId": "ev-005"},
+        {"id": "a3", "text": "CoordinateLabel (JXG.Text with function() callback over parentPoint.Y()) updates in real time within 16ms when parentPoint.Y() changes", "evidenceId": "ev-007"},
+        {"id": "a4", "text": "DragBehaviorInterface enables incremental migration from raw DOM addEventListener without regressing snap-to-grid and tangency assist. PR #90 already implemented AbsDragBehavior — pattern is proven for outer-abs case.", "evidenceId": "ev-003"}
+      ],
+      "evidenceBaseIds": ["ev-001", "ev-002", "ev-003", "ev-005", "ev-007"],
+      "contradictions": [
+        {
+          "id": "contra-jxg-A-base-01",
+          "claim": "ev-009 confirms Tracecurve requires a Glider as mover, conflicting with 'all 8 dependents auto-cascade via native _dep' — TracePath cannot use native tracecurve element",
+          "evidenceId": "ev-009",
+          "classification": "resolvable",
+          "resolution": "ROUND 1: TracePath and JSXGraph tracecurve are different mechanisms. TracePath can use board.on('update') to push dataX/dataY arrays (custom approach) while all other dependents cascade natively. This is a documented hybrid: 7 native + 1 custom. Exception is scoped, does not invalidate the core architecture. contradictionStatus: resolved."
+        }
+      ],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "sufficient",
+      "evaluationScores": {
+        "evidenceFit": 4,
+        "implementationDifficulty": 3,
+        "riskSeverity": 4,
+        "reversibility": 4,
+        "timeToValue": 3,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 4,
+        "forwardPropHealth": 4,
+        "agentComposability": 3,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Core assumptions backed by tier-1/2 JSXGraph docs (ev-001/ev-005/ev-007); reducedUpdate scope at 8+ dependents is minor gap",
+        "implementationDifficulty": "Moderate — migration from raw DOM addEventListener to parentPoint pattern in functiongraphDragSemantics.ts, ~2-4 weeks",
+        "riskSeverity": "Minor — DragBehaviorInterface provides incremental migration path; snap-to-grid regression risk is manageable",
+        "reversibility": "Mostly reversible — DragBehaviorInterface abstraction layer enables revert within days; TracePath hybrid is additive",
+        "timeToValue": "2-4 weeks — migration non-trivial but produces working real-time intersection + label updates",
+        "governanceCompliance": "Fully compliant — uses JSXGraph native APIs; InputSanitization (LaTeX→new Function()) boundary preserved",
+        "ecosystemMaturity": "JSXGraph 15+ years of production use; v1.12.2 is stable LTS; no ecosystem risk",
+        "dlaFit": "Most concepts cleanly assigned: IntersectionPoint→DATA, _dep→LOGIC, DragCascadeUpdate→ACTION; SECURITY and LEARN thin in base case",
+        "forwardPropHealth": "IntersectionResolverInterface → NativeIntersectionResolver → JSXGraph _dep → CoordinateLabel → JSXGraphCanvas chain is HEALTHY; TracePath custom update gap noted",
+        "agentComposability": "Core ops composable via IntersectionResolverInterface; TracePath custom board.on('update') handler requires human orchestration",
+        "prototypeValidation": "Not yet tested — score 3 placeholder; prototyper T7 will validate"
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationPhase": "Phase 2 — Operational Decision-Making",
+      "revisionRound": 1
+    },
+
+    {
+      "id": "sc-jxg-A-best",
+      "hypothesisId": "hyp-jxg-A",
+      "type": "best",
+      "session": "jsxgraph-sequencer-001",
+      "description": "Optimistic: perfect reducedUpdate cascade at 60fps+ with all 8 dependents auto-updating. DragBehaviorInterface migration completes with zero regression. New elements (integral, tangent line, second derivative) added with zero handler changes — pure OCP.",
+      "assumptions": [
+        {"id": "a1", "text": "board.reducedUpdate=true + 8 native _dep elements sustains 60fps across Chrome/Firefox/Safari SVG renderers with no dropped frames", "evidenceId": "ev-005"},
+        {"id": "a2", "text": "DragBehaviorInterface incremental migration completes with zero regression in snap-to-grid and tangency assist — JSXGraph drag callbacks provide same coordinate data as DOM events", "evidenceId": "ev-002"},
+        {"id": "a3", "text": "All dependent elements declared at board creation time via parentPoint closures — zero ad-hoc DOM mutations, fully ORCH-10 compliant", "evidenceId": "ev-007"},
+        {"id": "a4", "text": "parentPoint.on('drag') fires within same JSXGraph event loop iteration as functiongraph position — zero frame lag for dependent updates", "evidenceId": "ev-003"}
+      ],
+      "evidenceBaseIds": ["ev-002", "ev-003", "ev-005", "ev-007"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 5,
+        "riskSeverity": 5,
+        "reversibility": 4,
+        "timeToValue": 4,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 5,
+        "forwardPropHealth": 5,
+        "agentComposability": 4,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "reducedUpdate cascade correctness at 8+ dependents across all browsers is inference; 60fps guarantee not benchmarked at this scale",
+        "implementationDifficulty": "Trivial once parentPoint pattern established — new dependent elements added via board.create() with zero drag handler changes (pure OCP)",
+        "riskSeverity": "Negligible — JSXGraph single-threaded update loop eliminates race conditions; native cascade is self-maintaining",
+        "reversibility": "Mostly reversible — parentPoint pattern composable; new elements added as dependents are removable without side effects",
+        "timeToValue": "1-2 weeks after parentPoint migration — new elements declared in board.create() immediately",
+        "governanceCompliance": "Fully compliant — pure JSXGraph native API usage",
+        "ecosystemMaturity": "JSXGraph 15+ years; v1.12.2 stable; native _dep system well-documented",
+        "dlaFit": "All 5 domains cleanly covered: DependencyGraph IS the JSXGraph _dep system — perfect ontology alignment; no domain confusion",
+        "forwardPropHealth": "Full chain: IntersectionResolverInterface → NativeIntersectionResolver → JSXGraph _dep auto-cascade → CoordinateLabel → JSXGraphCanvas FULLY HEALTHY",
+        "agentComposability": "Most operations agent-composable via IntersectionResolverInterface and DragBehaviorInterface; TracePath custom update minor manual gap",
+        "prototypeValidation": "Not yet tested — score 3 placeholder"
+      },
+      "devcon5AlignmentScore": 5,
+      "implementationPhase": "Phase 3 — AI-First",
+      "revisionRound": 1
+    },
+
+    {
+      "id": "sc-jxg-A-worst",
+      "hypothesisId": "hyp-jxg-A",
+      "type": "worst",
+      "session": "jsxgraph-sequencer-001",
+      "description": "Pessimistic: DragBehaviorInterface migration breaks snap-to-grid and tangency assist. Raw DOM and JSXGraph parentPoint.on('drag') conflict — double-update per frame causes IntersectionPoint flickering. Migration stalls at 6-8 weeks. Teacher demo blocked.",
+      "assumptions": [
+        {"id": "a1", "text": "Raw DOM addEventListener and JSXGraph parentPoint.on('drag') fire in different phases — DOM fires first, updates ty, then JSXGraph re-fires for the same drag event, causing double update", "evidenceId": "ev-003"},
+        {"id": "a2", "text": "snap-to-grid and tangency assist in dragAssist.ts rely on raw DOM event coordinate APIs not directly available in JSXGraph callback (revised: requires non-trivial refactoring)", "evidenceId": "ev-002"},
+        {"id": "a3", "text": "Migration timeline extends to 6-8 weeks due to dual-event-system debugging and regression testing of all 16 element types", "evidenceId": null},
+        {"id": "a4", "text": "During migration window, both event systems active — IntersectionPoint visible flicker in teacher demo as board repaints twice per drag frame", "evidenceId": "ev-003"}
+      ],
+      "evidenceBaseIds": ["ev-002", "ev-003"],
+      "contradictions": [
+        {
+          "id": "contra-jxg-A-worst-01",
+          "claim": "ev-002 confirms JSXGraph drag callbacks provide full coordinate data — snap-to-grid IS portable to parentPoint.on('drag') without DOM-specific APIs",
+          "evidenceId": "ev-002",
+          "classification": "resolvable",
+          "resolution": "ROUND 1: ev-002 confirms JSXGraph drag event provides usrCoords. snap-to-grid IS portable — requires refactoring dragAssist.ts to use JXG coordinate system instead of DOM pixel coords. Assumption a2 revised: 'not available' → 'requires ~1-week refactoring'. Risk severity maintained at 2 (significant rework) but worst-case timeline reduced from 8 to 5 weeks. contradictionStatus: resolved."
+        }
+      ],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 2,
+        "riskSeverity": 2,
+        "reversibility": 3,
+        "timeToValue": 2,
+        "governanceCompliance": 4,
+        "ecosystemMaturity": 5,
+        "dlaFit": 3,
+        "forwardPropHealth": 2,
+        "agentComposability": 2,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "a3/a4 (migration timeline, flicker) have no direct evidence — inference from DOM/JSXGraph event model; a2 revised after contradiction resolution",
+        "implementationDifficulty": "Difficult — dual-event-system regression + dragAssist.ts refactoring, ~1-2 months total",
+        "riskSeverity": "Severe — IntersectionPoint flickering during teacher live demo is UX-breaking; blocked feature delivery for full teaching feature set",
+        "reversibility": "Partially reversible — DragBehaviorInterface provides abstraction but rollback requires reverting multiple files; significant effort",
+        "timeToValue": "1-2 months before stable migration — regression debugging delays value delivery",
+        "governanceCompliance": "Mostly compliant — no security gaps; regression is technical, not regulatory",
+        "ecosystemMaturity": "JSXGraph mature; dual-event-system issue is architectural choice, not ecosystem instability",
+        "dlaFit": "Core D/L/A clear; migration risk analysis lacks SECURITY/LEARN coverage; ForwardProp broken during migration window",
+        "forwardPropHealth": "ForwardProp chain broken at ACTION layer during migration: DragCascadeUpdate produces incorrect DragState while dual-event systems coexist",
+        "agentComposability": "Agents cannot compose against unreliable DragState mid-migration; IntersectionPoint coordinates non-deterministic",
+        "prototypeValidation": "Not yet tested — score 3 placeholder"
+      },
+      "devcon5AlignmentScore": 2,
+      "implementationPhase": "Phase 1 — Golden Tables",
+      "revisionRound": 1
+    },
+
+    {
+      "id": "sc-jxg-A-adv",
+      "hypothesisId": "hyp-jxg-A",
+      "type": "adversarial",
+      "session": "jsxgraph-sequencer-001",
+      "description": "Adversarial: |f(x)| absolute value function has a non-differentiable kink at fold boundary. JSXGraph native board.create('intersection') 2-root algorithm may stall or converge to wrong root near the kink. IntersectionResolverInterface fallback path not yet declared — no clean swap exists. Teacher demonstrates live; intersection jumps to wrong coordinate.",
+      "assumptions": [
+        {"id": "a1", "text": "There is NO official JSXGraph wiki example for intersection POINTS of two functiongraphs (claim-023, confidence 0.90). board.create('intersection', [fg1, fg2, 0]) was v1.12.1-improved but is untested for the specific functiongraph types in palantir-math (Linear/Quadratic crossing, |f(x)| crossing linear).", "evidenceId": "claim-023"},
+        {"id": "a2", "text": "At fold boundary (x where f_raw(x)+ty = 0), the abs-fold creates a kink — the 2-root solver's gradient approximation becomes unreliable at x=fold_boundary. A kink is non-differentiable but continuous; solver may oscillate rather than converge.", "evidenceId": "ev-001"},
+        {"id": "a3", "text": "IntersectionResolverInterface fallback to JXG.Math.Numerics.root() is not yet declared in the contract layer — no clean swap path exists at the boundary edge case", "evidenceId": null},
+        {"id": "a4", "text": "Teacher drags |f(x)| across fold boundary during live demo; intersection coordinate jumps visibly to wrong position — UX catastrophic for live teaching scenario", "evidenceId": null}
+      ],
+      "evidenceBaseIds": ["ev-001", "claim-023"],
+      "contradictions": [
+        {
+          "id": "contra-jxg-A-adv-01",
+          "claim": "ev-001 shows JSXGraph intersection uses 2-root algorithm with configurable precision — may handle kinks better than Newton-Raphson alone; kink is a non-differentiable point, not a discontinuity",
+          "evidenceId": "ev-001",
+          "classification": "evidence-gap-driven",
+          "resolution": "ROUND 2: ev-001 confirms 2-root algorithm with precision parameter. A kink (|f(x)|) is non-differentiable but continuous — unlike a discontinuity, the solver won't diverge but may oscillate near the kink. Exact behavior at fold boundary is an evidence gap: actual solver behavior on abs functions not documented. NextExperiment exp-jxg-01 created: prototype board.create('intersection') with |linear| function and test coordinate accuracy at fold boundary. contradictionStatus: detected (evidence gap — forwarded to prototyper T7)."
+        }
+      ],
       "contradictionStatus": "detected",
-      "evidenceSufficiency": "insufficient",
-      "revisionRound": 2,
-      "architectureImplications": ["Google ecosystem lock-in", "Firebase security rules for RBAC", "Firestore for score persistence"],
-      "implementationDifficulty": 3,
-      "deploymentImplications": ["Single vendor (Google) for everything"],
-      "governanceImplications": ["Firebase ToS likely states developer is responsible for COPPA — Firebase is processor, developer is operator. UNVERIFIED."],
-      "safetyImplications": ["Google infrastructure has strong security, but developer is still the COPPA operator"],
-      "recommendedActions": ["Read Firebase children's privacy policy exactly", "Verify Google Workspace for Education COPPA status", "Legal review still required"],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 2, "evidenceFit": "weak", "rationale": "Firebase children's page exists but exact COPPA compliance posture not verified in this run" },
-        { "dimension": "Implementation Difficulty", "score": 3, "evidenceFit": "moderate", "rationale": "Firebase + R3F well-documented" },
-        { "dimension": "Risk Severity", "score": 1, "evidenceFit": "moderate", "rationale": "Same COPPA risk as Option A — children's data is being stored" },
-        { "dimension": "Reversibility", "score": 2, "evidenceFit": "moderate", "rationale": "Google lock-in harder to reverse than Convex" },
-        { "dimension": "Time-to-Value", "score": 3, "evidenceFit": "moderate", "rationale": "Same timeline plus legal" },
-        { "dimension": "Governance Compliance", "score": 1, "evidenceFit": "weak", "rationale": "SAME AS OPTION A: cannot score above 1 without legal review. Firebase having a children's page does not equal compliance." },
-        { "dimension": "Ecosystem Maturity", "score": 5, "evidenceFit": "strong", "rationale": "Google/Firebase is the most mature BaaS" }
-      ]
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 2,
+        "riskSeverity": 2,
+        "reversibility": 4,
+        "timeToValue": 2,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 4,
+        "dlaFit": 4,
+        "forwardPropHealth": 3,
+        "agentComposability": 3,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Kink behavior at fold boundary is inference; ev-001 provides 2-root algorithm context but not abs-function-specific precision behavior",
+        "implementationDifficulty": "Difficult — custom fallback intersection logic for abs/piecewise + boundary detection + IntersectionResolverInterface fallback declaration, ~1-2 months",
+        "riskSeverity": "Severe — wrong intersection coordinate during teacher live demo is UX-breaking; affects primary use case",
+        "reversibility": "Mostly reversible — IntersectionResolverInterface provides clean fallback swap (JXG.Math.Numerics.root()); adding fallback is 1-2 days once declared",
+        "timeToValue": "1-2 months — requires prototype validation (T7) to confirm whether the risk is real before building fallback",
+        "governanceCompliance": "Fully compliant — edge case does not affect security boundaries",
+        "ecosystemMaturity": "JSXGraph mature; intersection element precision at abs-function kinks less documented — gap in ecosystem documentation",
+        "dlaFit": "IntersectionSolver as LOGIC with fallback path; adversarial tests the LOGIC→DATA boundary at edge case; SECURITY/LEARN not affected",
+        "forwardPropHealth": "Native path healthy for smooth functions; fallback solver path not declared in IntersectionResolverInterface — gap at edge case boundary",
+        "agentComposability": "Core composable; adversarial edge case requires explicit agent rule for abs-fold boundary detection before composing IntersectionSolver calls",
+        "prototypeValidation": "Not yet tested — score 3 placeholder; T7 MUST test intersection behavior at fold boundary"
+      },
+      "devcon5AlignmentScore": 3,
+      "implementationPhase": "Phase 2 — Operational Decision-Making",
+      "revisionRound": 2
     },
+
     {
-      "id": "sc-rt-b-best", "type": "best", "name": "Firebase Best: Google handles compliance complexity",
-      "description": "Firebase children's privacy controls + Google Workspace SSO + Firestore security rules provide a COPPA-compliant path. Google's legal infrastructure handles DPA with school districts.",
-      "assumptions": ["A1: Google provides standard DPA for education", "A2: Firebase children's privacy page means Firebase assists with COPPA", "A3: Google Workspace for Education is FTC-approved COPPA safe harbor"],
-      "evidenceBaseIds": [],
-      "contradictions": ["Google's COPPA safe harbor status is for Google's OWN services, not for third-party apps using Firebase"],
+      "id": "sc-jxg-B-base",
+      "hypothesisId": "hyp-jxg-B",
+      "type": "base",
+      "session": "jsxgraph-sequencer-001",
+      "description": "Standard adoption: board.on('update') observer + JXG.Math.Numerics.root() warm-start intersection solver + explicit BatchBoardUpdate. Zero migration cost — purely additive. Working intersection + label updates achievable in days. board.reducedUpdate=true CANNOT be used (architectural constraint).",
+      "assumptions": [
+        {"id": "a1", "text": "board.on('update') fires reliably on every JSXGraph board update triggered by functiongraph drag events", "evidenceId": "ev-003"},
+        {"id": "a2", "text": "JXG.Math.Numerics.root(h, warmStart) with warm start from previous intersection x completes in <1ms for linear and quadratic functiongraph pairs", "evidenceId": "ev-004"},
+        {"id": "a3", "text": "board.suspendUpdate() + unsuspendUpdate() batches 5 element updates into a single SVG repaint, maintaining 60fps at element counts ≤5", "evidenceId": "ev-004"},
+        {"id": "a4", "text": "Raw DOM addEventListener stays in place — board.on('update') is purely additive; zero existing behavior affected", "evidenceId": "ev-003"}
+      ],
+      "evidenceBaseIds": ["ev-003", "ev-004"],
+      "contradictions": [
+        {
+          "id": "contra-jxg-B-base-01",
+          "claim": "board.reducedUpdate=true suppresses the full update cycle, preventing board.on('update') from firing — reducedUpdate and board observer are mutually exclusive architectural choices",
+          "evidenceId": "ev-005",
+          "classification": "irreconcilable",
+          "resolution": "UNRESOLVABLE: board.reducedUpdate=true suppresses the full board update cycle that board.on('update') depends on. Both confirmed by ev-005. This is an architectural fact: H-B permanently forgoes the 40-60% frame computation reduction that H-A gains from reducedUpdate. Marked unresolvable — evaluator must weigh this against H-B's zero-migration-cost advantage."
+        }
+      ],
+      "contradictionStatus": "unresolvable",
+      "evidenceSufficiency": "sufficient",
+      "evaluationScores": {
+        "evidenceFit": 4,
+        "implementationDifficulty": 4,
+        "riskSeverity": 3,
+        "reversibility": 5,
+        "timeToValue": 5,
+        "governanceCompliance": 4,
+        "ecosystemMaturity": 5,
+        "dlaFit": 3,
+        "forwardPropHealth": 3,
+        "agentComposability": 3,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "board.on('update') confirmed ev-003; suspendUpdate confirmed ev-004; warm-start <1ms from claim-028 (tier-3 inference)",
+        "implementationDifficulty": "Straightforward — additive pattern, zero migration, proven observer+solver combination, ~1-2 weeks",
+        "riskSeverity": "Moderate — board.on('update') DRY risk at 5+ elements (rule of three); performance ceiling without reducedUpdate looms at higher element counts",
+        "reversibility": "Fully reversible — board.on('update') listener removed with zero side effects; zero data loss",
+        "timeToValue": "Days — working intersection + label update prototype achievable in <1 week with pure additive approach",
+        "governanceCompliance": "Mostly compliant — DDD partial violation (board observer is non-JSXGraph vocabulary §DC5-05 flag); no security gaps",
+        "ecosystemMaturity": "JSXGraph mature; board.on('update') well-documented in ev-003",
+        "dlaFit": "Core D/L/A clear; PECS violation: observer mixes SENSE+DECIDE+ACT+LEARN in one callback — domain separation is theoretical without callback decomposition",
+        "forwardPropHealth": "Backend propagation partially designed; observer as implicit hub lacks explicit contract layer between IntersectionSolver and observer callback",
+        "agentComposability": "Core ops composable at solver level; observer callback monolithic — agents cannot compose individual SENSE/DECIDE/ACT operations independently",
+        "prototypeValidation": "Not yet tested — score 3 placeholder"
+      },
+      "devcon5AlignmentScore": 3,
+      "implementationPhase": "Phase 1 — Golden Tables",
+      "revisionRound": 1
+    },
+
+    {
+      "id": "sc-jxg-B-best",
+      "hypothesisId": "hyp-jxg-B",
+      "type": "best",
+      "session": "jsxgraph-sequencer-001",
+      "description": "Optimistic: observer callback decomposed into 4 typed handlers (IntersectionHandler, LabelHandler, FoldHandler, TelemetryHandler) — each independently composable. Warm-start Newton-Raphson achieves <0.5ms. Full per-frame InteractionTelemetry capture. suspendUpdate eliminates SVG flicker.",
+      "assumptions": [
+        {"id": "a1", "text": "Observer callback decomposed into 4 typed handler functions (IntersectionHandler, LabelHandler, FoldHandler, TelemetryHandler), each with clear D/L/A domain — PECS violation partially mitigated", "evidenceId": "ev-003"},
+        {"id": "a2", "text": "Warm-start Newton-Raphson (initial guess = previous intersection x) reduces solver iterations by >=50% vs cold start, achieving <0.5ms per intersection solve", "evidenceId": "ev-004"},
+        {"id": "a3", "text": "Per-frame InteractionTelemetry captures solver iteration counts and element update durations with <0.1ms overhead per frame", "evidenceId": "ev-003"},
+        {"id": "a4", "text": "board.suspendUpdate() + unsuspendUpdate() fully eliminates visible SVG flicker even with 8 element updates per frame via single-repaint batching", "evidenceId": "ev-004"}
+      ],
+      "evidenceBaseIds": ["ev-003", "ev-004"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 4,
+        "riskSeverity": 4,
+        "reversibility": 5,
+        "timeToValue": 5,
+        "governanceCompliance": 4,
+        "ecosystemMaturity": 5,
+        "dlaFit": 3,
+        "forwardPropHealth": 3,
+        "agentComposability": 4,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "warm-start <0.5ms target is tier-3 inference from claim-028; callback decomposition benefits are inference; other assumptions tier-1/2",
+        "implementationDifficulty": "Straightforward — additive pattern with callback decomposition; zero migration; well-understood observer pattern, ~1-2 weeks",
+        "riskSeverity": "Minor — fine-grained telemetry enables early performance issue detection; decomposed handlers isolate failures",
+        "reversibility": "Fully reversible — remove observer listeners with zero data loss; handler decomposition is pure function extraction",
+        "timeToValue": "Days — zero migration cost; decomposed prototype achievable in <1 week",
+        "governanceCompliance": "Mostly compliant — DDD partial violation persists (board observer vocabulary); no security gaps",
+        "ecosystemMaturity": "JSXGraph mature; board events well-documented",
+        "dlaFit": "PECS violation mitigated by decomposition but domain mixing remains at callback registration level — improvement from base but not fully clean",
+        "forwardPropHealth": "Explicit contract for NewtonRaphsonResolver not yet declared even in best case; observer remains implicit hub",
+        "agentComposability": "Decomposed handlers independently composable by agents; handler-level tool bindings achievable; major improvement over base case",
+        "prototypeValidation": "Not yet tested — score 3 placeholder"
+      },
+      "devcon5AlignmentScore": 3,
+      "implementationPhase": "Phase 2 — Operational Decision-Making",
+      "revisionRound": 1
+    },
+
+    {
+      "id": "sc-jxg-B-worst",
+      "hypothesisId": "hyp-jxg-B",
+      "type": "worst",
+      "session": "jsxgraph-sequencer-001",
+      "description": "Pessimistic: 10+ dependent elements in board.on('update') observer exceed the 16ms frame budget without reducedUpdate. Observer callback becomes 200-line DRY violation. Performance ceiling hit permanently under H-B — migration toward H-A required to fix.",
+      "assumptions": [
+        {"id": "a1", "text": "Without board.reducedUpdate=true, full JSXGraph board update computes ALL element positions each drag frame — scales linearly with element count", "evidenceId": "ev-005"},
+        {"id": "a2", "text": "10 element updates × ~1.3ms each = ~13ms computation + ~3ms suspendUpdate repaint = ~16ms total — at exact frame budget limit with zero margin", "evidenceId": null},
+        {"id": "a3", "text": "board.on('update') callback grows to 200+ lines at 10 element types — DRY rule of three triggered at element 3; maintenance burden severe by element 10", "evidenceId": "ev-004"},
+        {"id": "a4", "text": "No path to adopt reducedUpdate without migrating to H-A parentPoint pattern — performance ceiling is permanent under H-B at 10+ element count", "evidenceId": "ev-005"}
+      ],
+      "evidenceBaseIds": ["ev-004", "ev-005"],
+      "contradictions": [
+        {
+          "id": "contra-jxg-B-worst-01",
+          "claim": "ev-004 documents suspendUpdate/unsuspendUpdate for batch updates — this reduces browser layout thrashing and may significantly reduce the frame budget impact",
+          "evidenceId": "ev-004",
+          "classification": "resolvable",
+          "resolution": "ROUND 1: ev-004 confirms suspendUpdate batches DOM repaints but NOT JSXGraph internal element evaluation. Each element's position IS still computed before the single repaint. suspendUpdate saves ~2-3ms on repaint but computation cost (per-element evaluation) remains. Assumption a2 revised: 10 elements × ~1.3ms + 3ms repaint savings via suspendUpdate → ~13ms total. Tight but potentially within 16ms budget at exactly 10 elements. Risk remains: at 11+ elements or slower hardware, budget exceeded. contradictionStatus: resolved."
+        }
+      ],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 2,
+        "riskSeverity": 1,
+        "reversibility": 3,
+        "timeToValue": 1,
+        "governanceCompliance": 4,
+        "ecosystemMaturity": 5,
+        "dlaFit": 2,
+        "forwardPropHealth": 2,
+        "agentComposability": 1,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "suspendUpdate behavior confirmed ev-004; per-element timing and performance ceiling are inference — no direct benchmark",
+        "implementationDifficulty": "Difficult — performance optimization without reducedUpdate requires custom batching research; migration to H-A needed for ceiling fix, ~1-2 months",
+        "riskSeverity": "Critical — 60fps cannot be guaranteed at 10+ elements without reducedUpdate; fundamental performance ceiling blocks full teaching feature set delivery",
+        "reversibility": "Partially reversible — DRY violation requires refactoring; performance fix requires H-A migration; significant effort but data preserved",
+        "timeToValue": ">2 months — performance ceiling prevents full teaching feature delivery until architectural rethink or migration",
+        "governanceCompliance": "Mostly compliant — no compliance gaps; performance ceiling is technical, not regulatory",
+        "ecosystemMaturity": "JSXGraph mature; performance ceiling is architectural choice consequence, not ecosystem instability",
+        "dlaFit": "Observer mixes 4 domains in worst case — D/L/A domain confusion is a defect not just debt at 200+ line callback scale",
+        "forwardPropHealth": "Frame budget exceeded → CoordinateLabel updates stale by 1+ frames → ForwardProp chain delivers incorrect display state to frontend",
+        "agentComposability": "Monolithic 200-line observer; no agent composability; all operations require human orchestration",
+        "prototypeValidation": "Not yet tested — score 3 placeholder; T8 MUST benchmark frame budget at 10 elements"
+      },
+      "devcon5AlignmentScore": 1,
+      "implementationPhase": "Phase 1 — Golden Tables",
+      "revisionRound": 1
+    },
+
+    {
+      "id": "sc-jxg-B-adv",
+      "hypothesisId": "hyp-jxg-B",
+      "type": "adversarial",
+      "session": "jsxgraph-sequencer-001",
+      "description": "Adversarial: Raw DOM addEventListener fires, advances ty on DragState. JSXGraph board.on('update') fires in a DIFFERENT event cycle — reads stale ty value, computes intersection with wrong function position. Under rapid drag (20+ events/sec), ty is 2-3 frames stale. Teacher demo: intersection jumps to wrong coordinate mid-drag.",
+      "assumptions": [
+        {"id": "a1", "text": "Raw DOM addEventListener 'mousemove' fires synchronously during drag — updates DragState.ty immediately without triggering board.update()", "evidenceId": "ev-003"},
+        {"id": "a2", "text": "JSXGraph board.on('update') fires only when JSXGraph's internal board.update() method is called — which is NOT triggered by raw DOM mousemove in the current codebase", "evidenceId": "ev-003"},
+        {"id": "a3", "text": "Under rapid drag (20+ mousemove events/sec), DOM handler fires 3-4× per frame but board.on('update') fires at most once per board.update() call — 3 intermediate ty values lost", "evidenceId": null},
+        {"id": "a4", "text": "IntersectionSolver in board.on('update') reads DragState.ty after DOM handler has advanced it by 1-2 frames — solver uses stale ty, producing intersection coordinate jump artifacts", "evidenceId": null}
+      ],
+      "evidenceBaseIds": ["ev-003"],
+      "contradictions": [
+        {
+          "id": "contra-jxg-B-adv-01",
+          "claim": "ev-003 shows board.on('update') fires after board.update() — if raw DOM drag handler internally calls board.update() or triggers a JSXGraph element that calls it, the two may be synchronized",
+          "evidenceId": "ev-003",
+          "classification": "evidence-gap-driven",
+          "resolution": "ROUND 2: decision-log confirms current codebase DOM drag handler directly manipulates JXG function parameter (not via board.update()). Therefore DOM drag and board.on('update') ARE in different event systems — synchronization gap is a real architectural risk. The race condition is an architectural fact, not speculation. Evidence gap remains: exact timing behavior under rapid drag (20+ events/sec) with specific hardware timer resolution. NextExperiment exp-jxg-02 created: instrument DOM drag handler + board.on('update') with performance.now() timestamps to measure synchronization gap under rapid drag. contradictionStatus: detected (evidence gap — forwarded to prototyper T8)."
+        }
+      ],
       "contradictionStatus": "detected",
-      "evidenceSufficiency": "insufficient",
-      "revisionRound": 2,
-      "architectureImplications": ["Hoping vendor solves compliance"],
-      "implementationDifficulty": 3,
-      "deploymentImplications": ["Same"],
-      "governanceImplications": ["CRITICAL CONTRADICTION: Google's COPPA compliance covers Google products, NOT third-party apps built on Firebase. Developer remains the COPPA operator."],
-      "safetyImplications": ["Same"],
-      "recommendedActions": ["Verify exact scope of Google's COPPA coverage for Firebase-based third-party apps"],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 1, "evidenceFit": "none", "rationale": "Google's COPPA coverage for third-party Firebase apps is UNVERIFIED and likely does not extend to developer's app" },
-        { "dimension": "Implementation Difficulty", "score": 3, "evidenceFit": "moderate", "rationale": "Same" },
-        { "dimension": "Risk Severity", "score": 2, "evidenceFit": "weak", "rationale": "Slightly better than A if Google provides standard education DPA" },
-        { "dimension": "Reversibility", "score": 2, "evidenceFit": "moderate", "rationale": "Google lock-in" },
-        { "dimension": "Time-to-Value", "score": 2, "evidenceFit": "weak", "rationale": "Legal review still required" },
-        { "dimension": "Governance Compliance", "score": 1, "evidenceFit": "none", "rationale": "Cannot score above 1. Google's compliance does not transfer to developer's app." },
-        { "dimension": "Ecosystem Maturity", "score": 5, "evidenceFit": "strong", "rationale": "Most mature" }
-      ]
-    },
-    {
-      "id": "sc-rt-b-worst", "type": "worst", "name": "Firebase Worst: Firebase ToS makes developer sole COPPA operator",
-      "description": "Firebase ToS explicitly states developer is responsible for all regulatory compliance. Firebase is data processor only. Developer has no legal infrastructure for COPPA operator obligations.",
-      "assumptions": ["A1: Firebase ToS assigns COPPA operator responsibility to developer", "A2: Individual developer cannot fulfill operator obligations without legal counsel", "A3: District rejects pilot because developer cannot demonstrate COPPA operator compliance"],
-      "evidenceBaseIds": [],
-      "contradictions": [],
-      "contradictionStatus": "none",
       "evidenceSufficiency": "partial",
-      "revisionRound": 2,
-      "architectureImplications": ["Firebase solves tech, not compliance"],
-      "implementationDifficulty": 1,
-      "deploymentImplications": ["Same as A-worst: blocked by compliance"],
-      "governanceImplications": ["Developer as COPPA operator needs: privacy policy, VPC mechanism or school consent, data retention policy, breach notification procedure, data deletion capability"],
-      "safetyImplications": ["Same as A-worst"],
-      "recommendedActions": ["Same as A-worst: legal review is prerequisite"],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 3, "evidenceFit": "moderate", "rationale": "Firebase ToS typically assigns compliance to developer — well-known pattern" },
-        { "dimension": "Implementation Difficulty", "score": 1, "evidenceFit": "moderate", "rationale": "Compliance program creation for solo developer is extremely difficult" },
-        { "dimension": "Risk Severity", "score": 1, "evidenceFit": "strong", "rationale": "Same catastrophic risk" },
-        { "dimension": "Reversibility", "score": 2, "evidenceFit": "moderate", "rationale": "Compliance work transfers across stacks" },
-        { "dimension": "Time-to-Value", "score": 1, "evidenceFit": "moderate", "rationale": "Blocked by compliance" },
-        { "dimension": "Governance Compliance", "score": 1, "evidenceFit": "moderate", "rationale": "Non-compliant" },
-        { "dimension": "Ecosystem Maturity", "score": 5, "evidenceFit": "strong", "rationale": "Irrelevant" }
-      ]
-    },
-    {
-      "id": "sc-rt-b-adv", "type": "adversarial", "name": "Firebase Adversarial: Google changes pricing/ToS for children's data",
-      "description": "Google changes Firebase pricing or ToS for apps handling children's data. New requirements (e.g., mandatory COPPA audit, additional fees) make the project economically unviable.",
-      "assumptions": ["A1: Google has changed pricing before (Firebase pricing changes 2023)", "A2: Google could add children's data handling fees", "A3: Solo developer cannot absorb compliance cost increases"],
-      "evidenceBaseIds": [],
-      "contradictions": [],
-      "contradictionStatus": "none",
-      "evidenceSufficiency": "partial",
-      "revisionRound": 2,
-      "architectureImplications": ["Vendor lock-in amplifies pricing risk"],
-      "implementationDifficulty": 1,
-      "deploymentImplications": ["Must migrate if pricing changes"],
-      "governanceImplications": ["Vendor dependency for compliance"],
-      "safetyImplications": ["Service disruption affects students"],
-      "recommendedActions": ["Plan B for self-hosting", "Budget for pricing changes"],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 3, "evidenceFit": "moderate", "rationale": "Firebase pricing changes in 2023 are documented precedent" },
-        { "dimension": "Implementation Difficulty", "score": 1, "evidenceFit": "moderate", "rationale": "Migration is expensive" },
-        { "dimension": "Risk Severity", "score": 2, "evidenceFit": "moderate", "rationale": "Economically unviable but not safety-critical" },
-        { "dimension": "Reversibility", "score": 1, "evidenceFit": "strong", "rationale": "Google lock-in makes migration very expensive" },
-        { "dimension": "Time-to-Value", "score": 1, "evidenceFit": "moderate", "rationale": "Project may be abandoned" },
-        { "dimension": "Governance Compliance", "score": 2, "evidenceFit": "moderate", "rationale": "Compliance work transfers" },
-        { "dimension": "Ecosystem Maturity", "score": 5, "evidenceFit": "strong", "rationale": "Mature" }
-      ]
-    },
-    {
-      "id": "sc-rt-c-base", "type": "base", "name": "Self-Hosted (PocketBase) Base: Maximum Data Control",
-      "description": "R3F for 3D. PocketBase (Go binary) for backend: SQLite DB, built-in auth, REST API. Self-hosted on a VPS (Hetzner/DigitalOcean $5-10/mo). Teacher dashboard as React SPA. Full control over data residence.",
-      "assumptions": ["A1: PocketBase provides adequate auth for school-managed accounts", "A2: Self-hosting gives full data control for COPPA compliance", "A3: 1-2 devs can manage a single VPS", "A4: PocketBase handles 100-500 concurrent users"],
-      "evidenceBaseIds": [],
-      "contradictions": ["Self-hosting gives data control but 1-2 devs may not maintain security patches", "No managed compliance certifications (SOC 2, etc.)"],
-      "contradictionStatus": "detected",
-      "evidenceSufficiency": "insufficient",
-      "revisionRound": 2,
-      "architectureImplications": ["Full data control", "No vendor DPA needed (you ARE the vendor)", "Ops burden on small team"],
-      "implementationDifficulty": 2,
-      "deploymentImplications": ["VPS management, backups, SSL, security patches — ongoing ops"],
-      "governanceImplications": ["COPPA operator responsibilities are fully on developer. No vendor to share liability with. BUT: no vendor compliance gap either."],
-      "safetyImplications": ["Data security depends entirely on developer's ops practices"],
-      "recommendedActions": ["Security audit of PocketBase deployment", "Backup strategy", "Still need legal review for COPPA compliance"],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 2, "evidenceFit": "weak", "rationale": "PocketBase for EdTech is not documented. Self-hosting gives control but compliance still unverified." },
-        { "dimension": "Implementation Difficulty", "score": 2, "evidenceFit": "moderate", "rationale": "PocketBase is simple but self-hosting adds ongoing ops" },
-        { "dimension": "Risk Severity", "score": 1, "evidenceFit": "moderate", "rationale": "Solo developer as data controller for children's data = maximum liability exposure" },
-        { "dimension": "Reversibility", "score": 4, "evidenceFit": "strong", "rationale": "Standard SQLite — fully portable, no vendor lock-in" },
-        { "dimension": "Time-to-Value", "score": 2, "evidenceFit": "moderate", "rationale": "Self-hosted setup + legal review = longer timeline" },
-        { "dimension": "Governance Compliance", "score": 1, "evidenceFit": "weak", "rationale": "SAME AS ALL OPTIONS: cannot score above 1 without legal review. Self-hosting doesn't solve COPPA — it just changes who is liable." },
-        { "dimension": "Ecosystem Maturity", "score": 2, "evidenceFit": "moderate", "rationale": "PocketBase is newer, smaller community" }
-      ]
-    },
-    {
-      "id": "sc-rt-c-best", "type": "best", "name": "Self-Hosted Best: Full control enables fastest compliance",
-      "description": "Self-hosting means no vendor DPA negotiation needed. Developer implements COPPA requirements directly: consent mechanism, data deletion API, retention limits. Legal review is simpler because there's no third party.",
-      "assumptions": ["A1: Legal review is simpler for self-hosted (no vendor dependency)", "A2: Developer implements consent flow directly", "A3: Data deletion API satisfies COPPA requirements"],
-      "evidenceBaseIds": [],
-      "contradictions": [],
-      "contradictionStatus": "none",
-      "evidenceSufficiency": "insufficient",
-      "revisionRound": 2,
-      "architectureImplications": ["Simplest compliance path in theory"],
-      "implementationDifficulty": 2,
-      "deploymentImplications": ["VPS ops still needed"],
-      "governanceImplications": ["No vendor dependency — but also no vendor security certifications to rely on"],
-      "safetyImplications": ["Developer is sole guarantor of data security"],
-      "recommendedActions": ["Legal review for self-hosted COPPA compliance"],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 1, "evidenceFit": "none", "rationale": "Legal simplicity of self-hosting is INFERENCE — no evidence this is actually simpler for COPPA" },
-        { "dimension": "Implementation Difficulty", "score": 2, "evidenceFit": "moderate", "rationale": "Consent flow + deletion API + ops = significant work" },
-        { "dimension": "Risk Severity", "score": 2, "evidenceFit": "weak", "rationale": "No vendor breach risk, but developer breach risk remains" },
-        { "dimension": "Reversibility", "score": 4, "evidenceFit": "strong", "rationale": "Standard stack, portable" },
-        { "dimension": "Time-to-Value", "score": 2, "evidenceFit": "weak", "rationale": "Legal review + consent implementation" },
-        { "dimension": "Governance Compliance", "score": 1, "evidenceFit": "none", "rationale": "STILL 1 — no legal review has occurred" },
-        { "dimension": "Ecosystem Maturity", "score": 2, "evidenceFit": "moderate", "rationale": "PocketBase newer" }
-      ]
-    },
-    {
-      "id": "sc-rt-c-worst", "type": "worst", "name": "Self-Hosted Worst: Security incident on unmanaged VPS",
-      "description": "Solo developer fails to apply security patch. VPS compromised. Children's educational records exposed. No incident response plan. No cyber insurance. Maximum personal liability.",
-      "assumptions": ["A1: Solo dev misses a critical security patch", "A2: VPS lacks IDS/monitoring", "A3: No incident response plan exists", "A4: Developer has no cyber liability insurance"],
-      "evidenceBaseIds": [],
-      "contradictions": [],
-      "contradictionStatus": "none",
-      "evidenceSufficiency": "partial",
-      "revisionRound": 2,
-      "architectureImplications": ["Self-hosting + solo dev = weakest security posture"],
-      "implementationDifficulty": 1,
-      "deploymentImplications": ["Compromised infrastructure"],
-      "governanceImplications": ["Maximum personal liability — developer is controller AND processor"],
-      "safetyImplications": ["Children's data exposed"],
-      "recommendedActions": ["If self-hosting: automated patching, IDS, backup encryption, cyber insurance"],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 3, "evidenceFit": "moderate", "rationale": "Solo-managed VPS security incidents are well-documented" },
-        { "dimension": "Implementation Difficulty", "score": 1, "evidenceFit": "moderate", "rationale": "Security program for solo dev is extremely hard" },
-        { "dimension": "Risk Severity", "score": 1, "evidenceFit": "strong", "rationale": "WORST CASE: children's data breach + no insurance + personal liability" },
-        { "dimension": "Reversibility", "score": 1, "evidenceFit": "strong", "rationale": "Breach is irreversible" },
-        { "dimension": "Time-to-Value", "score": 1, "evidenceFit": "moderate", "rationale": "Project destroyed" },
-        { "dimension": "Governance Compliance", "score": 1, "evidenceFit": "strong", "rationale": "Total failure" },
-        { "dimension": "Ecosystem Maturity", "score": 2, "evidenceFit": "moderate", "rationale": "Irrelevant" }
-      ]
-    },
-    {
-      "id": "sc-rt-c-adv", "type": "adversarial", "name": "Self-Hosted Adversarial: District IT rejects non-certified infrastructure",
-      "description": "School district IT department requires SOC 2 Type II or equivalent certification for any vendor storing student data. Self-hosted VPS with no certification is rejected. Pilot proposal dead.",
-      "assumptions": ["A1: District requires SOC 2 or equivalent", "A2: Solo developer cannot obtain SOC 2", "A3: District has standard vendor assessment process"],
-      "evidenceBaseIds": [],
-      "contradictions": [],
-      "contradictionStatus": "none",
-      "evidenceSufficiency": "partial",
-      "revisionRound": 2,
-      "architectureImplications": ["Self-hosting fails institutional requirements"],
-      "implementationDifficulty": 1,
-      "deploymentImplications": ["Cannot deploy in district"],
-      "governanceImplications": ["Institutional gatekeeping blocks self-hosted solutions"],
-      "safetyImplications": ["Not a safety issue — institutional process"],
-      "recommendedActions": ["Check district vendor assessment requirements BEFORE choosing self-hosted"],
-      "simulationRunId": "run-rt-01",
-      "evaluationScores": [
-        { "dimension": "Evidence Fit", "score": 3, "evidenceFit": "moderate", "rationale": "District vendor assessment requirements are standard practice" },
-        { "dimension": "Implementation Difficulty", "score": 1, "evidenceFit": "moderate", "rationale": "SOC 2 certification is impossible for solo developer" },
-        { "dimension": "Risk Severity", "score": 2, "evidenceFit": "moderate", "rationale": "Project rejected but no safety risk" },
-        { "dimension": "Reversibility", "score": 3, "evidenceFit": "moderate", "rationale": "Can switch to certified BaaS" },
-        { "dimension": "Time-to-Value", "score": 1, "evidenceFit": "moderate", "rationale": "Project blocked" },
-        { "dimension": "Governance Compliance", "score": 1, "evidenceFit": "moderate", "rationale": "Institutional requirement not met" },
-        { "dimension": "Ecosystem Maturity", "score": 2, "evidenceFit": "moderate", "rationale": "Same" }
-      ]
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 1,
+        "riskSeverity": 1,
+        "reversibility": 2,
+        "timeToValue": 1,
+        "governanceCompliance": 4,
+        "ecosystemMaturity": 5,
+        "dlaFit": 2,
+        "forwardPropHealth": 1,
+        "agentComposability": 1,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "DOM/board event system separation confirmed by decision-log analysis and ev-003; race condition timing under rapid drag is inference",
+        "implementationDifficulty": "Extremely hard — resolving DOM↔board event synchronization at <16ms frame boundary requires custom synchronization primitive; research-grade problem",
+        "riskSeverity": "Critical — ty synchronization corruption mid-drag causes intersection coordinate to jump to wrong position during teacher live demo; primary use case failure",
+        "reversibility": "Difficult to reverse — fixing the race condition requires fundamental change to drag event model (migrate toward H-A parentPoint); weeks of architectural rework",
+        "timeToValue": ">2 months — race condition identification + synchronization design + verification under various hardware timer resolutions",
+        "governanceCompliance": "Mostly compliant — no regulatory gaps; race condition is technical architectural failure",
+        "ecosystemMaturity": "JSXGraph mature; race condition is architectural choice consequence, not ecosystem immaturity",
+        "dlaFit": "Race condition exposes ACTION domain split across two event systems — DragState belongs to neither DOM nor board event exclusively; fundamental D/L/A boundary confusion",
+        "forwardPropHealth": "ty synchronization corruption breaks entire propagation chain: DragState → IntersectionSolver → CoordinateLabel → JSXGraphCanvas all receive incorrect values",
+        "agentComposability": "Agents cannot compose against a race condition; any IntersectionSolver call during rapid drag yields unpredictable results; no coordination protocol defined",
+        "prototypeValidation": "Not yet tested — score 3 placeholder; T8 MUST instrument drag event timing to confirm or deny race condition"
+      },
+      "devcon5AlignmentScore": 1,
+      "implementationPhase": "Phase 1 — Golden Tables",
+      "revisionRound": 2
     }
   ],
+
+  "implementationJourney": {
+    "hyp-s1-01": {
+      "phase1_golden_tables": {
+        "readiness": "HIGH",
+        "description": "BunStateFile (BunFile lazy-load) + StateSchemaDefinition (TypeBox Struct) establish correct DATA shape. All DATA objects classified with evidence.",
+        "keyDeliverables": ["StateSchemaDefinition TypeBox schema", "BunStateFile reader adapter (Bun.file().json())", "AtomicWriteAction initial implementation"],
+        "gaps": ["gap-s1-01: Bun.write atomicity unconfirmed — temp-file rename pattern should be added before Phase 1 is declared complete"]
+      },
+      "phase2_operational": {
+        "readiness": "MEDIUM",
+        "description": "StateReducer (DC5-06) added for LOGIC layer. SchemaValidatorInterface enables TypeBox/Valibot swap via OCP. StateChangeAuditLog captures write events.",
+        "keyDeliverables": ["StateReducer implementation", "SchemaValidatorInterface with TypeBox adapter", "StateChangeAuditLog write event tracking"],
+        "gaps": ["FileSystemAccessPolicy POSIX permission enforcement not formalized", "CLI 'state read' command surface not declared"]
+      },
+      "phase3_ai_first": {
+        "readiness": "LOW",
+        "description": "Agent composability requires locking protocol for concurrent AtomicWriteAction calls. Without locking, sc-s1-01-adv (concurrent write corruption) blocks Phase 3.",
+        "keyDeliverables": ["Advisory file lock mechanism for AtomicWriteAction", "Agent-addressable SchemaValidatorInterface tool binding", "TypeBox JSON Schema → CLI help text integration"],
+        "gaps": ["Concurrent write coordination protocol (blocks Agent Composability score >= 4)", "sc-s1-01-adv remains unresolvable without AtomicWriteAction redesign"]
+      }
+    },
+    "hyp-s1-02": {
+      "phase1_golden_tables": {
+        "readiness": "HIGH",
+        "description": "StateChangeAuditLog as primary DATA artifact (actually LEARN, which makes this LEARN-first). AppendLogAction (FileSink) + explicit .flush() establishes correct persistence shape. StateSchemaDefinition (Zod) defines entry schema.",
+        "keyDeliverables": ["StateChangeAuditLog LogEntry schema (Zod)", "AppendLogAction implementation with explicit .flush()", "FileSink adapter with error handling"],
+        "gaps": ["gap-s1-01: FileSink flush latency under load unconfirmed — needs bun bench", "Compaction trigger design not specified"]
+      },
+      "phase2_operational": {
+        "readiness": "MEDIUM",
+        "description": "StateReducer added to replay log and derive current state (canonical focus value). Compaction strategy implemented. SchemaValidatorInterface wraps Zod.",
+        "keyDeliverables": ["StateReducer log replay implementation", "Compaction trigger (AtomicWriteAction after N entries)", "SchemaValidatorInterface Zod adapter"],
+        "gaps": ["gap-s1-02: Replay latency at 50k entries unconfirmed", "Compaction atomicity introduces H1-style risk"]
+      },
+      "phase3_ai_first": {
+        "readiness": "HIGH",
+        "description": "Append-only log is inherently agent-composable. Multiple agents can AppendLogAction simultaneously without coordination. StateReducer provides query surface for agent tools.",
+        "keyDeliverables": ["StateReducer as agent-addressable query tool", "AppendLogAction as agent-composable write tool", "CLI 'state history' query surface"],
+        "gaps": ["sc-s1-02-adv remains unresolvable at log scale — compaction strategy must be production-hardened before Phase 3 at scale"]
+      }
+    }
+  },
+
   "simulationRuns": [
     {
-      "id": "run-rt-01",
-      "hypothesisId": "hyp-rt-01",
-      "scenarioIds": ["sc-rt-a-base","sc-rt-a-best","sc-rt-a-worst","sc-rt-a-adv","sc-rt-b-base","sc-rt-b-best","sc-rt-b-worst","sc-rt-b-adv","sc-rt-c-base","sc-rt-c-best","sc-rt-c-worst","sc-rt-c-adv"],
-      "parameters": { "architectureBranches": 3, "scenariosPerBranch": 4, "evaluationDimensions": 7, "benchmarkType": "red-team" },
-      "result": "12 scenarios generated and scored. CRITICAL FINDING: ALL branches score 1/5 on Governance Compliance because COPPA/FERPA compliance CANNOT be determined without completed legal review. This is not a tech failure — it is a structural impossibility. The evaluator hard gate R9 (insufficient evidence) should REJECT any recommendation that claims compliance.",
-      "round": 2,
-      "contradictionsFound": ["Firebase COPPA coverage scope (Google's compliance vs developer's compliance)", "Self-hosted compliance simplicity (inference, not verified)"],
-      "evidenceGaps": ["COPPA school consent mechanism exact conditions (needs legal review)", "FERPA applicability to this specific EdTech scenario (needs legal review)", "Convex COPPA/DPA availability", "Firebase ToS exact COPPA operator assignment", "District vendor assessment requirements for target schools"],
-      "nextActions": ["Legal review is PREREQUISITE before ANY recommendation can be ACCEPTED"]
-    }
-  ],
-  "revisionRounds": [
-    {
-      "id": "rev-rt-01", "round": 1, "simulationRunId": "run-rt-01",
-      "contradictionsAddressed": ["Firebase COPPA scope: clarified that Google's COPPA compliance covers Google products, NOT third-party Firebase apps. Developer is the COPPA operator regardless of BaaS choice."],
-      "evidenceGapsFilled": [],
-      "scenariosRevised": ["sc-rt-b-base", "sc-rt-b-best"],
-      "scenariosAdded": [],
-      "summary": "Round 1: Firebase COPPA scope contradiction resolved — developer is COPPA operator regardless of BaaS. All branches have identical governance score (1/5) because the blocker is legal review, not technology choice."
+      "id": "sim-run-s1-01",
+      "session": "smoke-001",
+      "hypothesisId": "hyp-s1-01",
+      "scenariosGenerated": 4,
+      "startedAt": "2026-04-11T10:42:00Z",
+      "completedAt": "2026-04-11T10:42:30Z",
+      "revisionRoundsCompleted": 2,
+      "finalContradictionStatus": {
+        "resolved": 2,
+        "unresolvable": 1,
+        "detected": 1
+      }
     },
     {
-      "id": "rev-rt-02", "round": 2, "simulationRunId": "run-rt-01",
-      "contradictionsAddressed": ["Self-hosted compliance simplicity: remains INFERENCE. No evidence that self-hosting makes COPPA compliance simpler."],
-      "evidenceGapsFilled": [],
-      "scenariosRevised": ["sc-rt-c-base", "sc-rt-c-best"],
-      "scenariosAdded": [],
-      "summary": "Round 2: Self-hosted compliance claim remains inference-grade. All 3 branches remain at Governance 1/5. 4 of 12 scenarios have evidenceSufficiency='insufficient'. 3 of 12 have contradictionStatus='detected'. Per scoring rubric stopping criteria: no scenarios can support a recommendation while governance is unresolved."
+      "id": "sim-run-s1-02",
+      "session": "smoke-001",
+      "hypothesisId": "hyp-s1-02",
+      "scenariosGenerated": 4,
+      "startedAt": "2026-04-11T10:42:00Z",
+      "completedAt": "2026-04-11T10:42:30Z",
+      "revisionRoundsCompleted": 2,
+      "finalContradictionStatus": {
+        "resolved": 2,
+        "unresolvable": 2,
+        "detected": 0
+      }
+    },
+    {
+      "id": "sim-run-jxg-A",
+      "session": "jsxgraph-sequencer-001",
+      "hypothesisId": "hyp-jxg-A",
+      "scenariosGenerated": 4,
+      "startedAt": "2026-04-11T15:00:00Z",
+      "completedAt": "2026-04-11T15:30:00Z",
+      "revisionRoundsCompleted": 2,
+      "finalContradictionStatus": {
+        "resolved": 2,
+        "unresolvable": 0,
+        "detected": 1
+      },
+      "note": "sc-jxg-A-adv contradiction remains 'detected' — evidence gap at abs-fold boundary forwarded to prototyper T7"
+    },
+    {
+      "id": "sim-run-jxg-B",
+      "session": "jsxgraph-sequencer-001",
+      "hypothesisId": "hyp-jxg-B",
+      "scenariosGenerated": 4,
+      "startedAt": "2026-04-11T15:00:00Z",
+      "completedAt": "2026-04-11T15:30:00Z",
+      "revisionRoundsCompleted": 2,
+      "finalContradictionStatus": {
+        "resolved": 2,
+        "unresolvable": 1,
+        "detected": 1
+      },
+      "note": "sc-jxg-B-base reducedUpdate mutual exclusivity is unresolvable architectural fact. sc-jxg-B-adv DOM/board race condition is evidence gap forwarded to prototyper T8"
     }
-  ]
+  ],
+
+  "revisionHistory": [
+    {
+      "round": 1,
+      "session": "smoke-001",
+      "trigger": "REQUIRED — contradictionStatus='detected' in sc-s1-01-base, sc-s1-02-base, sc-s1-02-worst after initial generation",
+      "changesApplied": [
+        "sc-s1-02-base: Resolved contra-s1-02-base-01 (FileSink flush) via c-s1-06 explicit .flush() documentation",
+        "sc-s1-02-base: Resolved contra-s1-02-base-02 (Zod perf) — 1.8μs per validation negligible for CLI scale",
+        "sc-s1-01-base: Contradiction reclassified as evidence-gap; resolution via POSIX write() atomicity inference",
+        "sc-s1-02-worst: contra-s1-02-worst-01 partially resolved — .flush() exists; latency concern remains evidence gap",
+        "sc-s1-01-adv: contra-s1-01-adv-01 classified as irreconcilable — AtomicWriteAction has no inherent locking",
+        "sc-s1-02-adv: both contradictions classified as irreconcilable — architectural facts, not evidence gaps"
+      ],
+      "contradictionsResolved": ["contra-s1-02-base-01", "contra-s1-02-base-02", "contra-s1-02-worst-01 (partial)"],
+      "contradictionsRemaining": ["contra-s1-01-base-01 (evidence gap)", "contra-s1-01-worst-01 (partially resolved)", "contra-s1-02-worst-02 (evidence gap)", "contra-s1-01-adv-01 (irreconcilable)", "contra-s1-02-adv-01 (irreconcilable)", "contra-s1-02-adv-02 (irreconcilable)"],
+      "evidenceGapsIdentified": ["gap-s1-01 (Bun.write atomicity for H1)", "gap-s1-02 (StateReducer replay at 50k entries)"],
+      "scoresUpdated": ["sc-s1-02-base: dlaFit 4→5 (after contradiction resolution)", "sc-s1-01-adv: agentComposability confirmed at 1"],
+      "newExperiments": []
+    },
+    {
+      "round": 2,
+      "session": "smoke-001",
+      "trigger": "REQUIRED — sc-s1-01-base, sc-s1-01-worst still have 'detected' contradictions after Round 1",
+      "changesApplied": [
+        "sc-s1-01-base: Resolved via POSIX write() atomicity inference for small state files (< 4KB fits in single write() syscall = atomic). contradictionStatus: detected→resolved. NextExperiment created.",
+        "sc-s1-01-worst: contra-s1-01-worst-01 resolved — POSIX write() atomic for block-level writes; partial-write risk only for files > 4KB. Updated assumption: 'small JSON files (< 4KB) likely safe'. contradictionStatus: detected→resolved.",
+        "sc-s1-01-worst: Updated evaluationScores.evidenceFit 2→2 (kept low — a3/a4 still have no evidence IDs)",
+        "sc-s1-02-worst: contra-s1-02-worst-02 remains 'detected' — replay latency at 50k unconfirmed. NextExperiment created. Flagged for evaluator.",
+        "sc-s1-01-adv: Updated to 'unresolvable' — finalized",
+        "sc-s1-02-adv: Updated to 'unresolvable' — both contradictions finalized as architectural facts"
+      ],
+      "contradictionsResolved": ["contra-s1-01-base-01", "contra-s1-01-worst-01"],
+      "contradictionsRemaining": ["contra-s1-02-worst-02 (evidence gap — replay latency at 50k entries)"],
+      "evidenceGapsIdentified": ["gap-s1-02 confirmed: Bun StateReducer replay latency at 50,000 events not benchmarked"],
+      "scoresUpdated": ["sc-s1-01-base: contradictionStatus resolved, no score changes", "sc-s1-01-worst: riskSeverity stays at 2 for large files"],
+      "newExperiments": [
+        "exp-s1-01: Run 'bun bench' with kill -9 during Bun.write() to confirm atomicity for state.json < 4KB",
+        "exp-s1-02: Benchmark Bun StateReducer replay with 10k, 50k, 100k LogEntry events — measure P50/P99 startup latency"
+      ]
+    },
+    {
+      "round": 1,
+      "session": "jsxgraph-sequencer-001",
+      "trigger": "REQUIRED — contradictions detected in sc-jxg-A-base (TracePath/tracecurve), sc-jxg-A-worst (snap-to-grid portability), sc-jxg-B-worst (suspendUpdate frame budget), sc-jxg-B-base (reducedUpdate exclusivity)",
+      "changesApplied": [
+        "sc-jxg-A-base: contra-jxg-A-base-01 resolved — TracePath hybrid approach (board.on('update') array push) does not invalidate native _dep architecture; exception scoped and documented. contradictionStatus: detected→resolved.",
+        "sc-jxg-A-worst: contra-jxg-A-worst-01 resolved — ev-002 confirms JSXGraph drag callbacks provide usrCoords; snap-to-grid IS portable via JXG coordinate system. a2 revised: 'unavailable' → 'requires ~1-week refactoring'. Worst-case timeline: 8 weeks → 5 weeks. contradictionStatus: detected→resolved.",
+        "sc-jxg-B-worst: contra-jxg-B-worst-01 resolved — ev-004 suspendUpdate reduces repaint cost (~2-3ms) but NOT element evaluation cost. a2 revised: 10 elements × ~1.3ms + batched repaint = ~13ms total. Within 16ms at exactly 10 elements; still critical at 11+. contradictionStatus: detected→resolved.",
+        "sc-jxg-B-base: contra-jxg-B-base-01 classified as unresolvable — board.reducedUpdate=true and board.on('update') are confirmed mutually exclusive architectural choices (ev-005). Architectural fact, not contradiction."
+      ],
+      "contradictionsResolved": ["contra-jxg-A-base-01", "contra-jxg-A-worst-01", "contra-jxg-B-worst-01"],
+      "contradictionsRemaining": ["contra-jxg-B-base-01 (irreconcilable)", "contra-jxg-A-adv-01 (evidence gap)", "contra-jxg-B-adv-01 (evidence gap)"],
+      "evidenceGapsIdentified": ["gap-jxg-01: JSXGraph 2-root solver behavior at abs-fold kink boundary not documented", "gap-jxg-02: DOM drag + board.on('update') timing synchronization under rapid drag not benchmarked"],
+      "scoresUpdated": ["sc-jxg-A-worst: riskSeverity stays 2 (migration rework); worst-case timeline revised", "sc-jxg-B-worst: a2 revised; riskSeverity stays 1 (performance ceiling still critical)"],
+      "newExperiments": []
+    },
+    {
+      "round": 2,
+      "session": "jsxgraph-sequencer-001",
+      "trigger": "REQUIRED — sc-jxg-A-adv and sc-jxg-B-adv have contradictionStatus='detected' (evidence gaps) after Round 1",
+      "changesApplied": [
+        "sc-jxg-A-adv: Evidence gap refined using ev-001 2-root algorithm context. Kink is non-differentiable but continuous — solver won't diverge but may oscillate. Exact fold-boundary behavior unconfirmed. NextExperiment exp-jxg-01 created. contradictionStatus: stays 'detected' (forwarded to prototyper T7 for prototype validation).",
+        "sc-jxg-B-adv: Race condition confirmed as architectural fact using decision-log analysis: DOM drag does NOT call board.update(). DOM drag and board.on('update') ARE in different event systems. Evidence gap remains: exact timing under rapid drag. NextExperiment exp-jxg-02 created. contradictionStatus: stays 'detected' (forwarded to prototyper T8).",
+        "sc-jxg-A-adv: forwardPropHealth score confirmed at 3 (fallback path not yet declared in IntersectionResolverInterface); reversibility confirmed at 4 (clean swap via interface once declared).",
+        "sc-jxg-B-best: PECS mitigation pattern formalized — decompose observer into 4 typed handlers; dlaFit confirmed at 3 (improvement from base but not fully clean)."
+      ],
+      "contradictionsResolved": [],
+      "contradictionsRemaining": ["contra-jxg-A-adv-01 (evidence gap — prototyper T7 will test)", "contra-jxg-B-adv-01 (evidence gap — prototyper T8 will test)"],
+      "evidenceGapsIdentified": ["gap-jxg-01 confirmed: need prototype test of board.create('intersection') at |linear| fold boundary", "gap-jxg-02 confirmed: need timing instrumentation of DOM drag vs board.on('update') under rapid drag"],
+      "scoresUpdated": [],
+      "newExperiments": [
+        "exp-jxg-01: Prototype board.create('intersection', [abs_fg, linear_fg]) and drag through fold boundary — measure coordinate accuracy before/at/after fold point",
+        "exp-jxg-02: Instrument DOM drag handler + board.on('update') with performance.now() — measure timing gap under rapid drag (20+ events/sec); confirm or deny race condition"
+      ]
+    }
+  ],
+
+  "nextExperiments": [
+    {
+      "id": "exp-s1-01",
+      "session": "smoke-001",
+      "description": "Confirm Bun.write() atomicity: write a test JSON file and send kill -9 signal mid-write. Check if partial file results. Run 100 iterations.",
+      "resolvesGap": "gap-s1-01",
+      "affectedScenarios": ["sc-s1-01-base", "sc-s1-01-worst"],
+      "expectedResolution": "If no partial file produced for < 4KB writes: Bun.write atomic for small CLI state → sc-s1-01-base and sc-s1-01-worst risk profile improves",
+      "priority": "p0"
+    },
+    {
+      "id": "exp-s1-02",
+      "session": "smoke-001",
+      "description": "Benchmark StateReducer replay: generate 10k, 50k, 100k LogEntry records and measure Bun replay P50/P99 latency. Compare against 100ms startup budget.",
+      "resolvesGap": "gap-s1-02",
+      "affectedScenarios": ["sc-s1-02-worst", "sc-s1-02-adv"],
+      "expectedResolution": "If P99 < 100ms for 50k entries: H2 worst-case severity improves; if P99 > 500ms: confirms sc-s1-02-adv risk profile",
+      "priority": "p1"
+    },
+    {
+      "id": "exp-jxg-01",
+      "session": "jsxgraph-sequencer-001",
+      "description": "Prototype: implement board.create('intersection', [abs_fg, linear_fg]) where abs_fg = board.create('functiongraph', [x => Math.abs(x + parentPoint.Y())]) and drag parentPoint through fold boundary (ty crosses 0). Measure intersection coordinate accuracy at 10 points near fold. Pass criteria: coordinate error < 0.01 at all 10 test points. KEY EVIDENCE: claim-023 (confidence 0.90) — no official wiki example for this exact pattern; v1.12.1 improved curve-curve precision (claim-009) but behavior at abs-fold kink is unconfirmed.",
+      "resolvesGap": "gap-jxg-01",
+      "affectedScenarios": ["sc-jxg-A-adv"],
+      "expectedResolution": "If coordinates accurate at fold boundary: sc-jxg-A-adv riskSeverity improves 2→4; native intersection element safe for abs functions. If coordinates wrong: IntersectionResolverInterface fallback path must be declared before H-A adoption.",
+      "priority": "p0",
+      "owner": "prototyper",
+      "task": "T7"
+    },
+    {
+      "id": "exp-jxg-02",
+      "session": "jsxgraph-sequencer-001",
+      "description": "Instrument prototype: add performance.now() timestamps to both raw DOM addEventListener callback and board.on('update') callback. Simulate rapid drag (requestAnimationFrame loop firing 20 events/sec). Measure: (a) time gap between DOM event and next board.on('update'); (b) whether ty read in board.on('update') matches ty set in last DOM event.",
+      "resolvesGap": "gap-jxg-02",
+      "affectedScenarios": ["sc-jxg-B-adv"],
+      "expectedResolution": "If ty values are always synchronized: sc-jxg-B-adv riskSeverity improves 1→3; race condition is theoretical only. If ty gap detected: race condition is confirmed; H-B architecture has a critical production risk under rapid drag.",
+      "priority": "p0",
+      "owner": "prototyper",
+      "task": "T8"
+    }
+  ],
+
+  "unresolved": [
+    {
+      "id": "unresolved-01",
+      "scenarioId": "sc-s1-02-worst",
+      "contradictionId": "contra-s1-02-worst-02",
+      "type": "evidence-gap",
+      "description": "StateReducer replay latency at 50,000 entries not benchmarked. Flagged for evaluator. NextExperiment exp-s1-02 created.",
+      "flaggedForEvaluator": true
+    },
+    {
+      "id": "unresolved-02",
+      "scenarioId": "sc-s1-01-adv",
+      "contradictionId": "contra-s1-01-adv-01",
+      "type": "unresolvable",
+      "description": "AtomicWriteAction concurrent writes require locking not provided by Bun.write. This is an architectural fact. Evaluator should note this as a hard requirement for Phase 3 (Agent Teams) use of H1.",
+      "flaggedForEvaluator": true
+    },
+    {
+      "id": "unresolved-03",
+      "scenarioId": "sc-s1-02-adv",
+      "contradictionId": "contra-s1-02-adv-02",
+      "type": "unresolvable",
+      "description": "H2 compaction inherits H1 atomicity risk. Any system requiring compaction at scale cannot escape Bun.write atomicity concern. Evaluator should note this as a shared risk.",
+      "flaggedForEvaluator": true
+    },
+    {
+      "id": "unresolved-04",
+      "scenarioId": "sc-jxg-A-adv",
+      "contradictionId": "contra-jxg-A-adv-01",
+      "type": "evidence-gap",
+      "session": "jsxgraph-sequencer-001",
+      "description": "JSXGraph 2-root algorithm behavior at |f(x)| fold boundary (kink, non-differentiable point) not confirmed. Forwarded to prototyper T7 via exp-jxg-01. Evaluator should flag hyp-jxg-A as conditional on prototype validation — if T7 finds intersection coordinate error > 0.01 at fold boundary, IntersectionResolverInterface fallback path must be declared before H-A adoption.",
+      "flaggedForEvaluator": true
+    },
+    {
+      "id": "unresolved-05",
+      "scenarioId": "sc-jxg-B-base",
+      "contradictionId": "contra-jxg-B-base-01",
+      "type": "unresolvable",
+      "session": "jsxgraph-sequencer-001",
+      "description": "board.reducedUpdate=true and board.on('update') are mutually exclusive: reducedUpdate suppresses the update cycle that the observer depends on. This is an architectural fact confirmed by ev-005. H-B permanently forgoes 40-60% frame computation reduction that H-A achieves via reducedUpdate. Evaluator must weigh against H-B's zero-migration-cost advantage.",
+      "flaggedForEvaluator": true
+    },
+    {
+      "id": "unresolved-06",
+      "scenarioId": "sc-jxg-B-adv",
+      "contradictionId": "contra-jxg-B-adv-01",
+      "type": "evidence-gap",
+      "session": "jsxgraph-sequencer-001",
+      "description": "DOM drag + board.on('update') race condition confirmed as architectural risk (separate event systems per decision-log). Exact timing impact under rapid drag (20+ events/sec) not measured. Forwarded to prototyper T8 via exp-jxg-02. Evaluator should note: if T8 confirms ty synchronization gap, sc-jxg-B-adv riskSeverity=1 is confirmed and H-B should be rated HIGH risk for production teaching demo use.",
+      "flaggedForEvaluator": true
+    }
+  ],
+
+  "stoppingCriteriaMet": false,
+  "stoppingCriteriaEvaluation": {
+    "session": "jsxgraph-sequencer-001",
+    "1_no_detected_contradictions": "FAIL — sc-jxg-A-adv (evidence gap: fold boundary precision) and sc-jxg-B-adv (evidence gap: DOM/board race condition timing) have contradictionStatus='detected'. NextExperiments exp-jxg-01 and exp-jxg-02 created. Forwarded to prototyper T7/T8.",
+    "2_no_insufficient_evidence": "PASS — all 8 jsxgraph scenarios are 'sufficient' or 'partial'",
+    "3_all_4_scenario_types_per_hypothesis": "PASS — 4 types × 2 hypotheses = 8 jsxgraph scenarios",
+    "4_evidence_gaps_as_experiments": "PASS — exp-jxg-01 (fold boundary precision) and exp-jxg-02 (DOM/board race condition timing) created",
+    "5_all_11_dimensions_scored": "PASS — all 8 jsxgraph scenarios have all 11 dimensions including prototypeValidation",
+    "6_all_devcon5_scores": "PASS — all 8 jsxgraph scenarios have devcon5AlignmentScore",
+    "7_all_implementation_phases": "PASS — all 8 jsxgraph scenarios have implementationPhase",
+    "8_minimum_2_revision_rounds": "PASS — 2 revision rounds completed for jsxgraph session",
+    "STOPPING_CRITERIA_MET": false,
+    "readyForPrototyper": true,
+    "note": "Evidence gaps sc-jxg-A-adv and sc-jxg-B-adv are targeted, scoped, and resolvable by T7/T8 prototype implementation. All other scenarios fully scored and ready for evaluator."
+  },
+
+  "t5Status": {
+    "completed": true,
+    "session": "jsxgraph-sequencer-001",
+    "hypothesesGenerated": 2,
+    "hypothesisIds": ["hyp-jxg-A", "hyp-jxg-B"],
+    "note": "Hypotheses drafted by ontologist (T4), formalized by simulator (T5). Moved from hypotheses_jsxgraph_sequencer_001_PENDING_SIMULATOR to main hypotheses array."
+  },
+
+  "t6Status": {
+    "completed": true,
+    "session": "jsxgraph-sequencer-001",
+    "scenariosGenerated": 8,
+    "revisionRoundsCompleted": 2,
+    "detectedContradictions": 2,
+    "unresolvedContradictions": 0,
+    "unresolvableContradictions": 1,
+    "evidenceGapsForwarded": ["exp-jxg-01 → prototyper T7", "exp-jxg-02 → prototyper T8"],
+    "stoppingCriteriaMet": false,
+    "readyForPrototyper": true,
+    "winningHypothesisPreliminary": "hyp-jxg-A",
+    "winRationale": "H-A scores higher on ForwardPropHealth (4 vs 3), DLA-Fit (4/5 vs 3), AgentComposability (3/4 vs 3/4), and eliminates the critical reducedUpdate mutual exclusivity that caps H-B at <10 elements. H-A's adversarial risk (fold boundary precision) is smaller scope and more targeted than H-B's adversarial risk (DOM/board race condition — architectural debt). Migration cost is H-A's only real disadvantage; DragBehaviorInterface mitigates this."
+  }
 }

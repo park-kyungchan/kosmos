@@ -6,7 +6,7 @@ The simulator agent references this document — it does not embed these rules.
 
 ---
 
-## Evaluation Dimensions (7)
+## Evaluation Dimensions (11)
 
 ### 1. Evidence Fit
 How well does available evidence support this scenario's assumptions?
@@ -118,6 +118,17 @@ Can agents compose ontology-based tools for this architecture?
 | 2 | Limited composability; agents need custom integration per operation |
 | 1 | No agent composability considered; all operations require human execution |
 
+### 11. Prototype Validation
+Does the hypothesis survive actual code implementation?
+
+| Score | Definition |
+|-------|-----------|
+| 5 | Prototype builds clean, all eval cases pass, no failure modes |
+| 4 | Prototype builds, >80% eval pass, minor failure modes |
+| 3 | Prototype builds with warnings, 50-80% eval pass |
+| 2 | Prototype builds partially, <50% eval pass, critical failure modes |
+| 1 | Prototype fails to build, or fundamental assumption disproved by code |
+
 ---
 
 ## Contradiction Classification
@@ -202,7 +213,7 @@ The simulation loop STOPS when ALL of these are true:
 2. No scenarios have `evidenceSufficiency: "insufficient"` (all sufficient or partial)
 3. All 4 scenario types exist per hypothesis
 4. All evidence gaps are documented as `NextExperiment` objects
-5. All scenarios are scored on all 7 dimensions
+5. All scenarios are scored on all 11 dimensions
 6. >= 2 revision rounds completed (when contradictions were found)
 
 The simulation loop FORCE-STOPS at round 5, with:
