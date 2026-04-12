@@ -13,6 +13,5 @@
     "types": ["bun-types"],
     "lib": ["ESNext", "DOM"]
   },
-  "include": ["**/*.ts", "**/*.d.ts"],
-  "exclude": ["hyp-cd-B/**"]
+  "include": ["*.ts", "*.d.ts"]
 }

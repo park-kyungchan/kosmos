@@ -1,288 +1,284 @@
 {
-  "version": "0.6.0",
-  "lastUpdated": "2026-04-11T14:00:00Z",
-  "sessionId": "jsxgraph-sequencer-001",
-  "previousBenchmarks": ["bench-001", "bench-002", "bench-003", "mathcrew-deep-dive-001", "smoke-test-001"],
+  "version": "0.7.0",
+  "lastUpdated": "2026-04-12T10:00:00Z",
+  "sessionId": "mathcrew-content-delivery-001",
+  "previousBenchmarks": ["jsxgraph-sequencer-001"],
   "entries": [
     {
       "type": "decomposition",
-      "timestamp": "2026-04-11T14:00:00Z",
+      "timestamp": "2026-04-12T10:00:00Z",
       "agent": "lead",
-      "objective": "palantir-math Sequencer 대시보드의 JSXGraph canvas에서: (1) Native JSXGraph 기능 조사, (2) Custom 기능 정교화/고도화, (3) 실시간 그래프 드래그를 통한 교점·절댓값 변화를 강의에 보여주기 위한 설계 리서치",
-      "rationale": "palantir-math는 이미 JSXGraph 1.12.2 + 16가지 element type + drag handler + autoIntersection + absolute value fold를 구현하고 있음. 그러나 교점은 정적 visibility 상태머신이고, 드래그 중 실시간 dependent element 업데이트 및 teaching annotation이 부재. 이 연구는 기존 코드 위에 어떤 native API를 활용하고 어떤 custom layer를 추가해야 하는지 정밀히 분석함.",
+      "objective": "mathcrew PR#28 Speech Bubble 기반 교육콘텐츠 전달방식 검토 + 현재 기술스택(Three.js 0.183.2 + WebGL2 + TS + Bun + Vite + ts-fsrs) 위에서 최신/최선의 교육콘텐츠 전달방식 리서치",
+      "rationale": "mathcrew v2는 3D 수학학습 월드(5개 행성)에서 약수/배수 개념을 VT(Variation Theory) + CRA(Concrete-Representational-Abstract) 프레임워크로 가르침. PR#28은 고정 HUD 패널에서 캐릭터 추종 말풍선으로의 마이그레이션을 완료. 이 리서치는 말풍선 이외에 3D 교육환경에서 콘텐츠를 더 효과적으로 전달할 수 있는 최신/최선의 방법이 있는지 조사함.",
       "currentCodebaseFindings": {
-        "jsxGraphVersion": "1.12.2",
-        "elementTypesSupported": 16,
-        "keyFiles": {
-          "canvas": "src/components/graph/JSXGraphCanvas.tsx (400 LOC)",
-          "renderer": "src/lib/jsxGraphRenderer.ts (1000+ LOC)",
-          "intersection": "src/lib/autoIntersectionVisibility.ts",
-          "dragSemantics": "src/lib/functiongraphDragSemantics.ts",
-          "graphFamily": "src/lib/graphFamily.ts",
-          "latexConverter": "src/lib/latexToJSXGraph.ts",
-          "sliders": "src/lib/jsxSceneSliders.ts",
-          "dataTypes": "src/types/seq-data.ts (750+ LOC)"
+        "techStack": {
+          "renderer": "Three.js 0.183.2 (WebGL2)",
+          "postprocessing": "postprocessing 6.36.7 + n8ao 1.10.1",
+          "spacedRepetition": "ts-fsrs 5.3.1",
+          "build": "Vite 8.0.5 + TypeScript 5.9.3 + Bun",
+          "testing": "Playwright 1.59.1"
         },
-        "implementedFeatures": [
-          "Glider drag via JXG native .on('drag')",
-          "Functiongraph drag via raw DOM addEventListener",
-          "Auto-intersection visibility state machine (add/rm/null)",
-          "Absolute value fold: unwrapOuterAbsoluteExpression() + dual-path evaluation",
-          "Graph family classification: Linear/Quadratic/Cubic/Quartic/Abs",
-          "Drag assist: tangency snapping, grid alignment",
-          "SVG glow filters for visual emphasis",
-          "Theme-aware axis/grid colors (5 themes)",
-          "LaTeX → JS function converter with 200-entry LRU cache",
-          "3-level caching: regex, LaTeX functions, compiled params"
-        ],
+        "currentApproach": {
+          "name": "Character-following CSS Speech Bubble",
+          "file": "src/hud/speech-bubble.ts (717 LOC)",
+          "projection": "Vector3.project → CSS transform (worldToScreen)",
+          "dataModel": "SpeechBubbleContent (title, body, phase, vocabularyIntro, successCriteria, promptText, promptKey, beatIndex, totalBeats)",
+          "hudSlimmed": "src/hud/hud.ts (530 LOC — progress bar, mini-telemetry, victory, dev panel)",
+          "architecture": "game-loop → SpeechBubbleContent → speech-bubble.ts (follows character) + HudUpdateData → hud.ts"
+        },
+        "teachingFramework": {
+          "beats": "TeachingBeat with 5 phases: motivate/explain/demonstrate/practice/assess",
+          "craMicroPhases": "C (Concrete) / R (Representational) / A (Abstract)",
+          "variationTheory": "contrast/separation/generalization/fusion/integration per planet",
+          "interactionModes": "pickup-drop, resonance-trial-sequencer, predict-verify, select-scan, observe, divisor-judge, observe-discovery, array-builder, venn-diagram, observe-factor-table",
+          "surfaces": "signal-console, constellation-triptych, resonance-loop, beacon-anchored, observatory-overview, orbital-array-deck, intersection-lens, number-line-rail",
+          "storyworlds": "observatory-approach, resonance-observatory, signal-console-hall, constellation-atlas, orbital-recap"
+        },
+        "pr28Impact": {
+          "additions": 1205,
+          "deletions": 1184,
+          "keyFiles": [
+            "src/hud/speech-bubble.ts (NEW, 717 LOC)",
+            "src/hud/hud.ts (2089 → 530 LOC, -74%)",
+            "src/game-loop.ts (+85/-42)",
+            "src/types/teaching.ts (+50/-3)",
+            "ontology/frontend.ts (+15/-3)",
+            "ontology/runtime.ts (+30/-17)"
+          ],
+          "verdict": "HUD 고정패널 → 캐릭터추종 말풍선 마이그레이션 완료. Enter-advances-beat 프레임워크 및 teaching-flow.ts 미변경."
+        },
         "identifiedGaps": [
-          "Intersection points are static — not recomputed during drag",
-          "No visual fold animation for |f(x)| during inner function translation",
-          "No dynamic coordinate labels on intersection points",
-          "No dependent element chain update during functiongraph drag",
-          "No teaching-focused real-time annotation overlay",
-          "No computed derivative/slope display at intersection",
-          "No trace path for dragged function history",
-          "graphFamily.ts doesn't cover piecewise or parametric drag semantics"
+          "Speech bubble is CSS overlay — no 3D depth integration or occlusion",
+          "Text rendering is DOM-based — no in-world diegetic UI",
+          "No spatial audio cues for teaching content transitions",
+          "No adaptive content pacing based on learner behavior",
+          "No micro-animation or visual storytelling for abstract concepts",
+          "No multi-modal content (only text + key prompts in bubble)",
+          "Vocabulary terms shown inline — no spatial/3D highlighting of referenced objects",
+          "Mini-telemetry is HUD-only — no in-world feedback visualization"
         ]
       }
     },
     {
       "type": "routing",
-      "timestamp": "2026-04-11T14:00:01Z",
+      "timestamp": "2026-04-12T10:00:01Z",
       "agent": "lead",
       "decisions": {
-        "RQ1": "external+context7 — JSXGraph 1.12.2 API: unused native element types (dependent points, dynamic text, transformation, tracecurve, dataplot)",
-        "RQ2": "external+internal — Real-time intersection recomputation architecture during drag events",
-        "RQ3": "external+internal — Absolute value fold algebra: |f(x)+t_y| visualization during f(x) drag",
-        "RQ4": "external — JSXGraph event system: suspendUpdate/unsuspendUpdate, batch update patterns",
-        "RQ5": "external+internal — Teaching annotation patterns: dynamic labels, value display, coordinate readout",
-        "RQ6": "internal — graphFamily extension model for composite/piecewise functions",
-        "RQ7": "external — JSXGraph SVG renderer performance: 10+ interactive elements, requestAnimationFrame integration"
+        "RQ1": "external — EdTech UX research + 3D education platforms + game-based learning studies for content delivery patterns",
+        "RQ2": "external+context7 — Three.js text/UI rendering libraries (troika-three-text, CSS3DRenderer, three-mesh-ui, htmlmesh)",
+        "RQ3": "external+internal — Interaction paradigms for educational pacing (spatial triggers, adaptive timing, multi-modal cues)",
+        "RQ4": "external — Cognitive load theory + Mayer multimedia learning principles applied to 3D educational spaces",
+        "RQ5": "external+context7 — Three.js ecosystem tools for enhanced content delivery (three-mesh-ui, troika, lottie-three)",
+        "RQ6": "internal+external — Teaching flow architecture adaptation paths for richer multimodal delivery",
+        "RQ7": "external — Performance comparison: CSS overlay vs CSS3DRenderer vs WebGL-native text with n8ao+postprocessing pipeline"
       }
     }
   ],
   "requirements": [
-    { "id": "req-jg-01", "description": "Real-time intersection point update when functiongraph is dragged", "category": "functional", "priority": "p0", "domain": "LOGIC" },
-    { "id": "req-jg-02", "description": "Absolute value |f(x)| fold visualization showing fold line and value changes during drag", "category": "functional", "priority": "p0", "domain": "LOGIC" },
-    { "id": "req-jg-03", "description": "Dynamic coordinate labels on intersection points (x, y values update in real-time)", "category": "functional", "priority": "p0", "domain": "DATA" },
-    { "id": "req-jg-04", "description": "Teaching-mode annotation overlay (highlight, trace, step narration)", "category": "functional", "priority": "p1", "domain": "ACTION" },
-    { "id": "req-jg-05", "description": "Dependent element cascade: drag one graph → all dependent computed elements update", "category": "functional", "priority": "p0", "domain": "ACTION" },
-    { "id": "req-jg-06", "description": "Performance: maintain 60fps with 10+ interactive elements on SVG renderer", "category": "non-functional", "priority": "p1", "domain": "ACTION" },
-    { "id": "req-jg-07", "description": "Graph family extension for piecewise and parametric drag semantics", "category": "functional", "priority": "p2", "domain": "LOGIC" },
-    { "id": "req-jg-08", "description": "Slope/derivative display at intersection and critical points", "category": "functional", "priority": "p1", "domain": "LOGIC" }
+    { "id": "req-cd-01", "description": "Identify content delivery approaches superior to CSS speech bubble for 3D math education", "category": "functional", "priority": "p0", "domain": "LOGIC" },
+    { "id": "req-cd-02", "description": "Evaluate in-world (diegetic) vs overlay (non-diegetic) content rendering for teaching effectiveness", "category": "functional", "priority": "p0", "domain": "DATA" },
+    { "id": "req-cd-03", "description": "Assess Three.js ecosystem libraries for advanced text/UI rendering (troika-three-text, three-mesh-ui, CSS3DRenderer)", "category": "functional", "priority": "p0", "domain": "DATA" },
+    { "id": "req-cd-04", "description": "Design interaction patterns that improve educational pacing beyond Enter-advances-beat", "category": "functional", "priority": "p1", "domain": "ACTION" },
+    { "id": "req-cd-05", "description": "Apply cognitive load theory and Mayer's multimedia learning principles to content delivery design", "category": "non-functional", "priority": "p1", "domain": "LOGIC" },
+    { "id": "req-cd-06", "description": "Maintain 60fps rendering performance with enhanced content delivery in n8ao+postprocessing pipeline", "category": "non-functional", "priority": "p0", "domain": "ACTION" },
+    { "id": "req-cd-07", "description": "Preserve compatibility with existing teaching flow (beats, CRA, VT) and ts-fsrs spaced repetition", "category": "constraint", "priority": "p0", "domain": "LOGIC" },
+    { "id": "req-cd-08", "description": "Support multimodal content delivery (text, visual cues, spatial highlighting, micro-animation)", "category": "functional", "priority": "p1", "domain": "ACTION" }
   ],
   "questions": [
     {
-      "id": "q-jg-01",
-      "text": "What JSXGraph 1.12.2 native APIs support real-time dependent element updates (board.on('update'), element.on('drag'), suspendUpdate/unsuspendUpdate)?",
+      "id": "q-cd-01",
+      "text": "What are the current best-practice UI patterns for delivering educational content in 3D learning environments? (diegetic UI, spatial UI, AR-like annotations, visual novel panels, proximity-triggered overlays)",
+      "domain": "DATA",
+      "priority": "p0",
+      "route": "external",
+      "status": "open"
+    },
+    {
+      "id": "q-cd-02",
+      "text": "How do modern Three.js text/UI rendering libraries compare for in-world educational content delivery? (troika-three-text SDF, CSS3DRenderer, three-mesh-ui, CanvasTexture, HTML overlay)",
+      "domain": "LOGIC",
+      "priority": "p0",
+      "route": "external+context7",
+      "status": "open"
+    },
+    {
+      "id": "q-cd-03",
+      "text": "What interaction paradigms best support educational pacing in 3D game environments? (auto-advance timing, spatial proximity triggers, gesture-based, adaptive AI-driven pacing, multi-modal cues)",
       "domain": "ACTION",
-      "priority": "p0",
-      "route": "external+context7",
-      "status": "open"
-    },
-    {
-      "id": "q-jg-02",
-      "text": "How should intersection point computation be architectured for real-time recomputation during functiongraph drag — JSXGraph native 'intersection' element vs custom Newton-Raphson solver?",
-      "domain": "LOGIC",
-      "priority": "p0",
-      "route": "external+internal",
-      "status": "open"
-    },
-    {
-      "id": "q-jg-03",
-      "text": "What is the optimal model for visualizing |f(x)+t| fold changes during drag — reflect-about-x-axis animation, ghost curve, or dual-curve overlay?",
-      "domain": "LOGIC",
-      "priority": "p0",
-      "route": "external+internal",
-      "status": "open"
-    },
-    {
-      "id": "q-jg-04",
-      "text": "Which JSXGraph native element types are available but unused in palantir-math (tracecurve, transform, derivative, integral display, dynamic text)?",
-      "domain": "DATA",
-      "priority": "p0",
-      "route": "external+context7",
-      "status": "open"
-    },
-    {
-      "id": "q-jg-05",
-      "text": "What teaching annotation UX patterns best serve live math lectures — real-time coordinate tooltip, sidebar value panel, or canvas overlay with KaTeX rendering?",
-      "domain": "DATA",
       "priority": "p1",
       "route": "external+internal",
       "status": "open"
     },
     {
-      "id": "q-jg-06",
-      "text": "How to maintain 60fps SVG rendering with 10+ interactive elements — JSXGraph batch update API, virtual element pooling, or selective DOM update?",
-      "domain": "ACTION",
+      "id": "q-cd-04",
+      "text": "How do cognitive load theory and Mayer's multimedia learning principles inform the design of content delivery UX in 3D educational spaces for elementary math?",
+      "domain": "LOGIC",
       "priority": "p1",
       "route": "external",
       "status": "open"
     },
     {
-      "id": "q-jg-07",
-      "text": "How to extend graphFamily.ts classification to support composite functions (piecewise, parametric) with appropriate drag semantics per segment?",
+      "id": "q-cd-05",
+      "text": "What Three.js ecosystem tools could enhance the current content delivery pipeline? (troika-three-text, three-mesh-ui, htmlmesh, drei text patterns, postprocessing text effects)",
+      "domain": "DATA",
+      "priority": "p0",
+      "route": "external+context7",
+      "status": "open"
+    },
+    {
+      "id": "q-cd-06",
+      "text": "How can the existing teaching flow architecture (beats + CRA phases + VT dimensions + interaction modes) be adapted for richer multimodal content delivery while preserving the existing SpeechBubbleContent/TeachingBeat contract?",
+      "domain": "ACTION",
+      "priority": "p1",
+      "route": "internal+external",
+      "status": "open"
+    },
+    {
+      "id": "q-cd-07",
+      "text": "What performance trade-offs exist between CSS overlay, CSS3DRenderer, and WebGL-native text rendering for 60fps educational content in scenes with n8ao + postprocessing effects pipeline?",
       "domain": "LOGIC",
-      "priority": "p2",
-      "route": "internal",
+      "priority": "p0",
+      "route": "external",
       "status": "open"
     }
   ],
   "projectScope": {
     "backend": {
       "data": [
-        "JSXGraphScene (scene graph document — elements, sliders, computed params, auto-intersections)",
-        "IntersectionPoint (computed geometry: el1 × el2 → (x,y) coordinates)",
-        "DragState (current translation vector per element)",
-        "CoordinateLabel (dynamic text content bound to element position)",
-        "GraphFamilyProfile (classification result per functiongraph)"
+        "SpeechBubbleContent (current: title, body, phase, vocabularyIntro, successCriteria, promptText, promptKey)",
+        "TeachingBeat (phase, craMicroPhase, interactionMode, successCriteria, vocabularyIntro)",
+        "PlanetTeachingContent (planetId, conceptId, vtDimension, beats, mathParams)",
+        "TeachingSurfaceStrategy (modeId, primarySurface, storyworldId)",
+        "MiniHudTelemetry (masteryScore, attemptCount, interactionProgress, discoveryTable)",
+        "ContentDeliveryConfig (NEW: rendering approach, interaction model, animation settings)",
+        "SpatialAnnotation (NEW: 3D-anchored educational annotations)"
       ],
       "logic": [
-        "IntersectionSolver (real-time root finding for f(x)=g(x) during drag)",
-        "AbsValueFoldComputer (|f(x)+t| → fold geometry: fold line, reflected segments)",
-        "DependencyGraph (DAG of element → dependent elements for cascade update)",
-        "DragSemanticResolver (extend graphFamily → drag model per element type)",
-        "DerivativeEvaluator (slope/tangent at intersection and critical points)"
+        "WorldToScreenProjection (Vector3.project → CSS transform — current approach)",
+        "ContentRenderingPipeline (game-loop → SpeechBubbleContent → speech-bubble.ts)",
+        "TeachingBeatProgression (beat sequencing, CRA micro-phase advancement)",
+        "FSRSScheduling (ts-fsrs spaced repetition for mastery tracking)",
+        "ContentDeliveryResolver (NEW: select rendering approach per teaching phase/context)",
+        "CognitiveLoadManager (NEW: adapt content density based on learner state)"
       ],
       "action": [
-        "DragCascadeUpdate (trigger dependent element recomputation on drag event)",
-        "BatchBoardUpdate (suspendUpdate → mutate N elements → unsuspendUpdate → single repaint)",
-        "AnnotationToggle (activate/deactivate teaching overlay per frame)",
-        "TraceCurveRecord (capture drag path as trace for playback)"
+        "EnterAdvancesBeat (current Enter key handler)",
+        "InteractionModeDispatch (10 interaction modes per teaching surface)",
+        "SpeechBubbleFollow (per-frame worldToScreen update)",
+        "HudUpdate (progress bar, telemetry, victory overlay)",
+        "SpatialContentTrigger (NEW: proximity/gaze-based content activation)",
+        "MicroAnimationSequencer (NEW: visual storytelling for abstract concepts)"
       ],
-      "security": [
-        "InputSanitization (LaTeX → JS function compilation via new Function() — XSS boundary)"
-      ],
+      "security": [],
       "learn": [
-        "InteractionTelemetry (drag events, intersection discoveries, frame timing)",
-        "TeachingEffectiveness (which annotations were used, student attention heuristic)"
+        "MiniHudTelemetry (mastery, attempts, progress tracking)",
+        "FSRSReviewLog (spaced repetition review history)",
+        "InteractionTelemetry (NEW: content delivery mode effectiveness tracking)",
+        "ContentEngagement (NEW: time-on-content, interaction depth, visual attention heuristic)"
       ]
     },
     "frontend": {
       "views": [
-        "EnhancedJSXGraphCanvas (main interactive canvas with real-time updates)",
-        "IntersectionLabelOverlay (dynamic coordinate display on intersection points)",
-        "AbsValueFoldVisualization (fold line + ghost curve for |f(x)| teaching)"
+        "SpeechBubble (CSS overlay following character — current)",
+        "HUD (progress bar, mini-telemetry, victory, dev panel — current)",
+        "DiegeticContentPanel (NEW: in-world 3D text/UI)",
+        "SpatialAnnotationOverlay (NEW: 3D-anchored educational labels)"
       ],
       "agentSurfaces": [],
       "scenarioFlows": [
-        "TeacherDragDemo (instructor drags f(x), all dependent visuals update live)",
-        "IntersectionDiscovery (drag two curves toward each other, watch intersection appear/vanish)",
-        "AbsValueTeaching (show how |f(x)| fold changes as f(x) translates vertically)"
+        "TeachingBeatFlow (motivate→explain→demonstrate→practice→assess per planet)",
+        "CRAProgression (Concrete→Representational→Abstract within planet)",
+        "VTDimensionJourney (contrast→separation→generalization→fusion→integration across planets)"
       ],
       "interaction": [
-        "FunctionDrag → IntersectionUpdate → LabelUpdate chain",
-        "SliderMove → ParameterBind → SceneRerender chain",
-        "ClickIntersection → ShowCoordinates → HighlightBothCurves chain"
+        "Enter key → advance beat (current)",
+        "Teaching interaction modes (10 types — current)",
+        "Spatial proximity → content trigger (NEW candidate)",
+        "Gaze/focus → content highlight (NEW candidate)",
+        "Adaptive timing → auto-advance (NEW candidate)"
       ],
       "rendering": [
-        "SVG glow filters (existing)",
-        "Dynamic text elements (JSXGraph native JXG.Text)",
-        "Trace curve overlay (JSXGraph native tracecurve)",
-        "Coordinate crosshairs (projection lines to axes)"
+        "CSS overlay via Vector3.project (current speech bubble)",
+        "WebGL2 scene with n8ao + postprocessing (current 3D)",
+        "CSS3DRenderer (NEW candidate — Three.js native CSS-in-3D)",
+        "troika-three-text SDF (NEW candidate — WebGL-native text)",
+        "three-mesh-ui (NEW candidate — WebGL UI panels)",
+        "CanvasTexture (NEW candidate — rasterized text on 3D meshes)"
       ]
     }
   },
-  "devconPhase": "Phase 2 — Operational Decision-Making: the core data shapes (JSXGraphScene, elements) exist; now adding real-time logic (intersection solver, dependency graph) and interactive actions (drag cascade, batch update)",
-  "userDirectives": [
-    {
-      "timestamp": "2026-04-11T14:45:00Z",
-      "directive": "Maximize JSXGraph native API usage. Custom code ONLY for features JSXGraph cannot handle natively (|f(x)| fold visualization, teaching annotations, piecewise drag semantics).",
-      "rationale": "JSXGraph 1.12.2 already provides: native intersection element (auto-updates on drag), derivative element, dynamic text with coordinate binding, reducedUpdate for 60fps, suspendUpdate/unsuspendUpdate batch rendering, otherintersection for multiple points, internal generalizedNewton + chandrupatla root-finders. Building custom replacements for these is unnecessary overhead.",
-      "affectsHypotheses": "Hypothesis A (native-first) is PREFERRED over Hypothesis B (custom layer)"
-    }
-  ],
+  "devconPhase": "Phase 2 → Phase 3 transition — Data model (TeachingBeat, SpeechBubbleContent) and basic rendering pipeline exist (Phase 2). Research targets enriched content delivery with potential adaptive/AI-first patterns (Phase 3 aspiration).",
+  "userDirectives": [],
   "codebaseUpdates": [
     {
-      "timestamp": "2026-04-11T14:46:00Z",
-      "pr": "#90",
-      "title": "[codex] preserve outer-abs drag semantics",
-      "impact": "req-jg-02 PARTIALLY SOLVED: functiongraphDragSemantics.ts now has translate-source-before-outer-abs support. graphFamily.ts extended for outer-absolute recognition. Remaining gap: visual fold animation + teaching annotation overlay.",
-      "filesChanged": ["functiongraphDragSemantics.ts", "graphFamily.ts", "jsxGraphRenderer.ts", "ontology/data.ts", "ontology/changeContracts.ts", "seq-data.ts"],
-      "verifiedBy": "Playwright on problem 15 frame #25"
+      "timestamp": "2026-04-12T06:17:00Z",
+      "pr": "#28",
+      "title": "feat: migrate HUD teaching panel to character speech bubble",
+      "impact": "HUD 2089→530 LOC. New speech-bubble.ts 717 LOC. SpeechBubbleContent type added to teaching.ts. Ontology frontend.ts/runtime.ts updated with SpeechBubble view + binding.",
+      "filesChanged": ["src/hud/speech-bubble.ts", "src/hud/hud.ts", "src/game-loop.ts", "src/types/teaching.ts", "ontology/frontend.ts", "ontology/runtime.ts"],
+      "verifiedBy": "bunx tsc + bunx vite build + audit:doc-contracts + audit:spatial-support"
     }
   ],
   "recommendations": [
     {
-      "id": "rec-jxg-001",
-      "hypothesisId": "hyp-jxg-A",
+      "id": "rec-cd-001",
+      "hypothesisId": "H-A",
       "verdict": "ACCEPT",
       "confidence": 0.88,
-      "rationale": "H-A (JSXGraph native-first) is the recommended architecture. User directive explicitly prefers native-first. Prototype validation: H-A has zero architectural defects (FM-A-001 is test harness only, medium severity). H-B has confirmed HIGH severity architectural race condition (FM-B-001: dragState.ty stale read). DevCon 5 alignment: H-A scores higher on DDD (pure JSXGraph vocabulary), DRY (board.reducedUpdate eliminates manual updates), OCP (add elements via board.create without handler modification). H-B flagged for DDD violation, PECS anti-pattern, OCP violation, and DRY risk. ForwardProp: H-A native cascade is HEALTHY; H-B observer-as-implicit-hub is fragile. Performance: H-A can use board.reducedUpdate=true (40-60% frame computation reduction); H-B permanently forgoes this.",
-      "alternativeId": "hyp-jxg-B",
-      "alternativeRationale": "H-B (custom interaction layer) has zero migration cost and fine-grained telemetry control. Valid if: element count stays ≤5 permanently, or if JSXGraph native intersection precision fails for abs-fold kinks in browser testing. Not recommended due to: (1) confirmed architectural race condition FM-B-001, (2) permanent performance ceiling without reducedUpdate, (3) DDD/DRY/OCP/PECS violations.",
-      "scenarioIds": ["sc-jxg-A-base", "sc-jxg-A-best", "sc-jxg-A-worst", "sc-jxg-A-adv", "sc-jxg-B-base", "sc-jxg-B-best", "sc-jxg-B-worst", "sc-jxg-B-adv"],
-      "riskIds": ["FM-A-001", "FM-B-001", "FM-B-002"],
+      "rationale": "H-A (Enhanced CSS Overlay) wins on: (1) lowest implementation cost (1-2 weeks additive), (2) zero WebGL render loop changes — no regression risk to n8ao/postprocessing pipeline, (3) highest reversibility (CSS-only changes, fully revertible), (4) pedagogical soundness confirmed by Mayer P8 Segmenting + CLT (speech bubble + Enter-advances-beat is correct for elementary), (5) CognitiveLoadManager adds adaptive content density (3 tiers) without architecture change, (6) prefers-reduced-motion WCAG 2.3 compliance built-in, (7) prototype passes 9/9 eval cases including beat sequencing invariant preservation.",
+      "alternativeId": "H-B",
+      "alternativeRationale": "H-B (Hybrid Diegetic + Overlay) is the Phase 3 evolution path. Valid when: (1) CRA Concrete phase needs in-world spatial annotations (SpatialAnnotation entity), (2) Mayer Spatial Contiguity principle demands labels near 3D objects, (3) troika-three-text SDF + n8ao compatibility is browser-validated (gap C-B01-1). Higher cost (6-8 weeks) but closes depth/occlusion gap for teaching-critical scenes. Prototype passes 8/8.",
+      "scenarioIds": ["S-A-01", "S-A-02", "S-A-03", "S-A-04", "S-B-01", "S-B-02", "S-B-03", "S-B-04"],
+      "riskIds": ["NE-02", "NE-03", "C-B01-1", "C-B03-1"],
       "whatWouldChangeDecision": [
-        "If native intersection precision at abs-fold kinks fails in browser testing → add fallback to JXG.Math.Numerics.root() via IntersectionResolverInterface",
-        "If parentPoint migration breaks snap-to-grid regression in ≥3 graph families → extend DragBehaviorInterface migration timeline; worst case: revert to H-B for affected families only",
-        "If element count stays ≤5 permanently → H-B's simpler additive pattern has lower total cost; reassess if scope narrows",
-        "If JSXGraph drops support for _dep chain auto-cascade in future major version → H-B's explicit control becomes necessary"
+        "If CRA Concrete phase requires spatial labels NEAR 3D manipulatives (Mayer Spatial Contiguity) → H-B becomes mandatory for motivate/explain/demonstrate phases",
+        "If troika-three-text + n8ao benchmark shows <5% FPS impact on Chromebook → H-B migration cost justified",
+        "If elementary learner testing shows speech bubble text insufficient for abstract concepts → add troika SDF labels as supplementary (H-B hybrid)",
+        "If accessibility audit requires screen reader support for in-world labels → CSS overlay (H-A) remains superior (DOM accessibility)",
+        "If audio narration (Mayer P9, d=0.87) is implemented first → H-A's simplicity is even more valuable as the high-ROI investment"
       ]
     }
   ],
   "experiments": [
     {
-      "id": "exp-jxg-01",
-      "description": "Test board.create('intersection') with |linear| function and verify coordinate accuracy at fold boundary (x where f_raw(x)+ty=0). Prototype partially addressed: FM-A-001 found test harness defect, not architectural flaw. Browser validation still needed.",
+      "id": "exp-cd-01",
+      "description": "Browser benchmark: CSS overlay z-order vs n8ao postprocessing canvas stacking context (gap NE-02). Validate that speech bubble DOM layer renders correctly above postprocessed WebGL output.",
       "status": "deferred-to-implementation",
-      "createdBy": "evaluator"
+      "priority": "p0"
     },
     {
-      "id": "exp-jxg-02",
-      "description": "Instrument DOM drag handler + board.on('update') with performance.now() timestamps to measure synchronization gap under rapid drag (20+ events/sec). Prototype confirmed race condition exists (FM-B-001). No further experiment needed — architectural defect confirmed.",
-      "status": "confirmed-by-prototype",
-      "createdBy": "evaluator"
+      "id": "exp-cd-02",
+      "description": "If H-B adopted: troika-three-text SDF + n8ao EffectComposer pass ordering benchmark. Validate OverrideMaterialManager.workaroundEnabled=true + renderBeforeCompositor pattern (gap C-B01-1).",
+      "status": "deferred-to-implementation",
+      "priority": "p1"
+    },
+    {
+      "id": "exp-cd-03",
+      "description": "Audio narration pilot: Web Speech API Korean TTS quality test with 3-5 teaching beats. Measure learner engagement delta per Mayer P9 Temporal Contiguity.",
+      "status": "proposed",
+      "priority": "p0"
     }
   ],
   "evaluatorGateResult": "ACCEPT",
   "evaluatorGateDetails": {
-    "evaluatedAt": "2026-04-11T18:00:00Z",
-    "evaluatedBy": "evaluator",
-    "session": "jsxgraph-sequencer-001",
-    "winningHypothesis": "hyp-jxg-A",
-    "gateResults": {
-      "R1_lowTierDependency": { "status": "PASS", "note": "All 12 sources tier-1/2. One [Inference] claim (claim-028, conf 0.85) is non-critical." },
-      "R2_unresolvedContradictions": { "status": "PASS", "note": "sc-jxg-A-adv 'detected' — prototype showed test harness defect (FM-A-001), not architectural. sc-jxg-B-adv 'detected' — prototype CONFIRMED race condition (FM-B-001). Neither blocks H-A recommendation." },
-      "R3_missingScenarioLink": { "status": "PASS", "note": "Both hypotheses have 4 scenarios each (base/best/worst/adversarial)." },
-      "R4_missingRiskLink": { "status": "PASS", "note": "3 failure modes documented (FM-A-001, FM-B-001, FM-B-002). Risks in worst/adversarial scenarios." },
-      "R5_staleEvidence": { "status": "PASS", "note": "All evidence from current session. JSXGraph 1.12.2 is current release." },
-      "R6_blurredProvenance": { "status": "PASS", "note": "All sources tagged [Official]/[Synthesis]/[Inference]. Confidence scores on all claims." },
-      "R7_missingWinRationale": { "status": "PASS", "note": "Win rationale produced in rec-jxg-001." },
-      "R8_noAlternatives": { "status": "PASS", "note": "H-B documented as competing alternative with rationale." },
-      "R9_insufficientEvidence": { "status": "PASS", "note": "All scenarios 'sufficient' or 'partial'; none 'insufficient'." },
-      "R10_missingReversalConditions": { "status": "PASS", "note": "4 reversal conditions documented in rec-jxg-001.whatWouldChangeDecision." },
-      "R11_dlaMissing": { "status": "PASS", "note": "20 objects across 5 domains (7 DATA, 5 LOGIC, 5 ACTION, 1 SECURITY, 2 LEARN)." },
-      "R12_devcon5NotApplied": { "status": "PASS", "note": "DDD/DRY/OCP/PECS on every object. H-B violations flagged." },
-      "R13_propagationBroken": { "status": "PASS", "note": "H-A ForwardProp HEALTHY (native cascade). BackwardProp partial (telemetry hook not yet declared). Neither broken." },
-      "R14_prototypeBuildFailure": { "status": "PASS", "note": "Both prototypes: tscErrors=0, buildStatus=success." },
-      "R15_evalPassRateBelowThreshold": { "status": "PASS", "note": "H-A passRate=1.0 (30/30). H-B passRate=1.0 (29/29)." }
+    "timestamp": "2026-04-12T13:00:00Z",
+    "agent": "evaluator",
+    "evaluationRound": 2,
+    "passed": ["R1", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"],
+    "failed": [],
+    "notApplicable": ["R2"],
+    "summary": "ACCEPT — 14/15 PASS, 0 FAIL, 1 N/A. Independent adversarial evaluation by evaluator agent. All upstream pipeline artifacts verified: 14 sources (40+ provenance-tagged claims), 21 D/L/A-classified objects, 12 scenarios (11-dim scoring, 2 revision rounds), recommendation with 7-point rationale + 5 reversal conditions. Both prototypes independently verified: bun test 74/74 (H-A) + 30/30 (H-B), bunx tsc --noEmit clean. H-A (Enhanced CSS Overlay) accepted as Phase 2 recommendation. H-B (Hybrid Diegetic) documented as Phase 3 evolution. H-C (Full WebGL) correctly deprioritized (staleness + WCAG insufficient evidence).",
+    "debateTriggered": false,
+    "previousRound": {
+      "verdict": "REJECT",
+      "timestamp": "2026-04-12T11:00:00Z",
+      "reason": "11/15 rules failed — upstream pipeline T2-T6 was incomplete (all state files empty except T1 intake). Correct rejection."
     },
-    "debateRequired": false,
-    "debateRationale": "No triggers met: (1) pass rate difference = 0% (<20% threshold). (2) No D/L/A misclassification in world-model. (3) FM-B-001 race condition WAS predicted by sc-jxg-B-adv — not a new failure type. (4) No contradicting evidence between prototypes.",
-    "prototypeValidationSummary": {
-      "hyp-jxg-A": {
-        "passRate": 1.0,
-        "architecturalDefects": 0,
-        "testHarnessDefects": 1,
-        "note": "FM-A-001 (medium): testFoldBoundaryPrecision anchor.Y() mismatch — test harness bug, not architectural. Native API claims all validated."
-      },
-      "hyp-jxg-B": {
-        "passRate": 1.0,
-        "architecturalDefects": 1,
-        "testHarnessDefects": 0,
-        "note": "FM-B-001 (HIGH): dragState.ty race condition between DOM addEventListener and board.on('update') — confirmed architectural. FM-B-002 (low): f=g degenerate convergence — edge case, non-architectural."
-      }
-    },
-    "confidenceBreakdown": {
-      "evidenceQuality": 0.92,
-      "prototypeValidation": 0.90,
-      "scenarioCoverage": 0.85,
-      "devcon5Alignment": 0.88,
-      "userDirectiveAlignment": 1.0,
-      "overall": 0.88
-    }
+    "caveats": [
+      "5 evidence-gap contradictions remain — tracked via next-experiments",
+      "7/12 scenarios have partial evidence sufficiency — validation work continues in implementation",
+      "Propagation paths are partial (designed, not implemented)",
+      "H-B evolution depends on NE-B-01 (troika FPS benchmark) — p0 before H-B work"
+    ]
   }
 }

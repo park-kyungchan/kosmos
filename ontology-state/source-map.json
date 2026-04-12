@@ -1,541 +1,775 @@
 {
-  "version": "0.6.0",
-  "lastUpdated": "2026-04-11T15:30:00Z",
-  "sessionId": "jsxgraph-sequencer-001",
+  "version": "0.7.0",
+  "lastUpdated": "2026-04-12T12:00:00Z",
+  "sessionId": "mathcrew-content-delivery-001",
   "sources": [
     {
-      "id": "src-jxg-api-docs",
-      "title": "JSXGraph 1.12.2 API Reference",
-      "url": "https://jsxgraph.org/docs/index.html",
-      "tier": "tier-1",
-      "domain": "ACTION",
-      "provenance": "[Official]",
-      "summary": "Full API reference for JSXGraph 1.12.2. Confirms element types: CurveIntersection, Derivative, Tracecurve, Intersection, Functiongraph, Glider. JXG.Math.Numerics contains generalizedNewton and chandrupatla root-finding algorithms used internally.",
-      "markers": ["jxg-api-v1.12.2"],
+      "id": "src-int-dc5",
+      "title": "DevCon 5 — Ontology Design Principles (§DC5-04, §DC5-05, §DC5-06)",
+      "url": "~/.claude/research/palantir/platform/devcon.md",
+      "tier": 1,
+      "domain": "LOGIC",
+      "provenance": "[Synthesis] from [Official] DevCon 5 session",
+      "freshnessDate": "2026-03-22",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "3-stage product journey (Golden Tables → Operational Decision-Making → AI-First). Four ontology design principles: DDD, DRY, Open-Closed, PECS. Primitives: Interfaces, Structs, Reducers, Derived properties, Object-backed link types.",
       "claims": [
         {
-          "id": "claim-001",
-          "text": "JSXGraph 1.12.2 has a Derivative element that computes the numerical derivative of any JXG.Curve, including functiongraph. Usage: board.create('derivative', [curve], {dash: 2})",
-          "confidence": 0.99,
-          "domain": "DATA"
-        },
-        {
-          "id": "claim-002",
-          "text": "JSXGraph CurveIntersection creates the REGION intersection of two closed paths (Curve/Polygon/Circle), not individual intersection points. Usage: board.create('curveintersection', [curve1, curve2], {fillColor: 'yellow', fillOpacity: 0.6})",
-          "confidence": 0.99,
-          "domain": "DATA"
-        },
-        {
-          "id": "claim-003",
-          "text": "JSXGraph Tracecurve traces the locus of a point as a Glider sweeps its constraint. Usage: board.create('tracecurve', [glider, tracedPoint]). numberPoints field controls curve resolution. LIMITATION: mover must be a Glider, not a freely dragged functiongraph.",
-          "confidence": 0.99,
-          "domain": "DATA"
-        },
-        {
-          "id": "claim-004",
-          "text": "JXG.Math.Numerics provides: generalizedNewton(c1, c2, t1ini, t2ini), generalizedDampedNewtonCurves(c1, c2, t1ini, t2ini, gamma, eps), root(f, x) as chandrupatla alias, Newton(f, x) for single-variable root-finding. JSXGraph uses these internally for the intersection element.",
-          "confidence": 0.99,
-          "domain": "LOGIC"
-        },
-        {
-          "id": "claim-005",
-          "text": "board.reducedUpdate property: 'If reducedUpdate is set to true then only the dragged element and few (dependent) elements are updated.' Critical for 60fps with 10+ elements.",
-          "confidence": 0.99,
-          "domain": "ACTION"
-        },
-        {
-          "id": "claim-006",
-          "text": "board.minimizeReflow attribute changes the redraw strategy in the SVG rendering engine. Available as board-level configuration for performance tuning.",
+          "id": "clm-int-01",
+          "text": "The 3-stage product journey is: (1) Golden Tables — data integrations, (2) Operational decision-making — kinetics via actions/logic/functions, (3) AI-First — LLMs atop captured kinetics.",
           "confidence": 0.95,
-          "domain": "ACTION"
+          "domain": "LOGIC",
+          "provenance": "[Synthesis]",
+          "marker": "§DC5-04",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
         },
         {
-          "id": "claim-007",
-          "text": "board.isSuspendedRedraw: flag set to true when suspendUpdate() is active, skipping all redraws until unsuspendUpdate() is called.",
-          "confidence": 0.99,
-          "domain": "ACTION"
-        },
-        {
-          "id": "claim-008",
-          "text": "Board modes: BOARD_MODE_DRAG (during drag, objects not highlighted), BOARD_MODE_NONE (normal), BOARD_MODE_MOVE_ORIGIN (panning). board.mouse references the currently dragged object.",
-          "confidence": 0.99,
-          "domain": "ACTION"
-        }
-      ]
-    },
-    {
-      "id": "src-jxg-releases",
-      "title": "JSXGraph GitHub Releases (v1.9.0-v1.12.2)",
-      "url": "https://github.com/jsxgraph/jsxgraph/releases",
-      "tier": "tier-1",
-      "domain": "ACTION",
-      "provenance": "[Official]",
-      "summary": "Release notes confirm: v1.12.1 increased precision for intersections of curves with curves or lines (BREAKING CHANGE WARNING). v1.11.0 added CSS class binding to elements enabling SVG filters. v1.9.0 overhauled otherintersection to support forbidden intersection arrays.",
-      "markers": ["jxg-releases"],
-      "claims": [
-        {
-          "id": "claim-009",
-          "text": "JSXGraph v1.12.1 release: 'Increased precision for intersections (points) of curves with curves or lines.' The intersection algorithm for curves was changed — may affect existing constructions. This confirms the Intersection element supports functiongraph inputs with individual POINTS.",
-          "confidence": 0.99,
-          "domain": "LOGIC"
-        },
-        {
-          "id": "claim-010",
-          "text": "JSXGraph v1.11.0: 'ability to pass the hosting element as a parameter to functions given as values of attributes' — enables context-aware attribute callbacks on any element. Also: CSS classes can now be bound to all JSXGraph elements, enabling SVG filter integration.",
-          "confidence": 0.99,
-          "domain": "ACTION"
-        },
-        {
-          "id": "claim-011",
-          "text": "JSXGraph v1.9.0: otherintersection element overhauled — 'Now it is possible to supply an array of points as forbidden intersection points. This makes it very convenient to visualize situations where more than two intersections arise.' Relevant for multiple functiongraph intersections.",
-          "confidence": 0.99,
-          "domain": "LOGIC"
-        },
-        {
-          "id": "claim-012",
-          "text": "JSXGraph v1.12.2 is identical to v1.12.1, only removing zip files for CDN (jsdelivr) size limits. Functional API is v1.12.1.",
-          "confidence": 0.99,
-          "domain": "DATA"
-        }
-      ]
-    },
-    {
-      "id": "src-jxg-board-events",
-      "title": "JSXGraph board.on('update') Event Pattern",
-      "url": "https://github.com/jsxgraph/jsxgraph/blob/main/examples/hypotrochoid.html",
-      "tier": "tier-1",
-      "domain": "ACTION",
-      "provenance": "[Official]",
-      "summary": "Confirmed board.on('update', callback) fires on every board update including drag operations. Can update external HTML elements with coordinate values. Also confirmed element.on('drag/move/up/down') event system from GeometryElement.",
-      "markers": ["jxg-events"],
-      "claims": [
-        {
-          "id": "claim-013",
-          "text": "board.on('update', function(){ /* read element coords, update labels */ }) fires on every board update. Inside callback, p.X() and p.Y() return current coordinates. Example: board.on('update', function(){ document.getElementById('D').value = g4.X(); })",
-          "confidence": 0.99,
-          "domain": "ACTION"
-        },
-        {
-          "id": "claim-014",
-          "text": "GeometryElement events: 'attribute', 'attribute:key', 'down', 'drag', 'move', 'up', 'over', 'out'. All elements including functiongraph inherit these via JXG.EventEmitter.",
-          "confidence": 0.99,
-          "domain": "ACTION"
-        },
-        {
-          "id": "claim-015",
-          "text": "JXG.addEvent(element.rendNode, 'mouseover', callback, element) works with SVG/VML renderer only. JSXGraph's native .on() system works with Canvas renderer too.",
-          "confidence": 0.99,
-          "domain": "ACTION"
-        }
-      ]
-    },
-    {
-      "id": "src-jxg-dynamic-text",
-      "title": "JSXGraph Dynamic Text and Draggable Function Patterns",
-      "url": "https://jsxgraph.uni-bayreuth.de/wiki/index.php/Draggable_exponential_function",
-      "tier": "tier-1",
-      "domain": "DATA",
-      "provenance": "[Official]",
-      "summary": "Dynamic text bound to function coordinates: board.create('text', [xFn, y, contentFn]). Draggable functiongraph defined as function of draggable point's coordinates: auto-updates all dependents via JSXGraph's native dependency system.",
-      "markers": ["jxg-dynamic-text", "jxg-drag-pattern"],
-      "claims": [
-        {
-          "id": "claim-016",
-          "text": "Dynamic text pattern: board.create('text', [function(){ return p.X() - 0.17; }, 2, function(){ return '$' + Math.floor(p.X() * 10) / 10 + '$'; }]) creates text that auto-updates when point p is dragged.",
-          "confidence": 0.99,
-          "domain": "DATA"
-        },
-        {
-          "id": "claim-017",
-          "text": "Draggable functiongraph via parent point: define functiongraph as function using A.X() and A.Y(), then create text reading same values. When A is dragged, JSXGraph's native dependency chain auto-updates graph + text + all dependents without manual board.update() calls.",
-          "confidence": 0.99,
-          "domain": "ACTION"
-        },
-        {
-          "id": "claim-018",
-          "text": "Opacity as a function pattern: board.create('text', [x, y, msg], { opacity: function(){ return condition ? 1 : 0; }}) enables conditional element visibility triggered by drag state.",
+          "id": "clm-int-02",
+          "text": "DevCon 5 explicitly identifies four ontology design principles applicable to content delivery system design: Domain-Driven Design (DDD), Don't Repeat Yourself (DRY), Open for extension/closed for modification (OCP), Producer Extends Consumer Super (PECS).",
           "confidence": 0.95,
-          "domain": "DATA"
+          "domain": "LOGIC",
+          "provenance": "[Official]",
+          "marker": "§DC5-05",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
+        },
+        {
+          "id": "clm-int-03",
+          "text": "Interfaces enable polymorphic workflows and future-proof composition — directly applicable to ContentDeliveryResolver selecting rendering approach per teaching phase.",
+          "confidence": 0.80,
+          "domain": "LOGIC",
+          "provenance": "[Inference]",
+          "marker": "§DC5-06",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
         }
       ]
     },
     {
-      "id": "src-jxg-suspend-update",
-      "title": "JSXGraph suspendUpdate/unsuspendUpdate + Locus Pattern",
-      "url": "https://jsxgraph.org/about/releases/",
-      "tier": "tier-1",
-      "domain": "ACTION",
-      "provenance": "[Official]",
-      "summary": "board.suspendUpdate() / board.unsuspendUpdate() batch update pattern confirmed in watts_curve tracecurve example. Locus element: board.createElement('locus', [point]) creates geometric locus. Intersection of geometric elements: board.createElement('intersection', [c2,c3,0]) selects index 0 of two intersection points.",
-      "markers": ["jxg-batch-update"],
-      "claims": [
-        {
-          "id": "claim-019",
-          "text": "batch update pattern: board.suspendUpdate() before creating/mutating multiple elements, board.unsuspendUpdate() after. Prevents N intermediate redraws during construction. Example from watts_curve: suspendUpdate() before 7 element creations, unsuspendUpdate() after.",
-          "confidence": 0.99,
-          "domain": "ACTION"
-        },
-        {
-          "id": "claim-020",
-          "text": "Native intersection of two circles with index selection: board.createElement('intersection', [c2, c3, 0]) returns the first intersection point, board.createElement('intersection', [c2, c3, 1]) returns the second. Index is the third argument.",
-          "confidence": 0.99,
-          "domain": "LOGIC"
-        },
-        {
-          "id": "claim-021",
-          "text": "Locus element: board.createElement('locus', [midpoint], {strokeColor: 'red'}) traces the geometric locus of a point as a glider moves. Different from Tracecurve: locus is computed analytically, tracecurve is sampled numerically.",
-          "confidence": 0.95,
-          "domain": "DATA"
-        }
-      ]
-    },
-    {
-      "id": "src-jxg-curve-intersection-wiki",
-      "title": "JSXGraph Wiki: Intersection of functiongraphs",
-      "url": "https://jsxgraph.uni-bayreuth.de/wiki/index.php/Intersection_of_functiongraphs",
-      "tier": "tier-1",
+      "id": "src-int-fde",
+      "title": "AI FDE — Eval-Driven Development Builder Loop (§FDE-05, §FDE-07, §FDE-08)",
+      "url": "~/.claude/research/palantir/platform/ai-fde.md",
+      "tier": 1,
       "domain": "LOGIC",
       "provenance": "[Official]",
-      "summary": "Official wiki example shows CurveIntersection (region) for functiongraphs, NOT individual points. To get actual intersection POINTS with coordinates, must use JXG.Math.Numerics.root() with f(x)-g(x)=0, or rely on board.create('intersection', ...) which v1.12.1 improved for curve-curve.",
-      "markers": ["jxg-fg-intersection"],
+      "freshnessDate": "2026-03-22",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "Eval-driven development loop: explore → draft → generate evals → run → inspect failures → refine. Feedback compounding: operator rejection becomes ontology-linked feedback, AI generates new eval cases. Context management = curated tool access per mode.",
       "claims": [
         {
-          "id": "claim-022",
-          "text": "CurveIntersection of functiongraphs creates filled intersection REGION, not POINTS. Example: board.create('curveintersection', [curve1, curve2], {fillColor:'yellow', fillOpacity:0.3}). This is useful for teaching |f(x)| fold regions or showing overlap between curves visually.",
-          "confidence": 0.99,
-          "domain": "LOGIC"
-        },
-        {
-          "id": "claim-023",
-          "text": "There is NO official JSXGraph wiki example for intersection POINTS of two functiongraphs. The standard approach is: (1) JXG.Math.Numerics.root(function(x){ return f(x)-g(x); }, initialGuess) to find x, then create a dependent JXG point at (x, f(x)). Or use board.create('intersection', [fg1, fg2, 0]) which v1.12.1 improved.",
-          "confidence": 0.90,
-          "domain": "LOGIC"
-        }
-      ]
-    },
-    {
-      "id": "src-jxg-glider",
-      "title": "JSXGraph Glider Element with snap and animation",
-      "url": "https://github.com/jsxgraph/jsxgraph/blob/main/examples/construct.html",
-      "tier": "tier-1",
-      "domain": "ACTION",
-      "provenance": "[Official]",
-      "summary": "Glider is a movable point constrained to a curve/line. Supports: snap-to-grid (snapsizex/snapsizey), snap-to-points (snaptopoints), animation (animateanimated, animatespeed, animatestart/stop/loop/direction), fixed mode. Can serve as drag handle for functiongraph translation.",
-      "markers": ["jxg-glider"],
-      "claims": [
-        {
-          "id": "claim-024",
-          "text": "Glider elements support snap-to-grid: snapsizex/snapsizey parameters. snaptopoints: true snaps to existing points. These behaviors make gliders suitable as constrained drag handles for teaching demonstrations.",
-          "confidence": 0.99,
-          "domain": "ACTION"
-        },
-        {
-          "id": "claim-025",
-          "text": "Glider infobox: showinfobox: true displays coordinate info. infoboxdigits: 'auto' controls decimal precision. This enables automatic coordinate readout during drag without custom text elements.",
+          "id": "clm-int-04",
+          "text": "AI FDE uses eval-driven development: generate eval suites from representative ontology cases, run evals, detect failure clusters, iterate automatically. Eyeballing is rejected as production path.",
           "confidence": 0.95,
-          "domain": "DATA"
-        }
-      ]
-    },
-    {
-      "id": "src-jxg-numerics",
-      "title": "JSXGraph JXG.Math.Numerics API Reference",
-      "url": "https://jsxgraph.org/docs/symbols/JXG.Math.Numerics.html",
-      "tier": "tier-1",
-      "domain": "LOGIC",
-      "provenance": "[Official]",
-      "summary": "Full numerics API. Root-finding: chandrupatla (via root()), Newton(), fzero(). Curve intersection: generalizedNewton(c1,c2,t1ini,t2ini), generalizedDampedNewtonCurves(c1,c2,t1ini,t2ini,gamma,eps). Integration: GaussLegendre, Romberg, NewtonCotes, Qag. Path simplification: RamerDouglasPeucker.",
-      "markers": ["jxg-numerics"],
-      "claims": [
-        {
-          "id": "claim-026",
-          "text": "JXG.Math.Numerics.generalizedNewton(c1, c2, t1ini, t2ini): Compute intersection of curves c1 and c2 using generalized Newton-Raphson. t1ini, t2ini are initial parameter guesses. Returns intersection point.",
-          "confidence": 0.99,
-          "domain": "LOGIC"
+          "domain": "LOGIC",
+          "provenance": "[Official]",
+          "marker": "§FDE-05, §FDE-07",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
         },
         {
-          "id": "claim-027",
-          "text": "JXG.Math.Numerics.root(f, x, context): abstract method for univariate root finding, alias for chandrupatla. Chandrupatla combines bisection, secant, and inverse quadratic interpolation — more robust than Newton for functions without derivatives. maxIterationsRoot configures max iterations.",
-          "confidence": 0.99,
-          "domain": "LOGIC"
-        },
-        {
-          "id": "claim-028",
-          "text": "For real-time functiongraph intersection during drag: use JXG.Math.Numerics.root(function(x){ return f(x) - g(x); }, lastKnownX) where lastKnownX is the previous intersection x-coordinate as warm start. This enables efficient re-rooting near the previous position.",
+          "id": "clm-int-05",
+          "text": "The feedback compounding loop: bad production outcomes → structured refinement inputs → new eval cases → refined logic. A 'feedback-quality gate agent' improves weak feedback itself. Applicable to LEARN telemetry for content delivery effectiveness.",
           "confidence": 0.85,
           "domain": "LOGIC",
-          "note": "[Inference] — derived from API capability, not from an official usage example for this exact pattern"
+          "provenance": "[Inference]",
+          "marker": "§FDE-08",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
+        },
+        {
+          "id": "clm-int-06",
+          "text": "Minimal HITL requires typed shared state plus explicit validators, not just stronger prompts. Content delivery architecture must have typed contracts (SpeechBubbleContent/TeachingBeat) with explicit validation before surface selection.",
+          "confidence": 0.80,
+          "domain": "LOGIC",
+          "provenance": "[Inference]",
+          "marker": "§FDE-11",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
         }
       ]
     },
     {
-      "id": "src-dc5-principles",
-      "title": "DevCon 5 Ontology Design Principles and 3-Phase Journey",
-      "url": "internal://research/palantir/platform/devcon.md",
-      "tier": "tier-1",
-      "domain": "LOGIC",
-      "provenance": "[Official]",
-      "summary": "DevCon 5 (March 2026): Four design principles (DDD/DRY/OCP/PECS). 3-phase product journey: Golden Tables → Operational Decision-Making → AI-First. palantir-math Sequencer is at Phase 2. Key primitives: Interfaces, Structs, Reducers, Derived Properties, Object-Backed Link Types.",
-      "markers": ["§DC5-04", "§DC5-05", "§DC5-06"],
-      "claims": [
-        {
-          "id": "claim-029",
-          "text": "[§DC5-05] Four ontology design principles: (1) Domain-Driven Design, (2) Don't Repeat Yourself (rule of three), (3) Open for extension, closed for modification, (4) Producer Extends, Consumer Super (PECS). These ARE software design principles applied to ontology.",
-          "confidence": 0.99,
-          "domain": "LOGIC"
-        },
-        {
-          "id": "claim-030",
-          "text": "[§DC5-04] palantir-math Sequencer JSXGraph enhancement is at Phase 2 — Operational Decision-Making: data shapes (JSXGraphScene) exist, now encoding kinetics (real-time intersection logic, drag cascade, dependent element chain) and interactive actions (drag → update → redraw).",
-          "confidence": 0.99,
-          "domain": "LOGIC"
-        },
-        {
-          "id": "claim-031",
-          "text": "[§DC5-03] Real-time decision space encoding: 'fragmented enterprise data must be represented at maximum fidelity.' Applied to canvas: drag position + intersection coordinates + annotation state must be captured at every drag frame for teaching-grade fidelity.",
-          "confidence": 0.95,
-          "domain": "ACTION"
-        },
-        {
-          "id": "claim-032",
-          "text": "[§DC5-06] Key ontology primitives for canvas enhancement: Reducers (collapse multi-value drag history into canonical drag state), Derived Properties (intersection coordinates derived from functiongraph positions), Interfaces (polymorphic drag behavior across Linear/Quadratic/Abs graph families).",
-          "confidence": 0.95,
-          "domain": "LOGIC"
-        }
-      ]
-    },
-    {
-      "id": "src-arch-ontology-model",
-      "title": "Palantir Ontology Model — SENSE→DECIDE→ACT→LEARN Digital Twin",
-      "url": "internal://research/palantir/architecture/ontology-model.md",
-      "tier": "tier-1",
-      "domain": "LOGIC",
-      "provenance": "[Official]",
-      "summary": "ARCH-05: Digital Twin = SENSE → DECIDE → ACT → LEARN loop. ARCH-14/15/16: DATA/LOGIC/ACTION domain classification. ARCH-21: Schema = Contract + Instruction + Verification.",
-      "markers": ["§ARCH-05", "§ARCH-14", "§ARCH-15", "§ARCH-16"],
-      "claims": [
-        {
-          "id": "claim-033",
-          "text": "[§ARCH-05] Digital Twin: SENSE = capture drag event (element position, delta), DECIDE = compute intersection (Newton-Raphson), ACT = update canvas (label coords, ghost curve, derivative), LEARN = record interaction telemetry (drag path, intersection events). All four phases must be covered for complete JSXGraph enhancement.",
-          "confidence": 0.95,
-          "domain": "LOGIC"
-        },
-        {
-          "id": "claim-034",
-          "text": "[§ARCH-15] LOGIC domain = reasoning layer. IntersectionSolver, AbsValueFoldComputer, DependencyGraph, DragSemanticResolver all belong to LOGIC. They derive facts from DATA but do not persist state directly.",
-          "confidence": 0.99,
-          "domain": "LOGIC"
-        },
-        {
-          "id": "claim-035",
-          "text": "[§ARCH-16] ACTION domain = mutations. DragCascadeUpdate, BatchBoardUpdate, AnnotationToggle, TraceCurveRecord are ACTION-domain operations — they change the canvas reality when executed.",
-          "confidence": 0.99,
-          "domain": "ACTION"
-        }
-      ]
-    },
-    {
-      "id": "src-jxg-abs-value-fold",
-      "title": "Absolute Value Fold Visualization via Ghost Curve Pattern",
-      "url": "https://jsxgraph.org/docs/symbols/Functiongraph.html",
-      "tier": "tier-2",
+      "id": "src-int-orch",
+      "title": "Orchestration Map — Builder Surfaces (§ORCH-03)",
+      "url": "~/.claude/research/palantir/architecture/orchestration-map.md",
+      "tier": 1,
       "domain": "LOGIC",
       "provenance": "[Synthesis]",
-      "summary": "Synthesized from JSXGraph functiongraph + CurveDifference/CurveIntersection API. |f(x)| fold visualization: create ghost curve as y = -f(x) for x where f(x)<0. Fold line at y=0. Highlight with CurveDifference for region below axis. Dynamic update via translationVector on functiongraph.",
-      "markers": ["jxg-abs-fold"],
+      "freshnessDate": "2026-03-22",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "Builder surfaces are the topmost layer. Runtime surfaces (SENSE→DECIDE→ACT) must be explicit and inspectable. Every UI construct must trace back to ontology semantics.",
       "claims": [
         {
-          "id": "claim-036",
-          "text": "[Synthesis] Absolute value visualization approach: (A) Primary curve f(x), (B) Ghost curve |f(x)| = Math.abs(f(x)), (C) Reflection guide: curve y = -f(x) for negative region (shown dashed), (D) Fold boundary: line at y=0 highlighted between x-intercepts. When f(x) translates vertically (ty parameter), all four update via shared ty closure.",
-          "confidence": 0.85,
-          "domain": "LOGIC"
-        },
-        {
-          "id": "claim-037",
-          "text": "[Synthesis] Real-time absolute value fold during drag: define absGraph = board.create('functiongraph', [function(x){ return Math.abs(f_raw(x) + ty); }]). When ty changes via drag, both f(x)+ty and |f(x)+ty| update simultaneously if both read the same ty variable.",
+          "id": "clm-int-07",
+          "text": "Every runtime UI construct must trace back to ontology semantics, not ad hoc dashboard needs. Content delivery UI (speech bubble, diegetic panel) must be ontology-bound.",
           "confidence": 0.90,
-          "domain": "ACTION"
+          "domain": "LOGIC",
+          "provenance": "[Synthesis]",
+          "marker": "§ORCH-04",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
         }
       ]
     },
     {
-      "id": "src-jxg-performance",
-      "title": "JSXGraph SVG Performance: minimizeReflow + reducedUpdate",
-      "url": "https://jsxgraph.org/docs/symbols/JXG.Board.html",
-      "tier": "tier-1",
-      "domain": "ACTION",
-      "provenance": "[Official]",
-      "summary": "Board-level performance controls: reducedUpdate (only update dragged element + direct deps), minimizeReflow (SVG reflow reduction), isSuspendedRedraw (skip all redraws). Critical for 60fps with 10+ interactive elements.",
-      "markers": ["jxg-performance"],
-      "claims": [
-        {
-          "id": "claim-038",
-          "text": "JSXGraph SVG renderer performance controls: (1) board.reducedUpdate — only recompute dragged element chain, (2) board.suspendUpdate() / board.unsuspendUpdate() — batch mutations, (3) board.minimizeReflow — SVG-specific reflow reduction. All three must be considered for 10+ element 60fps target.",
-          "confidence": 0.95,
-          "domain": "ACTION"
-        },
-        {
-          "id": "claim-039",
-          "text": "[Inference] For real-time drag with 10+ elements: the critical bottleneck is the intersection recomputation on each mouse-move event. Newton-Raphson with warm start (previous intersection x as initial guess) should complete in <1ms for smooth polynomials, well within 16ms frame budget.",
-          "confidence": 0.80,
-          "domain": "ACTION"
-        }
-      ]
-    },
-    {
-      "id": "src-jxg-tracecurve-glider-constraint",
-      "title": "JSXGraph Trace Curve and Locus Patterns",
-      "url": "https://jsxgraph.uni-bayreuth.de/wiki/index.php/Trace_curve",
-      "tier": "tier-1",
+      "id": "src-ext-troika",
+      "title": "troika-three-text v0.52.4 — Official Documentation",
+      "url": "https://protectwise.github.io/troika/troika-three-text/",
+      "tier": 1,
       "domain": "DATA",
       "provenance": "[Official]",
-      "summary": "Tracecurve requires Glider as mover. Not directly applicable to functiongraph drag. Alternative for drag-path recording: use board.on('update') to push current position to a data array, then update a curve.dataX/dataY manually.",
-      "markers": ["jxg-trace"],
+      "freshnessDate": "2025-09-10",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "aging",
+      "summary": "WebGL-native SDF text rendering for Three.js. Parses .ttf/.otf/.woff directly, generates SDF atlas on-the-fly in web worker (no frame drops). GPU-accelerated SDF generation (gpuAccelerateSDF:true default). Patches Three.js material shader — works with lighting, PBR, shadows, fog. Requires OverrideMaterialManager.workaroundEnabled=true for postprocessing library. Latest: v0.52.4 (2025-04-02). 2.4M weekly npm downloads.",
       "claims": [
         {
-          "id": "claim-040",
-          "text": "Tracecurve: board.create('tracecurve', [C_glider, S_dependent]) where C_glider is a Glider element and S_dependent is a point whose locus is traced. LIMITATION: C must be a Glider on a constraint. Cannot use for free drag of functiongraphs.",
-          "confidence": 0.99,
-          "domain": "DATA"
+          "id": "clm-ext-01",
+          "text": "troika-three-text v0.52.4 (released 2025-04-02) generates SDF atlas for glyphs on-the-fly in a web worker, preventing main-thread frame drops.",
+          "confidence": 0.98,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
         },
         {
-          "id": "claim-041",
-          "text": "[Synthesis] For functiongraph drag-path recording: create a curve with empty dataX/dataY, then in board.on('update') or element.on('drag'), push current graph position to dataX/dataY arrays and call curve.update(). This gives a hand-drawn trace effect without JSXGraph-native tracecurve.",
-          "confidence": 0.85,
-          "domain": "ACTION"
+          "id": "clm-ext-02",
+          "text": "troika-three-text patches any Three.js Material with SDF shader code, enabling support for lighting, PBR, shadows, and fog on in-world text. Text participates in the WebGL render pipeline.",
+          "confidence": 0.98,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-03",
+          "text": "For scenes using the `postprocessing` library (e.g. vanruesc/postprocessing used by n8ao), troika-three-text requires: `import { OverrideMaterialManager } from 'postprocessing'; OverrideMaterialManager.workaroundEnabled = true`. Without this, troika text custom materials are discarded by the EffectComposer.",
+          "confidence": 0.98,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-04",
+          "text": "troika-three-text supports `curveRadius` (cylindrical curvature), `outlineWidth/outlineBlur` (halo/drop-shadow), `depthOffset` (z-fighting prevention), `clipRect` (overflow clipping). These enable speech-bubble-panel-style in-world text boxes.",
+          "confidence": 0.98,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-05",
+          "text": "troika-three-text text geometry updates are asynchronous (web worker). `myText.sync(callback)` or `synccomplete` event provide notification on completion. Dynamic teaching content that changes per beat must account for this async update cycle.",
+          "confidence": 0.98,
+          "domain": "LOGIC",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-06",
+          "text": "troika-three-text supports `preloadFont({ characters: '...' })` to pre-generate SDF textures for a character set, preventing first-render latency. Critical for game scenes where first teaching beat must appear immediately.",
+          "confidence": 0.98,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-07",
+          "text": "troika-three-text v0.52.4 has 2.4M weekly npm downloads. Latest version released 2025-04-02. The library is actively maintained (bug fixes in 0.52.2-0.52.4 across Nov 2024 – Apr 2025).",
+          "confidence": 0.95,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
         }
       ]
     },
     {
-      "id": "src-orchestration-surfaces",
-      "title": "Palantir Builder Surface Principles from Orchestration Map",
-      "url": "internal://research/palantir/architecture/orchestration-map.md",
-      "tier": "tier-1",
-      "domain": "ACTION",
+      "id": "src-ext-three-mesh-ui",
+      "title": "three-mesh-ui v6.5.4 — GitHub Repository",
+      "url": "https://github.com/felixmariotto/three-mesh-ui",
+      "tier": 2,
+      "domain": "DATA",
       "provenance": "[Official]",
-      "summary": "ORCH-03/ORCH-10: Builder surfaces must be explicit, not implicit. ORCH-10 rule: 'Builder surfaces are explicit, not implicit.' Applies to JSXGraph canvas: teaching annotation overlay, coordinate labels, and interaction affordances must be declared elements, not side effects.",
-      "markers": ["§ORCH-03", "§ORCH-10"],
+      "freshnessDate": "2023-03-24",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "stale",
+      "summary": "WebGL-native UI panel library for Three.js. Created for VR contexts where HTML/CSS is impossible. Objects are THREE.Object3Ds. Block + Text primitives. MSDF font rendering (requires pre-built JSON+PNG font files). v7 in evaluation (PR#223). Last release 2023-03-24 (stale). 1.5k GitHub stars, 154 forks.",
       "claims": [
         {
-          "id": "claim-042",
-          "text": "[§ORCH-10] Rule: 'Builder surfaces are explicit, not implicit.' Applied to JSXGraph teaching canvas: every annotation element (coordinate label, fold line, derivative display, trace overlay) must be a declared board element with explicit lifecycle, not an ad-hoc DOM mutation.",
+          "id": "clm-ext-08",
+          "text": "three-mesh-ui creates WebGL-native UI panels as THREE.Object3D instances using Block+Text primitives. Requires pre-generated MSDF font files (.json + .png texture). Adds a `ThreeMeshUI.update()` call each frame.",
+          "confidence": 0.95,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "stale"
+        },
+        {
+          "id": "clm-ext-09",
+          "text": "three-mesh-ui last release was v6.5.4 on 2023-03-24 (3+ years ago as of 2026-04-12). v7.x is in PR evaluation (PR#223) but not released. The library has 63 open issues and 11 open PRs. Maintenance status: low activity.",
+          "confidence": 0.95,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "stale"
+        },
+        {
+          "id": "clm-ext-10",
+          "text": "three-mesh-ui was designed for VR contexts (no HTML/CSS available). In a non-VR WebGL2 game with CSS overlay capabilities, the motivation for three-mesh-ui over troika-three-text is lower. MSDF vs SDF: MSDF requires pre-built textures; troika generates on-the-fly.",
+          "confidence": 0.80,
+          "domain": "LOGIC",
+          "provenance": "[Inference]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "stale"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-css3drenderer",
+      "title": "Three.js CSS3DRenderer — Official Docs",
+      "url": "https://threejs.org/docs/pages/CSS3DRenderer.html",
+      "tier": 1,
+      "domain": "DATA",
+      "provenance": "[Official]",
+      "freshnessDate": "2025-01-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "aging",
+      "summary": "CSS3DRenderer applies hierarchical 3D CSS transforms to DOM elements. Cannot use Three.js material system or geometries. Only supports 100% browser zoom. Objects are CSS3DObject or CSS3DSprite. Runs as separate DOM layer alongside WebGLRenderer.",
+      "claims": [
+        {
+          "id": "clm-ext-11",
+          "text": "CSS3DRenderer is a separate renderer running as a CSS DOM layer — it cannot use Three.js materials or geometries. It is not part of the WebGL render pipeline.",
+          "confidence": 0.99,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-12",
+          "text": "CSS3DRenderer CANNOT receive WebGL-based postprocessing effects. EffectComposer constructor only accepts WebGLRenderer. There is no supported workaround for applying n8ao or other vanruesc/postprocessing effects to CSS3D elements.",
+          "confidence": 0.99,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": false,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-13",
+          "text": "CSS3DRenderer z-ordering with WebGL objects is problematic: CSS3D elements are positioned behind or in front of the WebGL canvas as a flat DOM layer. Proper occlusion (3D objects hiding CSS3D elements) is not reliably achievable.",
           "confidence": 0.90,
-          "domain": "ACTION"
+          "domain": "DATA",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-css-overlay-current",
+      "title": "mathcrew PR#28 — CSS Overlay Speech Bubble Architecture (Vector3.project)",
+      "url": "src/hud/speech-bubble.ts",
+      "tier": 1,
+      "domain": "DATA",
+      "provenance": "[Official]",
+      "freshnessDate": "2026-04-12",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "Current approach: Vector3.project → CSS transform per frame. Speech bubble follows character in screen space. Advantages: full HTML/CSS rendering, accessibility, easy rich text. Disadvantages: no 3D depth, no occlusion by 3D objects, no postprocessing integration, no spatial placement.",
+      "claims": [
+        {
+          "id": "clm-ext-14",
+          "text": "Current mathcrew PR#28 speech bubble uses Vector3.project + CSS transform to follow character in 2D screen space. This is a per-frame DOM mutation. It does not participate in the WebGL depth buffer.",
+          "confidence": 0.99,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
+        },
+        {
+          "id": "clm-ext-15",
+          "text": "CSS overlay (current approach) has full HTML/CSS rendering capabilities: styled text, emoji, variable font sizes, accessibility via DOM, keyboard focus, rich content. This is an advantage over in-world WebGL text.",
+          "confidence": 0.99,
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
+        },
+        {
+          "id": "clm-ext-16",
+          "text": "CSS overlay (current approach) cannot be occluded by 3D scene objects (planets, character mesh). The bubble always renders on top of WebGL content. This breaks spatial immersion for diegetic teaching scenarios.",
+          "confidence": 0.95,
+          "domain": "DATA",
+          "provenance": "[Inference]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-threejs-perf",
+      "title": "Building Efficient Three.js Scenes — Codrops 2025-02",
+      "url": "https://tympanus.net/codrops/2025/02/11/building-efficient-three-js-scenes-optimize-performance-while-maintaining-quality/",
+      "tier": 3,
+      "domain": "ACTION",
+      "provenance": "[Synthesis]",
+      "freshnessDate": "2025-02-11",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "aging",
+      "summary": "Three.js scene optimization with postprocessing (including N8AO). PerformanceMonitor dynamically disables postprocessing on decline. Canvas optimization: powerPreference high-performance, alpha:false, antialias:false, stencil:false, depth:false. Stable 60fps achievable with 27 meshes, 184 textures, 49 shaders, physics, N8AO.",
+      "claims": [
+        {
+          "id": "clm-ext-17",
+          "text": "A Three.js scene with 27 meshes, 184 textures, 49 shaders, physics simulation, and N8AO + postprocessing effects can run at stable 60fps with total asset size 2.1 MB using proper optimization (instancing, LOD, DPR cap, antialias:false).",
+          "confidence": 0.80,
+          "domain": "ACTION",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-18",
+          "text": "When using PerformanceMonitor with N8AO + postprocessing: the recommended fallback sequence is (1) reduce DPR by 20%, (2) disable postprocessing. This means postprocessing is a toggleable expense, not a fixed cost.",
+          "confidence": 0.80,
+          "domain": "ACTION",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-19",
+          "text": "Adding in-world WebGL text (e.g. troika-three-text) adds geometry, shader patches, and SDF atlas texture to the render pipeline. Per-frame sync overhead is offloaded to web worker but atlas sampling adds fragment shader cost. Specific FPS impact not benchmarked in this source.",
+          "confidence": 0.60,
+          "domain": "ACTION",
+          "provenance": "[Inference]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-mayer",
+      "title": "Mayer's 12 Principles of Multimedia Learning — Digital Learning Institute",
+      "url": "https://www.digitallearninginstitute.com/blog/mayers-principles-multimedia-learning",
+      "tier": 3,
+      "domain": "LOGIC",
+      "provenance": "[Synthesis]",
+      "freshnessDate": "2024-01-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "aging",
+      "summary": "Mayer's 12 principles: Multimedia, Coherence, Signalling, Redundancy, Spatial Contiguity, Temporal Contiguity, Segmenting, Pre-training, Modality, Voice, Personalisation, Image. Three assumptions: dual-channel (visual+auditory), limited capacity, active processing.",
+      "claims": [
+        {
+          "id": "clm-ext-20",
+          "text": "Spatial Contiguity Principle: text and visuals must be presented close together in the frame. For 3D educational content, labels/explanations should appear near the referenced 3D objects (spatial anchoring), not in a spatially distant HUD.",
+          "confidence": 0.95,
+          "domain": "LOGIC",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-21",
+          "text": "Segmenting Principle: information should be broken into manageable chunks with learner pacing control. mathcrew's beat-based teaching (motivate/explain/demonstrate/practice/assess) with Enter-advances-beat directly implements this principle.",
+          "confidence": 0.95,
+          "domain": "LOGIC",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-22",
+          "text": "Redundancy Principle: avoid presenting the same information simultaneously in both spoken words and on-screen text. In a 3D environment with narration, visual indicators (glow effects, spatial highlighting) should REPLACE duplicate text, not add to it.",
+          "confidence": 0.90,
+          "domain": "LOGIC",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-23",
+          "text": "Coherence Principle: exclude unnecessary information. Vocabulary terms shown inline in speech bubbles should only appear when semantically relevant, not decoratively. A richer rendering approach should not add cognitive load.",
+          "confidence": 0.90,
+          "domain": "LOGIC",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-24",
+          "text": "Signalling Principle: cues should draw attention to vital information. In 3D: visual highlights, glow on referenced objects, spatial arrows or particle trails anchored to math objects serve as signalling without adding text.",
+          "confidence": 0.90,
+          "domain": "LOGIC",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-25",
+          "text": "Temporal Contiguity Principle: words and pictures must be presented simultaneously, not sequentially. Teaching content animations (e.g. a divisor sorting animation) must be synchronized with the text explanation, not before or after.",
+          "confidence": 0.90,
+          "domain": "LOGIC",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-mayer-ar-2025",
+      "title": "Applying CTML Principles to Augmented Reality — Computers in Human Behavior Reports, 2025",
+      "url": "https://www.sciencedirect.com/science/article/pii/S2451958825000934",
+      "tier": 1,
+      "domain": "LOGIC",
+      "provenance": "[Official]",
+      "freshnessDate": "2025-05-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "Randomized study: 88 participants. AR (HMD or handheld) vs video, all designed per CTML. Result: no significant difference in extraneous cognitive load between AR and video when CTML principles applied. Retention/transfer task outcomes inconclusive. CTML principles can be extended to AR/3D contexts.",
+      "claims": [
+        {
+          "id": "clm-ext-26",
+          "text": "When AR/3D educational content is designed according to Cognitive Theory of Multimedia Learning principles, extraneous cognitive load is not increased compared to traditional video. Design quality — not immersion level — controls cognitive load.",
+          "confidence": 0.90,
+          "domain": "LOGIC",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
+        },
+        {
+          "id": "clm-ext-27",
+          "text": "Application design plays a pivotal role in determining cognitive load levels, particularly extraneous load. For mathcrew: the rendering approach (diegetic vs overlay) matters less than whether CTML principles (coherence, signalling, segmenting, spatial contiguity) are followed.",
+          "confidence": 0.85,
+          "domain": "LOGIC",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-diegetic-ui",
+      "title": "Types of UI in Gaming: Diegetic, Non-Diegetic, Spatial and Meta — Medium 2024-10",
+      "url": "https://medium.com/@lorenzoardeni/types-of-ui-in-gaming-diegetic-non-diegetic-spatial-and-meta-5024ce6362d0",
+      "tier": 5,
+      "domain": "DATA",
+      "provenance": "[Synthesis]",
+      "freshnessDate": "2024-10-25",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "Four UI types: Diegetic (in world, visible to characters — Dead Space health bar on suit), Non-diegetic (HUD overlay, not in world — WoW HUD), Spatial (in world but invisible to characters — Assassin's Creed enemy name tags), Meta (reflects character state without physical objects — Call of Duty blood screen).",
+      "claims": [
+        {
+          "id": "clm-ext-28",
+          "text": "Diegetic UI: exists in the game world and is perceived by characters. Example: health bar embedded on Isaac's suit in Dead Space. Eliminates graphic overlays that break the illusion of being in the world.",
+          "confidence": 0.90,
+          "domain": "DATA",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
+        },
+        {
+          "id": "clm-ext-29",
+          "text": "Spatial UI: displayed in the game world, part of the landscape/objects, but NOT perceived by characters. Example: enemy name tags in Assassin's Creed. This is the category most relevant to 3D spatial math annotations (labels on divisor objects, constellation labels).",
+          "confidence": 0.90,
+          "domain": "DATA",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
+        },
+        {
+          "id": "clm-ext-30",
+          "text": "Non-diegetic UI (current PR#28 speech bubble): displayed only to the player as a graphic overlay. Ideal for strategic information. The current CSS speech bubble is non-diegetic — it doesn't participate in the 3D world space.",
+          "confidence": 0.90,
+          "domain": "DATA",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "current"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-cra-meta",
+      "title": "Meta-Analytic Review of CRA Math Approach — SAGE Journals 2025",
+      "url": "https://journals.sagepub.com/doi/10.1177/09388982241292299",
+      "tier": 1,
+      "domain": "LOGIC",
+      "provenance": "[Official]",
+      "freshnessDate": "2025-01-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "aging",
+      "summary": "Meta-analysis of 30 single-case design studies. Overall effect size 0.9965 (statistically significant, large). CRA: Concrete manipulatives → Representational drawings/digital models → Abstract concepts. Strong evidence for math learning effectiveness.",
+      "claims": [
+        {
+          "id": "clm-ext-31",
+          "text": "CRA approach has a statistically significant overall effect size of 0.9965 across 30 single-case design studies. Concrete phase benefits from hands-on/physical manipulation of 3D objects.",
+          "confidence": 0.95,
+          "domain": "LOGIC",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-32",
+          "text": "CRA Concrete phase: teachers focus on hands-on manipulatives, students move and manipulate 3D objects. In mathcrew 3D world, the concrete phase is the interactive 3D scene itself — content delivery for concrete phase should guide attention to 3D objects being manipulated, not just text.",
+          "confidence": 0.85,
+          "domain": "LOGIC",
+          "provenance": "[Inference]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-variation-theory",
+      "title": "Application of Variation Theory in STEM Education — PMC 2023/2024",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10716585/",
+      "tier": 1,
+      "domain": "LOGIC",
+      "provenance": "[Official]",
+      "freshnessDate": "2024-01-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "aging",
+      "summary": "Four VT patterns: Contrast (show what it is by showing what it is not), Separation (vary one aspect while keeping others constant), Generalization (vary multiple aspects to find invariant), Fusion (combine multiple aspects simultaneously). Constructive + variation learning required for immersive VR environments.",
+      "claims": [
+        {
+          "id": "clm-ext-33",
+          "text": "Variation Theory defines four teaching patterns: Contrast, Separation, Generalization, Fusion. Each pattern requires different content delivery: Contrast needs side-by-side comparison; Separation needs focused highlighting of one varying aspect; Fusion needs simultaneous multi-aspect presentation.",
+          "confidence": 0.90,
+          "domain": "LOGIC",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-34",
+          "text": "Variation and constructive learning theories, when implemented in VR design, support active engagement, knowledge construction, contextual understanding, and personalized learning. The content delivery approach must change per VT dimension being taught.",
+          "confidence": 0.85,
+          "domain": "LOGIC",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-adaptive-gbl",
+      "title": "Interactivity in Game-Based Learning with AI — ASIS&T 2025 Systematic Review",
+      "url": "https://asistdl.onlinelibrary.wiley.com/doi/10.1002/pra2.1410",
+      "tier": 1,
+      "domain": "ACTION",
+      "provenance": "[Official]",
+      "freshnessDate": "2025-01-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "aging",
+      "summary": "Systematic review of 20 studies (2022-2025). Three interaction types: student-student, student-AI, adaptive/immersive environments. AI-driven adaptive pacing and personalized educational pathways are dominant 2024-2025 trend in game-based learning.",
+      "claims": [
+        {
+          "id": "clm-ext-35",
+          "text": "2024-2025 systematic review identifies adaptive/immersive environments with AI-driven content delivery as the dominant trend in educational game design. Real-time adaptive pacing (adjusting content delivery speed based on learner response) is a validated paradigm.",
+          "confidence": 0.85,
+          "domain": "ACTION",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-36",
+          "text": "Three types of interactivity in GBL: student-student (collaborative), student-AI (personalized feedback), and adaptive immersive (environment responds to learner). mathcrew currently implements student-AI (beat sequencing) but not adaptive immersive (proximity triggers, behavioral pacing).",
+          "confidence": 0.80,
+          "domain": "ACTION",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-fsrs-v6",
+      "title": "FSRS-6 Algorithm — Open Spaced Repetition",
+      "url": "https://github.com/open-spaced-repetition/awesome-fsrs",
+      "tier": 2,
+      "domain": "DATA",
+      "provenance": "[Official]",
+      "freshnessDate": "2025-01-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "aging",
+      "summary": "FSRS-6 is the latest version. 2 more parameters than FSRS-5. Machine learning based personalized review scheduling. Active development across multiple platform implementations.",
+      "claims": [
+        {
+          "id": "clm-ext-37",
+          "text": "FSRS-6 is the current latest version of the algorithm. ts-fsrs 5.3.1 (used in mathcrew) implements FSRS-5/6. The spaced repetition backend tracks retrievability (R) and stability (S). Content delivery should reflect R value — low-R items should trigger reinforcement teaching beats.",
+          "confidence": 0.80,
+          "domain": "DATA",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-threejs-perf-2025-issue",
+      "title": "Three.js Forum — CSS3DRenderer + postprocessing incompatibility",
+      "url": "https://discourse.threejs.org/t/is-there-an-official-or-workaround-way-to-apply-postprocessing-effects-to-a-css3drenderer/18239",
+      "tier": 3,
+      "domain": "ACTION",
+      "provenance": "[Official]",
+      "freshnessDate": "2020-08-28",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "stale",
+      "summary": "Official Three.js core developer (Mugen87) confirmation: CSS3DRenderer cannot receive WebGL-based postprocessing. EffectComposer only accepts WebGLRenderer. No workaround with usable performance exists.",
+      "claims": [
+        {
+          "id": "clm-ext-38",
+          "text": "Three.js core developer (Mugen87) confirmed: 'Since CSS3DRenderer works with plain HTML and CSS, there is no way to apply WebGL based post-processing effects to its output.' This is an architectural impossibility, not a missing feature.",
+          "confidence": 0.99,
+          "domain": "ACTION",
+          "provenance": "[Official]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "stale"
+        }
+      ]
+    },
+    {
+      "id": "src-ext-canvas-texture",
+      "title": "CanvasTexture text rendering — Three.js pattern",
+      "url": "https://threejs.org/",
+      "tier": 1,
+      "domain": "DATA",
+      "provenance": "[Synthesis]",
+      "freshnessDate": "2025-01-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "aging",
+      "summary": "CanvasTexture: draw text to 2D Canvas, apply as texture on PlaneGeometry. Participates in WebGL pipeline, affected by postprocessing. Requires manual re-render on text change. Lower quality than SDF at small sizes but simpler. Used for static or infrequently-updated labels.",
+      "claims": [
+        {
+          "id": "clm-ext-39",
+          "text": "CanvasTexture approach: 2D Canvas used as texture source on a PlaneGeometry mesh. Texture update requires `canvas.getContext('2d').fillText(...)` + `texture.needsUpdate = true`. Participates in WebGL render pipeline and receives postprocessing effects unlike CSS overlay.",
+          "confidence": 0.85,
+          "domain": "DATA",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
+        },
+        {
+          "id": "clm-ext-40",
+          "text": "CanvasTexture quality degrades at small display sizes or steep view angles due to rasterization. Text update frequency is bounded by canvas re-draw overhead (synchronous, on main thread). Not suited for high-frequency dynamic text.",
+          "confidence": 0.80,
+          "domain": "DATA",
+          "provenance": "[Synthesis]",
+          "isAtomic": true,
+          "retrievedDate": "2026-04-12",
+          "freshnessStatus": "aging"
         }
       ]
     }
   ],
   "evidence": [
     {
-      "id": "ev-001",
-      "claim": "claim-009",
-      "question_id": "q-jg-02",
-      "direction": "supports",
-      "quote": "Increased precision for intersections (points) of curves with curves or lines",
-      "source": "src-jxg-releases",
-      "note": "v1.12.1 improved native Intersection element for curve-curve — palantir-math already at 1.12.2"
+      "id": "ev-q-cd-01",
+      "questionId": "q-cd-01",
+      "claimIds": ["clm-ext-28", "clm-ext-29", "clm-ext-30", "clm-int-07", "clm-ext-20"],
+      "summary": "Best-practice 3D educational UI is Spatial UI (in-world, not perceived by characters): labels anchored to math objects. Diegetic for character-embedded state. Non-diegetic for strategic HUD. CTML Spatial Contiguity: text/labels must be near referenced objects."
     },
     {
-      "id": "ev-002",
-      "claim": "claim-026",
-      "question_id": "q-jg-02",
-      "direction": "supports",
-      "quote": "generalizedNewton(c1, c2, t1ini, t2ini): Compute an intersection of the curves c1 and c2 with a generalized Newton method",
-      "source": "src-jxg-numerics",
-      "note": "Available as direct call for custom intersection solver"
+      "id": "ev-q-cd-02",
+      "questionId": "q-cd-02",
+      "claimIds": ["clm-ext-01", "clm-ext-02", "clm-ext-03", "clm-ext-08", "clm-ext-09", "clm-ext-11", "clm-ext-13", "clm-ext-14", "clm-ext-39"],
+      "summary": "troika-three-text: best option for in-world WebGL text. Async SDF, postprocessing-compatible via OverrideMaterialManager workaround. CSS3DRenderer: no postprocessing integration. three-mesh-ui: stale, VR-focused, MSDF requires pre-built fonts. CanvasTexture: simpler but lower quality."
     },
     {
-      "id": "ev-003",
-      "claim": "claim-013",
-      "question_id": "q-jg-01",
-      "direction": "supports",
-      "quote": "board.on('update', function(){ document.getElementById('D').value = g4.X(); })",
-      "source": "src-jxg-board-events",
-      "note": "board.on('update') fires during drag — can trigger intersection recompute"
+      "id": "ev-q-cd-03",
+      "questionId": "q-cd-03",
+      "claimIds": ["clm-ext-35", "clm-ext-36", "clm-ext-21"],
+      "summary": "Adaptive AI-driven pacing is 2025 trend. Segmenting + learner pacing control are Mayer-validated. Proximity triggers and adaptive immersive environments extend beyond current Enter-advances-beat paradigm."
     },
     {
-      "id": "ev-004",
-      "claim": "claim-019",
-      "question_id": "q-jg-06",
-      "direction": "supports",
-      "quote": "board.suspendUpdate() before N element creations, board.unsuspendUpdate() after",
-      "source": "src-jxg-suspend-update",
-      "note": "BatchBoardUpdate pattern for dependent cascade mutation"
+      "id": "ev-q-cd-04",
+      "questionId": "q-cd-04",
+      "claimIds": ["clm-ext-20", "clm-ext-21", "clm-ext-22", "clm-ext-23", "clm-ext-24", "clm-ext-25", "clm-ext-26", "clm-ext-27", "clm-ext-31"],
+      "summary": "CTML: design quality controls cognitive load, not rendering approach. Spatial Contiguity, Segmenting, Coherence, Signalling, Temporal Contiguity are the 5 most applicable principles for 3D math education. CRA effect size 0.9965."
     },
     {
-      "id": "ev-005",
-      "claim": "claim-005",
-      "question_id": "q-jg-06",
-      "direction": "supports",
-      "quote": "reducedUpdate: If reducedUpdate is set to true then only the dragged element and few dependent elements are updated",
-      "source": "src-jxg-api-docs",
-      "note": "Critical performance flag for drag scenarios"
+      "id": "ev-q-cd-05",
+      "questionId": "q-cd-05",
+      "claimIds": ["clm-ext-01", "clm-ext-04", "clm-ext-05", "clm-ext-06", "clm-ext-07"],
+      "summary": "troika-three-text v0.52.4 (2025-04-02, 2.4M weekly downloads): primary ecosystem choice. SDF atlas, web worker, postprocessing-compatible, curveRadius + outlineBlur for panel-style text, preloadFont for zero-latency first beat."
     },
     {
-      "id": "ev-006",
-      "claim": "claim-036",
-      "question_id": "q-jg-03",
-      "direction": "supports",
-      "quote": "[Synthesis] Ghost curve |f(x)| via Math.abs wrapper + reflection guide at y=0",
-      "source": "src-jxg-abs-value-fold",
-      "note": "Absolute value fold teaching pattern"
+      "id": "ev-q-cd-06",
+      "questionId": "q-cd-06",
+      "claimIds": ["clm-int-02", "clm-int-03", "clm-ext-33", "clm-ext-34", "clm-ext-32"],
+      "summary": "VT dimension determines rendering: Contrast → split/comparison view; Separation → spatial highlighting of one varying attribute; Fusion → synchronized multi-modal content. CRA phase determines modality: Concrete → spatial highlighting on 3D objects; Representational → diagram overlays; Abstract → pure text/symbol."
     },
     {
-      "id": "ev-007",
-      "claim": "claim-016",
-      "question_id": "q-jg-05",
-      "direction": "supports",
-      "quote": "board.create('text', [function(){ return p.X()-0.17; }, 2, function(){ return '$' + pos + '$'; }])",
-      "source": "src-jxg-dynamic-text",
-      "note": "Dynamic coordinate labels for teaching annotation"
-    },
-    {
-      "id": "ev-008",
-      "claim": "claim-001",
-      "question_id": "q-jg-04",
-      "direction": "supports",
-      "quote": "board.create('derivative', [curve], {dash: 2})",
-      "source": "src-jxg-api-docs",
-      "note": "Native derivative element — unused in current palantir-math"
-    },
-    {
-      "id": "ev-009",
-      "claim": "claim-040",
-      "question_id": "q-jg-04",
-      "direction": "neutral",
-      "quote": "Tracecurve: board.create('tracecurve', [C_glider, S_dependent]). LIMITATION: mover must be a Glider.",
-      "source": "src-jxg-tracecurve-glider-constraint",
-      "note": "Tracecurve cannot be used directly for functiongraph drag history — needs custom array approach"
+      "id": "ev-q-cd-07",
+      "questionId": "q-cd-07",
+      "claimIds": ["clm-ext-03", "clm-ext-12", "clm-ext-38", "clm-ext-17", "clm-ext-18", "clm-ext-19", "clm-ext-15", "clm-ext-16"],
+      "summary": "CSS overlay (current): no postprocessing integration, no depth occlusion. CSS3DRenderer: architecturally incompatible with postprocessing (Three.js core confirmed). troika-three-text: WebGL-native, postprocessing-compatible via OverrideMaterialManager.workaroundEnabled=true, adds SDF atlas texture and shader patch overhead. Performance impact of troika: web worker offloads SDF gen; fragment shader cost unmeasured in n8ao context."
     }
   ],
   "researchQuestionStatus": {
-    "q-jg-01": {
-      "status": "answered",
-      "summary": "board.on('update', cb) fires every drag frame. element.on('drag', cb) at element level. board.suspendUpdate()/unsuspendUpdate() for batch. board.reducedUpdate=true for performance. Native dependency chain: functiongraph defined as function(x){...using A.X()/A.Y()...} auto-updates all dependents when A is dragged."
-    },
-    "q-jg-02": {
-      "status": "answered",
-      "summary": "Two approaches: (A) JSXGraph native Intersection element: board.create('intersection', [fg1, fg2, 0]) — v1.12.1 improved precision for curve-curve. Auto-updates as functions change IF functiongraphs are defined with JSXGraph-native dependency (via parent point). (B) Custom solver: JXG.Math.Numerics.root(function(x){return f(x)-g(x);}, warmStart) called in board.on('update'). Warm start (previous intersection x) is critical for <1ms performance."
-    },
-    "q-jg-03": {
-      "status": "answered",
-      "summary": "Three visual layers: (1) primary f(x)+ty curve, (2) |f(x)+ty| abs curve via Math.abs wrapper sharing ty variable, (3) reflection guide: dashed y=-f(x) for negative fold region, (4) fold boundary: line at y=0 between x-intercepts. All four share ty closure — update together on drag."
-    },
-    "q-jg-04": {
-      "status": "answered",
-      "summary": "Unused native elements: Derivative (numerical derivative curve), OtherIntersection (forbidden-point intersection), CurveDifference/CurveUnion (set operations for curve regions), Transform elements, Integral (area under curve). Tracecurve requires Glider mover — not directly applicable."
-    },
-    "q-jg-05": {
-      "status": "answered",
-      "summary": "Dynamic text: board.create('text', [xFn, y, contentFn]) — auto-updates on every board.update(). Coordinate labels bound to intersection point: board.create('text', [function(){return intersectPt.X();}, function(){return intersectPt.Y()+0.3;}, function(){return '('+intersectPt.X().toFixed(2)+', '+intersectPt.Y().toFixed(2)+')';}]). Glider infobox (showinfobox:true) for built-in coordinate display."
-    },
-    "q-jg-06": {
-      "status": "answered",
-      "summary": "Performance stack: (1) board.reducedUpdate=true during drag, (2) batch mutations with suspendUpdate/unsuspendUpdate, (3) board.minimizeReflow for SVG, (4) Newton warm start for intersection (<1ms for polynomials), (5) throttle board.on('update') to requestAnimationFrame if needed."
-    },
-    "q-jg-07": {
-      "status": "partial",
-      "summary": "graphFamily.ts extension: DDD principle suggests new Interface for DragBehavior per graph family (Linear/Quadratic/Cubic/Abs/Piecewise/Parametric). OCP: open for new families without modifying existing drag semantics. Parametric drag needs separate x(t)/y(t) drag model. Piecewise needs segment-aware drag constraint."
-    }
+    "q-cd-01": { "status": "answered", "summary": "Spatial UI (in-world anchored labels) is best-practice for 3D educational content. Current CSS overlay is non-diegetic HUD." },
+    "q-cd-02": { "status": "answered", "summary": "troika-three-text > CSS3DRenderer > CanvasTexture > three-mesh-ui for mathcrew stack. CSS3DRenderer is postprocessing-incompatible by design." },
+    "q-cd-03": { "status": "answered", "summary": "Adaptive AI-driven pacing + learner-controlled segmenting validated. Proximity triggers are viable next-step." },
+    "q-cd-04": { "status": "answered", "summary": "5 CTML principles dominate: Spatial Contiguity, Segmenting, Coherence, Signalling, Temporal Contiguity. Design quality controls cognitive load." },
+    "q-cd-05": { "status": "answered", "summary": "troika-three-text v0.52.4 is the primary ecosystem tool. Active, 2.4M weekly downloads, postprocessing-compatible." },
+    "q-cd-06": { "status": "answered", "summary": "VT dimension drives rendering mode. CRA phase drives content modality. Each requires different spatial rendering strategy." },
+    "q-cd-07": { "status": "partial", "summary": "CSS overlay = no postprocessing. CSS3DRenderer = postprocessing impossible. troika-three-text = postprocessing-compatible but exact n8ao FPS impact unmeasured." }
   }
 }

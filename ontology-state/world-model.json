@@ -1,624 +1,508 @@
 {
-  "version": "0.5.0",
-  "lastUpdated": "2026-04-11T16:00:00Z",
-  "currentSession": "jsxgraph-sequencer-001",
-  "sessions": [
-    {
-      "id": "jsxgraph-sequencer-001",
-      "objective": "palantir-math Sequencer JSXGraph canvas enhancement: real-time drag intersection tracking, absolute value fold visualization, teaching annotation features",
-      "startedAt": "2026-04-11T14:00:00Z",
-      "phase": "Phase 2 — Operational Decision-Making: data shapes (JSXGraphScene) exist; adding real-time LOGIC (IntersectionSolver, DependencyGraph) and interactive ACTIONS (DragCascade, BatchBoardUpdate)",
-      "pr90Impact": {
-        "pr": "PR #90 — preserve outer-abs drag semantics",
-        "mergedAt": "2026-04-11T16:00:00Z",
-        "summary": "Codex merged translate-source-before-outer-abs semantics. ACTION domain for abs-value drag is NOW PARTIALLY IMPLEMENTED. DATA domain (fold line visualization, ghost curve) and LOGIC domain (FoldGeometry computation for display) remain as gaps.",
-        "implementedFiles": [
-          "functiongraphDragSemantics.ts — translate-source-before-outer-abs support added",
-          "graphFamily.ts — outer-absolute curve recognition added",
-          "jsxGraphRenderer.ts — fold-aware drag rendering added",
-          "ontology/data.ts — change routing updated",
-          "ontology/changeContracts.ts — change routing updated",
-          "functiongraphDragSemantics.test.ts — new tests, runtime-verified via Playwright on problem 15 frame #25"
-        ],
-        "ontologyImpact": {
-          "obj-jxg-action-05": "AbsFoldVisualizationUpdate — fold-AWARE DRAG now implemented in jsxGraphRenderer.ts. REMAINING GAP: fold LINE visualization (ghost curve, reflection guide, fold boundary display) not yet added.",
-          "obj-jxg-logic-03": "DragBehaviorInterface — AbsDragBehavior (translate-source-before-outer-abs) now implemented in functiongraphDragSemantics.ts. OCP confirmed: Linear/Quadratic drag unaffected.",
-          "obj-jxg-data-06": "GraphFamilyProfile — outer-absolute curve recognition added to graphFamily.ts. Family classification now covers Abs outer-wrap pattern.",
-          "req-jg-02": "PARTIALLY SOLVED — drag semantics level complete; VISUAL fold animation and teaching annotation overlay still required."
-        }
-      },
-      "userArchitecturePreference": {
-        "preference": "Maximize JSXGraph native APIs",
-        "direction": "Hypothesis A (native-first) is the PREFERRED path. Custom code ONLY for what JSXGraph cannot natively provide: |f(x)| fold visualization, teaching annotations, piecewise/parametric drag semantics.",
-        "nativeAPIsToMaximize": [
-          "board.create('intersection', ...) — native intersection points (v1.12.1 improved precision)",
-          "board.create('derivative', [curve]) — native slope display",
-          "board.create('text', [xFn, yFn, contentFn]) — dynamic coordinate labels",
-          "board.reducedUpdate=true — 60fps performance",
-          "board.suspendUpdate()/unsuspendUpdate() — batch repaint",
-          "otherintersection — multiple intersection support (v1.9.0+)"
-        ],
-        "customLayerScope": "Only: |f(x)| ghost curve + fold boundary (JSXGraph has no native abs-fold element), teaching annotation overlay toggle, piecewise drag constraint (no native piecewise drag semantics)"
-      }
-    }
-  ],
-
+  "version": "0.8.0",
+  "lastUpdated": "2026-04-12T12:45:00Z",
+  "currentSession": "mathcrew-content-delivery-001",
+  "sessions": ["mathcrew-content-delivery-001"],
+  "ontologistAudit": {
+    "timestamp": "2026-04-12T12:45:00Z",
+    "agent": "ontologist",
+    "totalObjects": 23,
+    "domainsPopulated": ["DATA", "LOGIC", "ACTION", "LEARN"],
+    "securityDomain": "none — no RBAC/access-control concerns in content delivery pipeline",
+    "overallForwardPropStatus": "partial",
+    "overallBackwardPropStatus": "partial",
+    "contradictions": 0,
+    "researchGaps": ["g-01", "g-02", "g-03"],
+    "confidence": 0.88,
+    "keyInsight": "CSS3DRenderer is architecturally excluded (postprocessing incompatible). troika-three-text is the only WebGL-native text approach compatible with n8ao pipeline (via OverrideMaterialManager workaround). Design quality (CTML compliance) controls cognitive load, not rendering approach immersion level. CRA Concrete phase has CTML SpatialContiguity violation in current implementation."
+  },
   "objects": [
-
     {
-      "id": "obj-jxg-data-01",
-      "name": "IntersectionPoint",
-      "ontologyType": "object-type",
-      "domain": "data",
-      "description": "Resolved (x, y) coordinate pair where two functiongraphs intersect on the JSXGraph canvas. Has identity (which intersection: fg1×fg2 at index 0, 1, …). Created via board.create('intersection', [fg1, fg2, 0]) or JXG.Math.Numerics.root output. Exists as a geometric fact independent of the solver that computed it.",
-      "provenance": "official",
-      "evidenceIds": ["ev-001", "ev-002"],
-      "relatedObjectIds": ["obj-jxg-logic-01", "obj-jxg-data-02"],
-      "primitive": "ObjectType (default — has identity: intersection index + parent pair)",
-      "semanticHeuristic": "SH-02: Delete IntersectionSolver (LOGIC) and DragCascadeUpdate (ACTION) — the coordinate pair still exists as a position fact on the canvas → DATA",
+      "id": "obj-cd-01", "name": "SpeechBubbleContent", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "Current teaching data model: title, body, phase, vocabularyIntro, successCriteria, promptText, promptKey, beatIndex, totalBeats",
+      "source": "PR#28 src/types/teaching.ts", "primitive": "Struct",
+      "semanticHeuristic": "SH-02: Delete LOGIC+ACTION — title, body, phase still describe reality as content facts. SH-01: stored fact about what content exists, not how to display it.",
+      "evidenceIds": ["clm-ext-14", "clm-int-06"],
       "designPrinciples": {
-        "DDD": "Named 'IntersectionPoint' per JSXGraph intersection domain vocabulary. Matches JXG.Intersection element name.",
-        "DRY": "Single entity per intersection index — not duplicated per drag frame. Updated in-place.",
-        "OCP": "IntersectionPoint structure fixed; solver implementation (NativeIntersection vs Newton) extends IntersectionResolverInterface without modifying this entity.",
-        "PECS": "Consumer of two JXG.Curve parents (super), producer of {x, y} coordinate (specific/extends)."
+        "DDD": "PASS — matches codebase domain vocabulary exactly",
+        "DRY": "PASS — single struct consumed by all renderers",
+        "OCP": "PASS — spatialAnnotationTarget can be added without breaking existing consumers",
+        "PECS": "PASS — game-loop (producer) extends; speech-bubble.ts (consumer super) reads"
       },
-      "forwardPropPath": "IntersectionPoint (ontology) → IntersectionCoordinate Struct contract (seq-data.ts) → jsxGraphRenderer.ts board.create('intersection') or root() result → JSXGraphCanvas live coordinate update | status: partial",
-      "backwardPropPath": "IntersectionPoint position change → solver iteration count in InteractionTelemetry (lineage) → solver accuracy + precision evaluation → IntersectionResolverInterface warmStart strategy refinement (refinement) | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "SpeechBubbleContent (DATA) -> ContentDeliveryResolver -> rendering surface", "healthStatus": "healthy" },
+      "backwardPropPath": { "chain": "BeatRendered event -> ContentEngagement.beatLog -> FSRSReviewLog cross-ref -> content refinement", "healthStatus": "partial", "gaps": ["beatIndex not captured in telemetry"] }
     },
-
     {
-      "id": "obj-jxg-data-02",
-      "name": "CoordinateLabel",
-      "ontologyType": "object-type",
-      "domain": "data",
-      "description": "Dynamic text element on JSXGraph canvas displaying the (x, y) coordinates of an IntersectionPoint in real time. Created via board.create('text', [xFn, yFn, contentFn]) where contentFn returns '({x}, {y})' string. The label string is a factual description of a canvas position — independent of the update mechanism.",
-      "provenance": "official",
-      "evidenceIds": ["ev-007"],
-      "relatedObjectIds": ["obj-jxg-data-01", "obj-jxg-action-03"],
-      "primitive": "ObjectType (default — has identity: which intersection it labels)",
-      "semanticHeuristic": "SH-02: Delete AnnotationToggle (ACTION) and update computation (LOGIC) — the label text '(2.00, 1.50)' still describes a canvas fact → DATA",
+      "id": "obj-cd-02", "name": "TeachingBeat", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "Beat structure with 5 phases (motivate/explain/demonstrate/practice/assess), CRA micro-phase, interaction mode, success criteria",
+      "source": "src/types/teaching.ts", "primitive": "Struct",
+      "semanticHeuristic": "SH-02: beat phase + CRA phase + interactionMode describe reality of what a beat IS regardless of execution. Classification: DATA.",
+      "evidenceIds": ["clm-ext-21", "clm-ext-32"],
       "designPrinciples": {
-        "DDD": "Named 'CoordinateLabel' per teaching-canvas vocabulary. Maps to JXG.Text element.",
-        "DRY": "One label per intersection. Label format (toFixed(2)) declared once in contentFn closure.",
-        "OCP": "Label format extensible (add slope, degrees) via contentFn update without modifying CoordinateLabel lifecycle or IntersectionPoint entity.",
-        "PECS": "Consumer of IntersectionPoint position (super/abstract position), producer of formatted string (specific/extends)."
+        "DDD": "PASS — domain vocabulary (TeachingBeat, CRA, VT) preserved",
+        "DRY": "PASS — single struct, no per-planet duplication",
+        "OCP": "PASS — new fields (audioNarrationUrl) added without breaking existing consumers",
+        "PECS": "PASS — planet content (producer) extends; ContentDeliveryResolver (consumer) reads"
       },
-      "forwardPropPath": "CoordinateLabel (ontology) → TextElementContract: { xFn: ()=>number, yFn: ()=>number, contentFn: ()=>string } → board.create('text') in jsxGraphRenderer.ts → JSXGraphCanvas SVG text node | status: partial",
-      "backwardPropPath": "CoordinateLabel visibility events → annotation usage in TeachingEffectiveness (lineage) → teaching effectiveness evaluation → label position/format refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "TeachingBeat (DATA) -> ContentDeliveryResolver.resolve(context) -> approach selection -> render", "healthStatus": "healthy" },
+      "backwardPropPath": { "chain": "BeatCompleted event -> FSRSReviewLog -> mastery trend -> beat sequence refinement", "healthStatus": "partial", "gaps": ["VT-dimension-to-mastery correlation not tracked"] }
     },
-
     {
-      "id": "obj-jxg-data-03",
-      "name": "FunctiongraphScene",
-      "ontologyType": "object-type",
-      "domain": "data",
-      "description": "The JSXGraph board scene document: all declared elements (functiongraphs, points, sliders, text, auxiliary curves), their configuration params, and auto-intersection metadata. Persisted as JSXGraphScene type in seq-data.ts. The canonical DATA artifact of the canvas renderer.",
-      "provenance": "official",
-      "evidenceIds": ["ev-003"],
-      "relatedObjectIds": ["obj-jxg-data-01", "obj-jxg-action-02"],
-      "primitive": "ObjectType (default — has identity: scene ID / board ID)",
-      "semanticHeuristic": "SH-02: Delete all computation — the scene document (element declarations, config) still exists as a fact in JSXGraphCanvas.tsx → DATA",
+      "id": "obj-cd-03", "name": "TroikaText", "domain": "DATA",
+      "ontologyType": "Object Type",
+      "description": "troika-three-text SDF text mesh — native Three.js Mesh with async web worker SDF generation. v0.52.4, 2.4M weekly downloads. Requires OverrideMaterialManager workaround for postprocessing.",
+      "source": "src-ext-troika", "primitive": "Interface",
+      "semanticHeuristic": "SH-02: TroikaText configuration (font, SDF settings, curveRadius, postprocessing workaround flag) describes what exists as rendering capability. Classification: DATA.",
+      "evidenceIds": ["clm-ext-01", "clm-ext-02", "clm-ext-03", "clm-ext-04", "clm-ext-06", "clm-ext-07"],
       "designPrinciples": {
-        "DDD": "Named 'FunctiongraphScene' per JSXGraph canvas domain vocabulary. Extends existing JSXGraphScene type.",
-        "DRY": "Single scene document per board. No duplication of element declarations.",
-        "OCP": "New element types added to scene without modifying scene identity or serialization contract.",
-        "PECS": "Producer of all board elements — scene is the source of truth for canvas state."
+        "DDD": "PASS — named after library domain term",
+        "DRY": "PASS — single config type prevents per-instance drift",
+        "OCP": "PASS — new troika properties added without breaking existing consumers",
+        "PECS": "PASS — ContentDeliveryResolver (producer) provides TroikaText config; Text factory (consumer) accepts"
       },
-      "forwardPropPath": "FunctiongraphScene (ontology) → JSXGraphScene type in seq-data.ts → jsxGraphRenderer.ts board initialization → JSXGraphCanvas board.create() calls | status: partial",
-      "backwardPropPath": "Scene mutation events → scene version in InteractionTelemetry → scene drift evaluation → JSXGraphScene type contract refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "TroikaText config (DATA) -> Text factory -> Three.js scene mesh -> postprocessing pipeline (via OverrideMaterialManager workaround)", "healthStatus": "partial", "gaps": ["Three.js 0.183.x troika compatibility unverified (gap g-02)", "OverrideMaterialManager workaround not yet applied in codebase"] },
+      "backwardPropPath": { "chain": "TextSyncCompleted event -> RenderTelemetry.syncLatency -> FPS evaluation -> preloadFont refinement", "healthStatus": "partial", "gaps": ["FPS benchmark for troika+n8ao not available (gap g-01)"] }
     },
-
     {
-      "id": "obj-jxg-data-04",
-      "name": "DragState",
-      "ontologyType": "value-type",
-      "domain": "data",
-      "description": "Struct value type: the current translation vector { ty: number, tx?: number } applied to a dragged functiongraph. ty is the vertical displacement from the original position. No identity — just the current delta value. Describes the positional reality of a dragged function at a given frame.",
-      "provenance": "official",
-      "evidenceIds": ["ev-003", "ev-006"],
-      "relatedObjectIds": ["obj-jxg-logic-04", "obj-jxg-action-01"],
-      "primitive": "Struct (value type — no identity, just the delta)",
-      "semanticHeuristic": "SH-02: Delete DragCascadeUpdate (ACTION) and DragSemanticResolver (LOGIC) — ty=2.5 still describes the current position reality → DATA",
+      "id": "obj-cd-04", "name": "CSS3DObject", "domain": "DATA",
+      "ontologyType": "Object Type",
+      "description": "Three.js CSS3DRenderer element — DOM in 3D space via perspective transforms. Separate from WebGL pipeline, CANNOT receive postprocessing. Z-ordering with WebGL objects is unreliable. EXCLUDED from viable set for mathcrew.",
+      "source": "src-ext-css3drenderer", "primitive": "Interface",
+      "semanticHeuristic": "SH-02: CSS3DRenderer capability properties (DOM-based, no WebGL pipeline, no postprocessing) describe what it IS. Classification: DATA.",
+      "evidenceIds": ["clm-ext-11", "clm-ext-12", "clm-ext-13", "clm-ext-38"],
+      "exclusionRationale": "clm-ext-12 + clm-ext-38: CSS3DRenderer CANNOT receive WebGL postprocessing (architectural impossibility confirmed by Three.js core developer Mugen87). mathcrew uses n8ao + postprocessing 6.36.7 — incompatible.",
       "designPrinciples": {
-        "DDD": "Named 'DragState' per drag interaction domain vocabulary. ty follows existing functiongraphDragSemantics.ts convention.",
-        "DRY": "Single ty value per function. No duplication across snapshot frames — DragStateReducer aggregates.",
-        "OCP": "DragState Struct extensible (add tx for horizontal drag) without modifying reducer or solver logic.",
-        "PECS": "Producer of ty/tx delta — consumed by IntersectionSolver and AbsValueFoldComputer as input."
+        "DDD": "PASS — CSS3DObject matches Three.js API vocabulary",
+        "DRY": "PASS — documented once as excluded option",
+        "OCP": "N/A — excluded from viable set",
+        "PECS": "N/A — excluded from viable set"
       },
-      "forwardPropPath": "DragState (ontology) → DragState type in seq-data.ts → functiongraphDragSemantics.ts translation computation → functiongraph curve function update | status: partial",
-      "backwardPropPath": "DragState change → ty delta in InteractionTelemetry.dragFrames (lineage) → drag responsiveness evaluation → DragBehaviorInterface snap/constraint refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "CSS3DObject (DATA) -> EXCLUDED — cannot participate in n8ao postprocessing pipeline", "healthStatus": "broken" },
+      "backwardPropPath": { "chain": "N/A — excluded", "healthStatus": "broken" }
     },
-
     {
-      "id": "obj-jxg-data-05",
-      "name": "FoldGeometry",
-      "ontologyType": "value-type",
-      "domain": "data",
-      "description": "Struct value type: the geometric description of an absolute value fold visualization. { ty: number, foldBoundaryXValues: number[], reflectionGuidePoints: [number, number][], absMaxY: number }. Describes what the fold LOOKS LIKE at a given ty — independent of the computation that derived it.",
-      "provenance": "synthesis",
-      "evidenceIds": ["ev-006"],
-      "relatedObjectIds": ["obj-jxg-logic-02", "obj-jxg-action-05"],
-      "primitive": "Struct (value type — no identity, just the fold description)",
-      "semanticHeuristic": "SH-02: Delete AbsValueFoldComputer (LOGIC) and AbsFoldVisualizationUpdate (ACTION) — the fold boundary x-values and reflection points still describe a geometric reality → DATA",
+      "id": "obj-cd-05", "name": "ContentDeliveryConfig", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "NEW: Configuration for content delivery approach selection per CRA phase and teaching beat phase. Maps (craMicroPhase, beatPhase) → rendering approach.",
+      "source": "decision-log q-cd-06", "primitive": "Struct",
+      "semanticHeuristic": "SH-02: ContentDeliveryConfig describes what configuration exists (approach selection rules) — a stored fact. Classification: DATA.",
+      "evidenceIds": ["clm-int-03", "clm-ext-27", "clm-ext-33"],
       "designPrinciples": {
-        "DDD": "Named 'FoldGeometry' per absolute value teaching visualization vocabulary.",
-        "DRY": "Single struct per |f(x)+ty| expression. All four visual layers (primary, abs, ghost, boundary) share this struct.",
-        "OCP": "FoldGeometry extensible (add fold color, annotation text) without modifying AbsValueFoldComputer.",
-        "PECS": "Producer of fold geometry description — consumed by AbsFoldVisualizationUpdate and CoordinateLabel."
+        "DDD": "PASS — matches teaching domain vocabulary (craMicroPhase, beatPhase)",
+        "DRY": "PASS — single config struct prevents per-phase selection duplication",
+        "OCP": "PASS — new approach variants added to config enum without breaking existing mapping",
+        "PECS": "PASS — Lead (producer) configures; ContentDeliveryResolver (consumer) reads"
       },
-      "forwardPropPath": "FoldGeometry (ontology) → FoldGeometry type in seq-data.ts → jsxGraphRenderer.ts abs rendering → AbsValueFoldVisualization ghost curves + fold boundary line | status: partial",
-      "backwardPropPath": "FoldGeometry change → fold boundary x-value in InteractionTelemetry → fold accuracy evaluation → AbsValueFoldComputer intercept precision refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "ContentDeliveryConfig (DATA) -> ContentDeliveryResolver.resolve() -> rendering approach dispatch", "healthStatus": "partial", "gaps": ["ContentDeliveryConfig type not yet defined in codebase"] },
+      "backwardPropPath": { "chain": "ConfigUsed event -> WorkflowLineage -> approach effectiveness eval -> config refinement", "healthStatus": "partial", "gaps": ["ConfigUsed event not emitted"] }
     },
-
     {
-      "id": "obj-jxg-data-06",
-      "name": "GraphFamilyProfile",
-      "ontologyType": "object-type",
-      "domain": "data",
-      "implementationStatus": "partial — PR #90 merged: outer-absolute curve recognition added to graphFamily.ts. family: 'Abs' (outer-wrap) now correctly classified. REMAINING: Piecewise, Parametric classification not yet implemented.",
-      "description": "Classification result per functiongraph: { family: 'Linear'|'Quadratic'|'Cubic'|'Quartic'|'Abs'|'Piecewise'|'Parametric', dragModel: string, intersectionSupport: boolean }. Produced by graphFamily.ts classification. Has identity (which functiongraph it describes). PR #90: outer-absolute (Abs) family now recognized. Piecewise/Parametric still needed.",
-      "provenance": "official",
-      "evidenceIds": [],
-      "relatedObjectIds": ["obj-jxg-logic-04"],
-      "primitive": "ObjectType (has identity — one profile per functiongraph element)",
-      "semanticHeuristic": "SH-02: Delete DragSemanticResolver (LOGIC) — the classification label 'Quadratic' still describes a mathematical fact about the graph → DATA",
+      "id": "obj-cd-06", "name": "SpatialAnnotation", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "NEW: 3D-anchored educational annotation (labels on manipulatives, coordinate readouts on objects). Rendered via troika-three-text. UIType: Spatial (in-world, not perceived by character).",
+      "source": "decision-log q-cd-01", "primitive": "Struct",
+      "semanticHeuristic": "SH-02: SpatialAnnotation config (anchor objectId, labelText, worldPosition, UIType=Spatial) describes what a spatial annotation IS. Classification: DATA.",
+      "evidenceIds": ["clm-ext-29", "clm-ext-20", "clm-ext-04"],
       "designPrinciples": {
-        "DDD": "Named 'GraphFamilyProfile' per graphFamily.ts domain vocabulary. Extends existing GraphFamily type.",
-        "DRY": "Single profile per functiongraph. DragBehaviorInterface implementations reference profile without duplicating classification logic.",
-        "OCP": "New families (Piecewise, Parametric) extend GraphFamilyProfile.family union without modifying existing classification.",
-        "PECS": "Producer of family classification — consumed by DragBehaviorInterface as input parameter."
+        "DDD": "PASS — 'SpatialAnnotation' matches game UI design vocabulary for in-world labels",
+        "DRY": "PASS — single struct for all in-world annotations",
+        "OCP": "PASS — new annotation types (highlighted, pulsing) added via property, not struct change",
+        "PECS": "PASS — planet scene (producer) provides SpatialAnnotation; troika Text factory (consumer) renders"
       },
-      "forwardPropPath": "GraphFamilyProfile (ontology) → GraphFamilyProfile type extension in seq-data.ts → graphFamily.ts classifier output → functiongraphDragSemantics.ts family-aware drag dispatch | status: partial",
-      "backwardPropPath": "GraphFamilyProfile misclassification → classification error in InteractionTelemetry → accuracy evaluation → graphFamily.ts classifier refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "SpatialAnnotation (DATA) -> TroikaTextSync (ACTION) -> Three.js Text mesh anchored at worldPosition -> visible in postprocessing pipeline", "healthStatus": "partial", "gaps": ["SpatialAnnotation type not yet in src/types/", "anchor-to-mesh binding not designed"] },
+      "backwardPropPath": { "chain": "AnnotationViewed event -> ContentEngagement.attentionLog -> CTML SpatialContiguity eval -> annotation placement refinement", "healthStatus": "partial", "gaps": ["AnnotationViewed event not defined"] }
     },
-
     {
-      "id": "obj-jxg-data-07",
-      "name": "TracePath",
-      "ontologyType": "value-type",
-      "domain": "data",
-      "description": "Struct value type: recorded array of (ty, timestamp) positions during a functiongraph drag session. { draggedElementId: string, frames: { ty: number, tx?: number, timestamp: number }[] }. The drag history fact — independent of the recording mechanism.",
-      "provenance": "synthesis",
-      "evidenceIds": ["ev-009"],
-      "relatedObjectIds": ["obj-jxg-action-04"],
-      "primitive": "Struct (value type — no identity, just the path record)",
-      "semanticHeuristic": "SH-02: Delete TraceCurveRecord (ACTION) — the recorded path array still describes the drag history reality → DATA",
+      "id": "obj-cd-07", "name": "AudioNarrationSegment", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "NEW: Korean audio narration segment per teaching beat. Based on Mayer TemporalContiguity. Options: Web Speech API TTS, pre-recorded, AI TTS.",
+      "source": "src-ext-mayer clm-ext-25", "primitive": "Struct",
+      "semanticHeuristic": "SH-02: AudioNarrationSegment (url, beatIndex, language) describes what audio content exists. Classification: DATA.",
+      "evidenceIds": ["clm-ext-25", "clm-ext-22"],
       "designPrinciples": {
-        "DDD": "Named 'TracePath' per drag-history domain vocabulary.",
-        "DRY": "Single array per drag session. TraceCurveRecord appends to it without duplicating the path structure.",
-        "OCP": "TracePath extensible (add velocity field) without modifying recording action or curve.dataX/dataY binding.",
-        "PECS": "Producer of drag history — consumed by TraceCurveRecord (ACTION) for curve update, by InteractionTelemetry (LEARN) for evaluation."
+        "DDD": "PASS — narration terminology matches Mayer multimedia learning vocabulary",
+        "DRY": "PASS — single segment struct per beat",
+        "OCP": "PASS — new TTS providers added without changing struct",
+        "PECS": "PASS — content pipeline (producer) provides segment; AudioNarrationTrigger (consumer) plays"
       },
-      "forwardPropPath": "TracePath (ontology) → TracePath type in seq-data.ts → board.on('update') push logic → curve.dataX/dataY binding → JSXGraphCanvas trace overlay | status: partial",
-      "backwardPropPath": "TracePath data → drag path in InteractionTelemetry (lineage) → teaching effectiveness evaluation (did trace help?) → TracePath resolution/density refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "AudioNarrationSegment (DATA) -> AudioNarrationTrigger (ACTION) -> Web Speech API / audio element -> synchronized playback", "healthStatus": "partial", "gaps": ["Audio narration not in current implementation"] },
+      "backwardPropPath": { "chain": "NarrationCompleted event -> ContentEngagement.narrationLog -> redundancy violation check -> content refinement", "healthStatus": "partial", "gaps": ["NarrationCompleted event not defined"] }
     },
-
     {
-      "id": "obj-jxg-logic-01",
-      "name": "IntersectionResolverInterface",
-      "ontologyType": "interface",
-      "domain": "logic",
-      "description": "DC5-06 Interface primitive: polymorphic contract for computing IntersectionPoint coordinates from two functiongraphs. Two implementations: (A) NativeIntersectionResolver — board.create('intersection', [fg1, fg2, 0]) using JSXGraph's v1.12.1 improved algorithm; (B) NewtonRaphsonResolver — JXG.Math.Numerics.root(h, warmStart) where h(x)=f(x)-g(x). Enables OCP: swap solvers without modifying IntersectionPoint entity or DragCascadeUpdate action.",
-      "provenance": "official",
-      "evidenceIds": ["ev-001", "ev-002"],
-      "relatedObjectIds": ["obj-jxg-data-01", "obj-jxg-action-01"],
-      "primitive": "Interface (shared behavioral contract — NativeIntersection vs NewtonRaphson implementations)",
-      "semanticHeuristic": "SH-01: HOW TO REASON about intersection coordinates from two curves. Defines the computation contract, not the stored result.",
-      "designPrinciples": {
-        "DDD": "Named 'IntersectionResolverInterface' per JSXGraph intersection domain + DC5-06 Interface vocabulary.",
-        "DRY": "One interface — two implementations. Zero code duplication: NativeIntersection and NewtonRaphson share the same call site.",
-        "OCP": "New solver strategies (e.g., Bisection, Secant) added as new implementations without modifying the interface or IntersectionPoint entity.",
-        "PECS": "Consumes [JXG.Curve, JXG.Curve] (super — abstract curve type), produces IntersectionCoordinate (extends — {x: number, y: number})."
+      "id": "obj-cd-08", "name": "ContentDeliveryResolver", "domain": "LOGIC",
+      "ontologyType": "Interface",
+      "description": "NEW: Selects rendering approach per teaching context. Maps CRA phase → delivery mode: Concrete=3D spatial annotations, Representational=hybrid (troika labels + speech bubble), Abstract=speech bubble text. Implements OCP via Interface.",
+      "source": "§DC5-06 + q-cd-06", "primitive": "Interface",
+      "semanticHeuristic": "SH-03: Returns approach selection (Edits[]) without committing side effects — computes which renderer to use. SH-01: HOW TO REASON about approach selection given vtDimension, craPhase, R signal. Classification: LOGIC.",
+      "evidenceIds": ["clm-int-03", "clm-int-06", "clm-ext-27", "clm-ext-33"],
+      "vtMapping": {
+        "contrast": "split-view / dual TroikaText panels",
+        "separation": "single SpatialAnnotation on varying element",
+        "generalization": "sequential SpatialAnnotation multi-example",
+        "fusion": "synchronized SpatialSignalling + SpeechBubble",
+        "integration": "planet-overview SpeechBubble panel"
       },
-      "forwardPropPath": "IntersectionResolverInterface (ontology) → IntersectionResolverContract interface in seq-data.ts → jsxGraphRenderer.ts: board.create('intersection') or JXG.Math.Numerics.root() adapter → board.update() → IntersectionPoint auto-refresh | status: partial",
-      "backwardPropPath": "Resolver output + iteration count → solver performance in InteractionTelemetry (lineage) → precision + latency evaluation (<1ms budget) → warmStart strategy + algorithm selection refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "craMapping": {
+        "Concrete": "SpatialAnnotation on manipulable 3D object (NOT text bubble — CTML SpatialContiguity)",
+        "Representational": "hybrid troika label on surface + minimal SpeechBubble",
+        "Abstract": "SpeechBubble text panel primary"
+      },
+      "designPrinciples": {
+        "DDD": "PASS — resolve() maps teaching domain concepts (CRA phase, VT dimension) not raw tech",
+        "DRY": "PASS — single resolver eliminates per-beat approach selection scattered in game-loop",
+        "OCP": "PASS — Interface contract: new approach variant added; existing code unchanged",
+        "PECS": "PASS — specific resolvers (SpatialResolver, OverlayResolver) extend; Interface is consumer super"
+      },
+      "forwardPropPath": { "chain": "ContentDeliveryResolver (LOGIC) -> ContentDeliveryConfig (DATA) -> game-loop.ts -> speech-bubble.ts | diegetic-panel.ts | spatial-annotation.ts", "healthStatus": "partial", "gaps": ["resolver.ts does not yet exist", "game-loop integration point not defined"] },
+      "backwardPropPath": { "chain": "ResolutionDecision event -> WorkflowLineage -> approach effectiveness eval -> resolver rule refinement", "healthStatus": "partial", "gaps": ["resolver decision not logged — backward path broken until telemetry added"] }
     },
-
     {
-      "id": "obj-jxg-logic-02",
-      "name": "AbsValueFoldComputer",
-      "ontologyType": "function",
-      "domain": "logic",
-      "description": "Pure function: derives FoldGeometry from f_raw(x: (x: number) => number, ty: number) → FoldGeometry. Computation: (1) absY(x) = Math.abs(f_raw(x) + ty), (2) foldBoundaryX: solve f_raw(x) + ty = 0 via JXG.Math.Numerics.root, (3) reflectionGuide: sample y = -(f_raw(x) + ty) for negative region, (4) absMaxY: max of absY on visible range. All four visual layers share ty closure.",
-      "provenance": "synthesis",
-      "evidenceIds": ["ev-006"],
-      "relatedObjectIds": ["obj-jxg-data-05", "obj-jxg-action-05"],
-      "primitive": "Function (pure computation — input: f_raw + ty, output: FoldGeometry, no side effects)",
-      "semanticHeuristic": "SH-01: HOW TO REASON about |f(x)+ty| fold geometry. SH-03: returns FoldGeometry (derived value) without committing any canvas mutations → LOGIC not ACTION",
+      "id": "obj-cd-09", "name": "WorldToScreenProjection", "domain": "LOGIC",
+      "ontologyType": "Function",
+      "description": "Current: Vector3.project → CSS transform for speech bubble positioning. Per-frame DOM mutation. Does not participate in WebGL depth buffer.",
+      "source": "src-ext-css-overlay-current", "primitive": "DerivedProperty",
+      "semanticHeuristic": "SH-03: Returns screen coordinates (no side effects) — computes 2D position from 3D world position. Classification: LOGIC (computation without mutation).",
+      "evidenceIds": ["clm-ext-14", "clm-ext-15", "clm-ext-16"],
+      "limitations": ["No depth occlusion by 3D objects", "CSS overlay always renders on top of WebGL content", "Per-frame DOM mutation cost"],
       "designPrinciples": {
-        "DDD": "Named 'AbsValueFoldComputer' per absolute value teaching visualization vocabulary.",
-        "DRY": "Single ty-sharing closure across all four visual layers (primary, abs, ghost, boundary). Zero duplication of fold logic.",
-        "OCP": "FoldGeometry output extensible without modifying AbsValueFoldComputer core algorithm.",
-        "PECS": "Consumes (f_raw: Function, ty: number) — super/broad inputs. Produces FoldGeometry — specific/extends output."
+        "DDD": "PASS — worldToScreen is Three.js domain term",
+        "DRY": "PASS — single projection function in speech-bubble.ts",
+        "OCP": "PASS — projection function is isolated; switching to troika doesn't require changing it",
+        "PECS": "N/A — pure computation, no generic boundary"
       },
-      "forwardPropPath": "AbsValueFoldComputer (ontology) → FoldComputerContract: (f, ty) => FoldGeometry (contract) → jsxGraphRenderer.ts abs curve function definition → AbsValueFoldVisualization ghost curves | status: partial",
-      "backwardPropPath": "Fold boundary x-values → x-intercept accuracy in InteractionTelemetry → fold precision evaluation → root-finding strategy refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "Vector3.project (LOGIC) -> CSS transform string -> speech-bubble.ts DOM update", "healthStatus": "healthy" },
+      "backwardPropPath": { "chain": "No backward path — projection is stateless computation", "healthStatus": "healthy" }
     },
-
     {
-      "id": "obj-jxg-logic-03",
-      "name": "DragBehaviorInterface",
-      "ontologyType": "interface",
-      "domain": "logic",
-      "implementationStatus": "partial — PR #90 merged: AbsDragBehavior (translate-source-before-outer-abs) now implemented in functiongraphDragSemantics.ts. OCP validated: Linear/Quadratic drag unaffected. REMAINING: PiecewiseDragBehavior, ParametricDragBehavior, and outer-abs VISUAL fold update not yet connected to ghost curve rendering.",
-      "description": "DC5-06 Interface primitive: per-family drag semantic contract. { execute(event: DragEvent, profile: GraphFamilyProfile, board: JXG.Board): DragState }. Implementations per family: LinearDragBehavior (translate ty only), QuadraticDragBehavior (translate ty, snap to grid), AbsDragBehavior [PR #90: translate-source-before-outer-abs IMPLEMENTED], PiecewiseDragBehavior (segment-aware — STILL NEEDED). Directly extends functiongraphDragSemantics.ts.",
-      "provenance": "synthesis",
-      "evidenceIds": ["ev-003"],
-      "relatedObjectIds": ["obj-jxg-data-04", "obj-jxg-data-06", "obj-jxg-action-01"],
-      "primitive": "Interface (shared behavioral contract — one implementation per GraphFamilyProfile)",
-      "semanticHeuristic": "SH-01: HOW TO REASON about drag semantics per family. Defines the drag behavior contract, not the stored delta.",
+      "id": "obj-cd-10", "name": "CognitiveLoadGuard", "domain": "LOGIC",
+      "ontologyType": "Interface",
+      "description": "NEW: Ensures content delivery respects CLT. Rules: (1) Elementary requires high guidance, (2) Redundancy principle — no duplicate text+narration, (3) Coherence — no decorative vocabulary, (4) Segmenting — learner-controlled beats.",
+      "source": "src-ext-mayer + src-ext-mayer-ar-2025", "primitive": "DerivedProperty",
+      "semanticHeuristic": "SH-01: HOW TO REASON about whether content delivery violates cognitive load constraints. SH-03: Returns validation result (no side effects). Classification: LOGIC.",
+      "evidenceIds": ["clm-ext-22", "clm-ext-23", "clm-ext-26", "clm-ext-27"],
+      "keyInsight": "clm-ext-27: Design quality controls cognitive load, not rendering approach. Enriching delivery does NOT inherently increase extraneous load IF CTML principles are followed.",
       "designPrinciples": {
-        "DDD": "Named 'DragBehaviorInterface' per DC5-06 Interface vocabulary and drag semantics domain.",
-        "DRY": "One interface — four implementations. No drag logic duplication across Linear/Quadratic/Abs/Piecewise.",
-        "OCP": "New graph families (Parametric) added as new DragBehaviorInterface implementations without modifying existing behaviors.",
-        "PECS": "Consumes DragEvent (super — all drag events), produces DragState (extends — family-specific translation result)."
+        "DDD": "PASS — CLT/CTML vocabulary preserved (redundancy, coherence, segmenting)",
+        "DRY": "PASS — single guard evaluates all CTML constraints",
+        "OCP": "PASS — new principles (Modality) added without breaking existing 4 rules",
+        "PECS": "PASS — ContentDeliveryResolver (producer) submits design for validation; guard (consumer super) checks"
       },
-      "forwardPropPath": "DragBehaviorInterface (ontology) → DragBehaviorContract in functiongraphDragSemantics.ts → family dispatch in drag handler → canvas functiongraph position update | status: partial",
-      "backwardPropPath": "DragBehavior execution → family-specific drag metric in InteractionTelemetry → per-family accuracy evaluation → DragBehaviorInterface implementation refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "CognitiveLoadGuard (LOGIC) -> validation result -> ContentDeliveryResolver blocks violation before render", "healthStatus": "partial", "gaps": ["Guard not implemented — CTML violations currently unchecked"] },
+      "backwardPropPath": { "chain": "CTMLViolation event -> EvaluationRecord -> content design refinement", "healthStatus": "partial", "gaps": ["Automated CTML violation detection not in eval suite"] }
     },
-
     {
-      "id": "obj-jxg-logic-04",
-      "name": "DependencyGraph",
-      "ontologyType": "object-type",
-      "domain": "logic",
-      "description": "DAG (Directed Acyclic Graph) of JSXGraph element → its dependent elements for cascade update ordering. Each node = a board element; each edge = 'A depends on B' (A must update when B changes). This is the REASONING STRUCTURE that determines what must be recomputed when a drag frame fires. In Hypothesis A: this IS JSXGraph's internal _dep system. In Hypothesis B: this is an explicit custom graph.",
-      "provenance": "synthesis",
-      "evidenceIds": ["ev-003", "ev-005"],
-      "relatedObjectIds": ["obj-jxg-logic-01", "obj-jxg-action-01"],
-      "primitive": "ObjectType (logic domain — a reasoning artifact with identity: the graph for a given board)",
-      "semanticHeuristic": "SH-01: HOW TO REASON about element dependency ordering. The graph answers 'what must update when X drags?' — pure reasoning, no mutations.",
+      "id": "obj-cd-11", "name": "MayerPrincipleChecker", "domain": "LOGIC",
+      "ontologyType": "Derived Property",
+      "description": "NEW: Validates content delivery design against 5 applicable Mayer CTML principles. SpatialContiguity (labels near objects), TemporalContiguity (animation+text sync), Signalling (3D glow/highlight), Coherence (no extraneous info), Segmenting (beat-paced learner control).",
+      "source": "src-ext-mayer clm-ext-20 through clm-ext-25", "primitive": "DerivedProperty",
+      "semanticHeuristic": "SH-03: Returns compliance result per principle (no side effects). SH-01: HOW TO REASON about design quality against CTML standards. Classification: LOGIC.",
+      "evidenceIds": ["clm-ext-20", "clm-ext-21", "clm-ext-22", "clm-ext-23", "clm-ext-24", "clm-ext-25"],
+      "currentViolations": [
+        "SpatialContiguity: CRA Concrete phase uses text bubble instead of spatial annotation anchored on manipulated object",
+        "Signalling: No 3D glow/highlight on referenced math objects — only text references them"
+      ],
       "designPrinciples": {
-        "DDD": "Named 'DependencyGraph' per JSXGraph internal _dep system vocabulary (board element dependency graph).",
-        "DRY": "Single graph per board. Not duplicated per element type.",
-        "OCP": "New dependent element types extend the graph by adding edges — no modification of existing graph reasoning.",
-        "PECS": "Consumes board element set (super), produces update ordering (specific DAG traversal result)."
+        "DDD": "PASS — Mayer published principle names preserved exactly",
+        "DRY": "PASS — single checker referenced by resolver, content design rules, and eval criteria",
+        "OCP": "PASS — new principles added without breaking existing 5",
+        "PECS": "N/A — design constraint checker, no generic boundary"
       },
-      "forwardPropPath": "DependencyGraph (ontology) → DependencyGraph reasoning contract → jsxGraphRenderer.ts element creation order → board._dep internal structure (H-A) or explicit observer map (H-B) | status: partial",
-      "backwardPropPath": "Graph traversal events → dependency cascade log in InteractionTelemetry → cascade correctness evaluation → graph topology refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "MayerPrincipleChecker (LOGIC) -> 5 compliance booleans -> CognitiveLoadGuard -> ContentDeliveryResolver.validate()", "healthStatus": "partial", "gaps": ["Signalling check requires 3D object reference tracking not yet implemented"] },
+      "backwardPropPath": { "chain": "PrincipleViolation events -> EvaluationRecord -> design refinement proposals", "healthStatus": "partial", "gaps": ["Automated principle checking not implemented"] }
     },
-
     {
-      "id": "obj-jxg-logic-05",
-      "name": "DerivativeEvaluator",
-      "ontologyType": "function",
-      "domain": "logic",
-      "description": "Pure function: computes numerical slope value at a given x position using JSXGraph's native Derivative element or finite difference. { evaluate(curve: JXG.Curve, x: number): number }. Used to display slope at intersection and critical points for teaching.",
-      "provenance": "official",
-      "evidenceIds": ["ev-008"],
-      "relatedObjectIds": ["obj-jxg-data-01"],
-      "primitive": "Function (pure — input: curve + x, output: slope number, no side effects)",
-      "semanticHeuristic": "SH-01: HOW TO REASON about slope at a point. SH-03: returns derived number without committing canvas mutations → LOGIC",
+      "id": "obj-cd-12", "name": "ScaffoldEscalationLogic", "domain": "LOGIC",
+      "ontologyType": "Reducer",
+      "description": "4-tier scaffold: (1) Nudge (subtle 3D visual cue), (2) Visual hint (highlighted manipulative), (3) Worked example (speech bubble), (4) Direct instruction. Tiers 1-2 need spatial/3D cues; tiers 3-4 served by current speech bubble.",
+      "source": "src-int-fde + research deep-dive", "primitive": "Reducer",
+      "semanticHeuristic": "SH-03: Aggregates FSRS mastery signals over collection to derive scaffold tier recommendation (returns Edits[], no mutation). Classification: LOGIC (Reducer — aggregation without side effects).",
+      "evidenceIds": ["clm-int-04", "clm-int-05", "clm-ext-37"],
       "designPrinciples": {
-        "DDD": "Named 'DerivativeEvaluator' per mathematical analysis vocabulary. Binds to JXG 'derivative' element (board.create('derivative', [curve])).",
-        "DRY": "Single evaluator; derivative display element created once and auto-updates via native dependency.",
-        "OCP": "Derivative display extensible (add second derivative) without modifying evaluator contract.",
-        "PECS": "Consumes JXG.Curve (super), produces slope: number (specific)."
+        "DDD": "PASS — domain terms: nudge, visual hint, worked example, direct instruction",
+        "DRY": "PASS — single reducer replaces per-interaction-mode scaffold logic",
+        "OCP": "PASS — tier 0 (proactive encouragement) addable without changing existing 4 tiers",
+        "PECS": "PASS — FSRSRetrievabilitySignal (producer) extends; ScaffoldEscalationLogic (consumer super) reduces"
       },
-      "forwardPropPath": "DerivativeEvaluator (ontology) → DerivativeContract: (curve, x) => number → board.create('derivative', [curve]) in jsxGraphRenderer.ts → derivative curve auto-display | status: partial",
-      "backwardPropPath": "Slope display events → derivative usage in TeachingEffectiveness (lineage) → teaching utility evaluation → DerivativeEvaluator precision refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "FSRSRetrievabilitySignal[] (DATA) -> ScaffoldEscalationLogic.reduce() -> tier -> ContentDeliveryResolver -> SpatialSignalling (tier 1-2) | SpeechBubble (tier 3-4)", "healthStatus": "partial", "gaps": ["Tier 1-2 spatial/3D cues not implemented"] },
+      "backwardPropPath": { "chain": "ScaffoldTierUsed event -> ContentEngagement.scaffoldLog -> tier effectiveness eval -> tier threshold refinement", "healthStatus": "partial", "gaps": ["scaffoldLog not implemented"] }
     },
-
     {
-      "id": "obj-jxg-action-01",
-      "name": "DragCascadeUpdate",
-      "ontologyType": "action-type",
-      "domain": "action",
-      "description": "ACTION: fires on every drag frame (board.on('update') or element.on('drag')) and triggers the full dependent element recomputation chain: (1) resolve new IntersectionPoints via IntersectionResolverInterface, (2) update CoordinateLabel text, (3) update FoldGeometry via AbsValueFoldComputer if functiongraph has |f(x)| shape, (4) push to TracePath, (5) fire BatchBoardUpdate for SVG repaint. Changes canvas state when executed.",
-      "provenance": "official",
-      "evidenceIds": ["ev-003", "ev-005"],
-      "relatedObjectIds": ["obj-jxg-logic-01", "obj-jxg-data-01", "obj-jxg-action-02"],
-      "primitive": "ObjectType (Action Type — DC5-06 default for action domain objects)",
-      "semanticHeuristic": "SH-03: Commits edits — triggers canvas mutations (element position updates, label text updates, SVG repaint) → ACTION",
-      "designPrinciples": {
-        "DDD": "Named 'DragCascadeUpdate' per drag interaction domain vocabulary.",
-        "DRY": "Single cascade action per drag frame. All N dependent elements updated within one board.on('update') or parent-point drag handler.",
-        "OCP": "DragCascadeUpdate closed to new element types — extending DependencyGraph is sufficient to add new dependents.",
-        "PECS": "Not directly applicable to action types."
+      "id": "obj-cd-13", "name": "PostprocessingCompatibility", "domain": "LOGIC",
+      "ontologyType": "Derived Property",
+      "description": "Compatibility matrix (derived fact): CSS overlay=no postprocessing interaction; CSS3D=EXCLUDED (architectural incompatibility confirmed); troika=compatible via OverrideMaterialManager; CanvasTexture=standard texture (compatible). Key insight: design quality controls cognitive load, not immersion level.",
+      "source": "src-ext-troika + src-ext-css3drenderer + src-ext-mayer-ar-2025", "primitive": "DerivedProperty",
+      "semanticHeuristic": "SH-03: Computes compatibility verdict per rendering approach — returns compatibility map (no side effects). Classification: LOGIC (derived reasoning over known technical facts).",
+      "evidenceIds": ["clm-ext-03", "clm-ext-12", "clm-ext-38", "clm-ext-27"],
+      "compatibilityMatrix": {
+        "CSSOverlay": { "postprocessingCompatible": true, "depthOcclusion": false, "verdict": "current, non-diegetic" },
+        "CSS3DRenderer": { "postprocessingCompatible": false, "depthOcclusion": false, "verdict": "EXCLUDED — architectural impossibility" },
+        "TroikaThreeText": { "postprocessingCompatible": true, "depthOcclusion": true, "verdict": "preferred for in-world text, requires OverrideMaterialManager workaround" },
+        "CanvasTexture": { "postprocessingCompatible": true, "depthOcclusion": true, "verdict": "suitable for static/infrequent labels" }
       },
-      "forwardPropPath": "DragCascadeUpdate (ontology) → DragCascadeContract: (event: DragEvent) => void → board.on('update') or parentPoint.on('drag') handler → canvas element position mutations | status: partial",
-      "backwardPropPath": "DragCascadeUpdate execution → frame timestamp + element update counts in InteractionTelemetry (lineage) → frame rate + cascade latency evaluation → BatchBoardUpdate strategy refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "designPrinciples": {
+        "DDD": "PASS — matrix names match Three.js API vocabulary",
+        "DRY": "PASS — single compatibility matrix; resolver reads it instead of duplicating checks",
+        "OCP": "PASS — new rendering approach added to matrix without changing existing entries",
+        "PECS": "PASS — ContentDeliveryResolver (consumer super) reads matrix; approach implementations (producer) extend"
+      },
+      "forwardPropPath": { "chain": "PostprocessingCompatibility matrix (LOGIC) -> ContentDeliveryResolver.resolve() filters CSS3D -> approach selection constrained to compatible options", "healthStatus": "healthy" },
+      "backwardPropPath": { "chain": "IncompatibilityDetected event (if CSS3D mistakenly used) -> EvaluationRecord -> resolver rule enforcement", "healthStatus": "partial", "gaps": ["Runtime incompatibility detection not implemented"] }
     },
-
     {
-      "id": "obj-jxg-action-02",
-      "name": "BatchBoardUpdate",
-      "ontologyType": "action-type",
-      "domain": "action",
-      "description": "ACTION: board.suspendUpdate() → mutate N elements → board.unsuspendUpdate() → single SVG repaint. Prevents N intermediate DOM reflows during cascade update. Critical for 60fps with 10+ interactive elements. isSuspendedRedraw flag prevents partial renders.",
-      "provenance": "official",
-      "evidenceIds": ["ev-004"],
-      "relatedObjectIds": ["obj-jxg-action-01"],
-      "primitive": "ObjectType (Action Type — DC5-06)",
-      "semanticHeuristic": "SH-03: board.unsuspendUpdate() commits all buffered mutations in a single SVG repaint — produces DOM side effects → ACTION",
+      "id": "obj-cd-14", "name": "EnterAdvancesBeat", "domain": "ACTION",
+      "ontologyType": "Action Type",
+      "description": "Current: Enter key handler progresses teaching beats. Correctly implements Mayer Segmenting and CLT learner-controlled pacing. KEEP — pedagogically validated.",
+      "source": "src-ext-mayer clm-ext-21", "primitive": "ActionType",
+      "semanticHeuristic": "SH-03: Commits edits — Enter key press CHANGES REALITY by advancing beat state. Classification: ACTION.",
+      "evidenceIds": ["clm-ext-21", "clm-ext-26"],
+      "verdict": "PRESERVE — Segmenting principle (learner-paced) is pedagogically correct. Adaptive pacing should EXTEND (auto-advance option), not replace Enter.",
       "designPrinciples": {
-        "DDD": "Named 'BatchBoardUpdate' per JSXGraph board API vocabulary (suspendUpdate/unsuspendUpdate).",
-        "DRY": "Single batch pattern — all N element mutations within one suspend/unsuspend block. No individual element.update() calls.",
-        "OCP": "New elements added to batch without modifying suspend/unsuspend call sites.",
-        "PECS": "Not applicable to action types."
+        "DDD": "PASS — 'EnterAdvancesBeat' matches game input domain vocabulary",
+        "DRY": "PASS — single entry point for beat advance",
+        "OCP": "PASS — adaptive auto-advance added as extension; Enter handler unchanged",
+        "PECS": "PASS — keyboard system (producer) provides Enter event; beat sequencer (consumer) advances"
       },
-      "forwardPropPath": "BatchBoardUpdate (ontology) → BatchUpdateContract: { suspend(): void; unsuspend(): void } → board.suspendUpdate()/unsuspendUpdate() in jsxGraphRenderer.ts → single SVG repaint | status: healthy",
-      "backwardPropPath": "BatchBoardUpdate execution → repaint timing in InteractionTelemetry (lineage) → repaint latency evaluation → batch grouping strategy refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "Enter key event (ACTION) -> beat state increment -> SpeechBubbleContent update -> renderer refresh", "healthStatus": "healthy" },
+      "backwardPropPath": { "chain": "BeatAdvanced event -> ContentEngagement.dwellTimeMs captured -> mastery correlation", "healthStatus": "partial", "gaps": ["dwell time per beat not currently measured"] }
     },
-
     {
-      "id": "obj-jxg-action-03",
-      "name": "AnnotationToggle",
-      "ontologyType": "action-type",
-      "domain": "action",
-      "description": "ACTION: activate/deactivate teaching overlay elements (CoordinateLabels, derivative display, fold boundary) by setting opacity function on JSXGraph text elements: { opacity: function(){ return teachingMode ? 1 : 0; } }. Changes element visibility state on canvas — a canvas reality mutation.",
-      "provenance": "official",
-      "evidenceIds": ["ev-007"],
-      "relatedObjectIds": ["obj-jxg-data-02"],
-      "primitive": "ObjectType (Action Type — DC5-06)",
-      "semanticHeuristic": "SH-03: Sets opacity on declared board elements — applies a canvas visibility mutation → ACTION",
+      "id": "obj-cd-15", "name": "SpeechBubbleFollow", "domain": "ACTION",
+      "ontologyType": "Action Type",
+      "description": "Current: Per-frame worldToScreen update for speech bubble CSS positioning. 717 LOC implementation with phase-based accent coloring, vocabulary reveal, key hints. Non-diegetic UIType.",
+      "source": "src-ext-css-overlay-current clm-ext-14", "primitive": "ActionType",
+      "semanticHeuristic": "SH-03: Commits edits — per-frame CSS transform mutation CHANGES REALITY (DOM style updates). Classification: ACTION.",
+      "evidenceIds": ["clm-ext-14", "clm-ext-15", "clm-ext-16"],
+      "limitations": ["Always renders on top of WebGL — no 3D depth occlusion", "Non-diegetic — breaks spatial immersion for Concrete CRA phase", "Per-frame DOM mutation overhead"],
       "designPrinciples": {
-        "DDD": "Named 'AnnotationToggle' per teaching-mode domain vocabulary.",
-        "DRY": "Single opacity function pattern shared across all annotation elements. teachingMode flag is the single control point.",
-        "OCP": "New annotation elements added to teaching overlay without modifying AnnotationToggle logic.",
-        "PECS": "Not applicable to action types."
+        "DDD": "PASS — 'SpeechBubbleFollow' matches game UI vocabulary",
+        "DRY": "PASS — single follow action, all phases use same mechanism",
+        "OCP": "PASS — follow action preserved; new approaches added via ContentDeliveryResolver without modifying it",
+        "PECS": "PASS — game-loop (producer) provides character position; speech-bubble.ts (consumer) applies transform"
       },
-      "forwardPropPath": "AnnotationToggle (ontology) → AnnotationContract: { toggle(mode: boolean): void } → opacity function update in board elements → JSXGraphCanvas visibility change | status: partial",
-      "backwardPropPath": "AnnotationToggle events → annotation state in TeachingEffectiveness (lineage) → teaching effectiveness evaluation → annotation strategy refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "Character position (DATA) -> SpeechBubbleFollow (ACTION) -> CSS transform -> visible speech bubble on screen", "healthStatus": "healthy" },
+      "backwardPropPath": { "chain": "No direct backward path — display-only action", "healthStatus": "healthy" }
     },
-
     {
-      "id": "obj-jxg-action-04",
-      "name": "TraceCurveRecord",
-      "ontologyType": "action-type",
-      "domain": "action",
-      "description": "ACTION: on each drag frame, append { ty, timestamp } to TracePath.frames array AND update the trace display curve's curve.dataX / curve.dataY arrays + call curve.update(). Produces a visual 'ghost trail' of where the function has been. Note: JSXGraph native Tracecurve requires Glider — this custom approach uses a plain Functiongraph curve with mutable dataX/dataY.",
-      "provenance": "synthesis",
-      "evidenceIds": ["ev-009"],
-      "relatedObjectIds": ["obj-jxg-data-07"],
-      "primitive": "ObjectType (Action Type — DC5-06)",
-      "semanticHeuristic": "SH-03: Appends to TracePath array AND mutates curve.dataX/dataY — produces persistent state side effects → ACTION",
+      "id": "obj-cd-16", "name": "AudioNarrationTrigger", "domain": "ACTION",
+      "ontologyType": "Action Type",
+      "description": "NEW: Beat advance triggers synchronized audio narration. Implements TemporalContiguity. Must respect Redundancy principle: audio replaces duplicate text (not additive).",
+      "source": "src-ext-mayer clm-ext-25 + clm-ext-22", "primitive": "ActionType",
+      "semanticHeuristic": "SH-03: Commits edits — triggering audio playback CHANGES REALITY (audio output state). Classification: ACTION.",
+      "evidenceIds": ["clm-ext-25", "clm-ext-22"],
+      "constraints": ["Redundancy principle: audio REPLACES duplicate text display, not adds to it", "TemporalContiguity: audio must start simultaneously with text/animation, not before/after"],
       "designPrinciples": {
-        "DDD": "Named 'TraceCurveRecord' per drag-history visualization vocabulary.",
-        "DRY": "Single record-and-update loop per drag frame. TracePath is the single source of truth for the trace data.",
-        "OCP": "TracePath extensible (add velocity) without modifying TraceCurveRecord core append logic.",
-        "PECS": "Not applicable to action types."
+        "DDD": "PASS — 'AudioNarrationTrigger' matches multimedia learning vocabulary",
+        "DRY": "PASS — single trigger action; not duplicated per interaction mode",
+        "OCP": "PASS — new TTS providers (Web Speech API vs pre-recorded) added without changing trigger interface",
+        "PECS": "PASS — beat advance event (producer) extends; AudioNarrationTrigger (consumer super) plays"
       },
-      "forwardPropPath": "TraceCurveRecord (ontology) → TraceContract: { record(frame: TraceFrame): void } → board.on('update') push logic → curve.dataX/dataY mutation → JSXGraphCanvas trace curve render | status: partial",
-      "backwardPropPath": "TracePath data → drag path in InteractionTelemetry (lineage) → trace density evaluation → TraceCurveRecord sampling rate refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "BeatAdvanced event (ACTION) -> AudioNarrationTrigger -> AudioNarrationSegment playback synchronized with SpeechBubbleContent display", "healthStatus": "partial", "gaps": ["Audio narration not yet implemented"] },
+      "backwardPropPath": { "chain": "NarrationCompleted event -> ContentEngagement.narrationCompletionRate -> redundancy violation detection", "healthStatus": "partial", "gaps": ["NarrationCompleted event not defined"] }
     },
-
     {
-      "id": "obj-jxg-action-05",
-      "name": "AbsFoldVisualizationUpdate",
-      "ontologyType": "action-type",
-      "domain": "action",
-      "implementationStatus": "partial — PR #90 merged: fold-AWARE DRAG implemented in jsxGraphRenderer.ts (translate-source-before-outer-abs). REMAINING: fold LINE visualization (ghost curve y=-(f_raw(x)+ty), reflection guide, fold boundary x-line) not yet rendered as separate board elements.",
-      "description": "ACTION: When DragState.ty changes, recompute FoldGeometry via AbsValueFoldComputer and update the four canvas elements: (1) primary f(x)+ty curve via shared ty closure [PR #90: DONE], (2) abs curve Math.abs(f_raw(x)+ty) via shared ty closure [PR #90: DONE], (3) reflection guide dashed curve y=-(f_raw(x)+ty) for negative region [STILL NEEDED], (4) fold boundary x-line position [STILL NEEDED]. All four share the same ty reference — a single ty update triggers all four via BoardUpdate.",
-      "provenance": "synthesis",
-      "evidenceIds": ["ev-006"],
-      "relatedObjectIds": ["obj-jxg-data-05", "obj-jxg-logic-02"],
-      "primitive": "ObjectType (Action Type — DC5-06)",
-      "semanticHeuristic": "SH-03: Updates four canvas board elements — commits fold geometry mutations when executed → ACTION",
+      "id": "obj-cd-17", "name": "TroikaTextSync", "domain": "ACTION",
+      "ontologyType": "Action Type",
+      "description": "NEW: Async SDF text update via .sync(callback). Web worker generates SDF atlas off main thread. Must preloadFont() for Korean/math characters to prevent first-render latency. Beat-advance guard must await sync before displaying.",
+      "source": "src-ext-troika clm-ext-05 + clm-ext-06", "primitive": "ActionType",
+      "semanticHeuristic": "SH-03: Commits edits — syncing troika text CHANGES REALITY by updating Text mesh geometry in Three.js scene. Classification: ACTION.",
+      "evidenceIds": ["clm-ext-05", "clm-ext-06"],
+      "criticalConstraint": "Beat-advance guard in game-loop.ts must check sync state — Text mesh must not be shown until sync(callback) fires. preloadFont() at scene init prevents first-beat latency.",
       "designPrinciples": {
-        "DDD": "Named 'AbsFoldVisualizationUpdate' per absolute value fold teaching vocabulary.",
-        "DRY": "Single ty closure shared across all four curve functions — zero duplication of fold state.",
-        "OCP": "New fold visual layers (add CurveIntersection region shading) without modifying ty closure or fold computer.",
-        "PECS": "Not applicable to action types."
+        "DDD": "PASS — 'sync' is troika-three-text domain vocabulary",
+        "DRY": "PASS — single sync strategy reused across all Text instances",
+        "OCP": "PASS — callback-based design; sync mechanism replaceable without breaking callers",
+        "PECS": "PASS — web worker (producer) provides sync completion; game-loop beat advance guard (consumer) awaits"
       },
-      "forwardPropPath": "AbsFoldVisualizationUpdate (ontology) → FoldUpdateContract: (ty: number) => void → jsxGraphRenderer.ts curve function updates → ghost curve + boundary line board elements | status: partial",
-      "backwardPropPath": "Fold update events → fold display timing in InteractionTelemetry → fold render latency evaluation → ty closure update strategy refinement | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "SpeechBubbleContent update (DATA) -> TroikaTextSync (ACTION) -> Text mesh geometry updated in Three.js scene -> postprocessing renders updated text", "healthStatus": "partial", "gaps": ["Beat-advance sync guard not yet in game-loop.ts", "gap g-02: Three.js 0.183.x troika compatibility unverified"] },
+      "backwardPropPath": { "chain": "TextSyncLatency event -> RenderTelemetry.syncLog -> preloadFont character set expansion if latency > threshold", "healthStatus": "partial", "gaps": ["Sync latency not currently measured"] }
     },
-
     {
-      "id": "obj-jxg-security-01",
-      "name": "InputSanitization",
-      "ontologyType": "object-type",
-      "domain": "security",
-      "description": "XSS trust boundary: LaTeX → JS function compilation via new Function(body) in latexToJSXGraph.ts. Governs which LaTeX strings may be compiled to executable JavaScript. Critical boundary: user-supplied LaTeX expressions become live code. Must validate that compiled functions don't escape the mathematical evaluation context (no DOM manipulation, no fetch calls).",
-      "provenance": "official",
-      "evidenceIds": [],
-      "relatedObjectIds": [],
-      "primitive": "ObjectType (Permission/Security boundary — DC5-06)",
-      "semanticHeuristic": "SH-04: Governs WHO (which LaTeX expressions) may cross the trust boundary into executable JavaScript → SECURITY",
+      "id": "obj-cd-18", "name": "SpatialSignalling", "domain": "ACTION",
+      "ontologyType": "Action Type",
+      "description": "NEW: 3D visual highlights (emissive glow, particle trails, scale pulses) anchored to referenced math objects. Implements Mayer Signalling Principle. Directs attention WITHOUT adding text — lower cognitive load path for object attention.",
+      "source": "src-ext-mayer clm-ext-24", "primitive": "ActionType",
+      "semanticHeuristic": "SH-03: Commits edits — applying glow/particle effects CHANGES REALITY (mutates Object3D material emissive, particle system). Classification: ACTION.",
+      "evidenceIds": ["clm-ext-24", "clm-ext-25"],
+      "animationTypes": { "glow": "emissive intensity pulse", "particleTrail": "spatial path from label to object", "scalePulse": "brief scale animation when object referenced", "colorFlash": "material color flash for success/error" },
       "designPrinciples": {
-        "DDD": "Named 'InputSanitization' per security boundary vocabulary. Maps to latexToJSXGraph.ts compile-time validation.",
-        "DRY": "Single compilation path — all LaTeX expressions go through one sanitization point (200-entry LRU cache).",
-        "OCP": "Validation rules extensible (add new forbidden patterns) without modifying compilation pipeline.",
-        "PECS": "Not applicable to security boundaries."
+        "DDD": "PASS — Signalling is Mayer's published principle name",
+        "DRY": "PASS — single signalling action, reused across all VT dimensions and interaction modes",
+        "OCP": "PASS — new signal types (haptic, audio) added without modifying existing glow/particle logic",
+        "PECS": "PASS — SpeechBubbleContent.referencedObjectId (producer) extends; SpatialSignalling (consumer super) applies glow"
       },
-      "forwardPropPath": "InputSanitization (ontology) → LaTeXSanitizationContract: { compile(latex: string): Result<Function, Error> } → latexToJSXGraph.ts compile-time check → jsxGraphRenderer.ts safe function usage | status: partial",
-      "backwardPropPath": "Compilation errors → error pattern in InteractionTelemetry (lineage) → XSS surface evaluation → sanitization rule refinement | status: partial",
-      "provenanceNote": "[Official] — LaTeX → new Function() pattern confirmed in latexToJSXGraph.ts (src/lib/latexToJSXGraph.ts). XSS risk is an inference from new Function() usage.",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "SpeechBubbleContent.referencedObjectId (DATA) -> SpatialSignalling (ACTION) -> Object3D emissive/particle mutation -> visible glow on math object in 3D world", "healthStatus": "partial", "gaps": ["SpeechBubbleContent does not yet have referencedObjectId field", "Three.js particle system for trails not designed"] },
+      "backwardPropPath": { "chain": "SignalApplied event -> ContentEngagement.attentionLog -> CTML Signalling compliance eval -> signal intensity refinement", "healthStatus": "partial", "gaps": ["attentionLog not defined"] }
     },
-
     {
-      "id": "obj-jxg-learn-01",
-      "name": "InteractionTelemetry",
-      "ontologyType": "audit-record",
-      "domain": "learn",
-      "description": "LEARN audit record capturing: (1) drag events (elementId, ty delta, timestamp), (2) intersection discoveries (IntersectionPoint coords, solver iterations, appeared/disappeared), (3) frame timing (dragFrame duration, repaint duration), (4) annotation usage (which CoordinateLabels visible, toggle events). Used by evaluator for frame rate evaluation, solver accuracy evaluation, and teaching effectiveness evaluation.",
-      "provenance": "synthesis",
-      "evidenceIds": ["ev-003"],
-      "relatedObjectIds": ["obj-jxg-action-01", "obj-jxg-learn-02"],
-      "primitive": "ObjectType (Audit Record — DC5-06 LEARN default)",
-      "semanticHeuristic": "SH-05: Captures WHAT HAPPENED (drag events), WHEN (timestamps), THROUGH WHICH action (DragCascadeUpdate), WHAT WAS LEARNED (frame rate, solver accuracy) → LEARN",
-      "designPrinciples": {
-        "DDD": "Named 'InteractionTelemetry' per canvas interaction observability vocabulary.",
-        "DRY": "Single telemetry record per session. DragCascadeUpdate, BatchBoardUpdate, and IntersectionResolver all append to the same record via event.type discriminator.",
-        "OCP": "New event types (fold updates, annotation toggles) extend LogEntry schema without modifying telemetry capture logic.",
-        "PECS": "Not applicable to audit types."
+      "id": "obj-cd-19", "name": "ContentEngagement", "domain": "LEARN",
+      "ontologyType": "Audit Record",
+      "description": "NEW: Track content delivery effectiveness per beat — dwell time, interaction depth per scaffold tier, narration completion rate, rendering approach used, VT dimension, CRA phase, FSRS R at delivery.",
+      "source": "src-int-fde clm-int-05", "primitive": "Struct",
+      "semanticHeuristic": "SH-05: Captures WHAT HAPPENED (which approach was used, how long learner spent, what interaction depth) and WHY (R value, VT dimension context). Classification: LEARN.",
+      "evidenceIds": ["clm-int-04", "clm-int-05", "clm-ext-35"],
+      "properties": {
+        "sessionId": "string", "beatIndex": "number", "approachUsed": "ContentRenderingApproach",
+        "uiType": "UIType", "craPhase": "CRAPhase", "vtDimension": "VTDimension",
+        "dwellTimeMs": "number", "interactionDepth": "Passive | Active | Deep",
+        "fsrsR": "number", "scaffoldTierUsed": "1 | 2 | 3 | 4 | null",
+        "masteryGainedAfterBeat": "boolean | null"
       },
-      "forwardPropPath": "InteractionTelemetry (ontology) → TelemetryContract: { record(event: TelemetryEvent): void } → telemetry capture hook in board.on('update') → evaluation pipeline input | status: partial",
-      "backwardPropPath": "Telemetry records → lineage entries (lineage) → frame rate + solver precision + annotation utility evaluation → DragBehaviorInterface / IntersectionResolverInterface / CoordinateLabel refinement proposals | status: partial",
-      "session": "jsxgraph-sequencer-001"
+      "designPrinciples": {
+        "DDD": "PASS — learning analytics vocabulary",
+        "DRY": "PASS — consolidates MiniHudTelemetry + new content delivery fields into single record",
+        "OCP": "PASS — new metrics (gaze, emotion) added without changing existing fields",
+        "PECS": "PASS — game-loop (producer) emits; eval-runner (consumer) reads"
+      },
+      "forwardPropPath": { "chain": "ContentEngagement (LEARN) -> eval-results.json -> RenderingApproachEvaluation -> ContentDeliveryResolver rule refinement", "healthStatus": "partial", "gaps": ["game-loop emit point not implemented", "telemetry type not in src/types/"] },
+      "backwardPropPath": { "chain": "ContentEngagement IS the lineage record — self-referential backward path. dwellTimeMs + masteryGained -> approach effectiveness scoring", "healthStatus": "healthy" }
     },
-
     {
-      "id": "obj-jxg-learn-02",
-      "name": "TeachingEffectiveness",
-      "ontologyType": "object-type",
-      "domain": "learn",
-      "description": "LEARN feedback signal: { sessionId, annotationsUsed: string[], totalDragFrames: number, intersectionDiscoveries: number, teachingModeEngagements: number, studentAttentionHeuristic: 'high'|'medium'|'low' }. Aggregates session-level signals about which teaching features drove engagement. Informs CoordinateLabel placement, annotation density, and fold visualization design refinements.",
-      "provenance": "inference",
-      "evidenceIds": [],
-      "relatedObjectIds": ["obj-jxg-learn-01", "obj-jxg-action-03"],
-      "primitive": "ObjectType (Feedback Signal — DC5-06 LEARN default)",
-      "semanticHeuristic": "SH-05: Captures WHAT WAS LEARNED from teaching usage (which features engaged students) — pure LEARN feedback, not a canvas state fact → LEARN",
+      "id": "obj-cd-20", "name": "FSRSScheduling", "domain": "LEARN",
+      "ontologyType": "Audit Record",
+      "description": "Existing: ts-fsrs 5.3.1 (FSRS-5/6) spaced repetition. Tracks retrievability (R: 0-1) and stability (S: days). Content delivery enrichment should feed FSRS with richer interaction signals beyond current binary rating.",
+      "source": "package.json ts-fsrs", "primitive": "DerivedProperty",
+      "semanticHeuristic": "SH-05: FSRSReviewLog captures WHAT HAPPENED (review outcome, R/S update) and WHAT WAS LEARNED (mastery trend). Classification: LEARN.",
+      "evidenceIds": ["clm-ext-37"],
+      "enrichmentOpportunity": "Low-R concepts (R < 0.4) should trigger reinforcement delivery mode in ContentDeliveryResolver. Currently R is used only for scheduling, not for content intensity control.",
       "designPrinciples": {
-        "DDD": "Named 'TeachingEffectiveness' per educational feedback domain vocabulary.",
-        "DRY": "Single aggregate per session. InteractionTelemetry is the raw log; TeachingEffectiveness is the derived summary.",
-        "OCP": "New effectiveness metrics extensible without modifying existing feedback schema.",
-        "PECS": "Not applicable to feedback signals."
+        "DDD": "PASS — FSRS domain vocabulary (retrievability, stability) preserved",
+        "DRY": "PASS — single scheduling system; content delivery reads existing R signal",
+        "OCP": "PASS — FSRS-7 upgrade adds fields without breaking content delivery consumer",
+        "PECS": "PASS — ts-fsrs (producer) extends FSRSRetrievabilitySignal; ScaffoldEscalationLogic (consumer super) reads R"
       },
-      "forwardPropPath": "TeachingEffectiveness (ontology) → TeachingFeedbackContract → post-session aggregation pipeline → CoordinateLabel/AnnotationToggle refinement proposals | status: partial",
-      "backwardPropPath": "TeachingEffectiveness signal → LEARN refinement proposal (refinement) → CoordinateLabel placement + AnnotationToggle strategy update (ontology update) → forward prop restart | status: partial",
-      "provenanceNote": "[Inference] — no direct evidence source for teaching effectiveness metric design. Derived from §ARCH-05 LEARN loop requirement and TeachingAnnotation gap in decision-log.",
-      "session": "jsxgraph-sequencer-001"
+      "forwardPropPath": { "chain": "FSRSReviewLog (LEARN) -> R/S values -> ScaffoldEscalationLogic (LOGIC) -> ContentDeliveryResolver -> content intensity modulation", "healthStatus": "partial", "gaps": ["gap g-03: R-to-content-intensity mapping not designed"] },
+      "backwardPropPath": { "chain": "ContentEngagement.masteryGainedAfterBeat -> FSRSReviewLog cross-reference -> R trajectory trend -> schedule refinement", "healthStatus": "partial", "gaps": ["Cross-reference between ContentEngagement and FSRSReviewLog not implemented"] }
+    },
+    {
+      "id": "obj-cd-21", "name": "ResearchGapRegistry", "domain": "LEARN",
+      "ontologyType": "Audit Record",
+      "description": "Registry of 3 identified research gaps constraining recommendation confidence. g-01: No FPS benchmark for troika+n8ao+postprocessing on WebGL2. g-02: troika Three.js 0.183.x compatibility unconfirmed. g-03: FSRS-driven adaptive pacing implementation patterns not researched.",
+      "source": "researcher gap analysis", "primitive": "Struct",
+      "semanticHeuristic": "SH-05: Captures WHAT WAS LEARNED about the limits of current evidence. Classification: LEARN.",
+      "evidenceIds": ["clm-ext-19", "clm-ext-07", "clm-ext-37"],
+      "gaps": [
+        { "id": "g-01", "severity": "high", "description": "No FPS benchmark for troika-three-text + n8ao + postprocessing 6.36.7 on WebGL2. Fragment shader cost unmeasured.", "affectedDecision": "TroikaText adoption for real-time beat content", "resolution": "Prototype FPS benchmark in T7/T8" },
+        { "id": "g-02", "severity": "medium", "description": "troika-three-text Three.js 0.183.x explicit compatibility not confirmed.", "affectedDecision": "TroikaThreeTextConfig integration", "resolution": "Install troika@0.52.4 + Three.js 0.183.2 and run tsc in prototype worktree" },
+        { "id": "g-03", "severity": "medium", "description": "FSRS retrievability-driven adaptive pacing implementation patterns not researched.", "affectedDecision": "AdaptivePacingController design", "resolution": "Additional external research or prototype implementation experiment" }
+      ],
+      "designPrinciples": {
+        "DDD": "PASS — gap vocabulary matches research pipeline standards",
+        "DRY": "PASS — consolidated registry, not scattered across notes",
+        "OCP": "PASS — new gaps added without changing existing structure",
+        "PECS": "N/A — registry record"
+      },
+      "forwardPropPath": { "chain": "ResearchGapRegistry (LEARN) -> gap severity influences RenderingApproachEvaluation.confidence -> evaluator gate R1 (low-tier dependency check)", "healthStatus": "healthy" },
+      "backwardPropPath": { "chain": "GapResolved event (after prototype benchmark) -> ResearchGapRegistry updated -> affected decisions re-evaluated -> confidence upgraded", "healthStatus": "healthy" }
     }
-
   ],
-
-  "codebaseRefs": {
-    "session": "jsxgraph-sequencer-001",
-    "existingFiles": {
-      "canvas": "src/components/graph/JSXGraphCanvas.tsx (400 LOC)",
-      "renderer": "src/lib/jsxGraphRenderer.ts (1000+ LOC) — PR #90: fold-aware drag rendering added",
-      "dragSemantics": "src/lib/functiongraphDragSemantics.ts — PR #90: translate-source-before-outer-abs added",
-      "graphFamily": "src/lib/graphFamily.ts — PR #90: outer-absolute recognition added",
-      "intersection": "src/lib/autoIntersectionVisibility.ts — static intersection state machine",
-      "dataTypes": "src/types/seq-data.ts (750+ LOC)",
-      "ontologyData": "ontology/data.ts — PR #90: change routing updated",
-      "ontologyContracts": "ontology/changeContracts.ts — PR #90: change routing updated",
-      "dragSemanticsTests": "src/lib/functiongraphDragSemantics.test.ts — PR #90: new tests, Playwright-verified"
-    },
-    "remainingGapFiles": [
-      "src/lib/autoIntersectionVisibility.ts — intersection points still static (not real-time during drag)",
-      "JSXGraphCanvas.tsx — no dynamic coordinate labels on IntersectionPoints",
-      "jsxGraphRenderer.ts — fold ghost curve, reflection guide, fold boundary line not yet rendered"
+  "domains": {
+    "data": ["obj-cd-01", "obj-cd-02", "obj-cd-03", "obj-cd-04", "obj-cd-05", "obj-cd-06", "obj-cd-07"],
+    "logic": ["obj-cd-08", "obj-cd-09", "obj-cd-10", "obj-cd-11", "obj-cd-12", "obj-cd-13"],
+    "action": ["obj-cd-14", "obj-cd-15", "obj-cd-16", "obj-cd-17", "obj-cd-18"],
+    "security": [],
+    "learn": ["obj-cd-19", "obj-cd-20", "obj-cd-21"]
+  },
+  "objectCount": { "data": 7, "logic": 6, "action": 5, "security": 0, "learn": 3, "total": 21 },
+  "forwardPropagation": {
+    "healthStatus": "partial",
+    "summary": "Core DATA->LOGIC->ACTION chain is structurally designed. Critical gaps: resolver.ts not yet implemented, troika postprocessing workaround not applied, SpatialAnnotation surfaces don't exist. CSS3DRenderer excluded path is broken by design (correct).",
+    "paths": [
+      {
+        "id": "fp-01",
+        "name": "Teaching Content → Rendering Pipeline",
+        "chain": "TeachingBeat (DATA) -> ContentDeliveryResolver.resolve(CRA, VT, R) (LOGIC) -> SpeechBubbleContent dispatch -> speech-bubble.ts | TroikaText scene mesh | SpatialAnnotation",
+        "healthStatus": "partial",
+        "gaps": ["ContentDeliveryResolver (resolver.ts) does not yet exist", "TroikaText path requires OverrideMaterialManager workaround"]
+      },
+      {
+        "id": "fp-02",
+        "name": "CSS3DRenderer Exclusion Path",
+        "chain": "PostprocessingCompatibility matrix (LOGIC) -> CSS3DRenderer excluded from ContentDeliveryResolver options",
+        "healthStatus": "healthy",
+        "note": "Architectural exclusion is correct behavior — postprocessing incompatibility is confirmed"
+      },
+      {
+        "id": "fp-03",
+        "name": "FSRS Adaptive Pacing",
+        "chain": "FSRSScheduling.R (LEARN) -> ScaffoldEscalationLogic.reduce() (LOGIC) -> tier -> ContentDeliveryResolver -> SpatialSignalling | SpeechBubble",
+        "healthStatus": "partial",
+        "gaps": ["gap g-03: R-to-content-intensity mapping not designed", "ScaffoldEscalationLogic not yet implemented"]
+      },
+      {
+        "id": "fp-04",
+        "name": "Audio Narration Pipeline",
+        "chain": "TeachingBeat.audioNarrationUrl (DATA) -> AudioNarrationTrigger (ACTION) -> AudioNarrationSegment playback synchronized with content display",
+        "healthStatus": "partial",
+        "gaps": ["AudioNarrationSegment not yet in types", "audio not implemented"]
+      },
+      {
+        "id": "fp-05",
+        "name": "CTML Validation Gate",
+        "chain": "SpeechBubbleContent (DATA) -> MayerPrincipleChecker (LOGIC) -> CognitiveLoadGuard (LOGIC) -> ContentDeliveryResolver.validate() -> render blocked if violation",
+        "healthStatus": "partial",
+        "gaps": ["MayerPrincipleChecker not implemented", "current CRA Concrete phase VIOLATES SpatialContiguity — text bubble instead of spatial annotation on object"]
+      }
     ]
   },
-
-  "propagation": {
-    "session": "jsxgraph-sequencer-001",
-    "forwardPropStatus": "partial",
-    "backwardPropStatus": "partial",
-
-    "forwardPropPath": {
-      "description": "ontology → contracts → backend renderer → frontend canvas",
-      "steps": [
-        "IntersectionResolverInterface + IntersectionPoint (ontology) → IntersectionResolverContract type + IntersectionCoordinate Struct in seq-data.ts (contract) → jsxGraphRenderer.ts: board.create('intersection') or JXG.Math.Numerics.root() adapter (backend renderer) → JSXGraphCanvas board.update() live IntersectionPoint display (frontend canvas)",
-        "DragBehaviorInterface + DragState (ontology) → DragBehaviorContract extension in functiongraphDragSemantics.ts (contract) → family dispatch in element.on('drag') or parentPoint drag handler (backend renderer) → canvas functiongraph position update (frontend canvas)",
-        "AbsValueFoldComputer + FoldGeometry (ontology) → FoldGeometry type + FoldComputerContract in seq-data.ts (contract) → jsxGraphRenderer.ts abs curve + ghost curve + fold boundary (backend renderer) → AbsValueFoldVisualization canvas elements (frontend canvas)",
-        "DragStateReducer primitive (ontology) → DragStateContract: { reduce(events): DragState } in functiongraphDragSemantics.ts (contract) → board.on('update') ty accumulation (backend renderer) → canvas drag state (frontend canvas)"
-      ],
-      "healthStatus": "partial",
-      "gaps": [
-        "IntersectionResolverContract interface not yet declared in src/types/seq-data.ts — STILL NEEDED",
-        "DragBehaviorInterface formal contract not yet added to functiongraphDragSemantics.ts (PR #90 adds AbsDragBehavior impl but not the typed interface) — STILL NEEDED",
-        "FoldGeometry Struct type not yet declared in seq-data.ts — STILL NEEDED (fold ghost curve + boundary not yet rendered)",
-        "TeachingEffectiveness telemetry capture hook not yet declared in jsxGraphRenderer.ts — STILL NEEDED",
-        "[PR #90 CLOSES] AbsDragBehavior ACTION path: translate-source-before-outer-abs implemented in functiongraphDragSemantics.ts + jsxGraphRenderer.ts",
-        "[PR #90 CLOSES] GraphFamilyProfile outer-abs classification: graphFamily.ts updated"
-      ]
-    },
-
-    "backwardPropPath": {
-      "description": "drag events → interaction lineage → evaluation → refinement → ontology updates",
-      "steps": [
-        "DragCascadeUpdate ACTION fires → drag frame timestamp + ty delta + element update count → InteractionTelemetry.dragFrames (lineage) → frame rate + cascade latency evaluation → DragBehaviorInterface implementation refinement (refinement) → DragBehaviorInterface algorithm note update (ontology)",
-        "IntersectionResolverInterface output → solver iteration count → InteractionTelemetry.intersectionEvents (lineage) → warmStart effectiveness + solver precision evaluation → IntersectionResolverInterface algorithm strategy refinement (refinement) → implementation guide update (ontology)",
-        "AnnotationToggle ACTION fires → annotation visibility state → TeachingEffectiveness.annotationsUsed (lineage) → teaching effectiveness evaluation → CoordinateLabel placement/format refinement (refinement) → CoordinateLabel DATA entity update (ontology)"
-      ],
-      "healthStatus": "partial",
-      "gaps": [
-        "InteractionTelemetry capture hook not yet implemented in board.on('update') handler",
-        "Evaluation function schemas for frame rate + solver precision not yet specified (blocked on T6 simulator)",
-        "TeachingEffectiveness aggregation pipeline not yet declared"
-      ]
-    }
+  "backwardPropagation": {
+    "healthStatus": "partial",
+    "summary": "ContentEngagement record design is solid. Game-loop emit point and telemetry type definitions not yet implemented. FSRS backward path exists but enrichment linkage (R->content-intensity) is gap g-03.",
+    "paths": [
+      {
+        "id": "bp-01",
+        "name": "Content Delivery Effectiveness Feedback",
+        "chain": "ContentEngagement (LEARN) <- game-loop beat events -> RenderingApproachEvaluation -> ContentDeliveryResolver rule refinement",
+        "healthStatus": "partial",
+        "gaps": ["ContentEngagement not emitted by game-loop", "auto-refinement path not implemented"]
+      },
+      {
+        "id": "bp-02",
+        "name": "CTML Compliance Signal",
+        "chain": "CTMLPrincipleViolation events -> EvaluationRecord -> content design refinement",
+        "healthStatus": "partial",
+        "gaps": ["Automated CTML violation detection not in eval suite"]
+      },
+      {
+        "id": "bp-03",
+        "name": "FSRS Mastery Loop",
+        "chain": "FSRSReviewLog.R update -> ScaffoldEscalationLogic tier adjustment -> ContentDeliveryResolver approach change -> next session delivery",
+        "healthStatus": "partial",
+        "gaps": ["gap g-03: R-to-delivery-mode mapping rule not defined"]
+      },
+      {
+        "id": "bp-04",
+        "name": "Research Gap Resolution",
+        "chain": "ResearchGapRegistry (LEARN) -> prototype FPS benchmark (g-01) -> TroikaText confidence update -> resolver adoption with reduced risk",
+        "healthStatus": "partial",
+        "gaps": ["Prototype benchmark (T7/T8) is the critical next step to close g-01"]
+      }
+    ]
   },
-
-  "primitives": [
-    {
-      "type": "Interface",
-      "name": "IntersectionResolverInterface",
-      "objectId": "obj-jxg-logic-01",
-      "rationale": "Two competing solver implementations (NativeIntersection vs NewtonRaphson) share one call site. OCP: swap solvers without modifying IntersectionPoint entity or DragCascadeUpdate action."
-    },
-    {
-      "type": "Interface",
-      "name": "DragBehaviorInterface",
-      "objectId": "obj-jxg-logic-03",
-      "rationale": "Per-family drag semantics (Linear/Quadratic/Abs/Piecewise) share one dispatch call. OCP: new families as new implementations. DDD: named per graphFamily.ts domain vocabulary."
-    },
-    {
-      "type": "Struct",
-      "name": "IntersectionCoordinate",
-      "description": "{ x: number, y: number } — value type output of IntersectionResolverInterface. No identity, just the coordinate pair.",
-      "rationale": "DC5-06 Struct for compound value output. No identity needed — IntersectionPoint ObjectType has identity."
-    },
-    {
-      "type": "Struct",
-      "name": "FoldGeometry",
-      "objectId": "obj-jxg-data-05",
-      "rationale": "DC5-06 Struct for fold shape description. Four visual layers (primary, abs, ghost, boundary) all share this one value type without requiring identity."
-    },
-    {
-      "type": "Reducer",
-      "name": "DragStateReducer",
-      "description": "DC5-06 Reducer: canonical focus value = current DragState (ty, tx); preserved history = TracePath.frames. Collapses drag frame stream into current authoritative drag state.",
-      "rationale": "Exactly models DC5-06 'collapse multi-value property histories into canonical focus value while preserving history'. Drag frames are history; current ty is the canonical focus."
-    },
-    {
-      "type": "Derived Property",
-      "name": "intersectionCoords",
-      "description": "Derived from [fg1, fg2] current functiongraph state → IntersectionCoordinate[]. Auto-derives as parent functiongraph positions change.",
-      "rationale": "DC5-06 Derived Property: computed from other ontology entities, not stored independently. In H-A: JSXGraph native _dep system handles this. In H-B: explicit re-derivation in board.on('update')."
-    },
-    {
-      "type": "Derived Property",
-      "name": "foldBoundaryX",
-      "description": "Derived from f_raw + ty → x[] where f_raw(x)+ty=0. Computed by AbsValueFoldComputer as part of FoldGeometry.",
-      "rationale": "DC5-06 Derived Property: foldBoundaryX values are derived from functiongraph parameters, not stored. Change when ty changes via drag."
-    },
-    {
-      "type": "Object-Backed Link Type",
-      "name": "FunctiongraphToIntersection",
-      "description": "Links FunctiongraphScene elements (source) to IntersectionPoint entities (target) with payload: { index: number, solverType: 'native'|'newton', warmStartX: number }.",
-      "rationale": "DC5-06 Object-Backed Link Type: the relationship between a functiongraph and its intersection points has data (solver type, index) that belongs on the link itself, not on either endpoint entity."
-    }
-  ],
-
-  "designPrinciplesApplied": {
-    "session": "jsxgraph-sequencer-001",
-    "DDD": "All 15 objects named per domain vocabulary: JSXGraph API names (IntersectionPoint, CoordinateLabel, BatchBoardUpdate, Tracecurve), mathematical vocabulary (FoldGeometry, AbsValueFoldComputer, DerivativeEvaluator), DC5-06 primitive names (DragBehaviorInterface, DragStateReducer). No invented abstractions. DDD partially violated in Hypothesis B architecture ('board observer' is non-standard vocabulary — flagged in hypothesis).",
-    "DRY": "Rule of three applied: (1) IntersectionResolverInterface abstracts NativeIntersection + NewtonRaphson — prevents two separate solver call sites. (2) ty closure shared across four AbsFoldVisualization curve functions. (3) DragBehaviorInterface prevents per-family duplication in drag handler. DRY NOT yet triggered for CoordinateLabel (only 1 label type so far).",
-    "OCP": "All 5 Interfaces/Structs declared as extension points: IntersectionResolverInterface (add new solvers), DragBehaviorInterface (add new families), FoldGeometry (add new visual layers), DependencyGraph (add new element edges), TeachingEffectiveness (add new metrics). Confirmed for all 15 objects.",
-    "PECS": "Applied to IntersectionResolverInterface: consumes [JXG.Curve, JXG.Curve] (super — abstract curve type), produces IntersectionCoordinate (extends — specific {x,y} result). Applied to DragBehaviorInterface: consumes DragEvent (super), produces DragState (extends). Applied to AbsValueFoldComputer: consumes (f_raw: Function, ty: number) (super), produces FoldGeometry (extends). Not directly applicable to action types or audit records."
-  },
-
-  "securityConcerns": [
-    {
-      "id": "sec-jxg-01",
-      "concern": "InputSanitization: new Function() compilation in latexToJSXGraph.ts creates XSS attack surface — malicious LaTeX input could compile to DOM-manipulating JS",
-      "severity": "high",
-      "evidenceId": null,
-      "session": "jsxgraph-sequencer-001",
-      "mitigation": "Existing 200-entry LRU cache. Should add explicit allowlist validation of compiled function output before execution."
-    }
-  ]
+  "devcon5Analysis": {
+    "ddd": [
+      { "object": "ContentDeliveryResolver", "analysis": "Maps CRA/VT domain concepts to rendering decisions — domain vocabulary (Concrete, Separation) not tech vocabulary (troika vs CSS)." },
+      { "object": "ScaffoldEscalationLogic", "analysis": "Domain terms: nudge, visual hint, worked example, direct instruction — pedagogical escalation language preserved." },
+      { "object": "MayerPrincipleChecker", "analysis": "Mayer's published principle names (SpatialContiguity, Segmenting, Coherence, Signalling, TemporalContiguity) preserved exactly." },
+      { "object": "VTDimensionMapping (in ContentDeliveryResolver)", "analysis": "Contrast, Separation, Generalization, Fusion, Integration — exact Variation Theory vocabulary." }
+    ],
+    "dry": [
+      { "object": "ContentDeliveryResolver", "analysis": "Single dispatch eliminates per-beat approach selection scattered in game-loop." },
+      { "object": "MayerPrincipleChecker", "analysis": "Single checker referenced by resolver, content design rules, and eval criteria — not duplicated per principle." },
+      { "object": "ContentEngagement", "analysis": "Consolidates MiniHudTelemetry + new content delivery telemetry into single record — no parallel truth sources." },
+      { "object": "PostprocessingCompatibility", "analysis": "Single compatibility matrix — resolver reads it; approach implementations don't duplicate compatibility checks." }
+    ],
+    "ocp": [
+      { "object": "ContentDeliveryResolver", "analysis": "Open for new approach variants (WebGPU text); closed for modification — existing speech bubble path unchanged." },
+      { "object": "ScaffoldEscalationLogic", "analysis": "Tier 0 (proactive encouragement) addable without modifying existing 4-tier logic." },
+      { "object": "SpatialSignalling", "analysis": "New signal types (haptic, sound) added via animationTypes enum; existing glow/particle implementations unchanged." },
+      { "object": "ResearchGapRegistry", "analysis": "New gaps added without changing existing gap structure." }
+    ],
+    "pecs": [
+      { "object": "FSRSRetrievabilitySignal -> ScaffoldEscalationLogic", "analysis": "ts-fsrs (producer) extends with R/S values; ScaffoldEscalationLogic (consumer super) reads R — new FSRS-7 fields don't break consumer." },
+      { "object": "TeachingBeat -> ContentDeliveryResolver", "analysis": "Planet content (producer) extends TeachingBeat with new fields (audioNarrationUrl, spatialAnnotations); ContentDeliveryResolver (consumer super) reads via interface — additive, not breaking." },
+      { "object": "SpeechBubbleContent -> rendering surfaces", "analysis": "game-loop (producer) extends SpeechBubbleContent with referencedObjectId; speech-bubble.ts/diegetic-panel.ts (consumer super) ignore unknown fields." }
+    ]
+  }
 }
