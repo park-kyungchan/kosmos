@@ -1,549 +1,127 @@
 {
-  "id": "blueprint-jsxgraph-sequencer-001",
-  "createdAt": "2026-04-11T18:30:00Z",
-  "updatedAt": "2026-04-11T18:30:00Z",
-  "createdBy": "reporter-blueprint",
+  "id": "blueprint-mathcrew-content-delivery-001",
+  "version": "1.0.0",
+  "createdAt": "2026-04-12T13:00:00Z",
+  "updatedAt": "2026-04-12T13:00:00Z",
+  "createdBy": "lead",
+  "sessionId": "mathcrew-content-delivery-001",
+  "objective": "mathcrew PR#28 Speech Bubble 기반 교육콘텐츠 전달방식 검토 + 현재 기술스택(Three.js 0.183.2 + WebGL2 + TS + Bun + Vite + ts-fsrs) 위에서 최신/최선의 교육콘텐츠 전달방식 리서치",
+
+  "evaluatorGate": {
+    "result": "ACCEPT",
+    "confidence": 0.88,
+    "allGatesPass": true,
+    "passCount": 15,
+    "failCount": 0,
+    "evaluatedAt": "2026-04-12T12:30:00Z"
+  },
 
   "projectScope": {
-    "objective": "palantir-math Sequencer JSXGraph canvas enhancement: real-time drag intersection tracking, absolute value fold visualization, and teaching annotation features — maximizing JSXGraph 1.12.2 native API usage per user directive",
-    "backendDomains": [
-      "DATA: IntersectionPoint, CoordinateLabel, FunctiongraphScene, DragState, FoldGeometry, GraphFamilyProfile, TracePath",
-      "LOGIC: IntersectionSolver (IntersectionResolverInterface), AbsValueFoldComputer, DependencyGraph, DragBehaviorInterface, DerivativeEvaluator",
-      "ACTION: DragCascadeUpdate, BatchBoardUpdate, AnnotationToggle, TraceCurveRecord, AbsFoldVisualizationUpdate",
-      "SECURITY: InputSanitization (LaTeX → new Function() XSS boundary)",
-      "LEARN: InteractionTelemetry, TeachingEffectiveness"
-    ],
-    "frontendSurfaces": [
-      "EnhancedJSXGraphCanvas — main interactive canvas with real-time native cascade updates",
-      "IntersectionLabelOverlay — dynamic coordinate display on intersection points via JSXGraph Text elements",
-      "AbsValueFoldVisualization — four-layer fold: primary f(x)+ty, |f(x)+ty|, reflection guide (dashed), fold boundary line at y=0",
-      "TeacherDragDemo — instructor drags f(x) via parentPoint, all dependents update via native _dep chain",
-      "IntersectionDiscovery — drag two curves toward each other, watch intersection appear/vanish via otherintersection",
-      "AbsValueTeaching — live |f(x)| fold change demonstration as f(x) translates vertically"
-    ]
+    "backend": {
+      "data": ["SpeechBubbleContent", "TeachingBeat", "TroikaText", "ContentDeliveryConfig", "SpatialAnnotation", "AudioNarrationSegment"],
+      "logic": ["ContentDeliveryResolver", "WorldToScreenProjection", "CognitiveLoadGuard", "MayerPrincipleChecker", "ScaffoldEscalationLogic", "PostprocessingCompatibility"],
+      "action": ["EnterAdvancesBeat", "SpeechBubbleFollow", "AudioNarrationTrigger", "TroikaTextSync", "SpatialSignalling"],
+      "security": [],
+      "learn": ["ContentEngagement", "FSRSScheduling"]
+    },
+    "frontend": {
+      "views": ["SpeechBubble (CSS overlay — primary)", "DiegeticContentPanel (troika — Phase 3)"],
+      "interaction": ["Enter-advances-beat (retained)", "Proximity hints (optional Phase 3)"],
+      "rendering": ["CSS overlay via Vector3.project (primary)", "troika-three-text SDF (Phase 3)"]
+    }
   },
 
   "designPrinciples": {
-    "ddd": [
-      "IntersectionPoint named per JSXGraph intersection domain vocabulary — matches JXG.Intersection element name exactly",
-      "CoordinateLabel maps to JXG.Text element — no invented naming layer",
-      "DragState.ty follows existing functiongraphDragSemantics.ts convention — no reinvention of delta semantics",
-      "IntersectionResolverInterface uses JSXGraph Numerics vocabulary (generalizedNewton, chandrupatla, root) for all solver variants",
-      "DragBehaviorInterface extends graphFamily.ts taxonomy (Linear/Quadratic/Cubic/Quartic/Abs) — consistent with existing classification vocabulary",
-      "AbsFoldVisualizationUpdate aligns with existing unwrapOuterAbsoluteExpression() naming in jsxGraphRenderer.ts"
-    ],
-    "dry": [
-      "board.reducedUpdate=true eliminates all manual element.update() calls in drag handlers — single source of cascade truth",
-      "Single IntersectionPoint entity per intersection index — not duplicated per drag frame, updated in-place",
-      "CoordinateLabel format (toFixed(2)) declared once in contentFn closure — not repeated per render",
-      "Single ty value per function in DragState Struct — aggregated by DragStateReducer, not copied per observer",
-      "LaTeX→JS function LRU cache (200-entry, existing in latexToJSXGraph.ts) prevents recompilation — no secondary cache layer",
-      "board.suspendUpdate()/unsuspendUpdate() wrapping declares single batch repaint boundary — not per-element"
-    ],
-    "ocp": [
-      "IntersectionPoint structure is fixed — solver implementation (NativeIntersection vs NewtonRaphson) plugs into IntersectionResolverInterface without modifying entity",
-      "CoordinateLabel format extensible (add slope, degrees, units) via contentFn update — no lifecycle modification required",
-      "FunctiongraphScene open to new element types (Derivative, OtherIntersection, TracePath) without modifying scene identity or serialization contract",
-      "DragState Struct extensible (add tx for horizontal drag) without modifying DragStateReducer or IntersectionSolver",
-      "DragBehaviorInterface open for new graph families (Piecewise, Parametric) without modifying Linear/Quadratic/Abs handlers — OCP confirmed by PR #90 (AbsDragBehavior added without Linear regression)"
-    ],
-    "pecs": [
-      "IntersectionPoint: Consumer of two JXG.Curve parents (super/extends — accepts any functiongraph pair), Producer of {x, y} coordinate (specific/extends — typed IntersectionCoordinate)",
-      "CoordinateLabel: Consumer of IntersectionPoint position (super — accepts any {X(), Y()} point), Producer of formatted string (extends — specific '(x.xx, y.yy)' format)",
-      "DragState: Producer of ty/tx delta (extends — specific to drag context), consumed by IntersectionSolver and AbsValueFoldComputer (super — accept any numeric delta)",
-      "IntersectionResolverInterface: Consumer of function pair (super — any (f, g) returning number), Producer of {x, y} intersection (extends — specific resolved coordinate)",
-      "DragBehaviorInterface: Consumer of DragState (super — any delta struct), Producer of element mutation (extends — specific per graph family)"
-    ]
+    "ddd": "Content delivery uses domain vocabulary (TeachingBeat, CRAMicroPhase, SpeechBubbleContent). Dispatch logic maps teaching concepts to rendering, not raw tech.",
+    "dry": "Single ContentDeliveryResolver dispatches to appropriate renderer. No duplicate rendering logic.",
+    "ocp": "Open for new rendering approaches (troika, CSS3D) via Interface. Closed for core speech bubble contract.",
+    "pecs": "Producer (game-loop) extends TeachingBeat with new fields. Consumer (renderers) reads via supertype."
   },
 
-  "primitives": [
-    "ObjectType — IntersectionPoint (identity: intersection index + parent pair), CoordinateLabel (identity: which intersection it labels), FunctiongraphScene (identity: board ID), GraphFamilyProfile (identity: functiongraph element ID)",
-    "Struct (Value Type) — DragState { ty: number, tx?: number }, FoldGeometry { ty: number, foldBoundaryXValues: number[], reflectionGuidePoints: [number, number][], absMaxY: number }",
-    "Interface — IntersectionResolverInterface (polymorphic solver: NativeIntersection | NewtonRaphsonSolver), DragBehaviorInterface (per family: LinearDragBehavior | QuadraticDragBehavior | AbsDragBehavior | PiecewiseDragBehavior)",
-    "Reducer — DragStateReducer (collapse N drag-frame ty updates → canonical DragState), TracePathReducer (push/shift bounded 300-entry circular buffer)",
-    "Derived Property — DerivativeAt(curve, x): slope derived from functiongraph via board.create('derivative', [curve]) at intersection x; IntersectionCoordinate: derived from two functiongraph closures sharing parentPoint",
-    "ObjectBackedLinkType — IntersectionPointLink (connects two FunctiongraphScene elements at resolved coordinate, carries index and solver variant metadata)"
-  ],
-
-  "ontologyMapping": {
-    "data": [
-      {
-        "id": "obj-jxg-data-01",
-        "name": "IntersectionPoint",
-        "ontologyType": "object-type",
-        "domain": "data",
-        "description": "Resolved (x, y) coordinate pair where two functiongraphs intersect on the JSXGraph canvas. Created via board.create('intersection', [fg1, fg2, 0]) (H-A native) or JXG.Math.Numerics.root() output (fallback). Has identity: intersection index + parent pair.",
-        "provenance": "official",
-        "evidenceIds": ["ev-001", "ev-002"],
-        "relatedObjectIds": ["obj-jxg-logic-01", "obj-jxg-data-02"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-data-02",
-        "name": "CoordinateLabel",
-        "ontologyType": "object-type",
-        "domain": "data",
-        "description": "Dynamic text element displaying (x, y) of an IntersectionPoint in real time. board.create('text', [xFn, yFn, contentFn]) — all three args are function closures auto-evaluated on every board update. Has identity: which intersection it labels.",
-        "provenance": "official",
-        "evidenceIds": ["ev-007"],
-        "relatedObjectIds": ["obj-jxg-data-01", "obj-jxg-action-03"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-data-03",
-        "name": "FunctiongraphScene",
-        "ontologyType": "object-type",
-        "domain": "data",
-        "description": "JSXGraph board scene document: all declared elements (functiongraphs, points, sliders, text, auxiliary curves), configuration params, and auto-intersection metadata. Persisted in JSXGraphScene type in seq-data.ts. Identity: board ID.",
-        "provenance": "official",
-        "evidenceIds": ["ev-003"],
-        "relatedObjectIds": ["obj-jxg-data-01", "obj-jxg-action-02"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-data-04",
-        "name": "DragState",
-        "ontologyType": "value-type",
-        "domain": "data",
-        "description": "Struct value type: current translation vector { ty: number, tx?: number } applied to a dragged functiongraph. No identity — just the current delta value at a given drag frame. PR #90 confirmed ty semantics in functiongraphDragSemantics.ts.",
-        "provenance": "official",
-        "evidenceIds": ["ev-003", "ev-006"],
-        "relatedObjectIds": ["obj-jxg-logic-04", "obj-jxg-action-01"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-data-05",
-        "name": "FoldGeometry",
-        "ontologyType": "value-type",
-        "domain": "data",
-        "description": "Struct: geometric description of |f(x)+ty| fold visualization. { ty: number, foldBoundaryXValues: number[], reflectionGuidePoints: [number, number][], absMaxY: number }. Describes fold appearance at given ty — independent of computation. No native JSXGraph equivalent.",
-        "provenance": "synthesis",
-        "evidenceIds": ["ev-006"],
-        "relatedObjectIds": ["obj-jxg-logic-02", "obj-jxg-action-05"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-data-06",
-        "name": "GraphFamilyProfile",
-        "ontologyType": "object-type",
-        "domain": "data",
-        "description": "Classification result per functiongraph: { family: 'Linear'|'Quadratic'|'Cubic'|'Quartic'|'Abs'|'Piecewise'|'Parametric', isOuterAbs: boolean, dragModel: DragBehaviorKey }. Extended by PR #90 with outer-absolute recognition in graphFamily.ts.",
-        "provenance": "official",
-        "evidenceIds": ["ev-008"],
-        "relatedObjectIds": ["obj-jxg-logic-04"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-data-07",
-        "name": "TracePath",
-        "ontologyType": "object-type",
-        "domain": "data",
-        "description": "Bounded circular buffer (max 300 entries) of (x, y) positions recorded during functiongraph drag for teaching playback. Custom implementation required — JSXGraph native Tracecurve requires Glider mover, not applicable to free functiongraph drag (eval-suite-A-001 confirmed, ev-009).",
-        "provenance": "synthesis",
-        "evidenceIds": ["ev-009"],
-        "relatedObjectIds": ["obj-jxg-action-04"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      }
-    ],
-    "logic": [
-      {
-        "id": "obj-jxg-logic-01",
-        "name": "IntersectionSolver",
-        "ontologyType": "interface",
-        "domain": "logic",
-        "description": "IntersectionResolverInterface: polymorphic real-time root-finding for f(x)=g(x) during drag. H-A primary: NativeIntersection (board.create('intersection') with v1.12.1 improved curve-curve precision). Fallback: NewtonRaphsonSolver (JXG.Math.Numerics.root with warm-start lastX). Interface decouples strategy from IntersectionPoint entity.",
-        "provenance": "official",
-        "evidenceIds": ["ev-001", "ev-002"],
-        "relatedObjectIds": ["obj-jxg-data-01", "obj-jxg-action-01"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-logic-02",
-        "name": "AbsValueFoldComputer",
-        "ontologyType": "function",
-        "domain": "logic",
-        "description": "Computes FoldGeometry from |f(x)+ty|: finds x-intercepts (foldBoundaryXValues via JXG.Math.Numerics.root), generates reflectionGuidePoints, computes absMaxY. Custom code required — JSXGraph has no native abs-fold element. Output feeds AbsFoldVisualizationUpdate.",
-        "provenance": "synthesis",
-        "evidenceIds": ["ev-006"],
-        "relatedObjectIds": ["obj-jxg-data-05", "obj-jxg-action-05"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-logic-03",
-        "name": "DragBehaviorInterface",
-        "ontologyType": "interface",
-        "domain": "logic",
-        "description": "Polymorphic drag behavior per graph family. Implementations: LinearDragBehavior, QuadraticDragBehavior, AbsDragBehavior (translate-source-before-outer-abs — implemented in PR #90), PiecewiseDragBehavior (planned Phase 3). OCP: new families open without modifying existing handlers.",
-        "provenance": "official",
-        "evidenceIds": ["ev-003"],
-        "relatedObjectIds": ["obj-jxg-data-06", "obj-jxg-action-01"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-logic-04",
-        "name": "DragSemanticResolver",
-        "ontologyType": "function",
-        "domain": "logic",
-        "description": "Maps GraphFamilyProfile → DragBehaviorInterface implementation. Resolves which drag model to apply per curve type. Extends graphFamily.ts classification. PR #90 confirmed: outer-abs detection routes to AbsDragBehavior without Linear regression.",
-        "provenance": "official",
-        "evidenceIds": ["ev-003"],
-        "relatedObjectIds": ["obj-jxg-data-04", "obj-jxg-logic-03"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-logic-05",
-        "name": "DerivativeEvaluator",
-        "ontologyType": "function",
-        "domain": "logic",
-        "description": "Slope/derivative at intersection and critical points. H-A: board.create('derivative', [curve]) — unused native element, validated in proto-jxg-A-001 (claim-001: plugs into fg1._dep chain, no custom slope computation). Derived property from functiongraph.",
-        "provenance": "official",
-        "evidenceIds": ["ev-008"],
-        "relatedObjectIds": ["obj-jxg-data-01"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      }
-    ],
-    "action": [
-      {
-        "id": "obj-jxg-action-01",
-        "name": "DragCascadeUpdate",
-        "ontologyType": "action-type",
-        "domain": "action",
-        "description": "Triggers dependent element recomputation on drag event. H-A: parentPoint.setPosition() → JSXGraph native _dep chain auto-cascades all dependents (IntersectionPoint, CoordinateLabel, DerivativeEvaluator) without manual .update() calls. board.reducedUpdate=true scopes cascade to drag subtree only.",
-        "provenance": "official",
-        "evidenceIds": ["ev-003", "ev-004", "ev-005"],
-        "relatedObjectIds": ["obj-jxg-logic-01", "obj-jxg-action-02"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-action-02",
-        "name": "BatchBoardUpdate",
-        "ontologyType": "action-type",
-        "domain": "action",
-        "description": "board.suspendUpdate() → mutate N elements → board.unsuspendUpdate() → single DOM repaint. Eliminates N intermediate redraws during element construction or multi-element mutation. Validated in proto-jxg-A-001 wrapping all 10 element declarations (ev-004).",
-        "provenance": "official",
-        "evidenceIds": ["ev-004"],
-        "relatedObjectIds": ["obj-jxg-data-03"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-action-03",
-        "name": "AnnotationToggle",
-        "ontologyType": "action-type",
-        "domain": "action",
-        "description": "Activates/deactivates teaching overlay elements (CoordinateLabel, DerivativeEvaluator curve, TracePath display) per session mode. §ORCH-10 compliance: all annotation elements declared explicitly as board elements with lifecycle — no ad-hoc DOM mutations.",
-        "provenance": "official",
-        "evidenceIds": ["ev-007"],
-        "relatedObjectIds": ["obj-jxg-data-02"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-action-04",
-        "name": "TraceCurveRecord",
-        "ontologyType": "action-type",
-        "domain": "action",
-        "description": "Captures drag path for teaching playback. Custom implementation: push current element position to TracePath.dataX/dataY in board.on('update') callback, then call traceElement.update(). Native Tracecurve not applicable — requires Glider mover per JSXGraph docs (ev-009 confirmed by eval-suite-A-001).",
-        "provenance": "synthesis",
-        "evidenceIds": ["ev-009"],
-        "relatedObjectIds": ["obj-jxg-data-07"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-action-05",
-        "name": "AbsFoldVisualizationUpdate",
-        "ontologyType": "action-type",
-        "domain": "action",
-        "description": "Updates |f(x)+ty| four-layer visualization: (1) primary f(x)+ty curve, (2) |f(x)+ty| abs curve via Math.abs() wrapper sharing ty closure, (3) dashed reflection guide y=-f_raw(x) for negative fold region, (4) fold boundary line at y=0 between x-intercepts. PR #90 implemented drag semantics; fold line layers 3-4 remain for Phase 2.",
-        "provenance": "synthesis",
-        "evidenceIds": ["ev-006"],
-        "relatedObjectIds": ["obj-jxg-data-05", "obj-jxg-logic-02"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      }
-    ],
-    "security": [
-      {
-        "id": "obj-jxg-security-01",
-        "name": "InputSanitization",
-        "ontologyType": "function",
-        "domain": "security",
-        "description": "LaTeX → JS function compilation XSS boundary enforced at new Function() call site in latexToJSXGraph.ts. Existing 200-entry LRU cache must not be bypassed. No additional new Function() call sites permitted. All new drag-handler function closures must reference pre-compiled functions only.",
-        "provenance": "official",
-        "evidenceIds": [],
-        "relatedObjectIds": ["obj-jxg-data-03"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      }
-    ],
-    "learn": [
-      {
-        "id": "obj-jxg-learn-01",
-        "name": "InteractionTelemetry",
-        "ontologyType": "object-type",
-        "domain": "learn",
-        "description": "Records drag events, intersection discoveries, and frame timing per session. Captures: frameCount, intersection event timestamps, solver iteration counts, annotation usage frequency. Feeds TeachingEffectiveness evaluation. Declared as typed LEARN ref (feedbackEntityRef) in Phase 3.",
-        "provenance": "inference",
-        "evidenceIds": [],
-        "relatedObjectIds": ["obj-jxg-learn-02"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      },
-      {
-        "id": "obj-jxg-learn-02",
-        "name": "TeachingEffectiveness",
-        "ontologyType": "object-type",
-        "domain": "learn",
-        "description": "Evaluation artifact: annotation usage rates, dwell time on intersection labels, drag interaction patterns. Feeds refinement of CoordinateLabel position, FoldGeometry clarity, derivative display configuration. Evaluation criteria to be formalized in Phase 3.",
-        "provenance": "inference",
-        "evidenceIds": [],
-        "relatedObjectIds": ["obj-jxg-learn-01"],
-        "createdAt": "2026-04-11T14:30:00Z",
-        "updatedAt": "2026-04-11T16:00:00Z",
-        "createdBy": "ontologist"
-      }
-    ]
+  "stackRecommendation": {
+    "winningHypothesis": "H-A",
+    "label": "Enhanced CSS Overlay (Speech Bubble++)",
+    "confidence": 0.88,
+    "description": "Enrich existing CSS speech bubble with CSS-native animations, CognitiveLoadManager (adaptive content density), modality flags (phase icons, vocabulary highlights, progress arc), and audio narration (Mayer P9). Zero WebGL render loop changes.",
+    "alternative": {
+      "hypothesisId": "H-B",
+      "label": "Hybrid Diegetic + Overlay",
+      "description": "Phase 3 evolution: add troika-three-text SDF labels for in-world spatial annotations on motivate/explain/demonstrate phases. CSS overlay retained for practice/assess. ContentDeliveryResolver dispatches per CRA phase.",
+      "whenToAdopt": "When CRA Concrete phase demands spatial labels near 3D manipulatives (Mayer Spatial Contiguity)"
+    },
+    "disqualified": {
+      "hypothesisId": "H-C",
+      "label": "Full WebGL-Native Content (three-mesh-ui)",
+      "reason": "three-mesh-ui abandoned (last release 2021). WCAG 2.1 AA accessibility contradictions unresolved. SpeechBubbleContent contract breakage required."
+    }
   },
 
-  "recommendedStack": {
-    "name": "JSXGraph Native-First Canvas Enhancement Stack (H-A)",
-    "technologies": [
-      {
-        "id": "tech-jxg-001",
-        "createdAt": "2026-04-11T14:00:00Z",
-        "updatedAt": "2026-04-11T18:00:00Z",
-        "createdBy": "researcher",
-        "name": "JSXGraph 1.12.2",
-        "category": "Interactive Geometry Engine",
-        "version": "1.12.2",
-        "url": "https://jsxgraph.org",
-        "license": "LGPL-3.0",
-        "maturity": "stable",
-        "evidenceIds": ["ev-001", "ev-002", "ev-003", "ev-004", "ev-005"],
-        "strengths": [
-          "Native intersection element with v1.12.1 improved precision for curve-curve (claim-009)",
-          "board.reducedUpdate=true for 40-60% frame computation reduction during drag (claim-005)",
-          "Native Derivative element: board.create('derivative', [curve]) — validated in proto-jxg-A-001 (claim-001)",
-          "Dynamic text auto-updates via function closures in board.create('text', [xFn, yFn, contentFn]) (claim-016, claim-017)",
-          "board.on('update') fires every drag frame for telemetry without polling (claim-013)",
-          "otherintersection support for multiple intersection points with forbidden-point arrays (claim-011)",
-          "JXG.Math.Numerics.root() and generalizedNewton() available as fallback solver (claim-004, claim-027)"
-        ],
-        "weaknesses": [
-          "Tracecurve requires Glider mover — cannot track free functiongraph drag path natively (claim-003, ev-009)",
-          "No native absolute value fold visualization element — custom AbsValueFoldComputer required",
-          "parentPoint migration required to move existing raw DOM drag handlers to native _dep chain (Phase 2 deliverable)"
-        ],
-        "constraintIds": []
-      },
-      {
-        "id": "tech-jxg-002",
-        "createdAt": "2026-04-11T14:00:00Z",
-        "updatedAt": "2026-04-11T18:00:00Z",
-        "createdBy": "researcher",
-        "name": "TypeScript + Bun",
-        "category": "Runtime + Type System",
-        "version": "5.x + 1.x",
-        "url": null,
-        "license": "MIT",
-        "maturity": "stable",
-        "evidenceIds": [],
-        "strengths": [
-          "Type-safe JSXGraph element creation with project-level jsxgraph.d.ts",
-          "bun test runner for eval suites — proto-jxg-A-001 and proto-jxg-B-001 both achieved tscErrors=0",
-          "Zero external runtime dependencies for core schemas"
-        ],
-        "weaknesses": [
-          "JSXGraph type definitions (jsxgraph.d.ts) require project-level maintenance as JSXGraph API evolves"
-        ],
-        "constraintIds": []
-      }
-    ],
-    "rationale": "JSXGraph 1.12.2 native APIs cover ~90% of requirements without custom code: native intersection auto-updates eliminate solver wiring for the common case; board.reducedUpdate=true provides 60fps performance budget for 10+ elements; native Derivative element provides slope display at zero additional code cost. Custom code is bounded to: (1) TracePath buffer (Tracecurve Glider limitation), (2) |f(x)| fold visualization (no native abs-fold), (3) piecewise/parametric drag semantics. Aligns precisely with user directive (native-first mandate at 2026-04-11T14:45:00Z) and achieves evaluator ACCEPT verdict (confidence 0.88).",
-    "alternatives": [
-      {
-        "name": "H-B Custom Interaction Layer (hyp-jxg-B)",
-        "whyNot": "Confirmed architectural race condition FM-B-001 (dragState.ty stale read between DOM addEventListener and board.on('update') — HIGH severity, N-1 stale frames under rapid drag burst, eval-suite-B-001 B-T9). Permanent performance ceiling: board.reducedUpdate=true incompatible with H-B observer pattern. DDD violation (mixed vocabulary), OCP violation (DependencyGraph as implicit hub), DRY risk (duplicate cascade management). Valid fallback ONLY if: JSXGraph native intersection fails at abs-fold kinks in browser testing, OR element count permanently stays ≤5, OR JSXGraph drops _dep chain support."
-      }
-    ],
-    "confidence": 0.88
+  "propagation": {
+    "forwardProp": {
+      "status": "healthy",
+      "primaryChain": "TeachingBeat → ContentDeliveryResolver → SpeechBubbleContent → speech-bubble.ts → CSS DOM",
+      "phase3Chain": "TeachingBeat → ContentDeliveryResolver → [troika labels | CSS overlay] → visual output"
+    },
+    "backwardProp": {
+      "status": "partial",
+      "chain": "User interaction → ContentEngagement → FSRS review signal → mastery update → content delivery refinement",
+      "gaps": ["beatIndex not captured in telemetry", "VT-dimension-to-mastery correlation not tracked"]
+    }
   },
 
-  "forwardProp": {
-    "description": "Ontology contracts flow forward through seq-data.ts type declarations into jsxGraphRenderer.ts board element creation, then into JSXGraphCanvas.tsx live SVG updates via JSXGraph native _dep cascade",
-    "steps": [
-      "IntersectionPoint (ontology) → IntersectionCoordinate Struct contract in seq-data.ts",
-      "IntersectionCoordinate contract → board.create('intersection', [fg1, fg2, 0]) in jsxGraphRenderer.ts",
-      "FunctiongraphScene (ontology) → JSXGraphScene type in seq-data.ts → board initialization in JSXGraphCanvas.tsx",
-      "DragState (ontology) → translate-source-before-outer-abs in functiongraphDragSemantics.ts (PR #90 confirmed)",
-      "DragBehaviorInterface (ontology) → DragSemanticResolver routing in functiongraphDragSemantics.ts → AbsDragBehavior / LinearDragBehavior dispatch",
-      "FoldGeometry (ontology) → FoldGeometry struct contract in seq-data.ts → AbsValueFoldComputer output → AbsFoldVisualizationUpdate four-layer curve construction in jsxGraphRenderer.ts",
-      "CoordinateLabel (ontology) → TextElementContract {xFn, yFn, contentFn} → board.create('text') in jsxGraphRenderer.ts",
-      "board.reducedUpdate=true → native _dep chain cascade → IntersectionPoint + CoordinateLabel + DerivativeEvaluator auto-update on every drag frame without manual wiring",
-      "GraphFamilyProfile (ontology) → graphFamily.ts classification output → DragSemanticResolver → DragBehaviorInterface dispatch"
-    ],
-    "healthStatus": "partial",
-    "gaps": [
-      "FoldGeometry → fold line display (layers 3-4: reflection guide + fold boundary at y=0) not yet implemented — PR #90 only covers drag semantics level",
-      "CoordinateLabel → TextElementContract not yet a formally declared type in seq-data.ts (relies on inline board.create args)",
-      "InteractionTelemetry → no declared telemetry hook in JSXGraphCanvas.tsx yet (Phase 3 deliverable)",
-      "parentPoint migration not yet applied to all existing raw DOM addEventListener drag handlers in jsxGraphRenderer.ts (Phase 2 deliverable)",
-      "DerivativeEvaluator → board.create('derivative', [curve]) not yet wired into jsxGraphRenderer.ts scene construction (Phase 2 deliverable)"
-    ]
-  },
-
-  "backwardProp": {
-    "description": "Runtime canvas events flow backward into InteractionTelemetry lineage, TeachingEffectiveness evaluation, and ontology refinement for solver warm-start and overlay design",
-    "steps": [
-      "Drag frame events (board.on('update')) → InteractionTelemetry.dragFrames push (lineage capture)",
-      "InteractionTelemetry.dragFrames → frame timing, solver iteration count → performance evaluation",
-      "Intersection discovery events (IntersectionPoint visibility change) → event log in InteractionTelemetry (lineage)",
-      "IntersectionPoint coordinate accuracy → IntersectionResolverInterface warm-start strategy refinement (LEARN)",
-      "TeachingEffectiveness metrics (annotation dwell, label usage rates) → CoordinateLabel position and FoldGeometry clarity refinement",
-      "Solver convergence failures / edge cases (asymptotes, tangent intersections) → root-finder parameter tuning → IntersectionSolver evaluation update",
-      "FM-A-001 (test harness defect at fold kink) → exp-jxg-01 browser validation → native intersection precision verdict → IntersectionResolverInterface strategy update if kink fails"
-    ],
-    "healthStatus": "partial",
-    "gaps": [
-      "InteractionTelemetry not yet declared as typed LEARN ref (feedbackEntityRef) in seq-data.ts — heuristic only at present",
-      "TeachingEffectiveness evaluation criteria not formally defined — qualitative annotation usage observation only",
-      "exp-jxg-01 (fold boundary precision at abs-fold kink) deferred to browser testing — verdict not yet closed",
-      "No evaluationEntityRef declared for IntersectionSolver accuracy — informal precision notes in eval-results.json only",
-      "No refinementSignalEntityRef for DragBehaviorInterface parameter tuning from telemetry data"
-    ]
-  },
-
-  "implementationStrategy": [
-    {
-      "phase": 1,
-      "name": "Golden Tables",
-      "description": "Establish stable data shape contracts in seq-data.ts before adding live logic. Finalize IntersectionPoint, CoordinateLabel, DragState, FoldGeometry, GraphFamilyProfile, TracePath type declarations. These DATA layer facts anchor all subsequent logic and action layers.",
+  "threePhaseStrategy": {
+    "phase1_goldenTables": {
+      "name": "H-A CSS Animation Baseline",
+      "duration": "1-2 weeks",
       "deliverables": [
-        "IntersectionPoint and CoordinateLabel type contracts in seq-data.ts (IntersectionCoordinate struct, TextElementContract interface)",
-        "FoldGeometry struct type: { ty: number, foldBoundaryXValues: number[], reflectionGuidePoints: [number, number][], absMaxY: number }",
-        "GraphFamilyProfile extended with PiecewiseFamily and ParametricFamily variants in seq-data.ts and graphFamily.ts",
-        "TracePath type: circular buffer struct with dataX: number[], dataY: number[], maxSize: 300",
-        "IntersectionResolverInterface: { solve(f: (x:number)=>number, g: (x:number)=>number, warmStart?: number): IntersectionCoordinate | null }",
-        "DragBehaviorInterface: { apply(element: JXG.Curve, dragState: DragState): void }"
-      ],
-      "dependencies": [
-        "seq-data.ts base types (existing — 750+ LOC)",
-        "graphFamily.ts with outer-abs recognition (PR #90 merged)",
-        "functiongraphDragSemantics.ts with translate-source-before-outer-abs (PR #90 merged)"
+        "SpeechBubbleContent extended with animationHints + modalityFlags",
+        "CognitiveLoadManager (3 density tiers from MiniHudTelemetry)",
+        "CSS keyframe animations (fade-in, slide-up, pulse) with prefers-reduced-motion gate",
+        "Phase-based accent coloring via data-phase attribute",
+        "Browser validation: NE-02 CSS z-order vs postprocessing canvas"
       ]
     },
-    {
-      "phase": 2,
-      "name": "Operational Decision-Making",
-      "description": "Add real-time logic and interactive actions on top of Phase 1 contracts. Migrate functiongraph drag to parentPoint model for native _dep cascade. Wire native intersection, coordinate labels, derivative display, batch updates, and abs-fold visualization layers into jsxGraphRenderer.ts.",
+    "phase2_operationalDecisionMaking": {
+      "name": "Audio Narration + Scaffold Escalation",
+      "duration": "3-4 weeks",
       "deliverables": [
-        "parentPoint migration in jsxGraphRenderer.ts: replace raw DOM addEventListener with parentPoint.setPosition() drag model for all functiongraphs",
-        "board.create('intersection', [fg1, fg2, 0/1]) for all autoIntersection pairs: replaces static visibility state machine with live auto-updating native elements",
-        "board.create('otherintersection', [fg1, fg2, i1]) for second intersection points with forbidden-point exclusion (v1.9.0+)",
-        "board.create('text', [xFn, yFn, contentFn]) dynamic CoordinateLabels on all IntersectionPoints",
-        "board.create('derivative', [curve]) for derivative/slope display at intersection (new native element — validated in proto-jxg-A-001)",
-        "AbsFoldVisualizationUpdate: four-layer abs curve construction in jsxGraphRenderer.ts (primary + abs + reflection guide + fold boundary)",
-        "board.reducedUpdate=true set immediately after board initialization in JSXGraphCanvas.tsx",
-        "TracePath: board.on('update') push to dataX/dataY arrays + curve.update() for drag history recording",
-        "BatchBoardUpdate (suspendUpdate/unsuspendUpdate) wrapping all element construction phases"
-      ],
-      "dependencies": [
-        "Phase 1 type contracts declared in seq-data.ts",
-        "JSXGraph 1.12.2 native APIs: board.create('intersection'), board.create('derivative'), board.create('text'), board.create('otherintersection')",
-        "exp-jxg-01 browser validation (can proceed in parallel — fallback to JXG.Math.Numerics.root() if kink precision fails)"
+        "AudioNarrationSegment per TeachingBeat (Mayer P9, d=0.87 effect size)",
+        "Web Speech API Korean TTS or pre-recorded audio segments",
+        "ScaffoldEscalationLogic 4-tier: nudge → visual hint → worked example → direct instruction",
+        "SpatialSignalling for scaffold tiers 1-2 (3D glow, particle trails)",
+        "InteractionTelemetry instrumentation for ContentEngagement"
       ]
     },
-    {
-      "phase": 3,
-      "name": "AI-First",
-      "description": "Declare InteractionTelemetry as typed LEARN ref. Formalize TeachingEffectiveness evaluation. Add piecewise/parametric drag semantics. Close exp-jxg-01 verdict. Establish refinement loop from telemetry to solver and overlay parameter tuning.",
+    "phase3_aiFirst": {
+      "name": "Hybrid Diegetic + Adaptive Content",
+      "duration": "6-8 weeks",
       "deliverables": [
-        "InteractionTelemetry typed ref declaration in seq-data.ts (feedbackEntityRef, workflowLineageEntityRef)",
-        "TeachingEffectiveness evaluation criteria formalized: annotation dwell thresholds, intersection discovery rate, drag interaction patterns",
-        "DragBehaviorInterface for Piecewise family: segment-aware drag constraint per piecewise interval",
-        "DragBehaviorInterface for Parametric family: separate x(t)/y(t) drag model",
-        "AnnotationToggle: explicit element lifecycle management for all teaching overlay elements per §ORCH-10",
-        "exp-jxg-01 closure: browser test of native intersection precision at abs-fold kink — produce final IntersectionResolverInterface strategy verdict",
-        "Refinement loop: solver warm-start parameter tuning from InteractionTelemetry solver iteration counts",
-        "evaluationEntityRef and refinementSignalEntityRef declared for IntersectionSolver accuracy tracking"
-      ],
-      "dependencies": [
-        "Phase 2 implementation running in browser",
-        "InteractionTelemetry data from Phase 2 runtime (minimum 1 teaching session)",
-        "Browser testing environment for exp-jxg-01 (JSXGraph-in-browser — tsc-only validation insufficient)"
+        "troika-three-text SDF labels for SpatialAnnotation (if n8ao benchmark passes)",
+        "ContentDeliveryResolver routing by CRA phase",
+        "CognitiveLoadManager feedback loop via FSRS mastery data",
+        "A/B testing framework for content delivery mode effectiveness",
+        "MicroAnimationSequencer for abstract concept visualization"
       ]
     }
-  ],
+  },
 
-  "evaluatorGate": "ACCEPT",
-  "evaluatorReason": "H-A (JSXGraph native-first) accepted. All 15 R-gates PASS. R1: all 14 sources tier-1/2. R2: no unresolved contradictions blocking H-A. R3: 8 scenarios linked (4 per hypothesis). R4: 3 failure modes documented (FM-A-001, FM-B-001, FM-B-002). R5: all evidence current (JSXGraph 1.12.2 is current release). R6: all sources tagged [Official]/[Synthesis]/[Inference] with confidence scores. R7: win rationale produced (rec-jxg-001). R8: H-B documented as competing alternative. R9: all scenarios sufficient or partial — none insufficient. R10: 4 reversal conditions documented. R11: 20 objects across 5 D/L/A/S/LEARN domains. R12: DDD/DRY/OCP/PECS applied to all objects; H-B violations flagged. R13: H-A ForwardProp HEALTHY (native cascade); BackwardProp partial (telemetry not yet declared). R14: both prototypes buildStatus=success, tscErrors=0. R15: H-A passRate=1.0 (30/30), H-B passRate=1.0 (29/29). No debate triggered: pass rate difference=0%, no D/L/A misclassification, FM-B-001 predicted by sc-jxg-B-adv. Confidence: 0.88. H-B disqualified by FM-B-001 HIGH-severity architectural race condition (dragState.ty stale read — N-1 stale frames under rapid drag) and permanent board.reducedUpdate=true performance ceiling.",
+  "evalResultsSummary": {
+    "prototypes": {
+      "H-A": { "linesOfCode": 334, "buildStatus": "pass", "evalPassRate": 1.0, "failureModes": 0 },
+      "H-B": { "linesOfCode": 336, "buildStatus": "pass", "evalPassRate": 1.0, "failureModes": 0 }
+    },
+    "totalEvalCases": 17,
+    "totalPassed": 17,
+    "overallPassRate": 1.0
+  },
 
-  "scenarioIds": [
-    "sc-jxg-A-base",
-    "sc-jxg-A-best",
-    "sc-jxg-A-worst",
-    "sc-jxg-A-adv",
-    "sc-jxg-B-base",
-    "sc-jxg-B-best",
-    "sc-jxg-B-worst",
-    "sc-jxg-B-adv"
-  ],
-
-  "riskIds": [
-    "FM-A-001",
-    "FM-B-001",
-    "FM-B-002"
-  ],
-
-  "sourceIds": [
-    "src-jxg-api-docs",
-    "src-jxg-releases",
-    "src-jxg-board-events",
-    "src-jxg-dynamic-text",
-    "src-jxg-suspend-update",
-    "src-jxg-curve-intersection-wiki",
-    "src-jxg-glider",
-    "src-jxg-numerics",
-    "src-dc5-principles",
-    "src-arch-ontology-model",
-    "src-jxg-abs-value-fold",
-    "src-jxg-performance",
-    "src-jxg-tracecurve-glider-constraint",
-    "src-orchestration-surfaces"
-  ],
-
-  "confidence": 0.88
+  "keyInsights": [
+    "현재 Speech Bubble 접근방식은 교육학적으로 올바름 (Mayer P8 Segmenting + CLT learner-controlled pacing)",
+    "가장 높은 ROI 개선: 한국어 오디오 내레이션 추가 (Mayer P9 Temporal Contiguity, d=0.87)",
+    "CSS3DRenderer는 n8ao/postprocessing과 구조적으로 비호환 — 제외됨",
+    "troika-three-text는 postprocessing과 호환 (OverrideMaterialManager workaround) — Phase 3 후보",
+    "렌더링 방식보다 설계 품질(CTML 원칙 준수)이 인지부하를 더 크게 좌우함 (clm-ext-27)",
+    "초등 교육에서는 Diegetic UI보다 Spatial UI(비디에제틱)가 적합 — 이중 인지처리 부담 감소",
+    "three-mesh-ui는 3년 이상 방치 → 신규 프로젝트에 부적합"
+  ]
 }
