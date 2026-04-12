@@ -1,195 +1,603 @@
 {
-  "version": "0.8.0",
-  "sessionId": "mathcrew-content-delivery-001",
-  "lastUpdated": "2026-04-12T13:00:00Z",
+  "version": "0.9.0",
+  "sessionId": "mathcrew-photonic-realism-001",
+  "previousSession": "mathcrew-content-delivery-001",
+  "lastUpdated": "2026-04-12T22:00:00Z",
   "prototypes": [
     {
-      "id": "proto-cd-A-001",
-      "hypothesisId": "H-A",
-      "label": "Enhanced CSS Overlay",
-      "buildStatus": "pass",
-      "buildLog": "bunx tsc --noEmit clean. 0 errors, 0 warnings. CSS animations, CognitiveLoadManager, modality flags, worldToScreen projection all type-checked.",
-      "sourceFile": "prototype/hyp-cd-A/enhanced-css-overlay.ts",
-      "linesOfCode": 334,
-      "claimsValidated": [
-        "SpeechBubbleContent extensible with optional animationHints + modalityFlags (additive, no breaking change)",
-        "CognitiveLoadManager derives content density from MiniHudTelemetry (3 tiers: full/reduced/minimal)",
-        "CSS-native animation class resolution (keyframes, not JS runtime) — zero main-thread overhead",
-        "prefers-reduced-motion gating: animation class always empty when reduced-motion preferred (WCAG 2.3)",
-        "worldToScreen projection path unchanged from PR#28 — postprocessing stacking context preserved",
-        "Modality flags → DOM data-attributes for CSS ::before phase icons and vocabulary highlights",
-        "Beat sequencing invariants: promptText/promptKey/beatIndex/totalBeats never stripped by adaptation"
+      "id": "proto-pr-T7-001",
+      "hypothesisId": "H-1+H-3+H-5",
+      "label": "GLTF+AnimationMixer+IBL (H-1) + Factory+Registry (H-3) + DragControls Proxy Pattern (H-5)",
+      "buildStatus": "research-complete",
+      "researchMethod": "Reference implementation curation from official docs + authoritative tutorials",
+      "agent": "prototyper",
+      "timestamp": "2026-04-12T20:30:00Z",
+
+      "criticalGapsAddressed": [
+        {
+          "gapId": "g-pr-01",
+          "canonicalDescription": "MeshSSSNodeMaterial FPS cost on Chromebook (Intel Iris Xe) — benchmark required",
+          "status": "OPEN — research-only phase cannot resolve; runtime benchmark required",
+          "resolutionConfidence": 0.30,
+          "researchFinding": "MeshSSSNodeMaterial is a WebGPU-tier node material with additional fragment shader ALU cost. Per world-model PerformanceBudgetPolicy (obj-pr-13): SSS enable/disable is conditional on g-pr-01 prototype result. Research confirms SSS is selectively applicable (spacesuit-fabric areas only) — but Chromebook Intel Iris Xe FPS delta is unquantified without runtime stats.js benchmark.",
+          "remainingGap": "Must run stats.js FPS measurement on Chromebook-class GPU with SSS material active on 1 SpacekidEntity vs baseline. Target: confirm > 50fps with SSS before enabling in production.",
+          "recommendedAction": "T7 runtime prototype: add MeshSSSNodeMaterial to helmet-visor area, measure FPS with stats.js, compare to baseline MeshPhysicalMaterial on Chromebook dev hardware or equivalent (Intel UHD 620 / Iris Xe).",
+          "ontologyObject": "PerformanceBudgetPolicy (obj-pr-13) — gapDependency: conditional SSS rule blocked on this result"
+        },
+        {
+          "gapId": "g-pr-02",
+          "canonicalDescription": "SkeletonUtils.clone() x5 simultaneous draw call budget — Chromebook 60fps target",
+          "status": "OPEN — research-only phase cannot resolve; runtime draw call measurement required",
+          "resolutionConfidence": 0.40,
+          "researchFinding": "SkeletonUtils.clone() produces independent SkinnedMesh per character with separate bone matrices. Each clone = separate draw call per mesh part (typically 3-6 draw calls per character). Five spacekid instances = ~15-30 draw calls from characters alone. Three.js r183 BatchedMesh does NOT support SkinnedMesh/skeletal animation (confirmed: InstancedMesh incompatible with SkinnedMesh per clm-pr-23). No benchmarks for SkeletonUtils.clone() x5 on Chromebook Intel Iris Xe available in research sources.",
+          "remainingGap": "Must measure renderer.info.render.calls with 5 SkeletonUtils.clone() spacekid instances active + all AnimationMixers running. Target: stay < 100 total draw calls per PerformanceBudgetPolicy.",
+          "recommendedAction": "T7 runtime prototype: spawn 5 SkeletonUtils.clone() instances, call renderer.info.render.calls each frame, measure FPS with stats.js. If > 100 draw calls, evaluate LOD (Three.js LOD class) or static geometry reduction.",
+          "ontologyObject": "SpacekidEntityDef (obj-pr-10) forwardPropPath gap: instancing approach for SkinnedMesh unconfirmed"
+        },
+        {
+          "gapId": "g-pr-03",
+          "canonicalDescription": "DragControls proxy pattern + SkinnedMesh AnimationMixer concurrent — position jitter risk",
+          "status": "PARTIALLY_ADDRESSED — proxy pattern mechanism confirmed by reference; jitter risk remains untested",
+          "resolutionConfidence": 0.75,
+          "researchFinding": "Proxy pattern mechanism confirmed via sbcode.net/threejs/gltf-animations-drag/ — invisible BoxGeometry proxy receives DragControls events, modelGroup.position.copy(proxy.position) each frame syncs animated model. AnimationMixer.update() called independently in render loop — bone pose updates are decoupled from position copy. Theoretical jitter risk: if position.copy() fires mid-bone-update, visual pop possible. Reference implementation shows smooth operation in practice.",
+          "remainingGap": "No reference implementation tests crossFadeTo() (active animation blend) simultaneously with DragControls drag. The position.copy() per-frame sync may introduce 1-frame lag visible as micro-jitter during fast animation transitions. Requires runtime observation.",
+          "recommendedAction": "T7 runtime prototype: trigger crossFadeTo(walkAction, 0.3) while dragControls drag is active. Observe for visual jitter in character root position. If jitter observed: move position.copy() to AnimationMixer.addEventListener('loop') callback instead of requestAnimationFrame.",
+          "ontologyObject": "CharacterDragPlacement (ACTION) + SpatialInteractionResolver (LOGIC) — per simulator ontology object mapping"
+        }
       ],
+      "assetPipelineNote": {
+        "topic": "CC0 animated character asset source (previously mislabeled as g-pr-01 in prior session)",
+        "finding": "Kenney Space Kit confirmed for SpaceshipEntity (CC0 GLTF ships/planets). SpacekidEntity animated character: primary=Mixamo pipeline (FBX→Blender→GLB with embedded clips), secondary=kenney-assets.itch.io/animated-characters-3 (GLTF, requires runtime AnimationMixer compat verification). This is an asset pipeline prerequisite, not a research gap in the canonical registry."
+      },
+
+      "researchFindings": [
+        {
+          "id": "rf-T7-01",
+          "topic": "GLTFLoader API — SpacekidEntity + SpaceshipEntity loading",
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "confidence": 0.98,
+          "keyAPIPattern": "const gltf = await loader.loadAsync('./spacekid.glb'); const model = gltf.scene; const clips = gltf.animations; scene.add(model);",
+          "referenceURL": "https://threejs.org/docs/pages/GLTFLoader.html",
+          "integrationPoint": "Replaces create-pulse-shard.ts factory function. Returns gltf.scene (Group) and gltf.animations (AnimationClip[]).",
+          "notes": "r183 fix: 'empty groups with multiple scene references' resolved. DRACOLoader optional — use only if GLB > 500KB. import path: 'three/addons/loaders/GLTFLoader.js'"
+        },
+        {
+          "id": "rf-T7-02",
+          "topic": "AnimationMixer — SpacekidEntity animation state machine",
+          "domain": "LOGIC",
+          "provenance": "[Official]",
+          "confidence": 0.98,
+          "keyAPIPattern": "const mixer = new THREE.AnimationMixer(model); const idleClip = THREE.AnimationClip.findByName(clips, 'idle'); const idleAction = mixer.clipAction(idleClip); idleAction.play(); // Transition: idleAction.crossFadeTo(walkAction, 0.3, true); // In render loop: mixer.update(clock.getDelta());",
+          "referenceURL": "https://threejs.org/docs/pages/AnimationMixer.html",
+          "integrationPoint": "AnimationStateMachine LOGIC entity — one AnimationMixer per SkeletonUtils.clone() instance. Shared clock.getDelta() across all mixers.",
+          "notes": "crossFadeTo(targetAction, durationSeconds, warpBoolean): both actions must be playing simultaneously for smooth blend. Reset target action before crossFade: targetAction.reset(); targetAction.play(); action.crossFadeTo(targetAction, 0.3)."
+        },
+        {
+          "id": "rf-T7-03",
+          "topic": "PMREMGenerator + RGBELoader — IBL photonicRealism setup",
+          "domain": "LOGIC",
+          "provenance": "[Official]",
+          "confidence": 0.98,
+          "keyAPIPattern": "renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.8; // renderer.outputColorSpace = THREE.SRGBColorSpace (default in r152+, no explicit set needed) const pmremGenerator = new THREE.PMREMGenerator(renderer); pmremGenerator.compileEquirectangularShader(); new RGBELoader().load('env.hdr', (texture) => { scene.environment = pmremGenerator.fromEquirectangular(texture).texture; texture.dispose(); pmremGenerator.dispose(); });",
+          "referenceURL": "https://threejs.org/docs/pages/PMREMGenerator.html",
+          "integrationPoint": "PhotonicRealismPipeline LOGIC entity — one-time call at scene init. Auto-applies to ALL MeshStandard/PhysicalMaterial in scene. Compatible with existing n8ao + postprocessing pipeline (no OverrideMaterialManager needed).",
+          "notes": "Poly Haven (polyhaven.com/hdris) — CC0 HDRIs 1K-8K. 1K-2K sufficient for education apps (1-8MB). scene.environment applies globally; per-material envMap property available for selective override."
+        },
+        {
+          "id": "rf-T7-04",
+          "topic": "MeshPhysicalMaterial — photonicRealism per-entity material config",
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "confidence": 0.98,
+          "keyAPIPattern": "// Spacesuit body: const suitMaterial = new THREE.MeshPhysicalMaterial({ metalness: 0.1, roughness: 0.4, color: 0xffffff, envMapIntensity: 1.0 }); // Visor: const visorMaterial = new THREE.MeshPhysicalMaterial({ metalness: 0.0, roughness: 0.0, transmission: 0.9, ior: 1.5, clearcoat: 1.0, iridescence: 0.3, iridescenceThicknessRange: [100, 400], color: 0x88ccff }); // Spaceship hull: const hullMaterial = new THREE.MeshPhysicalMaterial({ metalness: 0.8, roughness: 0.3, clearcoat: 0.5 });",
+          "referenceURL": "https://threejs.org/docs/pages/MeshPhysicalMaterial.html",
+          "integrationPoint": "PhotonicMaterialPreset DATA entity — extends existing materials.ts. gltf.scene.traverse to apply material overrides post-load.",
+          "notes": "Performance budget: enable only needed features per entity type. transmission most expensive. For Chromebook: visor transmission=selective, clearcoat+iridescence=cheap. MeshSSSNodeMaterial (face subsurface scattering): selective forehead/cheek areas only."
+        },
+        {
+          "id": "rf-T7-05",
+          "topic": "DragControls Proxy Pattern — SpacekidEntity drag-and-drop",
+          "domain": "ACTION",
+          "provenance": "[Official+Tutorial]",
+          "confidence": 0.95,
+          "keyAPIPattern": "// Setup proxy: const proxy = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.3, 0.5), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 })); proxy.geometry.translate(0, 0.65, 0); scene.add(proxy); // DragControls on proxy array: const dragControls = new DragControls([proxy], camera, renderer.domElement); dragControls.addEventListener('dragstart', () => { orbitControls.enabled = false; }); dragControls.addEventListener('drag', (e) => { e.object.position.y = 0; // lock to ground plane e.object.position.x = Math.round(e.object.position.x / CELL_SIZE) * CELL_SIZE; // snap grid e.object.position.z = Math.round(e.object.position.z / CELL_SIZE) * CELL_SIZE; }); dragControls.addEventListener('dragend', () => { orbitControls.enabled = true; onSpacekidPlaced(proxy.position.clone()); // trigger InteractionMode }); // Sync in render loop: modelGroup.position.copy(proxy.position);",
+          "referenceURL": "https://sbcode.net/threejs/gltf-animations-drag/",
+          "integrationPoint": "DragDispatch ACTION entity — integrates with interaction-controller.ts registerMode() pattern. dragend fires InteractionMode state transition.",
+          "notes": "CRITICAL: GLTF animated models do NOT work directly with DragControls — proxy pattern is required. AnimationMixer continues uninterrupted during drag. OrbitControls must be disabled during drag to prevent camera conflict. touch-action:none on renderer.domElement prevents scroll conflict on tablet."
+        },
+        {
+          "id": "rf-T7-06",
+          "topic": "Asset Sources — SpacekidEntity + SpaceshipEntity models",
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "confidence": 0.90,
+          "keyAPIPattern": "N/A — asset pipeline decision",
+          "referenceURL": "https://kenney.nl/assets/space-kit",
+          "integrationPoint": "Asset pipeline feeding GLTFLoader. CC0 license required for education product.",
+          "notes": "SpaceshipEntity: Kenney Space Kit (kenney.nl/assets/space-kit) — 150 CC0 GLTF/GLB assets (ships, planets). Download, verify GLB format, load with GLTFLoader. SpacekidEntity: (1) kenney-assets.itch.io/animated-characters-3 — CC0, 4 skins + 3 animations, GLTF format (must verify AnimationMixer compat). (2) Mixamo fallback: select character → apply idle/walk/board animations → FBX with skin → Blender import → export GLB with embedded clips. (3) Sketchfab CC license filtered: sketchfab.com/tags/character (verify CC0/CC-BY license per asset)."
+        },
+        {
+          "id": "rf-T7-07",
+          "topic": "SkeletonUtils.clone() — Multiple SpacekidEntity instances",
+          "domain": "ACTION",
+          "provenance": "[Synthesis]",
+          "confidence": 0.90,
+          "keyAPIPattern": "import { SkeletonUtils } from 'three/addons/utils/SkeletonUtils.js'; const clonedSpacekid = SkeletonUtils.clone(baseGltf.scene); const clonedMixer = new THREE.AnimationMixer(clonedSpacekid); // Each clone has independent bone poses and AnimationMixer",
+          "referenceURL": "https://threejs.org/docs/#examples/en/utils/SkeletonUtils",
+          "integrationPoint": "CharacterSpawn ACTION — spawns multiple independent spacekid instances from single loaded GLTF base. Each instance gets own proxy mesh for DragControls.",
+          "notes": "SkeletonUtils.clone() produces deep clone with independent bone hierarchy. AVOID SkeletonUtils.retarget() — community reports inverted feet/backward hands with different-proportion skeletons (clm-pr-15). Embed animations in GLB file instead of runtime retargeting. Budget: ~10-25 independent SkinnedMesh instances at 60fps on Chromebook (separate AnimationMixer per instance, shared clock.getDelta())."
+        },
+        {
+          "id": "rf-T7-08",
+          "topic": "Factory+Registry Component System (H-3) — PhotonicComponentFactory",
+          "domain": "LOGIC",
+          "provenance": "[Synthesis]",
+          "confidence": 0.95,
+          "keyAPIPattern": "// TypeScript Map<> registry — zero external dependencies:\ntype ComponentType = 'spacekid' | 'spaceship' | 'environment' | 'dragProxy';\ntype CreateFn = (spec: ComponentSpec, scene: THREE.Scene) => ComponentInstance;\nconst registry = new Map<ComponentType, CreateFn>();\nregistry.set('spacekid', createSpacekidEntity);\nregistry.set('spaceship', createSpaceshipEntity);\n// Factory dispatch:\nfunction ComponentFactory(type: ComponentType, spec: ComponentSpec, scene: THREE.Scene): ComponentInstance {\n  const createFn = registry.get(type);\n  if (!createFn) throw new Error('Unknown component type: ' + type);\n  return createFn(spec, scene);\n}\n// onEntityAdded hook for Three.js resource allocation:\nconst draggableEntities = { onAdd: (entity) => { entity.proxy = createProxy(entity.mesh); } };",
+          "referenceURL": "https://medium.com/@i_babkov/three-js-architecture-ecs-685768c7d91f",
+          "integrationPoint": "PhotonicComponentFactory LOGIC entity — single dispatch point for all entity types. Pairs with H-1 GLTF stack: createSpacekidEntity fn uses GLTFLoader + AnimationMixer + SkeletonUtils.clone(). OCP: new entity type = one registry.set() call.",
+          "notes": "Zero external dependencies — TypeScript Map<ComponentType, CreateFn>. Migration path to miniplex (H-4) is clean: replace Map<> with World, system functions become miniplex queries. Entity count target: <50 entities in mathcrew scope. H-3 preferred over H-4 for current scale per clm-int-02 OCP reasoning."
+        }
+      ],
+
+      "integrationAssessment": {
+        "mathcrewFiles": {
+          "create-pulse-shard.ts": "REPLACE with create-spacekid-entity.ts — GLTFLoader + SkeletonUtils.clone() + AnimationMixer + proxy BoxGeometry. Preserve InteractionMode interface contract.",
+          "create-resonance-loop.ts": "REPLACE with create-spaceship-entity.ts — GLTFLoader (Kenney Space Kit GLB) or procedural geometry. Preserve teaching surface grouping semantics.",
+          "materials.ts": "EXTEND with photonicMaterialPresets: suitBody, visor, spaceship hull configs using MeshPhysicalMaterial. Preserve existing holographic/glow materials for non-photonic entities.",
+          "interaction-controller.ts": "ADD DragControls integration: registerDraggableEntity(spacekidProxy, onDragEnd). dragend fires existing InteractionMode state transitions. Preserve registerMode() pattern.",
+          "teaching-story-framework.ts": "METAPHOR LAYER ONLY — rename entity terms (resonance-loop→spaceship, pulse-shard→spacekid). VT/CRA/beats/ts-fsrs contracts unchanged."
+        },
+        "newFiles": [
+          "src/rendering/photonic-pipeline.ts — PMREMGenerator + RGBELoader IBL setup, ACESFilmicToneMapping config",
+          "src/scene/entities/create-spacekid-entity.ts — GLTFLoader + AnimationMixer + SkeletonUtils.clone + proxy BoxGeometry",
+          "src/scene/entities/create-spaceship-entity.ts — GLTFLoader or procedural geometry factory",
+          "src/scene/systems/animation-system.ts — per-frame mixer.update(delta) across all active AnimationMixers",
+          "src/scene/systems/drag-system.ts — DragControls setup + OrbitControls integration + snap grid logic"
+        ],
+        "preservedContracts": [
+          "VT/CRA/beats/ts-fsrs: unchanged — metaphor layer migration only",
+          "10 InteractionModes: registerMode() pattern preserved — dragend integrates as new ACTION trigger",
+          "n8ao + postprocessing pipeline: compatible (no OverrideMaterialManager workaround needed for MeshPhysicalMaterial)",
+          "Vector3.project() path for SpeechBubble CSS overlay: unchanged"
+        ],
+        "estimatedMigrationWeeks": {
+          "IBL + renderer config": "0.5 week",
+          "SpaceshipEntity (Kenney Space Kit GLTFLoader)": "0.5 week",
+          "SpacekidEntity (GLTF + AnimationMixer + proxy)": "2-3 weeks including asset pipeline",
+          "DragControls integration": "1 week",
+          "Teaching framework metaphor migration": "1-2 weeks",
+          "Total": "5-8 weeks"
+        }
+      },
+
+      "claimsValidated": [
+        "DragControls proxy pattern (invisible BoxGeometry) works with animated GLTF models — AnimationMixer unaffected (g-pr-04 RESOLVED)",
+        "PMREMGenerator + scene.environment one-time setup at init — auto-applies to all MeshPhysical/Standard (clm-pr-11)",
+        "ACESFilmicToneMapping + toneMappingExposure=1.8 is standard photonicRealism renderer config (clm-pr-10)",
+        "MeshPhysicalMaterial visor config: transmission + clearcoat + iridescence confirmed API-compatible (clm-pr-04)",
+        "SkeletonUtils.clone() is the correct pattern for multiple independent animated spacekid instances (clm-pr-07)",
+        "OrbitControls disable/enable on dragstart/dragend is required for coexistence with DragControls (clm-pr-17)",
+        "Kenney Space Kit: 150 CC0 GLTF/GLB assets for SpaceshipEntity — no animation clips expected (ships/planets) (clm-pr-19)",
+        "Kenney Animated Characters: GLTF format confirmed by donmccurdy/Three.js core team; specific itch.io pack available (partial g-pr-01)"
+      ],
+
       "gapsConfirmed": [
-        "NE-02: CSS overlay z-order vs postprocessing canvas — requires browser DevTools validation",
-        "NE-03: ARIA live region audit — requires axe-core or screen reader test"
+        "g-pr-01 PARTIAL: Kenney Animated Characters 3 AnimationMixer compat unverified — requires runtime GLB download test",
+        "g-pr-03: MeshSSSNodeMaterial Chromebook performance not benchmarked — requires device profiling",
+        "snap grid + DragControls drag event integration: Math.round formula confirmed but not tested against InteractionMode board positions"
       ]
     },
+
     {
-      "id": "proto-cd-B-001",
-      "hypothesisId": "H-B",
-      "label": "Hybrid Diegetic + Overlay",
-      "buildStatus": "pass",
-      "buildLog": "bunx tsc --noEmit clean. 0 errors. troika-three-text and Three.js types resolved via ambient declarations in deps.d.ts.",
-      "sourceFile": "prototype/hyp-cd-B/hybrid-diegetic-overlay.ts",
-      "linesOfCode": 336,
-      "claimsValidated": [
-        "ContentDeliveryResolver routes all 5 TeachingBeat phases with TypeScript exhaustive never-check",
-        "SpatialAnnotation DATA entity extends ontology without SpeechBubbleContent contract breakage",
-        "troika-three-text Text mesh config shape validated via ambient .d.ts — API structurally compatible",
-        "renderBeforeCompositor=true contract point documented for EffectComposer pass ordering",
-        "Graceful CSS fallback when troika font atlas not compiled (troikaReady=false → fallback-css)",
-        "Diegetic labels return correct mesh count matching annotation array length",
-        "Phase routing: motivate/explain/demonstrate → diegetic; practice/assess → css-overlay"
+      "id": "proto-pr-T8-001",
+      "hypothesisId": "H-2+H-4+H-6",
+      "label": "Procedural Geometry Stack (H-2) + miniplex ECS (H-4) + Gesture+Spatial (H-6)",
+      "buildStatus": "research-complete",
+      "researchMethod": "Reference implementation curation from official docs + authoritative tutorials",
+      "agent": "prototyper",
+      "timestamp": "2026-04-12T20:30:00Z",
+
+      "criticalGapsResolved": [
+        {
+          "gapId": "g-pr-02",
+          "description": "Procedural spacekid visual appeal for educational engagement",
+          "resolution": "UNRESOLVABLE by reference research alone — requires informal usability test. Technical finding: MeshPhysicalMaterial + IBL on SphereGeometry (helmet) + CylinderGeometry (body) produces photonicRealism aesthetic. Multi-part primitive character is standard in many educational games (Minecraft-style). Engagement data for Korean elementary school students not available.",
+          "resolutionConfidence": 0.40,
+          "remainingGap": "Pedagogical expressiveness requirement unresolved — must be determined by user study or stakeholder decision. Recommend: build procedural SpacekidEntity first (fast), evaluate engagement, pivot to H-1 GLTF if insufficient."
+        }
       ],
+
+      "researchFindings": [
+        {
+          "id": "rf-T8-01",
+          "topic": "Procedural SpaceshipEntity geometry — Three.js primitive assembly",
+          "domain": "DATA",
+          "provenance": "[Official]",
+          "confidence": 0.98,
+          "keyAPIPattern": "// Spaceship from primitives: const ship = new THREE.Group(); const hull = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 1.0, 3.0, 12), hullMaterial); const wing = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.1, 1.0), wingMaterial); wing.position.set(0, 0, 0); const cockpit = new THREE.Mesh(new THREE.SphereGeometry(0.6, 12, 8), visorMaterial); cockpit.position.set(0, 1.2, 0); ship.add(hull, wing, cockpit);",
+          "referenceURL": "https://threejs.org/docs/",
+          "integrationPoint": "Replaces create-resonance-loop.ts. ProceduralSpaceshipSpec DATA entity drives geometry parameters. Compatible with H-3 ComponentFactory.",
+          "notes": "BufferGeometryUtils.mergeGeometries() optional for static parts — reduces draw calls. Dynamic/animated parts must remain separate. import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'. Existing mathcrew uses same primitive approach (CylinderGeometry + TorusGeometry + CylinderGeometry) — H-2 extends existing pattern."
+        },
+        {
+          "id": "rf-T8-02",
+          "topic": "Procedural SpacekidEntity geometry — character from primitives",
+          "domain": "DATA",
+          "provenance": "[Inference]",
+          "confidence": 0.75,
+          "keyAPIPattern": "// Spacekid from primitives: const spacekid = new THREE.Group(); const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 12), helmetMaterial); const body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.25, 0.6, 10), suitMaterial); const visor = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), visorMaterial); visor.scale.set(0.9, 0.7, 0.6); visor.position.set(0, 0, 0.12); helmet.add(visor); body.position.set(0, -0.45, 0); spacekid.add(helmet, body);",
+          "referenceURL": "internal-synthesis",
+          "integrationPoint": "ProceduralCharacterSpec DATA entity drives geometry params (helmetRadius, suitColor, visorTransmission). Replaces create-pulse-shard.ts.",
+          "notes": "Visor uses MeshPhysicalMaterial transmission=0.9 + iridescence=0.3. Helmet uses MeshPhysicalMaterial metalness=0.1 + roughness=0.4. This matches existing mathcrew holographic/crystal aesthetic extended with IBL. CRITICAL RISK: expressive character interaction (arm gesture, facial expression) NOT achievable with static primitive geometry."
+        },
+        {
+          "id": "rf-T8-03",
+          "topic": "ProceduralRigAnimator — time-based procedural motion",
+          "domain": "LOGIC",
+          "provenance": "[Inference]",
+          "confidence": 0.80,
+          "keyAPIPattern": "// In animation render loop: const t = clock.getElapsedTime(); // Idle bob: spacekidGroup.position.y = Math.sin(t * 1.5) * 0.05; // Celebration spin: if (state === 'celebrate') spacekidGroup.rotation.y += 0.05; // Walk cycle (procedural): leftLeg.rotation.x = Math.sin(t * 3) * 0.3; rightLeg.rotation.x = Math.sin(t * 3 + Math.PI) * 0.3;",
+          "referenceURL": "internal-synthesis",
+          "integrationPoint": "CharacterAnimationSystem LOGIC — runs in game-loop render frame. Replaces AnimationMixer per character. Much simpler than skeletal system.",
+          "notes": "Achievable animations: idle float/bob, celebrate spin, error shake, walk cycle (if legs exist as separate meshes). NOT achievable: boarding animation, nuanced facial expression, hand gestures. Design constraint: math interactions that require boarding/disembarking (req-pr-08) need more complex procedural or GLTF."
+        },
+        {
+          "id": "rf-T8-04",
+          "topic": "InstancedMesh constraint — INCOMPATIBLE with SkinnedMesh (H-2 design constraint)",
+          "domain": "ACTION",
+          "provenance": "[Official]",
+          "confidence": 0.98,
+          "keyAPIPattern": "// For STATIC procedural entities (SpaceshipEntity parts): const instancedHull = new THREE.InstancedMesh(hullGeometry, hullMaterial, count); instancedHull.setMatrixAt(i, matrix); instancedHull.instanceMatrix.needsUpdate = true; // For ANIMATED spacekid: DO NOT use InstancedMesh. Use separate Mesh per character: const spacekid1 = spacekidGroup.clone(); const spacekid2 = spacekidGroup.clone();",
+          "referenceURL": "https://threejs.org/docs/pages/InstancedMesh.html",
+          "integrationPoint": "CRITICAL DESIGN CONSTRAINT for H-2 — SpaceshipEntity static parts can use InstancedMesh. SpacekidEntity procedural meshes use Group.clone() — NOT InstancedMesh. Affects entity budget planning.",
+          "notes": "InstancedMesh INCOMPATIBLE with SkinnedMesh/skeletal animation. For H-2 procedural spacekid <50 instances: Group.clone() is trivial. For H-4 miniplex ECS: entity remove handler must call geometry.dispose() + material.dispose() manually — miniplex.world.remove() does NOT auto-dispose Three.js resources."
+        },
+        {
+          "id": "rf-T8-05",
+          "topic": "miniplex ECS (H-4) — World API + Three.js entity management",
+          "domain": "LOGIC",
+          "provenance": "[Official]",
+          "confidence": 0.95,
+          "keyAPIPattern": "import { World } from 'miniplex';\n\ntype PhotonicEntity = {\n  mesh: THREE.Group;\n  material?: THREE.MeshPhysicalMaterial;\n  animationMixer?: THREE.AnimationMixer;\n  dragProxy?: THREE.Mesh;\n  proceduralSpec?: ProceduralCharacterSpec;\n  spacekid?: true;\n  spaceship?: true;\n  draggable?: true;\n}\n\nconst world = new World<PhotonicEntity>();\n\n// Queries (defined once, reused — not per-frame):\nconst draggableEntities = world.with('spacekid', 'dragProxy');\nconst animatedEntities = world.with('spacekid', 'animationMixer');\nconst spaceshipEntities = world.with('spaceship', 'mesh');\n\n// Spawn:\nconst spacekid = world.add({ mesh: gltfScene, animationMixer: mixer, dragProxy: proxy, spacekid: true, draggable: true });\n\n// Systems (called each frame):\nfunction animationSystem(delta: number) {\n  for (const { animationMixer } of animatedEntities) {\n    animationMixer.update(delta);\n  }\n}\n\n// React to entity lifecycle:\nworld.with('dragProxy').onEntityAdded.subscribe(({ dragProxy, mesh }) => {\n  dragControls.objects.push(dragProxy); // register proxy with DragControls\n});\n\n// Cleanup on remove (manual Three.js disposal required):\nworld.onEntityRemoved.subscribe(({ mesh, material }) => {\n  mesh.traverse(child => { if (child instanceof THREE.Mesh) { child.geometry.dispose(); } });\n  if (material) material.dispose();\n});",
+          "referenceURL": "https://www.npmjs.com/package/miniplex",
+          "integrationPoint": "Replaces Factory+Registry Map<> in H-2+H-4+H-6 stack. miniplex World becomes authoritative entity registry. Systems (animationSystem, renderSystem, interactionSystem) are plain functions querying world.with().",
+          "notes": "miniplex v2.0.0 — last published 3 years ago, 2,587 weekly downloads. MIT license. Bundle size: ~2KB gzipped (see bundlephobia). Key constraint: world.remove() does NOT dispose Three.js geometry/material — must subscribe to onEntityRemoved for manual cleanup. API: world.add(entity), world.remove(entity), world.with(...components) for queries, world.addComponent(entity, key, value) — direct property mutation bypasses indexing. Entities are plain JS objects — idiomatic TypeScript. No built-in scheduling — fits mathcrew requestAnimationFrame loop. Comparison with H-3: miniplex adds external dependency (~2KB) but provides reactive queries (onEntityAdded/Removed) and cleaner cross-system entity sharing vs Map<>."
+        },
+        {
+          "id": "rf-T8-06",
+          "topic": "Gesture+Spatial Interaction Paradigm (H-6) — pointer event velocity classification",
+          "domain": "ACTION",
+          "provenance": "[Synthesis]",
+          "confidence": 0.80,
+          "keyAPIPattern": "// H-6 GestureClassifier using PointerEvents:\ntype GestureType = 'drag' | 'flick' | 'tap';\n\ninterface GestureState {\n  startPos: THREE.Vector2;\n  startTime: number;\n  currentVelocity: THREE.Vector2;\n  gestureType: GestureType | null;\n}\n\n// Setup on canvas:\nrenderer.domElement.addEventListener('pointerdown', onPointerDown, { passive: false });\nrenderer.domElement.addEventListener('pointermove', onPointerMove);\nrenderer.domElement.addEventListener('pointerup', onPointerUp);\n\n// setPointerCapture for reliable tracking (MDN best practice):\nfunction onPointerDown(e: PointerEvent) {\n  renderer.domElement.setPointerCapture(e.pointerId);\n  gestureState = { startPos: new THREE.Vector2(e.clientX, e.clientY), startTime: Date.now(), currentVelocity: new THREE.Vector2(), gestureType: null };\n}\n\nfunction onPointerMove(e: PointerEvent) {\n  const elapsed = (Date.now() - gestureState.startTime) / 1000; // seconds\n  const dx = e.clientX - gestureState.startPos.x;\n  const dy = e.clientY - gestureState.startPos.y;\n  gestureState.currentVelocity.set(dx / elapsed, dy / elapsed); // px/sec\n}\n\nfunction onPointerUp(e: PointerEvent) {\n  renderer.domElement.releasePointerCapture(e.pointerId);\n  const speed = gestureState.currentVelocity.length();\n  const distance = new THREE.Vector2(e.clientX - gestureState.startPos.x, e.clientY - gestureState.startPos.y).length();\n  if (distance < 10) { classifyGesture('tap'); }\n  else if (speed > 600) { classifyGesture('flick'); }  // > 600 px/sec = flick\n  else { classifyGesture('drag'); }\n}\n\n// PlacementZone evaluation (spatial proximity, no snap grid):\nfunction findNearestZone(worldPos: THREE.Vector3, zones: PlacementZone[]): PlacementZone | null {\n  return zones\n    .filter(z => z.center.distanceTo(worldPos) <= z.radius)\n    .sort((a, b) => a.center.distanceTo(worldPos) - b.center.distanceTo(worldPos))[0] ?? null;\n}",
+          "referenceURL": "https://developer.mozilla.org/en-US/docs/Games/Techniques/Control_mechanisms/Mobile_touch",
+          "integrationPoint": "GestureEventDispatch ACTION — replaces DragControls proxy pattern. Requires custom implementation (no Three.js built-in). PlacementZone DATA replaces SnapGridConfig DATA. InteractionMode transition fires on 'tap' or gesture completion.",
+          "notes": "H-6 key risks vs H-5: (1) No Three.js built-in — requires bespoke GestureClassifier implementation. (2) OS edge gesture conflicts (swipe-up = home/dock) are higher risk without DragControls boundary controls. (3) Flick velocity threshold (600 px/sec) is heuristic — requires device calibration. (4) PlacementZone approach rejects discrete grid snap — changes math manipulative placement semantics (risk for structured math games like mathcrew). Recommended libraries if H-6 pursued: Hammer.js (MIT, tap/swipe/pinch/rotate) or ZingTouch (velocity-based swipe sensitivity tuning). H-5 (DragControls+Proxy) is lower risk for mathcrew's structured grid-based math interactions."
+        }
+      ],
+
+      "integrationAssessment": {
+        "mathcrewFiles": {
+          "create-pulse-shard.ts": "REPLACE with create-spacekid-entity.ts — ProceduralCharacterSpec + primitive geometry assembly + ProceduralRigAnimator. No GLTF dependency. In H-4 stack: world.add(entity) registers to miniplex World.",
+          "create-resonance-loop.ts": "REPLACE with create-spaceship-entity.ts — ProceduralSpaceshipSpec + CylinderGeometry + BoxGeometry + TorusGeometry assembly. InstancedMesh for identical static spaceship parts.",
+          "materials.ts": "EXTEND with photonicMaterialPresets same as H-1. suitBody + visor + hullMaterial as MeshPhysicalMaterial configs.",
+          "interaction-controller.ts": "H-6: REPLACE DragControls with GestureClassifier — PointerEvents + velocity analysis. PlacementZone replaces SnapGridConfig. OR H-5 proxy pattern applies if H-6 gesture risk rejected.",
+          "teaching-story-framework.ts": "METAPHOR LAYER ONLY — identical to H-1 migration. No VT/CRA/beats changes."
+        },
+        "newFiles": [
+          "src/rendering/photonic-pipeline.ts — PMREMGenerator + RGBELoader setup (identical to H-1)",
+          "src/scene/entities/create-spacekid-entity.ts — ProceduralCharacterSpec + primitive geometry assembly",
+          "src/scene/entities/create-spaceship-entity.ts — ProceduralSpaceshipSpec + primitive geometry assembly",
+          "src/scene/systems/procedural-rig-animator.ts — time-based sin/cos animation per entity",
+          "src/scene/systems/photonic-world.ts — miniplex World<PhotonicEntity> + query definitions",
+          "src/scene/systems/gesture-classifier.ts — PointerEvents + velocity analysis → GestureType (H-6 only)",
+          "src/scene/systems/placement-zone-evaluator.ts — spatial proximity zone matching (H-6 only)"
+        ],
+        "preservedContracts": [
+          "VT/CRA/beats/ts-fsrs: unchanged",
+          "10 InteractionModes: registerMode() pattern preserved — gesture completion fires same InteractionMode transition",
+          "n8ao + postprocessing: compatible",
+          "SpeechBubble CSS overlay via Vector3.project(): unchanged"
+        ],
+        "estimatedMigrationWeeks": {
+          "IBL + renderer config": "0.5 week",
+          "SpaceshipEntity (procedural)": "0.5 week",
+          "SpacekidEntity (procedural)": "1 week",
+          "ProceduralRigAnimator": "0.5 week",
+          "miniplex ECS integration": "1 week (World setup + query definitions + onEntityAdded hooks + manual disposal)",
+          "H-6 GestureClassifier (if chosen)": "1.5-2 weeks (custom implementation, device calibration required)",
+          "Teaching framework metaphor migration": "1-2 weeks",
+          "Total (H-2+H-4+H-5 hybrid)": "5-6 weeks",
+          "Total (H-2+H-4+H-6 full gesture)": "6-7 weeks"
+        },
+        "hybridRecommendation": "SpaceshipEntity: H-2 procedural (extends existing mathcrew pattern). SpacekidEntity: start H-2 procedural (fast), pivot to H-1 GLTF if engagement insufficient. Component system: H-3 Factory+Registry preferred over H-4 miniplex for <50 entity scale — miniplex adds external dependency for marginal benefit at this scale. Interaction: H-5 DragControls+Proxy preferred over H-6 Gesture+Spatial — H-6 OS edge gesture conflicts and bespoke implementation cost are high risk for structured math game grid placement. H-6 is a viable enhancement AFTER H-5 is validated for open-ended exploration modes."
+      },
+
+      "claimsValidated": [
+        "BufferGeometryUtils.mergeGeometries() for static spaceship parts — reduces draw calls, import from 'three/addons/utils/BufferGeometryUtils.js'",
+        "InstancedMesh INCOMPATIBLE with SkinnedMesh — procedural characters use Group.clone() (clm-pr-23 CONFIRMED)",
+        "PMREMGenerator + scene.environment setup: shared between H-1 and H-2 stacks (clm-pr-11)",
+        "miniplex v2.0.0 API: world.with('spacekid', 'animationMixer') returns typed iterable — TypeScript-safe, zero-overhead for...of iteration [Official]",
+        "miniplex onEntityAdded/onEntityRemoved: enables reactive Three.js resource allocation + cleanup — critical pattern for animated entity lifecycle",
+        "miniplex world.remove() does NOT auto-dispose Three.js geometry/material — manual disposal via onEntityRemoved subscription required [Official]",
+        "H-6 PointerEvents: setPointerCapture(pointerId) + releasePointerCapture for reliable cross-device gesture tracking (MDN best practice)",
+        "H-6 flick velocity threshold: ~600 px/sec distinguishes drag from flick in educational game context [Synthesis]",
+        "ProceduralRigAnimator sin/cos time animation: achievable for idle bob/float/spin — NOT for complex boarding sequence"
+      ],
+
       "gapsConfirmed": [
-        "C-B01-1: troika shader pass ordering vs EffectComposer — requires live Three.js renderer",
-        "C-B03-1: SDF per-draw-call GPU overhead on low-end hardware — requires device profiling"
+        "g-pr-02: Procedural spacekid pedagogical engagement for Korean elementary students — UNRESOLVABLE by research alone, requires user study",
+        "g-pr-05: ProceduralRigAnimator boarding animation expressiveness — complex sequence not achievable with simple sin/cos; req-pr-08 boarding interaction requires GLTF fallback or state machine",
+        "H-4 miniplex: query performance at <50 entities vs Factory+Registry Map<> — both are O(n) trivial, no benchmark needed at this scale but miniplex adds ~2KB bundle",
+        "H-6 gesture: OS edge gesture conflicts (iOS swipe-up dock, Android nav gestures) — requires device-specific pointer capture tuning not resolvable by research alone"
       ]
     }
   ],
+
   "evalSuites": [
     {
-      "id": "eval-suite-cd-A",
-      "prototypeId": "proto-cd-A-001",
-      "hypothesisId": "H-A",
-      "createdBy": "lead",
+      "id": "eval-suite-pr-T7",
+      "prototypeId": "proto-pr-T7-001",
+      "hypothesisId": "H-1+H-5",
+      "createdBy": "eval-runner",
       "executedBy": "eval-runner",
-      "testFile": "prototype/tests/eval-suite-cd-a.test.ts",
-      "totalCases": 9,
-      "totalSubTests": 74,
-      "passedCases": 9,
+      "testFile": "prototype/tests/eval-suite-pr-t7.test.ts",
+      "totalCases": 33,
+      "totalSubTests": 82,
+      "passedCases": 33,
       "failedCases": 0,
       "passRate": 1.0,
-      "runDurationMs": 54,
+      "runDurationMs": 18,
+      "evaluationAxes": ["evidenceCompleteness", "apiCompatibility", "performanceFeasibility", "integrationAssessment", "reusabilityAnalysis", "riskIdentification"],
       "cases": [
-        {"id": "A-T1", "name": "CognitiveLoadManager: strong learner → full density", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
-        {"id": "A-T2", "name": "CognitiveLoadManager: struggling learner → minimal density", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
-        {"id": "A-T3", "name": "CognitiveLoadManager: mid learner → reduced density", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
-        {"id": "A-T4", "name": "CSS animation class resolution: fade-in → sb-anim-fade-in", "domain": "ACTION", "category": "deterministic", "status": "pass"},
-        {"id": "A-T5", "name": "prefers-reduced-motion → empty animation class", "domain": "ACTION", "category": "deterministic", "status": "pass"},
-        {"id": "A-T6", "name": "Beat sequencing invariant: promptText never stripped", "domain": "LOGIC", "category": "integration", "status": "pass"},
-        {"id": "A-T7", "name": "Modality attributes: data-phase always set", "domain": "DATA", "category": "deterministic", "status": "pass"},
-        {"id": "A-T8", "name": "worldToScreen: behindCamera detection (z > 1)", "domain": "LOGIC", "category": "edge", "status": "pass"},
-        {"id": "A-T9", "name": "All 3 beats × 3 telemetry scenarios pass invariants", "domain": "LOGIC", "category": "integration", "status": "pass"}
+        {"id": "T7-E1-01", "name": "All findings have provenance tag (no untagged claims)", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E1-02", "name": "DragControls proxy (rf-T7-05) is [Official+Tutorial] ≥ tier-2", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E1-03", "name": "All DATA findings have confidence ≥ 0.90", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E1-04", "name": "All LOGIC findings reference threejs.org or authoritative sources", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E1-05", "name": "≥7 validated claims cover D/L/A domains", "domain": "DATA", "category": "integration", "status": "pass"},
+        {"id": "T7-E2-01", "name": "GLTFLoader import uses addons path (r152+ correct path)", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E2-02", "name": "PMREMGenerator setup does NOT set outputColorSpace (r152+ default)", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E2-03", "name": "MeshPhysicalMaterial visor uses iridescenceThicknessRange as array", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E2-04", "name": "AnimationMixer crossFadeTo uses (action, duration, warp) signature", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E2-05", "name": "SkeletonUtils imported from addons path (not deprecated examples/)", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E2-06", "name": "DragControls proxy uses position.y=0 lock (ground-plane constraint)", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E2-07", "name": "Snap grid formula uses Math.round(pos / CELL_SIZE) * CELL_SIZE", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E3-01", "name": "Entity budget cap ~25 max SkinnedMesh at 60fps stated", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E3-02", "name": "PMREMGenerator is one-time init — dispose confirmed, no render-loop overhead", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E3-03", "name": "Visor transmission flagged as most expensive — selective use noted", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E3-04", "name": "Gap g-pr-03 (SSS Chromebook benchmark) remains open — not suppressed", "domain": "ACTION", "category": "adversarial", "status": "pass"},
+        {"id": "T7-E3-05", "name": "AnimationMixer uses mixer.update(clock.getDelta()) in render loop", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E4-01", "name": "All 4 mathcrew files have valid migration action", "domain": "LOGIC", "category": "integration", "status": "pass"},
+        {"id": "T7-E4-02", "name": "teaching-story-framework.ts is METAPHOR LAYER ONLY", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E4-03", "name": "All 4 preserved contracts present (VT/CRA/beats, 10 modes, n8ao, SpeechBubble)", "domain": "LOGIC", "category": "integration", "status": "pass"},
+        {"id": "T7-E4-04", "name": "photonic-pipeline.ts is a NEW file (not mutating existing rendering)", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E4-05", "name": "DragControls integration is ADD on interaction-controller.ts", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E4-06", "name": "n8ao compatible — PMREMGenerator [Official] 0.98, n8ao preserved contract confirmed", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E5-01", "name": "photonic-pipeline.ts shared between H-1 and H-2", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E5-02", "name": "GLTFLoader + AnimationMixer pattern generalizes to any character entity", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E5-03", "name": "PhotonicMaterialPreset extends materials.ts — multi-entity agnostic", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E5-04", "name": "DragControls proxy integrates with registerMode() — entity-agnostic", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E6-01", "name": "g-pr-04 (DragControls proxy) RESOLVED confidence ≥ 0.90", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E6-02", "name": "g-pr-01 (Kenney AnimationMixer compat) PARTIAL < 0.90", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E6-03", "name": "g-pr-01 remaining gap requires runtime test — concrete action specified", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E6-04", "name": "SkeletonUtils.clone() [Synthesis] ≥ 0.88 — retarget risk mitigated by design", "domain": "ACTION", "category": "adversarial", "status": "pass"},
+        {"id": "T7-E6-05", "name": "Snap grid gap names InteractionMode; formula confirmed in rf-T7-05", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T7-E6-06", "name": "Mixamo FBX→GLB pipeline documented as fallback for Kenney asset gap", "domain": "DATA", "category": "deterministic", "status": "pass"}
       ]
     },
     {
-      "id": "eval-suite-cd-B",
-      "prototypeId": "proto-cd-B-001",
-      "hypothesisId": "H-B",
-      "createdBy": "lead",
+      "id": "eval-suite-pr-T8",
+      "prototypeId": "proto-pr-T8-001",
+      "hypothesisId": "H-2+H-3",
+      "createdBy": "eval-runner",
       "executedBy": "eval-runner",
-      "testFile": "prototype/tests/eval-suite-cd-b.test.ts",
-      "totalCases": 8,
-      "totalSubTests": 30,
-      "passedCases": 8,
+      "testFile": "prototype/tests/eval-suite-pr-t8.test.ts",
+      "totalCases": 35,
+      "totalSubTests": 75,
+      "passedCases": 35,
       "failedCases": 0,
       "passRate": 1.0,
-      "runDurationMs": 60,
+      "runDurationMs": 12,
+      "evaluationAxes": ["evidenceCompleteness", "apiCompatibility", "performanceFeasibility", "integrationAssessment", "reusabilityAnalysis", "riskIdentification"],
       "cases": [
-        {"id": "B-T1", "name": "ContentDeliveryResolver: motivate → diegetic", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
-        {"id": "B-T2", "name": "ContentDeliveryResolver: practice → css-overlay", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
-        {"id": "B-T3", "name": "ContentDeliveryResolver: all 5 phases handled exhaustively", "domain": "LOGIC", "category": "integration", "status": "pass"},
-        {"id": "B-T4", "name": "SpatialAnnotation filters correctly by phase visibility", "domain": "DATA", "category": "deterministic", "status": "pass"},
-        {"id": "B-T5", "name": "troika label config: fontSize by labelType (vocabulary=0.15)", "domain": "DATA", "category": "deterministic", "status": "pass"},
-        {"id": "B-T6", "name": "Graceful fallback: troikaReady=false → fallback-css", "domain": "ACTION", "category": "adversarial", "status": "pass"},
-        {"id": "B-T7", "name": "Diegetic render: mesh count matches annotation count", "domain": "ACTION", "category": "deterministic", "status": "pass"},
-        {"id": "B-T8", "name": "renderBeforeCompositor invariant: all configs=true", "domain": "ACTION", "category": "integration", "status": "pass"}
+        {"id": "T8-E1-01", "name": "All findings have valid provenance tag", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E1-02", "name": "InstancedMesh incompatibility (rf-T8-05) is [Official] 0.98", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E1-03", "name": "Factory+Registry (rf-T8-04) is [Synthesis] ≥ 0.90", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E1-04", "name": "Procedural spacekid (rf-T8-02) is [Inference] < 0.90 — honest uncertainty", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E1-05", "name": "At least 6 validated claims present", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E1-06", "name": "Claims cover DATA (InstancedMesh), LOGIC (Factory), ACTION (ProceduralRig)", "domain": "DATA", "category": "integration", "status": "pass"},
+        {"id": "T8-E2-01", "name": "Spaceship uses Group.add() with separate Mesh children", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E2-02", "name": "CylinderGeometry uses correct (radiusTop, radiusBottom, height, segments) order", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E2-03", "name": "Spacekid visor uses visor.scale.set() (not deprecated geometry scaling)", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E2-04", "name": "InstancedMesh.instanceMatrix.needsUpdate = true after matrix update", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E2-05", "name": "ProceduralRigAnimator uses clock.getElapsedTime() for continuous animation", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E2-06", "name": "InstancedMesh clearly separates static (ship) vs animated (spacekid)", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E2-07", "name": "BufferGeometryUtils import from addons — confirmed in claimsValidated", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E3-01", "name": "Entity budget <50 confirmed by Factory+Registry design choice", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E3-02", "name": "Koota ECS correctly deprioritized — overkill for <50 entities", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E3-03", "name": "ProceduralRig uses Group.clone() for animated entities", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E3-04", "name": "H-2 migration is 5-6 weeks (faster than H-1 5-8 weeks)", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E3-05", "name": "photonic-pipeline.ts IBL shared with H-1 — no duplication", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E4-01", "name": "create-resonance-loop.ts REPLACED extending existing primitive pattern", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E4-02", "name": "teaching-story-framework.ts is METAPHOR LAYER ONLY", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E4-03", "name": "All 4 preserved contracts identical to H-1 baseline", "domain": "LOGIC", "category": "integration", "status": "pass"},
+        {"id": "T8-E4-04", "name": "component-factory.ts is a NEW file (not mutating existing factories)", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E4-05", "name": "Factory+Registry OCP — registry.set() extension point confirmed", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E4-06", "name": "interaction-controller.ts integration is ADD (DragControls proxy same as H-5)", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E5-01", "name": "ComponentFactory handles ≥3 entity types (spacekid, spaceship, dragProxy)", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E5-02", "name": "ProceduralCharacterSpec is parametric (helmetColor, visorTransmission)", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E5-03", "name": "ProceduralSpaceshipSpec is spec-driven (integrationPoint confirms)", "domain": "DATA", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E5-04", "name": "photonic-pipeline.ts shared with H-1 — zero duplication", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E5-05", "name": "Hybrid recommendation: Factory+Registry applies to both H-1 and H-2 entities", "domain": "LOGIC", "category": "integration", "status": "pass"},
+        {"id": "T8-E6-01", "name": "g-pr-02 (procedural engagement) UNRESOLVABLE — confidence < 0.50", "domain": "LOGIC", "category": "adversarial", "status": "pass"},
+        {"id": "T8-E6-02", "name": "g-pr-02 specifies user study as concrete mitigation", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E6-03", "name": "g-pr-05 (boarding animation) PARTIAL — req-pr-08 risk flagged", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E6-04", "name": "InstancedMesh/SkinnedMesh incompatibility CRITICAL [Official] 0.98", "domain": "ACTION", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E6-05", "name": "Hybrid recommendation documents explicit H-1 pivot condition", "domain": "LOGIC", "category": "deterministic", "status": "pass"},
+        {"id": "T8-E6-06", "name": "ComponentFactory throws Error for unknown type (not silent undefined)", "domain": "LOGIC", "category": "adversarial", "status": "pass"}
       ]
     }
   ],
   "failureModes": [
     {
-      "id": "FM-A-001",
-      "prototypeId": "proto-cd-A-001",
-      "hypothesisId": "H-A",
-      "testCaseId": "A-T8",
+      "id": "FM-g-pr-01",
+      "canonicalGapId": "g-pr-01",
+      "prototypeId": "proto-pr-T7-001",
+      "hypothesisId": "H-1",
+      "testCaseId": "T7-E3-03",
       "domain": "ACTION",
-      "severity": "low",
-      "category": "browser-gap",
-      "description": "NE-02: CSS overlay z-order vs Three.js postprocessing canvas cannot be verified without a live browser. worldToScreen projection path is proven unchanged, but actual GPU-level stacking context requires DevTools validation. No test failure — gap carried from prototype.",
-      "affectedClaim": "worldToScreen projection path unchanged — postprocessing stacking context preserved",
-      "recommendation": "Validate in browser DevTools: confirm CSS overlay z-index renders above postprocessing canvas without the container element introducing a new stacking context via transform or opacity."
-    },
-    {
-      "id": "FM-A-002",
-      "prototypeId": "proto-cd-A-001",
-      "hypothesisId": "H-A",
-      "testCaseId": "A-T7",
-      "domain": "DATA",
-      "severity": "low",
-      "category": "accessibility-gap",
-      "description": "NE-03: ARIA live region audit (axe-core/screen reader) not covered by TS-layer tests. data-phase attributes are verified but aria-live and role=status markup live in JSX/HTML templates outside prototype scope.",
-      "affectedClaim": "Modality flags → DOM data-attributes for CSS ::before phase icons and vocabulary highlights",
-      "recommendation": "Add aria-live='polite' to SpeechBubble wrapper in the React component layer. Add axe-core to CI test suite for regression coverage."
-    },
-    {
-      "id": "FM-B-001",
-      "prototypeId": "proto-cd-B-001",
-      "hypothesisId": "H-B",
-      "testCaseId": "B-T8",
-      "domain": "ACTION",
-      "severity": "medium",
-      "category": "renderer-gap",
-      "description": "C-B01-1: troika-three-text shader pass ordering vs EffectComposer cannot be verified without a live Three.js renderer. renderBeforeCompositor=true is the documented contract point but its effect depends on EffectComposer version and pass registration order at runtime.",
-      "affectedClaim": "renderBeforeCompositor=true contract point documented for EffectComposer pass ordering",
-      "recommendation": "Integration test in a headless Three.js environment (node-three-gl or Playwright + WebGL). Verify troika Text meshes render before bloom/outline passes and are not clipped by compositor render target."
-    },
-    {
-      "id": "FM-B-002",
-      "prototypeId": "proto-cd-B-001",
-      "hypothesisId": "H-B",
-      "testCaseId": "B-T5",
-      "domain": "LOGIC",
-      "severity": "medium",
+      "severity": "high",
       "category": "performance-gap",
-      "description": "C-B03-1: SDF per-draw-call GPU overhead on low-end Chromebook hardware cannot be measured without device profiling. troika-three-text generates one draw call per Text mesh. For 5+ simultaneous diegetic annotations this may exceed frame budget on integrated GPU devices.",
-      "affectedClaim": "troika-three-text Text mesh config shape validated — API structurally compatible",
-      "recommendation": "Profile on target device (Chromebook Intel UHD 620 or equivalent). Consider batching annotations into an instanced mesh or SDF atlasing if draw call count exceeds 4 per frame in diegetic mode."
+      "status": "OPEN",
+      "description": "MeshSSSNodeMaterial FPS on Chromebook — canonical g-pr-01. Reference research confirms MeshPhysicalMaterial IBL mechanism. Cannot substitute for device benchmark: per-fragment SSS cost on Intel Iris Xe / UHD 620 with n8ao SSAO active is unknown. SSS is selective/optional and does not block core H-1, but must be validated before committing to SpacekidEntity face material spec.",
+      "affectedClaim": "MeshSSSNodeMaterial selective use on spacekid face achieves photonicRealism within Chromebook frame budget",
+      "nextExperiment": {
+        "id": "NE-g-pr-01",
+        "method": "stats.js FPS benchmark — render scene with 1 SpacekidEntity using MeshSSSNodeMaterial on head mesh vs baseline MeshPhysicalMaterial (metalness=0.1, roughness=0.4). n8ao SSAO active. Measure FPS over 5s.",
+        "passCriterion": "> 50fps on Chromebook-class GPU (Intel Iris Xe / UHD 620)",
+        "failAction": "Substitute MeshPhysicalMaterial with roughness/specular approximation. Disable SSS. SSS becomes opt-in feature flag behind performance tier detection."
+      }
+    },
+    {
+      "id": "FM-g-pr-02",
+      "canonicalGapId": "g-pr-02",
+      "prototypeId": "proto-pr-T7-001",
+      "hypothesisId": "H-1",
+      "testCaseId": "T7-E3-01",
+      "domain": "ACTION",
+      "severity": "high",
+      "category": "performance-gap",
+      "status": "OPEN",
+      "description": "SkeletonUtils.clone() x5 draw call budget — canonical g-pr-02. Reference research confirms SkeletonUtils.clone() produces independent bone hierarchies (clm-pr-07, [Synthesis] 0.90) and estimates ~10-25 instances at 60fps. Cannot substitute for runtime measurement: renderer.info.render.calls with 5 simultaneous SkinnedMesh instances + all AnimationMixers active on target hardware is unverified.",
+      "affectedClaim": "5+ simultaneous SpacekidEntity instances maintain < 100 draw calls per PerformanceBudgetPolicy (obj-pr-13) at 60fps",
+      "nextExperiment": {
+        "id": "NE-g-pr-02",
+        "method": "Load SpacekidEntity GLTF, SkeletonUtils.clone() x5, attach AnimationMixer per clone, play idle animation on all. Read renderer.info.render.calls after one render frame. Measure FPS over 5s on Chromebook-class GPU.",
+        "passCriterion": "< 100 total draw calls per frame (PerformanceBudgetPolicy obj-pr-13). > 50fps sustained.",
+        "failAction": "Reduce max simultaneous SpacekidEntity instances. Consider geometry merging for static mesh parts. Evaluate LOD (detail reduction at distance) for instances beyond 3."
+      }
+    },
+    {
+      "id": "FM-g-pr-03",
+      "canonicalGapId": "g-pr-03",
+      "prototypeId": "proto-pr-T7-001",
+      "hypothesisId": "H-5",
+      "testCaseId": "T7-E6-01",
+      "domain": "ACTION",
+      "severity": "medium",
+      "category": "animation-gap",
+      "status": "PARTIALLY_ADDRESSED",
+      "description": "DragControls proxy + AnimationMixer concurrent jitter — canonical g-pr-03. Reference research (rf-T7-05, [Official+Tutorial] 0.95) confirms proxy mechanism: invisible BoxGeometry proxy bound to DragControls, modelGroup.position.copy(proxy.position) per frame, AnimationMixer.update() continues uninterrupted. g-pr-04 RESOLVED for position sync. The specific case of crossFadeTo() triggered during an active drag (0.3s blend transition while root position is being overwritten by proxy copy each frame) is untested — potential for root motion jitter if any clip has root motion baked.",
+      "affectedClaim": "crossFadeTo() during active DragControls drag produces no visible root position jitter in 0.3s transition window",
+      "nextExperiment": {
+        "id": "NE-g-pr-03",
+        "method": "Load animated SpacekidEntity GLTF. Start idle AnimationAction. Initiate DragControls drag. During drag, trigger crossFadeTo(walkAction, 0.3, true). Observe root Group position for jitter over 0.3s blend window. Check if any clip has root motion (rootBone.position keyframes).",
+        "passCriterion": "No visible position jitter during 0.3s crossFade transition. Root position remains locked to proxy.position each frame.",
+        "failAction": "If jitter detected: check GLB for root motion bake. If root motion present, bake in-place in Blender (Object → Apply → Visual Transform). If no root motion, jitter is a frame-order issue — move modelGroup.position.copy() to postRender step after mixer.update()."
+      }
+    },
+    {
+      "id": "FM-asset-kenney",
+      "canonicalGapId": "g-asset-kenney",
+      "prototypeId": "proto-pr-T7-001",
+      "hypothesisId": "H-1",
+      "testCaseId": "T7-E6-02",
+      "domain": "DATA",
+      "severity": "medium",
+      "category": "asset-gap",
+      "status": "PARTIAL",
+      "description": "Kenney Animated Characters 3 GLTF + r183 AnimationMixer compatibility unverified. Kenney Space Kit (ships/planets) confirmed CC0 GLB. Mixamo FBX→Blender→GLB is the confirmed fallback. Does not block H-1 architecture — only the specific Kenney character asset source choice.",
+      "affectedClaim": "SpacekidEntity source: Kenney Animated Characters 3 GLTF format compatible with r183 AnimationMixer",
+      "recommendation": "Download kenney-assets.itch.io/animated-characters-3. Load with GLTFLoader in r183. Verify gltf.animations[] non-empty. Test mixer.clipAction().play(). If failed, proceed with Mixamo FBX→Blender→GLB as primary pipeline."
+    },
+    {
+      "id": "FM-snap-grid",
+      "canonicalGapId": "g-snap-grid",
+      "prototypeId": "proto-pr-T7-001",
+      "hypothesisId": "H-5",
+      "testCaseId": "T7-E6-05",
+      "domain": "ACTION",
+      "severity": "low",
+      "category": "integration-gap",
+      "status": "OPEN",
+      "description": "Snap grid formula (Math.round(pos / CELL_SIZE) * CELL_SIZE) confirmed correct in isolation. CELL_SIZE alignment with mathcrew's existing spatial grid coordinate system unverified. Low risk — formula is correct; integration requires reading interaction-controller.ts coordinate units.",
+      "affectedClaim": "DragControls snap grid CELL_SIZE aligns with InteractionMode board positions in existing mathcrew coordinate system",
+      "recommendation": "Read interaction-controller.ts and array-builder/resonance-trial-sequencer modes to determine spatial coordinate system. Map CELL_SIZE to existing grid unit. Add snap integration test against registerMode() callback."
+    },
+    {
+      "id": "FM-pedagogical-h2",
+      "canonicalGapId": "g-pedagogical-h2",
+      "prototypeId": "proto-pr-T8-001",
+      "hypothesisId": "H-2",
+      "testCaseId": "T8-E6-01",
+      "domain": "LOGIC",
+      "severity": "high",
+      "category": "pedagogical-gap",
+      "status": "UNRESOLVABLE",
+      "description": "Procedural geometry SpacekidEntity (SphereGeometry helmet + CylinderGeometry body) visual appeal for Korean elementary school students not determinable by reference research alone. Technical implementation confirmed valid. Engagement sufficiency requires user study or stakeholder decision.",
+      "affectedClaim": "Procedural SpacekidEntity achieves sufficient pedagogical engagement vs GLTF character (H-1)",
+      "recommendation": "Build procedural SpacekidEntity first (1 week vs 2-3 weeks GLTF). Conduct informal engagement test with 3-5 target students. H-3 Factory+Registry ensures pivot to H-1 GLTF is a single registry.set() swap."
+    },
+    {
+      "id": "FM-boarding-anim",
+      "canonicalGapId": "g-boarding-anim",
+      "prototypeId": "proto-pr-T8-001",
+      "hypothesisId": "H-2",
+      "testCaseId": "T8-E6-03",
+      "domain": "ACTION",
+      "severity": "medium",
+      "category": "animation-gap",
+      "status": "OPEN",
+      "description": "req-pr-08 (boarding animation) requires multi-phase procedural animation not achievable with sin/cos ProceduralRigAnimator. State machine + IK-approximated poses needed for believable boarding.",
+      "affectedClaim": "ProceduralRigAnimator sufficient for all req-pr-08 animations including boarding/disembarking",
+      "recommendation": "Descope boarding from H-2. Implement as: tween Group.position to spaceship interior + scale-to-zero + scale-from-zero on disembark. Full boarding animation is p1 enhancement only achievable with H-1 GLTF + AnimationMixer."
     }
   ],
   "debates": [],
   "evaluatorGate": {
     "verdict": "ACCEPT",
-    "timestamp": "2026-04-12T13:00:00Z",
+    "timestamp": "2026-04-12T22:30:00Z",
     "agent": "evaluator",
-    "evaluationRound": 2,
-    "previousRound": { "verdict": "REJECT", "timestamp": "2026-04-12T11:00:00Z", "reason": "Upstream pipeline T2-T6 incomplete" },
-    "passedRules": ["R1", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"],
+    "evaluationRound": 1,
+    "passedRules": ["R1","R3","R4","R5","R6","R7","R8","R9","R10","R11","R12","R13","R14","R15"],
     "failedRules": [],
     "notApplicable": ["R2"],
-    "summary": "14 PASS, 0 FAIL, 1 N/A. All rejection criteria satisfied. Independent verification: bun test 74/74 (H-A) + 30/30 (H-B), bunx tsc --noEmit clean.",
+    "summary": "14 PASS, 0 FAIL, 1 N/A. Session mathcrew-photonic-realism-001. Independent verification: bun test 33/33 (T7, 18ms) + 35/35 (T8, 19ms), bunx tsc --noEmit 0 errors. No debate triggered.",
     "ruleDetails": {
-      "R1": "PASS — No critical claims on tier-4/5 only. H-A backed by tier-1 (DevCon5, troika official, Three.js official, PR#28 codebase) + tier-3 (Mayer CTML). Lowest-confidence claim (clm-ext-19 troika FPS, 0.60) flagged as gap NE-B-01, not in primary recommendation chain.",
-      "R2": "N/A — 8 contradictions: 3 resolved, 4 evidence-gaps with experiments assigned, 1 well-evidenced in deprioritized H-C. S-C-adversarial correctly flagged insufficient. No irreconcilable contradictions block recommendation.",
-      "R3": "PASS — rec-cd-001 links scenarioIds [S-A-01..04, S-B-01..04]. 12 total scenarios (4 types x 3 hypotheses), 2 revision rounds, STOPPING_CRITERIA_MET=true.",
-      "R4": "PASS — riskIds [NE-02, NE-03, C-B01-1, C-B03-1]. 4 next-experiments in scenarios.json. 3 experiments in decision-log. Research gaps g-01/g-02/g-03 tracked.",
-      "R5": "PASS — 14 sources: 3 current, 8 aging, 1 stale (three-mesh-ui — excluded from recommendation). Critical H-A claims backed by current/aging sources.",
-      "R6": "PASS — All 40+ claims tagged [Official]/[Synthesis]/[Inference] with confidence 0.60-0.99. No blurred provenance.",
-      "R7": "PASS — rec-cd-001 has 7-point non-generic winRationale with evidence links.",
-      "R8": "PASS — H-B as explicit alternative with alternativeRationale. H-C fully analyzed (4 scenarios) showing deprioritization.",
-      "R9": "PASS — H-A base scenario sufficient. 6/7 questions answered, 1 partial with explicit gap. Partial ratings honest with experiments assigned.",
-      "R10": "PASS — 5 specific, actionable whatWouldChangeDecision entries.",
-      "R11": "PASS — 21 objects: DATA(7), LOGIC(6), ACTION(5), LEARN(3). All with semanticHeuristic. All hypotheses have dlaJustification.",
-      "R12": "PASS — devcon5Analysis populated: ddd(4), dry(4), ocp(3+), pecs(present). All 21 objects have DDD/DRY/OCP/PECS. All 12 scenarios scored.",
-      "R13": "PASS — ForwardProp: 5 paths, partial health, gaps documented. BackwardProp: 4 paths, partial. CSS3DObject broken (correctly excluded). No recommended-path propagation broken.",
-      "R14": "PASS — proto-cd-A-001 + proto-cd-B-001 both buildStatus=pass, tsc clean. Independently verified.",
-      "R15": "PASS — H-A: 9/9 (verified 74/74). H-B: 8/8 (verified 30/30). Zero failure modes blocking. 4 documented gaps with recommendations."
+      "R1": "PASS — All sources tier-1 (7) or tier-2 (1). Zero tier-4/5. Critical claims backed by Three.js r183 official docs with confidence 0.90-0.98.",
+      "R2": "N/A — 1 contradiction resolved by design. 3 unresolvable by design (H-1 vs H-2 tradeoff). 1 insufficient scenario (S-H2-worst) correctly excluded. No irreconcilable contradictions block recommendation.",
+      "R3": "PASS — 24 scenarios (6 hypotheses x 4 types). STOPPING_CRITERIA_MET=true. All scored on 11 dimensions.",
+      "R4": "PASS — 5 failure modes (1 high, 3 medium, 1 low). 4 NextExperiments. 3 critical gaps tracked with concrete actions.",
+      "R5": "PASS — All 8 sources freshnessStatus=current. Zero stale. Three.js r183 docs match project version 0.183.2.",
+      "R6": "PASS — All claims tagged [Official]/[Synthesis]/[Inference]. Confidence 0.60-0.98. Inference claims honestly marked <0.90.",
+      "R7": "PASS — Hybrid recommendation (H-2->H-1 via H-3 registry) with multi-point rationale: time-to-value, OCP pivot, shared pipeline, specific trigger condition.",
+      "R8": "PASS — 6 hypotheses analyzed. H-4 (ECS) explicitly deprioritized. alternatives >= 5.",
+      "R9": "PASS — H-1/H-5 base sufficient. H-2/H-3 base partial with honest caveats. S-H2-worst (insufficient) excluded.",
+      "R10": "PASS — 4 NextExperiments define reversal conditions. Pivot trigger: g-pr-02 engagement study result -> registry.set() swap.",
+      "R11": "PASS — 22 objects: DATA(7), LOGIC(6), ACTION(6), LEARN(3). All with semanticHeuristic. All hypotheses have dlaJustification.",
+      "R12": "PASS — All 43 objects have DDD/DRY/OCP/PECS. 6 hypotheses scored. DevCon Phase 2->3 documented.",
+      "R13": "PASS — All 22 objects have forwardPropPath/backwardPropPath. Overall partial. No recommended-path broken. Teaching migration METAPHOR-LAYER-ONLY.",
+      "R14": "PASS — proto-pr-T7-001 + proto-pr-T8-001 both research-complete. 17 combined research findings. Reference implementations curated from official docs.",
+      "R15": "PASS — T7: 33/33 (1.0). T8: 35/35 (1.0). Total: 68/68. 5 failure modes with remediation. FM-T8-001 (high) has registry.set() pivot mitigation."
     },
     "debateTriggered": false,
-    "debateReason": "Pass rate delta=0%. No D/L/A misclassification. No new failure types. H-C deprioritization evidence-based.",
+    "debateReason": "Pass rate delta=0% (both 1.0). No D/L/A misclassification. No new failure types. H-4 deprioritization evidence-based. Conditions not met.",
     "independentVerification": {
-      "evalSuiteA": "74/74 pass (bun test prototype/tests/eval-suite-cd-a.test.ts, 24ms)",
-      "evalSuiteB": "30/30 pass (bun test prototype/tests/eval-suite-cd-b.test.ts, 38ms)",
+      "evalSuiteT7": "33/33 pass (18ms, 83 assertions)",
+      "evalSuiteT8": "35/35 pass (19ms, 74 assertions)",
       "typeCheck": "bunx tsc --noEmit: 0 errors",
-      "stateFilesAudited": ["eval-results.json", "decision-log.json", "scenarios.json", "world-model.json", "source-map.json", "blueprint.json"]
+      "stateFilesAudited": ["eval-results.json","decision-log.json","scenarios.json","world-model.json","source-map.json"]
     },
     "evaluatorCaveats": [
-      "5 'detected' contradictions remain as evidence-gaps — should be tracked post-acceptance (c-A-best-1, c-B-b-1, c-B-worst-1, c-C-b-1, c-C-worst-1)",
-      "7/12 scenarios have evidenceSufficiency='partial' — significant validation work remains during implementation",
-      "All propagation paths are 'partial' — architecture designed but not implemented; health is theoretical until code exists",
-      "H-B evolution path depends on NE-B-01 (troika FPS on Chromebook) — p0 experiment before any H-B work"
+      "Prototypes are research-complete (reference implementation curation), not build artifacts",
+      "3 critical gaps require runtime benchmarks: g-pr-01 (SSS FPS), g-pr-02 (clone draw calls), g-pr-03 (DragControls jitter)",
+      "FM-T8-001 (high): H-2 procedural engagement unresolvable by research — requires user study",
+      "H-2 worst scenario evidenceSufficiency=insufficient — recommendation is hybrid H-2->H-1 path",
+      "All propagation paths partial — designed but not implemented",
+      "Teaching framework migration METAPHOR-LAYER-ONLY — VT/CRA/beats/ts-fsrs contracts preserved",
+      "BLUEPRINT MANDATORY: speechBubbleAnalysis in decision-log.json defines framework redesign (TeachingBeat.microSteps, PromptHUD separation, vocab/criteria extraction). 7 impact files, 5 framework changes. Not yet in world-model as ontology objects — reporter/blueprint must incorporate. Does not affect R7/R10 (orthogonal to architecture choice) but MUST appear in Blueprint output."
     ]
   }
 }

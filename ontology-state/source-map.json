@@ -1,8 +1,181 @@
 {
-  "version": "0.7.0",
-  "lastUpdated": "2026-04-12T12:00:00Z",
-  "sessionId": "mathcrew-content-delivery-001",
+  "version": "0.9.0",
+  "lastUpdated": "2026-04-12T21:30:00Z",
+  "sessionId": "mathcrew-photonic-realism-001",
+  "previousSessions": ["mathcrew-content-delivery-001"],
   "sources": [
+    {
+      "id": "src-pr-gltf",
+      "title": "Three.js GLTFLoader + DRACOLoader — Official Documentation (r183)",
+      "url": "https://threejs.org/docs/pages/GLTFLoader.html",
+      "tier": 1,
+      "domain": "DATA",
+      "provenance": "[Official]",
+      "freshnessDate": "2026-03-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "GLB/GLTF 캐릭터 모델 로딩. r183에서 'empty groups with multiple scene references' 수정. GLTF result: scene, animations[], cameras[], asset, parser. DRACOLoader로 80-90% geometry 압축 가능. import path: three/addons/loaders/GLTFLoader.js",
+      "claims": [
+        { "id": "clm-pr-01", "text": "GLTFLoader.loadAsync(url) returns Promise<GLTF> with scene (Group), animations (AnimationClip[]), cameras, asset metadata. r183 fully compatible.", "confidence": 0.98, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-02", "text": "DRACOLoader WASM decoder (gstatic.com CDN) compresses geometry 80-90%. CPU decode cost offsets network savings for small models (<100KB).", "confidence": 0.95, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-03", "text": "GLTF scene.traverse + isMesh pattern for castShadow/receiveShadow setup. Standard integration pattern for all GLTF models.", "confidence": 0.98, "domain": "DATA", "provenance": "[Official]", "isAtomic": true }
+      ]
+    },
+    {
+      "id": "src-pr-pbr",
+      "title": "Three.js MeshPhysicalMaterial — Complete PBR Property Reference (r183)",
+      "url": "https://threejs.org/docs/pages/MeshPhysicalMaterial.html",
+      "tier": 1,
+      "domain": "DATA",
+      "provenance": "[Official]",
+      "freshnessDate": "2026-03-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "전체 PBR feature set: metalness, roughness, clearcoat, iridescence, sheen, transmission, ior, anisotropy, dispersion. r183에서 clearcoat support for rectangular area lights 추가. 'Higher performance cost per pixel than other materials.'",
+      "claims": [
+        { "id": "clm-pr-04", "text": "MeshPhysicalMaterial supports clearcoat (0-1), iridescence (thin-film, IOR 1.0-2.333, thickness 100-400nm), sheen (fabric), transmission (physical transparency with IOR-based refraction), anisotropy, dispersion. All disabled by default.", "confidence": 0.98, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-05", "text": "Each enabled MeshPhysicalMaterial feature adds shader complexity. transmission is most expensive. For education devices: enable only needed features per entity type.", "confidence": 0.95, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-06", "text": "Spacesuit visor: clearcoat(1.0) + iridescence(0.3) + envMap. Spaceship hull: metalness(0.8) + roughness(0.3) + clearcoat(0.5). These combinations are GPU-feasible per-entity.", "confidence": 0.80, "domain": "LOGIC", "provenance": "[Inference]", "isAtomic": true }
+      ]
+    },
+    {
+      "id": "src-pr-anim",
+      "title": "Three.js AnimationMixer + Skeletal Animation System (r183)",
+      "url": "https://threejs.org/docs/#api/en/animation/AnimationMixer",
+      "tier": 1,
+      "domain": "LOGIC",
+      "provenance": "[Official]",
+      "freshnessDate": "2026-03-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "AnimationClip (data) + AnimationMixer (controller) + AnimationAction (per-clip control). GLTF animations loaded via gltf.animations[]. crossFadeTo/crossFadeFrom for smooth transitions. mixer.update(delta) must be called every frame. r183: BezierInterpolant + DEVTOOLS access.",
+      "claims": [
+        { "id": "clm-pr-07", "text": "AnimationMixer: one per animated model. clipAction(clip).play() starts animation. crossFadeTo(action, 0.5, true) blends smoothly. Weight 0-1 controls influence.", "confidence": 0.98, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-08", "text": "For 10-50 animated characters, each requires separate AnimationMixer instance. Clock.getDelta() should be shared (not per-mixer). CPU-bound per-mixer update.", "confidence": 0.90, "domain": "ACTION", "provenance": "[Synthesis]", "isAtomic": true },
+        { "id": "clm-pr-09", "text": "GLTF animation clips: idle, walk, board, celebrate, error — all can be embedded in single GLB file. AnimationClip.findByName(clips, 'idle') for named lookup.", "confidence": 0.95, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true }
+      ]
+    },
+    {
+      "id": "src-pr-pmrem",
+      "title": "Three.js PMREMGenerator + Environment Maps — PBR Lighting Setup (r183)",
+      "url": "https://threejs.org/docs/pages/PMREMGenerator.html",
+      "tier": 1,
+      "domain": "DATA",
+      "provenance": "[Official]",
+      "freshnessDate": "2026-03-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "PMREMGenerator converts equirectangular HDR/EXR to pre-filtered mipmap for roughness-based PBR sampling. scene.environment auto-applies to all MeshStandard/PhysicalMaterial. ACESFilmicToneMapping recommended. r183: PMREM cache fix.",
+      "claims": [
+        { "id": "clm-pr-10", "text": "Complete PBR env setup: renderer.outputColorSpace=SRGBColorSpace, toneMapping=ACESFilmicToneMapping, toneMappingExposure=1.8. RGBELoader for .hdr, EXRLoader for .exr.", "confidence": 0.98, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-11", "text": "scene.environment = pmremGenerator.fromEquirectangular(texture).texture — automatically applies PBR lighting to ALL MeshStandard/PhysicalMaterial in scene. One-time GPU operation.", "confidence": 0.98, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-12", "text": "Poly Haven (polyhaven.com/hdris): CC0 license, hundreds of free HDRIs, 1K-8K resolution. 1K-2K sufficient for education apps (1-8MB).", "confidence": 0.95, "domain": "DATA", "provenance": "[Official]", "isAtomic": true }
+      ]
+    },
+    {
+      "id": "src-pr-instanced",
+      "title": "Three.js InstancedMesh — Batch Rendering (r183)",
+      "url": "https://threejs.org/docs/pages/InstancedMesh.html",
+      "tier": 1,
+      "domain": "ACTION",
+      "provenance": "[Official]",
+      "freshnessDate": "2026-03-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "InstancedMesh renders multiple instances with single draw call. setMatrixAt/setColorAt per instance. CRITICAL: InstancedMesh does NOT support SkinnedMesh/skeletal animation. For animated characters, use separate SkinnedMesh + AnimationMixer per character.",
+      "claims": [
+        { "id": "clm-pr-13", "text": "CRITICAL: InstancedMesh does NOT natively support SkinnedMesh/skeletal animation. No official API for instanced skeletal animation. Community workaround (bone texture atlas, PR #22667) not merged into core.", "confidence": 0.98, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-14", "text": "For 10-50 animated spacekid characters: use separate SkinnedMesh instances from GLTFLoader, each with own AnimationMixer. InstancedMesh only for static/identical objects (environmental props).", "confidence": 0.95, "domain": "ACTION", "provenance": "[Synthesis]", "isAtomic": true },
+        { "id": "clm-pr-15", "text": "InstancedMesh performance: 10 instances — minimal benefit. 50+ — noticeable. 100+ — significant. Per-instance frustum culling NOT natively supported.", "confidence": 0.90, "domain": "ACTION", "provenance": "[Synthesis]", "isAtomic": true }
+      ]
+    },
+    {
+      "id": "src-pr-drag",
+      "title": "Three.js DragControls — Drag-and-Drop Interaction (r183)",
+      "url": "https://threejs.org/docs/pages/DragControls.html",
+      "tier": 1,
+      "domain": "ACTION",
+      "provenance": "[Official]",
+      "freshnessDate": "2026-03-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "DragControls: drag objects in 3D. Constructor(objects[], camera, domElement). Events: hoveron/hoveroff/dragstart/drag/dragend. Touch support via touches property. Must disable OrbitControls during drag.",
+      "claims": [
+        { "id": "clm-pr-16", "text": "DragControls events (dragstart/drag/dragend) provide event.object — the dragged Object3D. Integrates with GLTF-loaded models via recursive:true (default).", "confidence": 0.98, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-17", "text": "OrbitControls must be disabled during drag (orbitControls.enabled=false on dragstart, true on dragend). DragControls supports touch via touches:{ONE:PAN} property.", "confidence": 0.95, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-18", "text": "Custom raycasting for advanced hit testing: raycaster.setFromCamera(pointer, camera) + raycaster.intersectObjects(objects, true). Pointer events unify mouse+touch.", "confidence": 0.95, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true }
+      ]
+    },
+    {
+      "id": "src-pr-assets",
+      "title": "Free 3D Model Sources for Education — Sketchfab/Mixamo/ReadyPlayerMe/PolyHaven",
+      "url": "https://sketchfab.com",
+      "tier": 1,
+      "domain": "DATA",
+      "provenance": "[Official]",
+      "freshnessDate": "2026-04-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "Sketchfab: 800K+ free models, CC licenses, auto GLB conversion. Mixamo: 2400+ free mo-cap animations, royalty-free, FBX→GLB conversion needed. Ready Player Me: GLB API, quality presets, morph targets. Poly Haven: CC0 HDRIs + models. KenShape: pixel→3D voxel tool ($3.99), GLTF export.",
+      "claims": [
+        { "id": "clm-pr-19", "text": "Sketchfab: 800K+ free downloadable models, auto GLTF conversion, CC license filtering. Spaceship category: sketchfab.com/tags/spaceship. Character category: sketchfab.com/tags/character.", "confidence": 0.95, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-20", "text": "Mixamo: free royalty-free 2400+ mo-cap animations. Upload custom humanoid → auto-rig + apply animations. FBX output only → Blender/Mixamo2GLTF for GLB conversion.", "confidence": 0.90, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-21", "text": "Ready Player Me API: https://models.readyplayer.me/{id}.glb?quality=medium&meshLod=1. Quality presets (low/medium/high), configurable morph targets, Draco compression option.", "confidence": 0.90, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-22", "text": "Poly Haven: CC0 HDRIs (1K-8K), CC0 3D models, CC0 textures. Best source for environment maps in education apps — no attribution required.", "confidence": 0.95, "domain": "DATA", "provenance": "[Official]", "isAtomic": true }
+      ]
+    },
+    {
+      "id": "src-pr-crossref",
+      "title": "Cross-Reference Analysis — API Compatibility Matrix",
+      "url": "internal-analysis",
+      "tier": 2,
+      "domain": "LOGIC",
+      "provenance": "[Synthesis]",
+      "freshnessDate": "2026-04-12",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "Critical cross-references: (1) InstancedMesh + SkinnedMesh INCOMPATIBLE — animated characters must use separate SkinnedMesh. (2) GLTFLoader → AnimationMixer tightly coupled via gltf.animations[]. (3) PMREMGenerator → scene.environment auto-applies to MeshPhysicalMaterial. (4) DragControls works with GLTF models (recursive:true). (5) All 7 APIs fully compatible with r183.",
+      "claims": [
+        { "id": "clm-pr-23", "text": "CRITICAL CONSTRAINT: InstancedMesh + SkinnedMesh are INCOMPATIBLE. For 10-50 animated spacekid characters: separate SkinnedMesh per character + shared geometry + individual AnimationMixer. Budget: ~25 characters at 60fps on mid-range GPU.", "confidence": 0.90, "domain": "LOGIC", "provenance": "[Synthesis]", "isAtomic": true },
+        { "id": "clm-pr-24", "text": "GLTFLoader.load() → gltf.scene (visual) + gltf.animations[] (clips) → AnimationMixer.clipAction(clip) — tightly coupled pipeline. Animation data MUST be embedded in GLB file.", "confidence": 0.95, "domain": "LOGIC", "provenance": "[Synthesis]", "isAtomic": true },
+        { "id": "clm-pr-25", "text": "Renderer config shared across Topics 2+4: outputColorSpace=SRGBColorSpace (r183 default), toneMapping=ACESFilmicToneMapping, toneMappingExposure=1.8. One-time global setup.", "confidence": 0.98, "domain": "LOGIC", "provenance": "[Synthesis]", "isAtomic": true },
+        { "id": "clm-pr-26", "text": "Existing mathcrew n8ao + postprocessing pipeline: MeshPhysicalMaterial is compatible with n8ao SSAO. No OverrideMaterialManager workaround needed (unlike troika-three-text). GLTF models participate in postprocessing naturally.", "confidence": 0.85, "domain": "LOGIC", "provenance": "[Inference]", "isAtomic": true }
+      ]
+    },
+    {
+      "id": "src-pr-miniplex",
+      "title": "miniplex v2.0.0 — Developer-Friendly ECS for TypeScript Games",
+      "url": "https://www.npmjs.com/package/miniplex",
+      "tier": 2,
+      "domain": "LOGIC",
+      "provenance": "[Official]",
+      "freshnessDate": "2023-01-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "miniplex ECS: World<Entity> manages typed entities. world.with(...components) returns archetypal query (iterable). world.add(entity), world.remove(entity). No built-in scheduling. onEntityAdded/onEntityRemoved events for lifecycle hooks. Entities are plain JS objects — direct property mutation OK for component values, use addComponent/removeComponent to add/remove components. ~2KB gzipped, MIT license, 2587 weekly downloads.",
+      "claims": [
+        { "id": "clm-pr-27", "text": "miniplex v2.0.0 API: World<Entity> — world.add(entity), world.remove(entity), world.with(...components) → typed Query<Entity>. For...of iteration over queries. No built-in scheduling.", "confidence": 0.98, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-28", "text": "miniplex onEntityAdded/onEntityRemoved: reactive lifecycle hooks per query. Critical for Three.js: subscribe to onEntityRemoved to call geometry.dispose() + material.dispose() — miniplex.world.remove() does NOT auto-dispose Three.js resources.", "confidence": 0.95, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-29", "text": "miniplex bundle size: ~2KB gzipped (bundlephobia). Adds external dependency vs Factory+Registry zero-dep Map<>. Migration path: replace Map<ComponentType, CreateFn> with World<Entity> — query replaces registry lookup, system functions replace createFn dispatch.", "confidence": 0.90, "domain": "DATA", "provenance": "[Official]", "isAtomic": true }
+      ]
+    },
+    {
+      "id": "src-pr-gesture",
+      "title": "Pointer Events — Gesture Detection for 3D Games (MDN + Three.js forum)",
+      "url": "https://developer.mozilla.org/en-US/docs/Games/Techniques/Control_mechanisms/Mobile_touch",
+      "tier": 1,
+      "domain": "ACTION",
+      "provenance": "[Official]",
+      "freshnessDate": "2025-01-01",
+      "retrievedDate": "2026-04-12",
+      "freshnessStatus": "current",
+      "summary": "PointerEvents API: setPointerCapture(pointerId) + releasePointerCapture on pointerdown/pointerup for reliable cross-device gesture tracking. Velocity calculation: delta position / elapsed time (px/sec). Flick threshold ~600 px/sec. For continuous gestures: capture pointer. OS edge conflict: iOS swipe-up (home) + Android nav gestures conflict with canvas touch events — requires CSS touch-action:none.",
+      "claims": [
+        { "id": "clm-pr-30", "text": "PointerEvents best practice for gestures: setPointerCapture(e.pointerId) on pointerdown + releasePointerCapture on pointerup — ensures pointerMove events fire even when pointer leaves canvas. Applies to both mouse and touch.", "confidence": 0.98, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-pr-31", "text": "Flick gesture velocity classification: delta_position / delta_time (px/sec). Threshold ~600 px/sec distinguishes drag from flick in game context. ZingTouch library provides configurable minVelocity parameter for swipe recognition.", "confidence": 0.75, "domain": "LOGIC", "provenance": "[Synthesis]", "isAtomic": true },
+        { "id": "clm-pr-32", "text": "OS edge gesture conflicts: iOS 15+ swipe-up triggers Dock/App Switcher; Android navigation gestures interfere with canvas touch. Mitigation: touch-action:none on renderer.domElement + viewport meta touch-action:none. High risk for H-6 at screen edges.", "confidence": 0.85, "domain": "ACTION", "provenance": "[Synthesis]", "isAtomic": true }
+      ]
+    },
     {
       "id": "src-int-dc5",
       "title": "DevCon 5 — Ontology Design Principles (§DC5-04, §DC5-05, §DC5-06)",
@@ -15,761 +188,10 @@
       "freshnessStatus": "current",
       "summary": "3-stage product journey (Golden Tables → Operational Decision-Making → AI-First). Four ontology design principles: DDD, DRY, Open-Closed, PECS. Primitives: Interfaces, Structs, Reducers, Derived properties, Object-backed link types.",
       "claims": [
-        {
-          "id": "clm-int-01",
-          "text": "The 3-stage product journey is: (1) Golden Tables — data integrations, (2) Operational decision-making — kinetics via actions/logic/functions, (3) AI-First — LLMs atop captured kinetics.",
-          "confidence": 0.95,
-          "domain": "LOGIC",
-          "provenance": "[Synthesis]",
-          "marker": "§DC5-04",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        },
-        {
-          "id": "clm-int-02",
-          "text": "DevCon 5 explicitly identifies four ontology design principles applicable to content delivery system design: Domain-Driven Design (DDD), Don't Repeat Yourself (DRY), Open for extension/closed for modification (OCP), Producer Extends Consumer Super (PECS).",
-          "confidence": 0.95,
-          "domain": "LOGIC",
-          "provenance": "[Official]",
-          "marker": "§DC5-05",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        },
-        {
-          "id": "clm-int-03",
-          "text": "Interfaces enable polymorphic workflows and future-proof composition — directly applicable to ContentDeliveryResolver selecting rendering approach per teaching phase.",
-          "confidence": 0.80,
-          "domain": "LOGIC",
-          "provenance": "[Inference]",
-          "marker": "§DC5-06",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        }
-      ]
-    },
-    {
-      "id": "src-int-fde",
-      "title": "AI FDE — Eval-Driven Development Builder Loop (§FDE-05, §FDE-07, §FDE-08)",
-      "url": "~/.claude/research/palantir/platform/ai-fde.md",
-      "tier": 1,
-      "domain": "LOGIC",
-      "provenance": "[Official]",
-      "freshnessDate": "2026-03-22",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "Eval-driven development loop: explore → draft → generate evals → run → inspect failures → refine. Feedback compounding: operator rejection becomes ontology-linked feedback, AI generates new eval cases. Context management = curated tool access per mode.",
-      "claims": [
-        {
-          "id": "clm-int-04",
-          "text": "AI FDE uses eval-driven development: generate eval suites from representative ontology cases, run evals, detect failure clusters, iterate automatically. Eyeballing is rejected as production path.",
-          "confidence": 0.95,
-          "domain": "LOGIC",
-          "provenance": "[Official]",
-          "marker": "§FDE-05, §FDE-07",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        },
-        {
-          "id": "clm-int-05",
-          "text": "The feedback compounding loop: bad production outcomes → structured refinement inputs → new eval cases → refined logic. A 'feedback-quality gate agent' improves weak feedback itself. Applicable to LEARN telemetry for content delivery effectiveness.",
-          "confidence": 0.85,
-          "domain": "LOGIC",
-          "provenance": "[Inference]",
-          "marker": "§FDE-08",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        },
-        {
-          "id": "clm-int-06",
-          "text": "Minimal HITL requires typed shared state plus explicit validators, not just stronger prompts. Content delivery architecture must have typed contracts (SpeechBubbleContent/TeachingBeat) with explicit validation before surface selection.",
-          "confidence": 0.80,
-          "domain": "LOGIC",
-          "provenance": "[Inference]",
-          "marker": "§FDE-11",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        }
-      ]
-    },
-    {
-      "id": "src-int-orch",
-      "title": "Orchestration Map — Builder Surfaces (§ORCH-03)",
-      "url": "~/.claude/research/palantir/architecture/orchestration-map.md",
-      "tier": 1,
-      "domain": "LOGIC",
-      "provenance": "[Synthesis]",
-      "freshnessDate": "2026-03-22",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "Builder surfaces are the topmost layer. Runtime surfaces (SENSE→DECIDE→ACT) must be explicit and inspectable. Every UI construct must trace back to ontology semantics.",
-      "claims": [
-        {
-          "id": "clm-int-07",
-          "text": "Every runtime UI construct must trace back to ontology semantics, not ad hoc dashboard needs. Content delivery UI (speech bubble, diegetic panel) must be ontology-bound.",
-          "confidence": 0.90,
-          "domain": "LOGIC",
-          "provenance": "[Synthesis]",
-          "marker": "§ORCH-04",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-troika",
-      "title": "troika-three-text v0.52.4 — Official Documentation",
-      "url": "https://protectwise.github.io/troika/troika-three-text/",
-      "tier": 1,
-      "domain": "DATA",
-      "provenance": "[Official]",
-      "freshnessDate": "2025-09-10",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "aging",
-      "summary": "WebGL-native SDF text rendering for Three.js. Parses .ttf/.otf/.woff directly, generates SDF atlas on-the-fly in web worker (no frame drops). GPU-accelerated SDF generation (gpuAccelerateSDF:true default). Patches Three.js material shader — works with lighting, PBR, shadows, fog. Requires OverrideMaterialManager.workaroundEnabled=true for postprocessing library. Latest: v0.52.4 (2025-04-02). 2.4M weekly npm downloads.",
-      "claims": [
-        {
-          "id": "clm-ext-01",
-          "text": "troika-three-text v0.52.4 (released 2025-04-02) generates SDF atlas for glyphs on-the-fly in a web worker, preventing main-thread frame drops.",
-          "confidence": 0.98,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-02",
-          "text": "troika-three-text patches any Three.js Material with SDF shader code, enabling support for lighting, PBR, shadows, and fog on in-world text. Text participates in the WebGL render pipeline.",
-          "confidence": 0.98,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-03",
-          "text": "For scenes using the `postprocessing` library (e.g. vanruesc/postprocessing used by n8ao), troika-three-text requires: `import { OverrideMaterialManager } from 'postprocessing'; OverrideMaterialManager.workaroundEnabled = true`. Without this, troika text custom materials are discarded by the EffectComposer.",
-          "confidence": 0.98,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-04",
-          "text": "troika-three-text supports `curveRadius` (cylindrical curvature), `outlineWidth/outlineBlur` (halo/drop-shadow), `depthOffset` (z-fighting prevention), `clipRect` (overflow clipping). These enable speech-bubble-panel-style in-world text boxes.",
-          "confidence": 0.98,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-05",
-          "text": "troika-three-text text geometry updates are asynchronous (web worker). `myText.sync(callback)` or `synccomplete` event provide notification on completion. Dynamic teaching content that changes per beat must account for this async update cycle.",
-          "confidence": 0.98,
-          "domain": "LOGIC",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-06",
-          "text": "troika-three-text supports `preloadFont({ characters: '...' })` to pre-generate SDF textures for a character set, preventing first-render latency. Critical for game scenes where first teaching beat must appear immediately.",
-          "confidence": 0.98,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-07",
-          "text": "troika-three-text v0.52.4 has 2.4M weekly npm downloads. Latest version released 2025-04-02. The library is actively maintained (bug fixes in 0.52.2-0.52.4 across Nov 2024 – Apr 2025).",
-          "confidence": 0.95,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-three-mesh-ui",
-      "title": "three-mesh-ui v6.5.4 — GitHub Repository",
-      "url": "https://github.com/felixmariotto/three-mesh-ui",
-      "tier": 2,
-      "domain": "DATA",
-      "provenance": "[Official]",
-      "freshnessDate": "2023-03-24",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "stale",
-      "summary": "WebGL-native UI panel library for Three.js. Created for VR contexts where HTML/CSS is impossible. Objects are THREE.Object3Ds. Block + Text primitives. MSDF font rendering (requires pre-built JSON+PNG font files). v7 in evaluation (PR#223). Last release 2023-03-24 (stale). 1.5k GitHub stars, 154 forks.",
-      "claims": [
-        {
-          "id": "clm-ext-08",
-          "text": "three-mesh-ui creates WebGL-native UI panels as THREE.Object3D instances using Block+Text primitives. Requires pre-generated MSDF font files (.json + .png texture). Adds a `ThreeMeshUI.update()` call each frame.",
-          "confidence": 0.95,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "stale"
-        },
-        {
-          "id": "clm-ext-09",
-          "text": "three-mesh-ui last release was v6.5.4 on 2023-03-24 (3+ years ago as of 2026-04-12). v7.x is in PR evaluation (PR#223) but not released. The library has 63 open issues and 11 open PRs. Maintenance status: low activity.",
-          "confidence": 0.95,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "stale"
-        },
-        {
-          "id": "clm-ext-10",
-          "text": "three-mesh-ui was designed for VR contexts (no HTML/CSS available). In a non-VR WebGL2 game with CSS overlay capabilities, the motivation for three-mesh-ui over troika-three-text is lower. MSDF vs SDF: MSDF requires pre-built textures; troika generates on-the-fly.",
-          "confidence": 0.80,
-          "domain": "LOGIC",
-          "provenance": "[Inference]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "stale"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-css3drenderer",
-      "title": "Three.js CSS3DRenderer — Official Docs",
-      "url": "https://threejs.org/docs/pages/CSS3DRenderer.html",
-      "tier": 1,
-      "domain": "DATA",
-      "provenance": "[Official]",
-      "freshnessDate": "2025-01-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "aging",
-      "summary": "CSS3DRenderer applies hierarchical 3D CSS transforms to DOM elements. Cannot use Three.js material system or geometries. Only supports 100% browser zoom. Objects are CSS3DObject or CSS3DSprite. Runs as separate DOM layer alongside WebGLRenderer.",
-      "claims": [
-        {
-          "id": "clm-ext-11",
-          "text": "CSS3DRenderer is a separate renderer running as a CSS DOM layer — it cannot use Three.js materials or geometries. It is not part of the WebGL render pipeline.",
-          "confidence": 0.99,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-12",
-          "text": "CSS3DRenderer CANNOT receive WebGL-based postprocessing effects. EffectComposer constructor only accepts WebGLRenderer. There is no supported workaround for applying n8ao or other vanruesc/postprocessing effects to CSS3D elements.",
-          "confidence": 0.99,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": false,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-13",
-          "text": "CSS3DRenderer z-ordering with WebGL objects is problematic: CSS3D elements are positioned behind or in front of the WebGL canvas as a flat DOM layer. Proper occlusion (3D objects hiding CSS3D elements) is not reliably achievable.",
-          "confidence": 0.90,
-          "domain": "DATA",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-css-overlay-current",
-      "title": "mathcrew PR#28 — CSS Overlay Speech Bubble Architecture (Vector3.project)",
-      "url": "src/hud/speech-bubble.ts",
-      "tier": 1,
-      "domain": "DATA",
-      "provenance": "[Official]",
-      "freshnessDate": "2026-04-12",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "Current approach: Vector3.project → CSS transform per frame. Speech bubble follows character in screen space. Advantages: full HTML/CSS rendering, accessibility, easy rich text. Disadvantages: no 3D depth, no occlusion by 3D objects, no postprocessing integration, no spatial placement.",
-      "claims": [
-        {
-          "id": "clm-ext-14",
-          "text": "Current mathcrew PR#28 speech bubble uses Vector3.project + CSS transform to follow character in 2D screen space. This is a per-frame DOM mutation. It does not participate in the WebGL depth buffer.",
-          "confidence": 0.99,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        },
-        {
-          "id": "clm-ext-15",
-          "text": "CSS overlay (current approach) has full HTML/CSS rendering capabilities: styled text, emoji, variable font sizes, accessibility via DOM, keyboard focus, rich content. This is an advantage over in-world WebGL text.",
-          "confidence": 0.99,
-          "domain": "DATA",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        },
-        {
-          "id": "clm-ext-16",
-          "text": "CSS overlay (current approach) cannot be occluded by 3D scene objects (planets, character mesh). The bubble always renders on top of WebGL content. This breaks spatial immersion for diegetic teaching scenarios.",
-          "confidence": 0.95,
-          "domain": "DATA",
-          "provenance": "[Inference]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-threejs-perf",
-      "title": "Building Efficient Three.js Scenes — Codrops 2025-02",
-      "url": "https://tympanus.net/codrops/2025/02/11/building-efficient-three-js-scenes-optimize-performance-while-maintaining-quality/",
-      "tier": 3,
-      "domain": "ACTION",
-      "provenance": "[Synthesis]",
-      "freshnessDate": "2025-02-11",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "aging",
-      "summary": "Three.js scene optimization with postprocessing (including N8AO). PerformanceMonitor dynamically disables postprocessing on decline. Canvas optimization: powerPreference high-performance, alpha:false, antialias:false, stencil:false, depth:false. Stable 60fps achievable with 27 meshes, 184 textures, 49 shaders, physics, N8AO.",
-      "claims": [
-        {
-          "id": "clm-ext-17",
-          "text": "A Three.js scene with 27 meshes, 184 textures, 49 shaders, physics simulation, and N8AO + postprocessing effects can run at stable 60fps with total asset size 2.1 MB using proper optimization (instancing, LOD, DPR cap, antialias:false).",
-          "confidence": 0.80,
-          "domain": "ACTION",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-18",
-          "text": "When using PerformanceMonitor with N8AO + postprocessing: the recommended fallback sequence is (1) reduce DPR by 20%, (2) disable postprocessing. This means postprocessing is a toggleable expense, not a fixed cost.",
-          "confidence": 0.80,
-          "domain": "ACTION",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-19",
-          "text": "Adding in-world WebGL text (e.g. troika-three-text) adds geometry, shader patches, and SDF atlas texture to the render pipeline. Per-frame sync overhead is offloaded to web worker but atlas sampling adds fragment shader cost. Specific FPS impact not benchmarked in this source.",
-          "confidence": 0.60,
-          "domain": "ACTION",
-          "provenance": "[Inference]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-mayer",
-      "title": "Mayer's 12 Principles of Multimedia Learning — Digital Learning Institute",
-      "url": "https://www.digitallearninginstitute.com/blog/mayers-principles-multimedia-learning",
-      "tier": 3,
-      "domain": "LOGIC",
-      "provenance": "[Synthesis]",
-      "freshnessDate": "2024-01-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "aging",
-      "summary": "Mayer's 12 principles: Multimedia, Coherence, Signalling, Redundancy, Spatial Contiguity, Temporal Contiguity, Segmenting, Pre-training, Modality, Voice, Personalisation, Image. Three assumptions: dual-channel (visual+auditory), limited capacity, active processing.",
-      "claims": [
-        {
-          "id": "clm-ext-20",
-          "text": "Spatial Contiguity Principle: text and visuals must be presented close together in the frame. For 3D educational content, labels/explanations should appear near the referenced 3D objects (spatial anchoring), not in a spatially distant HUD.",
-          "confidence": 0.95,
-          "domain": "LOGIC",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-21",
-          "text": "Segmenting Principle: information should be broken into manageable chunks with learner pacing control. mathcrew's beat-based teaching (motivate/explain/demonstrate/practice/assess) with Enter-advances-beat directly implements this principle.",
-          "confidence": 0.95,
-          "domain": "LOGIC",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-22",
-          "text": "Redundancy Principle: avoid presenting the same information simultaneously in both spoken words and on-screen text. In a 3D environment with narration, visual indicators (glow effects, spatial highlighting) should REPLACE duplicate text, not add to it.",
-          "confidence": 0.90,
-          "domain": "LOGIC",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-23",
-          "text": "Coherence Principle: exclude unnecessary information. Vocabulary terms shown inline in speech bubbles should only appear when semantically relevant, not decoratively. A richer rendering approach should not add cognitive load.",
-          "confidence": 0.90,
-          "domain": "LOGIC",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-24",
-          "text": "Signalling Principle: cues should draw attention to vital information. In 3D: visual highlights, glow on referenced objects, spatial arrows or particle trails anchored to math objects serve as signalling without adding text.",
-          "confidence": 0.90,
-          "domain": "LOGIC",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-25",
-          "text": "Temporal Contiguity Principle: words and pictures must be presented simultaneously, not sequentially. Teaching content animations (e.g. a divisor sorting animation) must be synchronized with the text explanation, not before or after.",
-          "confidence": 0.90,
-          "domain": "LOGIC",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-mayer-ar-2025",
-      "title": "Applying CTML Principles to Augmented Reality — Computers in Human Behavior Reports, 2025",
-      "url": "https://www.sciencedirect.com/science/article/pii/S2451958825000934",
-      "tier": 1,
-      "domain": "LOGIC",
-      "provenance": "[Official]",
-      "freshnessDate": "2025-05-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "Randomized study: 88 participants. AR (HMD or handheld) vs video, all designed per CTML. Result: no significant difference in extraneous cognitive load between AR and video when CTML principles applied. Retention/transfer task outcomes inconclusive. CTML principles can be extended to AR/3D contexts.",
-      "claims": [
-        {
-          "id": "clm-ext-26",
-          "text": "When AR/3D educational content is designed according to Cognitive Theory of Multimedia Learning principles, extraneous cognitive load is not increased compared to traditional video. Design quality — not immersion level — controls cognitive load.",
-          "confidence": 0.90,
-          "domain": "LOGIC",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        },
-        {
-          "id": "clm-ext-27",
-          "text": "Application design plays a pivotal role in determining cognitive load levels, particularly extraneous load. For mathcrew: the rendering approach (diegetic vs overlay) matters less than whether CTML principles (coherence, signalling, segmenting, spatial contiguity) are followed.",
-          "confidence": 0.85,
-          "domain": "LOGIC",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-diegetic-ui",
-      "title": "Types of UI in Gaming: Diegetic, Non-Diegetic, Spatial and Meta — Medium 2024-10",
-      "url": "https://medium.com/@lorenzoardeni/types-of-ui-in-gaming-diegetic-non-diegetic-spatial-and-meta-5024ce6362d0",
-      "tier": 5,
-      "domain": "DATA",
-      "provenance": "[Synthesis]",
-      "freshnessDate": "2024-10-25",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "Four UI types: Diegetic (in world, visible to characters — Dead Space health bar on suit), Non-diegetic (HUD overlay, not in world — WoW HUD), Spatial (in world but invisible to characters — Assassin's Creed enemy name tags), Meta (reflects character state without physical objects — Call of Duty blood screen).",
-      "claims": [
-        {
-          "id": "clm-ext-28",
-          "text": "Diegetic UI: exists in the game world and is perceived by characters. Example: health bar embedded on Isaac's suit in Dead Space. Eliminates graphic overlays that break the illusion of being in the world.",
-          "confidence": 0.90,
-          "domain": "DATA",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        },
-        {
-          "id": "clm-ext-29",
-          "text": "Spatial UI: displayed in the game world, part of the landscape/objects, but NOT perceived by characters. Example: enemy name tags in Assassin's Creed. This is the category most relevant to 3D spatial math annotations (labels on divisor objects, constellation labels).",
-          "confidence": 0.90,
-          "domain": "DATA",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        },
-        {
-          "id": "clm-ext-30",
-          "text": "Non-diegetic UI (current PR#28 speech bubble): displayed only to the player as a graphic overlay. Ideal for strategic information. The current CSS speech bubble is non-diegetic — it doesn't participate in the 3D world space.",
-          "confidence": 0.90,
-          "domain": "DATA",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "current"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-cra-meta",
-      "title": "Meta-Analytic Review of CRA Math Approach — SAGE Journals 2025",
-      "url": "https://journals.sagepub.com/doi/10.1177/09388982241292299",
-      "tier": 1,
-      "domain": "LOGIC",
-      "provenance": "[Official]",
-      "freshnessDate": "2025-01-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "aging",
-      "summary": "Meta-analysis of 30 single-case design studies. Overall effect size 0.9965 (statistically significant, large). CRA: Concrete manipulatives → Representational drawings/digital models → Abstract concepts. Strong evidence for math learning effectiveness.",
-      "claims": [
-        {
-          "id": "clm-ext-31",
-          "text": "CRA approach has a statistically significant overall effect size of 0.9965 across 30 single-case design studies. Concrete phase benefits from hands-on/physical manipulation of 3D objects.",
-          "confidence": 0.95,
-          "domain": "LOGIC",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-32",
-          "text": "CRA Concrete phase: teachers focus on hands-on manipulatives, students move and manipulate 3D objects. In mathcrew 3D world, the concrete phase is the interactive 3D scene itself — content delivery for concrete phase should guide attention to 3D objects being manipulated, not just text.",
-          "confidence": 0.85,
-          "domain": "LOGIC",
-          "provenance": "[Inference]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-variation-theory",
-      "title": "Application of Variation Theory in STEM Education — PMC 2023/2024",
-      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10716585/",
-      "tier": 1,
-      "domain": "LOGIC",
-      "provenance": "[Official]",
-      "freshnessDate": "2024-01-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "aging",
-      "summary": "Four VT patterns: Contrast (show what it is by showing what it is not), Separation (vary one aspect while keeping others constant), Generalization (vary multiple aspects to find invariant), Fusion (combine multiple aspects simultaneously). Constructive + variation learning required for immersive VR environments.",
-      "claims": [
-        {
-          "id": "clm-ext-33",
-          "text": "Variation Theory defines four teaching patterns: Contrast, Separation, Generalization, Fusion. Each pattern requires different content delivery: Contrast needs side-by-side comparison; Separation needs focused highlighting of one varying aspect; Fusion needs simultaneous multi-aspect presentation.",
-          "confidence": 0.90,
-          "domain": "LOGIC",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-34",
-          "text": "Variation and constructive learning theories, when implemented in VR design, support active engagement, knowledge construction, contextual understanding, and personalized learning. The content delivery approach must change per VT dimension being taught.",
-          "confidence": 0.85,
-          "domain": "LOGIC",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-adaptive-gbl",
-      "title": "Interactivity in Game-Based Learning with AI — ASIS&T 2025 Systematic Review",
-      "url": "https://asistdl.onlinelibrary.wiley.com/doi/10.1002/pra2.1410",
-      "tier": 1,
-      "domain": "ACTION",
-      "provenance": "[Official]",
-      "freshnessDate": "2025-01-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "aging",
-      "summary": "Systematic review of 20 studies (2022-2025). Three interaction types: student-student, student-AI, adaptive/immersive environments. AI-driven adaptive pacing and personalized educational pathways are dominant 2024-2025 trend in game-based learning.",
-      "claims": [
-        {
-          "id": "clm-ext-35",
-          "text": "2024-2025 systematic review identifies adaptive/immersive environments with AI-driven content delivery as the dominant trend in educational game design. Real-time adaptive pacing (adjusting content delivery speed based on learner response) is a validated paradigm.",
-          "confidence": 0.85,
-          "domain": "ACTION",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-36",
-          "text": "Three types of interactivity in GBL: student-student (collaborative), student-AI (personalized feedback), and adaptive immersive (environment responds to learner). mathcrew currently implements student-AI (beat sequencing) but not adaptive immersive (proximity triggers, behavioral pacing).",
-          "confidence": 0.80,
-          "domain": "ACTION",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-fsrs-v6",
-      "title": "FSRS-6 Algorithm — Open Spaced Repetition",
-      "url": "https://github.com/open-spaced-repetition/awesome-fsrs",
-      "tier": 2,
-      "domain": "DATA",
-      "provenance": "[Official]",
-      "freshnessDate": "2025-01-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "aging",
-      "summary": "FSRS-6 is the latest version. 2 more parameters than FSRS-5. Machine learning based personalized review scheduling. Active development across multiple platform implementations.",
-      "claims": [
-        {
-          "id": "clm-ext-37",
-          "text": "FSRS-6 is the current latest version of the algorithm. ts-fsrs 5.3.1 (used in mathcrew) implements FSRS-5/6. The spaced repetition backend tracks retrievability (R) and stability (S). Content delivery should reflect R value — low-R items should trigger reinforcement teaching beats.",
-          "confidence": 0.80,
-          "domain": "DATA",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-threejs-perf-2025-issue",
-      "title": "Three.js Forum — CSS3DRenderer + postprocessing incompatibility",
-      "url": "https://discourse.threejs.org/t/is-there-an-official-or-workaround-way-to-apply-postprocessing-effects-to-a-css3drenderer/18239",
-      "tier": 3,
-      "domain": "ACTION",
-      "provenance": "[Official]",
-      "freshnessDate": "2020-08-28",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "stale",
-      "summary": "Official Three.js core developer (Mugen87) confirmation: CSS3DRenderer cannot receive WebGL-based postprocessing. EffectComposer only accepts WebGLRenderer. No workaround with usable performance exists.",
-      "claims": [
-        {
-          "id": "clm-ext-38",
-          "text": "Three.js core developer (Mugen87) confirmed: 'Since CSS3DRenderer works with plain HTML and CSS, there is no way to apply WebGL based post-processing effects to its output.' This is an architectural impossibility, not a missing feature.",
-          "confidence": 0.99,
-          "domain": "ACTION",
-          "provenance": "[Official]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "stale"
-        }
-      ]
-    },
-    {
-      "id": "src-ext-canvas-texture",
-      "title": "CanvasTexture text rendering — Three.js pattern",
-      "url": "https://threejs.org/",
-      "tier": 1,
-      "domain": "DATA",
-      "provenance": "[Synthesis]",
-      "freshnessDate": "2025-01-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "aging",
-      "summary": "CanvasTexture: draw text to 2D Canvas, apply as texture on PlaneGeometry. Participates in WebGL pipeline, affected by postprocessing. Requires manual re-render on text change. Lower quality than SDF at small sizes but simpler. Used for static or infrequently-updated labels.",
-      "claims": [
-        {
-          "id": "clm-ext-39",
-          "text": "CanvasTexture approach: 2D Canvas used as texture source on a PlaneGeometry mesh. Texture update requires `canvas.getContext('2d').fillText(...)` + `texture.needsUpdate = true`. Participates in WebGL render pipeline and receives postprocessing effects unlike CSS overlay.",
-          "confidence": 0.85,
-          "domain": "DATA",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        },
-        {
-          "id": "clm-ext-40",
-          "text": "CanvasTexture quality degrades at small display sizes or steep view angles due to rasterization. Text update frequency is bounded by canvas re-draw overhead (synchronous, on main thread). Not suited for high-frequency dynamic text.",
-          "confidence": 0.80,
-          "domain": "DATA",
-          "provenance": "[Synthesis]",
-          "isAtomic": true,
-          "retrievedDate": "2026-04-12",
-          "freshnessStatus": "aging"
-        }
+        { "id": "clm-int-01", "text": "The 3-stage product journey applies to photonicRealism: (1) Golden Tables — entity definitions + material presets, (2) Operational — interaction systems + animation controllers, (3) AI-First — adaptive content delivery.", "confidence": 0.90, "domain": "LOGIC", "provenance": "[Synthesis]", "isAtomic": true },
+        { "id": "clm-int-02", "text": "OCP (Open-Closed): PhotonicComponentFactory must be open for extension (new math concepts → new entity types) without modifying core factory code.", "confidence": 0.95, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true },
+        { "id": "clm-int-03", "text": "DDD: Entity names (SpaceshipEntity, SpacekidEntity) must match domain vocabulary. Teaching surface names must map 1:1 to ontology terms.", "confidence": 0.95, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true }
       ]
     }
-  ],
-  "evidence": [
-    {
-      "id": "ev-q-cd-01",
-      "questionId": "q-cd-01",
-      "claimIds": ["clm-ext-28", "clm-ext-29", "clm-ext-30", "clm-int-07", "clm-ext-20"],
-      "summary": "Best-practice 3D educational UI is Spatial UI (in-world, not perceived by characters): labels anchored to math objects. Diegetic for character-embedded state. Non-diegetic for strategic HUD. CTML Spatial Contiguity: text/labels must be near referenced objects."
-    },
-    {
-      "id": "ev-q-cd-02",
-      "questionId": "q-cd-02",
-      "claimIds": ["clm-ext-01", "clm-ext-02", "clm-ext-03", "clm-ext-08", "clm-ext-09", "clm-ext-11", "clm-ext-13", "clm-ext-14", "clm-ext-39"],
-      "summary": "troika-three-text: best option for in-world WebGL text. Async SDF, postprocessing-compatible via OverrideMaterialManager workaround. CSS3DRenderer: no postprocessing integration. three-mesh-ui: stale, VR-focused, MSDF requires pre-built fonts. CanvasTexture: simpler but lower quality."
-    },
-    {
-      "id": "ev-q-cd-03",
-      "questionId": "q-cd-03",
-      "claimIds": ["clm-ext-35", "clm-ext-36", "clm-ext-21"],
-      "summary": "Adaptive AI-driven pacing is 2025 trend. Segmenting + learner pacing control are Mayer-validated. Proximity triggers and adaptive immersive environments extend beyond current Enter-advances-beat paradigm."
-    },
-    {
-      "id": "ev-q-cd-04",
-      "questionId": "q-cd-04",
-      "claimIds": ["clm-ext-20", "clm-ext-21", "clm-ext-22", "clm-ext-23", "clm-ext-24", "clm-ext-25", "clm-ext-26", "clm-ext-27", "clm-ext-31"],
-      "summary": "CTML: design quality controls cognitive load, not rendering approach. Spatial Contiguity, Segmenting, Coherence, Signalling, Temporal Contiguity are the 5 most applicable principles for 3D math education. CRA effect size 0.9965."
-    },
-    {
-      "id": "ev-q-cd-05",
-      "questionId": "q-cd-05",
-      "claimIds": ["clm-ext-01", "clm-ext-04", "clm-ext-05", "clm-ext-06", "clm-ext-07"],
-      "summary": "troika-three-text v0.52.4 (2025-04-02, 2.4M weekly downloads): primary ecosystem choice. SDF atlas, web worker, postprocessing-compatible, curveRadius + outlineBlur for panel-style text, preloadFont for zero-latency first beat."
-    },
-    {
-      "id": "ev-q-cd-06",
-      "questionId": "q-cd-06",
-      "claimIds": ["clm-int-02", "clm-int-03", "clm-ext-33", "clm-ext-34", "clm-ext-32"],
-      "summary": "VT dimension determines rendering: Contrast → split/comparison view; Separation → spatial highlighting of one varying attribute; Fusion → synchronized multi-modal content. CRA phase determines modality: Concrete → spatial highlighting on 3D objects; Representational → diagram overlays; Abstract → pure text/symbol."
-    },
-    {
-      "id": "ev-q-cd-07",
-      "questionId": "q-cd-07",
-      "claimIds": ["clm-ext-03", "clm-ext-12", "clm-ext-38", "clm-ext-17", "clm-ext-18", "clm-ext-19", "clm-ext-15", "clm-ext-16"],
-      "summary": "CSS overlay (current): no postprocessing integration, no depth occlusion. CSS3DRenderer: architecturally incompatible with postprocessing (Three.js core confirmed). troika-three-text: WebGL-native, postprocessing-compatible via OverrideMaterialManager.workaroundEnabled=true, adds SDF atlas texture and shader patch overhead. Performance impact of troika: web worker offloads SDF gen; fragment shader cost unmeasured in n8ao context."
-    }
-  ],
-  "researchQuestionStatus": {
-    "q-cd-01": { "status": "answered", "summary": "Spatial UI (in-world anchored labels) is best-practice for 3D educational content. Current CSS overlay is non-diegetic HUD." },
-    "q-cd-02": { "status": "answered", "summary": "troika-three-text > CSS3DRenderer > CanvasTexture > three-mesh-ui for mathcrew stack. CSS3DRenderer is postprocessing-incompatible by design." },
-    "q-cd-03": { "status": "answered", "summary": "Adaptive AI-driven pacing + learner-controlled segmenting validated. Proximity triggers are viable next-step." },
-    "q-cd-04": { "status": "answered", "summary": "5 CTML principles dominate: Spatial Contiguity, Segmenting, Coherence, Signalling, Temporal Contiguity. Design quality controls cognitive load." },
-    "q-cd-05": { "status": "answered", "summary": "troika-three-text v0.52.4 is the primary ecosystem tool. Active, 2.4M weekly downloads, postprocessing-compatible." },
-    "q-cd-06": { "status": "answered", "summary": "VT dimension drives rendering mode. CRA phase drives content modality. Each requires different spatial rendering strategy." },
-    "q-cd-07": { "status": "partial", "summary": "CSS overlay = no postprocessing. CSS3DRenderer = postprocessing impossible. troika-three-text = postprocessing-compatible but exact n8ao FPS impact unmeasured." }
-  }
+  ]
 }
