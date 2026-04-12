@@ -1,20 +1,22 @@
 {
-  "version": "0.8.0",
-  "lastUpdated": "2026-04-12T12:45:00Z",
-  "currentSession": "mathcrew-content-delivery-001",
-  "sessions": ["mathcrew-content-delivery-001"],
+  "version": "0.9.0",
+  "lastUpdated": "2026-04-12T19:00:00Z",
+  "currentSession": "mathcrew-photonic-realism-001",
+  "sessions": ["mathcrew-content-delivery-001", "mathcrew-photonic-realism-001"],
   "ontologistAudit": {
-    "timestamp": "2026-04-12T12:45:00Z",
+    "timestamp": "2026-04-12T19:00:00Z",
     "agent": "ontologist",
-    "totalObjects": 23,
+    "totalObjects": 43,
     "domainsPopulated": ["DATA", "LOGIC", "ACTION", "LEARN"],
-    "securityDomain": "none — no RBAC/access-control concerns in content delivery pipeline",
+    "securityDomain": "none — no RBAC/access-control concerns identified for photonicRealism pipeline",
     "overallForwardPropStatus": "partial",
     "overallBackwardPropStatus": "partial",
-    "contradictions": 0,
-    "researchGaps": ["g-01", "g-02", "g-03"],
-    "confidence": 0.88,
-    "keyInsight": "CSS3DRenderer is architecturally excluded (postprocessing incompatible). troika-three-text is the only WebGL-native text approach compatible with n8ao pipeline (via OverrideMaterialManager workaround). Design quality (CTML compliance) controls cognitive load, not rendering approach immersion level. CRA Concrete phase has CTML SpatialContiguity violation in current implementation."
+    "contradictions": 1,
+    "contradictionDetail": "SkeletonUtils.retarget() reliability: [Official] API exists but community reports [Synthesis] document frequent failures with different-proportion skeletons. Resolution: bundle animations in GLB, avoid runtime retargeting.",
+    "researchGaps": ["g-01", "g-02", "g-03", "g-pr-01", "g-pr-02", "g-pr-03"],
+    "confidence": 0.85,
+    "priorSessionInsight": "CSS3DRenderer is architecturally excluded (postprocessing incompatible). troika-three-text is the only WebGL-native text approach compatible with n8ao pipeline. CRA Concrete phase has CTML SpatialContiguity violation.",
+    "currentSessionInsight": "photonicRealism = MeshPhysicalMaterial (PBR) + PMREMGenerator HDRI (IBL) + selective MeshSSSNodeMaterial (SSS). Teaching framework migration is METAPHOR-LAYER-ONLY — VT/CRA/beats/ts-fsrs/10 InteractionMode contracts preserved. SpacekidEntity uses GLTF+AnimationMixer; SpaceshipEntity uses procedural geometry. Component Factory+Registry (OCP) preferred over full ECS for <50 entities. Drag uses proxy mesh pattern. n8ao halfRes+DPR adaptive for Chromebook 60fps."
   },
   "objects": [
     {
@@ -395,19 +397,512 @@
       },
       "forwardPropPath": { "chain": "ResearchGapRegistry (LEARN) -> gap severity influences RenderingApproachEvaluation.confidence -> evaluator gate R1 (low-tier dependency check)", "healthStatus": "healthy" },
       "backwardPropPath": { "chain": "GapResolved event (after prototype benchmark) -> ResearchGapRegistry updated -> affected decisions re-evaluated -> confidence upgraded", "healthStatus": "healthy" }
+    },
+    {
+      "id": "obj-pr-01", "name": "SpaceshipEntityDef", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "Replaces resonanceLoop (TorusGeometry observatory). Procedural geometry spaceship: fuselage (CylinderGeometry), wings (BoxGeometry), engine pods (CylinderGeometry). MeshPhysicalMaterial: metalness=0.85, roughness=0.15, clearcoat=1.0, clearcoatRoughness=0.1, envMapIntensity=1.5. PMREMGenerator HDRI from Polyhaven CC0. Entity definition stored as DATA — geometry params, material presets, LOD levels.",
+      "source": "src-pr-threejs-api-r183 clm-pr-01, clm-pr-02; src-pr-pbr-pmrem clm-pr-17",
+      "primitive": "Struct",
+      "semanticHeuristic": "SH-02: SpaceshipEntityDef (geometry params, material preset refs, LOD config) describes what the spaceship entity IS — a stored configuration fact. Delete LOGIC (how to build it) and ACTION (how to animate it): core config still describes reality.",
+      "evidenceIds": ["clm-pr-01", "clm-pr-02", "clm-pr-17", "clm-pr-18"],
+      "designPrinciples": {
+        "DDD": "PASS — 'SpaceshipEntity' replaces 'resonanceLoop' per user request; domain vocabulary updated",
+        "DRY": "PASS — single entity definition; PhotonicComponentFactory reads it, not duplicated per scene",
+        "OCP": "PASS — new LOD levels or material variants added as new presets without changing base struct",
+        "PECS": "PASS — scene authoring (producer) defines SpaceshipEntityDef; PhotonicComponentFactory (consumer) instantiates"
+      },
+      "forwardPropPath": { "chain": "SpaceshipEntityDef (DATA) -> PhotonicComponentFactory (LOGIC) -> Three.js Group with MeshPhysicalMaterial meshes -> PMREMGenerator IBL -> n8ao SSAO -> render", "healthStatus": "partial", "gaps": ["PhotonicComponentFactory not yet implemented", "HDRI asset not bundled in mathcrew/public/"] },
+      "backwardPropPath": { "chain": "PhotonicComponentUsageMetrics (LEARN) -> entity variant effectiveness -> SpaceshipEntityDef material preset refinement", "healthStatus": "partial", "gaps": ["PhotonicComponentUsageMetrics not yet implemented"] }
+    },
+    {
+      "id": "obj-pr-02", "name": "SpacekidEntityDef", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "Replaces pulseShard (crystal/orbiter). GLTF character: child in spacesuit. Asset pipeline: Kenney CC0 character base → Blender spacesuit skin → Mixamo walk/idle/gesture animations baked into GLB → gltfjsx -S -T -t compression (up to 90% size reduction). AnimationMixer for clip management. SkeletonUtils.clone() for multi-instance. SpacekidEntityDef stores: assetUrl, animations{idle,walk,wave,pickup,board}, scale, lodLevels.",
+      "source": "src-pr-gltf-workflow clm-pr-11 through clm-pr-15; src-pr-threejs-api-r183 clm-pr-05 through clm-pr-07",
+      "primitive": "Struct",
+      "semanticHeuristic": "SH-02: SpacekidEntityDef (assetUrl, animation clip names, LOD config) describes what the character asset IS. Baked animations are a DATA fact about which clips exist.",
+      "evidenceIds": ["clm-pr-05", "clm-pr-06", "clm-pr-07", "clm-pr-11", "clm-pr-12", "clm-pr-13"],
+      "skeletonRetargetingNote": "CONTRADICTION RESOLVED: SkeletonUtils.retarget() unreliable for different-proportion skeletons [Synthesis]. Bundle Mixamo animations directly in GLB during Blender export — avoid runtime retargeting. clm-pr-14 confirms bundle approach.",
+      "designPrinciples": {
+        "DDD": "PASS — 'SpacekidEntity' is the new user-specified domain vocabulary (우주복 입은 어린이)",
+        "DRY": "PASS — single GLTF asset; SkeletonUtils.clone() creates instances without re-loading",
+        "OCP": "PASS — new animation clips added to GLB without changing entity definition interface",
+        "PECS": "PASS — asset pipeline (producer) provides GLB; CharacterAnimationSystem (consumer) plays clips"
+      },
+      "forwardPropPath": { "chain": "SpacekidEntityDef (DATA) -> GLTFLoader.load(assetUrl) -> SkeletonUtils.clone() -> AnimationMixer -> CharacterAnimationSystem (LOGIC) -> scene integration", "healthStatus": "partial", "gaps": ["Kenney CC0 + Mixamo GLB pipeline not yet executed", "gap g-pr-02: instancing approach for SkinnedMesh unconfirmed"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry (LEARN) -> character interaction frequency -> SpacekidEntityDef animation clip priority refinement", "healthStatus": "partial", "gaps": ["InteractionTelemetry not yet implemented"] }
+    },
+    {
+      "id": "obj-pr-03", "name": "PhotonicMaterialPreset", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "Named PBR material preset for photonicRealism pipeline. Fields: presetId, materialType ('MeshPhysicalMaterial'|'MeshSSSNodeMaterial'), metalness, roughness, clearcoat, clearcoatRoughness, transmission, ior, envMapIntensity, thickness (SSS), scatterDistance (SSS), hdriUrl. Standard presets: 'spaceship-hull' (metalness=0.85, clearcoat=1.0), 'visor-glass' (transmission=0.95, ior=1.5), 'spacesuit-fabric' (MeshSSSNodeMaterial, thickness=0.5).",
+      "source": "src-pr-threejs-api-r183 clm-pr-01 through clm-pr-04; src-pr-pbr-pmrem clm-pr-17 through clm-pr-21",
+      "primitive": "Struct",
+      "semanticHeuristic": "SH-02: PhotonicMaterialPreset (named material parameters) describes what a material configuration IS — a stored fact about rendering intent. Classification: DATA.",
+      "evidenceIds": ["clm-pr-01", "clm-pr-02", "clm-pr-03", "clm-pr-04", "clm-pr-17", "clm-pr-18", "clm-pr-19"],
+      "standardPresets": {
+        "spaceship-hull": { "type": "MeshPhysicalMaterial", "metalness": 0.85, "roughness": 0.15, "clearcoat": 1.0, "clearcoatRoughness": 0.1, "envMapIntensity": 1.5 },
+        "visor-glass": { "type": "MeshPhysicalMaterial", "transmission": 0.95, "ior": 1.5, "roughness": 0.05, "thickness": 0.01 },
+        "spacesuit-fabric": { "type": "MeshSSSNodeMaterial", "color": "#E8D5B7", "thickness": 0.5, "scatterDistance": 0.3, "roughness": 0.8 },
+        "engine-glow": { "type": "MeshPhysicalMaterial", "emissive": "#FF6B35", "emissiveIntensity": 2.0, "metalness": 0.3, "roughness": 0.7 }
+      },
+      "designPrinciples": {
+        "DDD": "PASS — preset names match visual design vocabulary ('visor-glass', 'spaceship-hull')",
+        "DRY": "PASS — named presets prevent per-mesh material parameter duplication",
+        "OCP": "PASS — new presets added without changing existing ones; PhotonicComponentFactory reads preset by id",
+        "PECS": "PASS — scene authoring (producer) creates presets; PhotonicRealismPipeline (consumer) applies to meshes"
+      },
+      "forwardPropPath": { "chain": "PhotonicMaterialPreset (DATA) -> PhotonicRealismPipeline (LOGIC) -> Three.js material instantiation -> PMREMGenerator IBL binding -> scene", "healthStatus": "partial", "gaps": ["Polyhaven CC0 HDRI not yet downloaded to mathcrew/public/hdri/"] },
+      "backwardPropPath": { "chain": "PhotonicComponentUsageMetrics (LEARN) -> material visual quality scores -> preset parameter refinement", "healthStatus": "partial", "gaps": ["no visual quality scoring mechanism defined yet"] }
+    },
+    {
+      "id": "obj-pr-04", "name": "PhotonicComponentDefinition", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "Registry entry for a photonicRealism component: componentId, entityType ('spaceship'|'spacekid'|'math-object'), geometryFn (procedural) or assetUrl (GLTF), materialPresetIds[], interactionModes[], lodLevels[], tags[]. Component Factory reads from registry (OCP — new entity types added as registry entries, not code changes).",
+      "source": "src-pr-ecs-architecture clm-pr-22 through clm-pr-25",
+      "primitive": "Struct",
+      "semanticHeuristic": "SH-02: PhotonicComponentDefinition describes what a component IS (its configuration contract). A stored fact about component capability and defaults. Classification: DATA.",
+      "evidenceIds": ["clm-pr-22", "clm-pr-23", "clm-pr-24"],
+      "designPrinciples": {
+        "DDD": "PASS — 'Component' matches ECS domain vocabulary",
+        "DRY": "PASS — single registry entry per component type prevents per-scene definition duplication",
+        "OCP": "PASS — new component types registered without modifying Factory code",
+        "PECS": "PASS — scene authoring (producer) registers definitions; PhotonicComponentFactory (consumer) reads"
+      },
+      "forwardPropPath": { "chain": "PhotonicComponentDefinition (DATA) -> PhotonicComponentFactory.create(componentId) (LOGIC) -> instantiated Three.js Group -> scene", "healthStatus": "partial", "gaps": ["Component registry not yet designed in codebase"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry (LEARN) -> component interaction metrics -> definition interactionModes refinement", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-05", "name": "CharacterAnimationClip", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "Named animation clip definition per character: clipId, name ('idle'|'walk'|'wave'|'pickup'|'board-spaceship'|'gesture-point'), durationSeconds, looping, blendDuration, triggerConditions. All clips must be baked into character GLB (Mixamo → Blender export) — no runtime SkeletonUtils.retarget(). AnimationMixer uses THREE.AnimationAction for clip playback and cross-fade.",
+      "source": "src-pr-gltf-workflow clm-pr-12 through clm-pr-15; src-pr-threejs-api-r183 clm-pr-05 through clm-pr-07",
+      "primitive": "Struct",
+      "semanticHeuristic": "SH-02: CharacterAnimationClip (clip metadata, trigger conditions) describes what animation states EXIST in the character asset. A stored fact about available animations. Classification: DATA.",
+      "evidenceIds": ["clm-pr-05", "clm-pr-06", "clm-pr-12", "clm-pr-14"],
+      "animationCatalog": {
+        "idle": { "looping": true, "blendDuration": 0.3, "trigger": "default state" },
+        "walk": { "looping": true, "blendDuration": 0.2, "trigger": "drag velocity > 0" },
+        "wave": { "looping": false, "blendDuration": 0.3, "trigger": "spatial proximity trigger" },
+        "pickup": { "looping": false, "blendDuration": 0.2, "trigger": "grab interaction" },
+        "board-spaceship": { "looping": false, "blendDuration": 0.4, "trigger": "BoardingAnimation ACTION" }
+      },
+      "designPrinciples": {
+        "DDD": "PASS — clip names match character interaction vocabulary",
+        "DRY": "PASS — clip catalog defined once; CharacterAnimationSystem reads it",
+        "OCP": "PASS — new clips added to catalog without changing AnimationSystem",
+        "PECS": "PASS — character GLB (producer) provides clips; AnimationMixer (consumer) plays them"
+      },
+      "forwardPropPath": { "chain": "CharacterAnimationClip (DATA) -> CharacterAnimationSystem.playClip() (LOGIC) -> AnimationMixer.clipAction() -> animated character in scene", "healthStatus": "partial", "gaps": ["GLB with baked Mixamo animations not yet created"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry.clipPlayedId (LEARN) -> clip usage frequency -> catalog priority ordering refinement", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-06", "name": "TeachingStoryFrame", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "MODIFIED from content-delivery session. Extends TeachingBeat with photonicRealism narrative context: storyBeatId, narrativeRole ('spacekid-discovers'|'spacekid-boards'|'spacekid-explains'), spatialTriggerIds[], characterPlacementConstraint. The math contract (TeachingBeat) is PRESERVED — only narrative framing added as optional extension fields.",
+      "source": "src-pr-teaching-framework clm-pr-34 through clm-pr-36",
+      "primitive": "Struct",
+      "semanticHeuristic": "SH-02: TeachingStoryFrame (narrative role, spatial trigger refs, character placement constraint) describes what a story beat IS — extends existing teaching data without replacing core contracts. Classification: DATA.",
+      "evidenceIds": ["clm-pr-34", "clm-pr-35", "clm-pr-36"],
+      "migrationScope": "METAPHOR LAYER ONLY — TeachingBeat (math contract) unchanged. VT/CRA/beats/ts-fsrs/10 InteractionMode types preserved. Only visual/narrative framing replaced (resonanceLoop→spaceship, pulseShard→spacekid).",
+      "designPrinciples": {
+        "DDD": "PASS — 'StoryFrame' extends existing beat domain vocabulary",
+        "DRY": "PASS — extends TeachingBeat struct; does not duplicate beat fields",
+        "OCP": "PASS — optional storyBeatId fields addable without breaking existing TeachingBeat consumers",
+        "PECS": "PASS — scene authoring (producer) extends TeachingStoryFrame; ContentDeliveryResolver (consumer) reads optional fields"
+      },
+      "forwardPropPath": { "chain": "TeachingStoryFrame (DATA) -> ContentDeliveryResolver narrative context -> SpatialProximityTrigger, BoardingAnimation dispatch -> teaching beat with story context", "healthStatus": "partial", "gaps": ["storyBeatId field not yet in TeachingBeat type"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry.storyBeatId (LEARN) -> story context engagement metrics -> narrative structure refinement", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-07", "name": "CharacterAssetPipeline", "domain": "DATA",
+      "ontologyType": "Struct",
+      "description": "Describes the offline character asset pipeline: source (Kenney CC0 base mesh) → Blender (spacesuit skin + Mixamo animation bake) → gltfjsx compression (-S -T -t flags, up to 90% reduction) → mathcrew/public/characters/spacekid.glb. This is DATA about what the asset pipeline produces and what assets exist at what paths.",
+      "source": "src-pr-gltf-workflow clm-pr-11 through clm-pr-15; src-pr-pbr-pmrem clm-pr-21",
+      "primitive": "Struct",
+      "semanticHeuristic": "SH-02: CharacterAssetPipeline describes what the pipeline IS (steps, inputs, outputs, asset paths) — a stored configuration fact about asset production. Classification: DATA.",
+      "evidenceIds": ["clm-pr-11", "clm-pr-13", "clm-pr-15", "clm-pr-21"],
+      "pipelineSteps": [
+        { "step": 1, "tool": "Kenney.nl Space Kit CC0", "output": "base character mesh FBX" },
+        { "step": 2, "tool": "Blender 3.x", "action": "spacesuit texture + Mixamo animation bake", "output": "character.blend" },
+        { "step": 3, "tool": "Blender GLTF exporter", "settings": "animations: included, compress: none", "output": "spacekid-raw.glb" },
+        { "step": 4, "tool": "gltfjsx -S -T -t", "flags": "-S (no shadows), -T (no types), -t (transform)", "output": "spacekid.glb (90% smaller)" },
+        { "step": 5, "target": "mathcrew/public/characters/spacekid.glb", "note": "GLTFLoader URL must be absolute in Three.js r183" }
+      ],
+      "designPrinciples": {
+        "DDD": "PASS — pipeline vocabulary (gltfjsx, Mixamo, CC0) matches 3D asset domain",
+        "DRY": "PASS — single pipeline definition; all instances reference same compressed GLB",
+        "OCP": "PASS — new character variants added as new GLB files without pipeline changes",
+        "PECS": "N/A — pipeline description, not code boundary"
+      },
+      "forwardPropPath": { "chain": "CharacterAssetPipeline (DATA) -> spacekid.glb in public/ -> GLTFLoader.load() -> SpacekidEntityDef instantiation", "healthStatus": "partial", "gaps": ["GLB not yet created — requires Blender + Mixamo workflow execution"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry animation quality signals -> CharacterAssetPipeline asset update (new Blender export)", "healthStatus": "partial", "gaps": ["No automated asset quality evaluation"] }
+    },
+    {
+      "id": "obj-pr-08", "name": "PhotonicRealismPipeline", "domain": "LOGIC",
+      "ontologyType": "Interface",
+      "description": "Orchestrates photonicRealism rendering setup: (1) PMREMGenerator.fromEquirectangular(hdriTexture) → scene.environment and scene.background, (2) MeshPhysicalMaterial assignment from PhotonicMaterialPreset, (3) MeshSSSNodeMaterial selective assignment (spacesuit fabric only — SSS cost justified for pedagogical focus), (4) n8ao SSAO pass (halfRes=true, adaptive DPR cap), (5) postprocessing pipeline compose. Returns scene-ready configuration — no side effects (LOGIC, not ACTION).",
+      "source": "src-pr-threejs-api-r183 clm-pr-01 through clm-pr-04; src-pr-pbr-pmrem clm-pr-17 through clm-pr-21; src-pr-performance-2025 clm-pr-26 through clm-pr-30",
+      "primitive": "Interface",
+      "semanticHeuristic": "SH-03: PhotonicRealismPipeline computes rendering configuration (LOGIC — returns config object, no scene mutations). PhotonicRealismApplier (ACTION) reads config and mutates scene.",
+      "evidenceIds": ["clm-pr-01", "clm-pr-03", "clm-pr-04", "clm-pr-17", "clm-pr-19", "clm-pr-26", "clm-pr-27"],
+      "pipelineStages": {
+        "stage1_ibl": "PMREMGenerator.fromEquirectangular(loader.load(hdriUrl)) — blocks render until HDRI loaded; use LoadingManager",
+        "stage2_materials": "iterate PhotonicComponentDefinition[] → assign PhotonicMaterialPreset via materialPresetId lookup",
+        "stage3_sss": "selective: only spacesuit-fabric preset → MeshSSSNodeMaterial (validate gap g-pr-01 FPS cost first)",
+        "stage4_ssao": "n8ao: AmbientOcclusionPass(camera, scene) halfRes=true; adaptive DPR: desktop=1.0, mobile=1.5 cap",
+        "stage5_compose": "EffectComposer: RenderPass → AOPass → OutputPass"
+      },
+      "designPrinciples": {
+        "DDD": "PASS — pipeline stages named by rendering domain terms (IBL, SSS, SSAO, compose)",
+        "DRY": "PASS — single pipeline setup; scene authoring does not duplicate per-entity material setup",
+        "OCP": "PASS — Interface: new pipeline stages (bloom, depth-of-field) added without changing existing stages",
+        "PECS": "PASS — PhotonicMaterialPreset[] (producer) provides params; pipeline (consumer super) instantiates materials"
+      },
+      "forwardPropPath": { "chain": "PhotonicRealismPipeline (LOGIC) -> scene.environment (IBL) + material assignment + n8ao SSAO pass -> EffectComposer -> WebGL2 render", "healthStatus": "partial", "gaps": ["Polyhaven HDRI not yet in mathcrew/public/", "gap g-pr-01: MeshSSSNodeMaterial FPS cost on Chromebook unverified"] },
+      "backwardPropPath": { "chain": "AdaptiveDPRController.currentDPR (LEARN) -> FPS below threshold -> pipeline stage disable (SSS first, then SSAO halfRes) -> DPR reduction", "healthStatus": "partial", "gaps": ["AdaptiveDPRController not yet implemented"] }
+    },
+    {
+      "id": "obj-pr-09", "name": "PhotonicComponentFactory", "domain": "LOGIC",
+      "ontologyType": "Interface",
+      "description": "Creates photonicRealism entity instances from PhotonicComponentDefinition registry. For procedural entities (SpaceshipEntityDef): constructs Three.js geometry + assigns PhotonicMaterialPreset materials + wraps in Group. For GLTF entities (SpacekidEntityDef): GLTFLoader.load(assetUrl) → SkeletonUtils.clone() per instance. Implements OCP — new entity types registered, factory code unchanged.",
+      "source": "src-pr-ecs-architecture clm-pr-22 through clm-pr-25; src-pr-threejs-api-r183 clm-pr-05 through clm-pr-07",
+      "primitive": "Interface",
+      "semanticHeuristic": "SH-01: PhotonicComponentFactory defines HOW TO REASON about creating entities (which geometry, which material, which loader). Returns entity Group (LOGIC — computation). PhotonicFeedbackEffect (ACTION) applies runtime mutations.",
+      "evidenceIds": ["clm-pr-05", "clm-pr-07", "clm-pr-22", "clm-pr-23", "clm-pr-24"],
+      "factoryMethods": {
+        "create(componentId, position)": "reads PhotonicComponentDefinition, routes to procedural or GLTF path, returns Three.js Group",
+        "createProcedural(def)": "constructs geometry + materials from def.geometryFn + def.materialPresetIds",
+        "createGLTF(def)": "GLTFLoader.load(def.assetUrl) → clone(gltf.scene) via SkeletonUtils.clone()",
+        "dispose(entity)": "geometry.dispose() + material.dispose() + texture.dispose() per mesh"
+      },
+      "designPrinciples": {
+        "DDD": "PASS — factory is standard DDD/ECS vocabulary for entity creation",
+        "DRY": "PASS — single creation logic for all entity types; no per-scene instantiation duplication",
+        "OCP": "PASS — new entity types: add PhotonicComponentDefinition entry. Factory Interface unchanged.",
+        "PECS": "PASS — PhotonicComponentDefinition (producer extends); Factory (consumer super) creates from definition"
+      },
+      "forwardPropPath": { "chain": "PhotonicComponentDefinition (DATA) -> PhotonicComponentFactory.create() (LOGIC) -> Three.js Group added to scene -> PhotonicRealismPipeline material binding", "healthStatus": "partial", "gaps": ["Factory implementation not yet in codebase", "gap g-pr-02: SkinnedMesh instancing performance unconfirmed"] },
+      "backwardPropPath": { "chain": "PhotonicComponentUsageMetrics (LEARN) -> creation frequency per componentId -> factory cache/preload optimization", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-10", "name": "CharacterAnimationSystem", "domain": "LOGIC",
+      "ontologyType": "Interface",
+      "description": "Manages AnimationMixer lifecycle for SpacekidEntity instances. playClip(entity, clipId, blendDuration): calls mixer.clipAction(clip).fadeIn(blendDuration).play(). stopClip(entity, clipId): fadeOut(blendDuration). Per-frame update(delta): mixer.update(delta) in game-loop render loop. Handles clip cross-fading for smooth walk→idle→wave transitions. One AnimationMixer per SpacekidEntity instance (SkeletonUtils.clone() provides independent mixer).",
+      "source": "src-pr-threejs-api-r183 clm-pr-05 through clm-pr-07",
+      "primitive": "Interface",
+      "semanticHeuristic": "SH-01: CharacterAnimationSystem defines HOW TO REASON about clip state transitions (which clips to blend, when to cross-fade). Returns clip state (LOGIC — no scene mutations). CharacterDragPlacement (ACTION) calls playClip to trigger walk animation.",
+      "evidenceIds": ["clm-pr-05", "clm-pr-06", "clm-pr-07"],
+      "clipTransitionTable": {
+        "drag-start": "idle → walk (fadeIn 0.2s)",
+        "drag-end": "walk → idle (fadeIn 0.3s)",
+        "proximity-trigger": "idle → wave (once, then idle)",
+        "boarding-sequence": "walk → board-spaceship (once)",
+        "gesture-interaction": "idle → gesture-point (once, then idle)"
+      },
+      "designPrinciples": {
+        "DDD": "PASS — AnimationMixer is Three.js domain vocabulary; clipAction/fadeIn are API terms",
+        "DRY": "PASS — single animation system; CharacterDragPlacement and SpatialProximityTrigger both call playClip()",
+        "OCP": "PASS — new transition rules added to clipTransitionTable without changing core system",
+        "PECS": "PASS — CharacterAnimationClip[] (producer); AnimationSystem (consumer super) plays clips"
+      },
+      "forwardPropPath": { "chain": "CharacterAnimationSystem (LOGIC) -> mixer.update(delta) in game-loop -> SkinnedMesh bone transforms -> Three.js skinning shader -> WebGL render", "healthStatus": "partial", "gaps": ["SpacekidEntity GLB not yet loaded; mixer setup not designed in game-loop"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry.clipPlayedId (LEARN) -> clip play frequency -> animation transition timing optimization", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-11", "name": "SpatialInteractionResolver", "domain": "LOGIC",
+      "ontologyType": "Interface",
+      "description": "Resolves which spatial interaction to trigger based on character position + scene state. Rules: (1) if character within proximity threshold of spaceship && beatTrigger → BoardingAnimation, (2) if character placed in math-zone → SpatialProximityTrigger fires beat, (3) if gesture detected (pinch/spread on tablet) → GestureInteractionAdapter. Returns InteractionEvent (LOGIC — computation, no mutation). Spatial math: Three.js Vector3.distanceTo() for proximity checks.",
+      "source": "src-pr-drag-interaction clm-pr-31 through clm-pr-33",
+      "primitive": "Interface",
+      "semanticHeuristic": "SH-01: SpatialInteractionResolver defines HOW TO REASON about which interaction applies given character position. Returns InteractionEvent (no side effects — classification: LOGIC). ACTION agents execute the returned event.",
+      "evidenceIds": ["clm-pr-31", "clm-pr-32", "clm-pr-33"],
+      "resolutionRules": [
+        { "condition": "distanceTo(character, spaceship) < proximityThreshold", "event": "BoardingTrigger" },
+        { "condition": "character placed in math-zone (defined by TeachingStoryFrame.spatialTriggerIds)", "event": "MathZoneTrigger" },
+        { "condition": "gesture: pinch detected on canvas", "event": "ScaleGesture" },
+        { "condition": "gesture: two-finger rotate on canvas", "event": "RotateGesture" }
+      ],
+      "designPrinciples": {
+        "DDD": "PASS — resolver pattern matches game/simulation domain for spatial event classification",
+        "DRY": "PASS — single resolver for all spatial interaction types; CharacterDragPlacement does not duplicate proximity logic",
+        "OCP": "PASS — new trigger conditions added to resolutionRules array without modifying resolver Interface",
+        "PECS": "PASS — TeachingStoryFrame.spatialTriggerIds (producer); SpatialInteractionResolver (consumer) resolves events"
+      },
+      "forwardPropPath": { "chain": "Character position (DATA) -> SpatialInteractionResolver.resolve() (LOGIC) -> InteractionEvent -> BoardingAnimation | SpatialProximityTrigger | GestureInteractionAdapter dispatch (ACTION)", "healthStatus": "partial", "gaps": ["Proximity threshold values not yet calibrated", "math-zone definitions not in scene authoring tooling"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry.eventId (LEARN) -> event frequency per trigger type -> proximity threshold refinement", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-12", "name": "TeachingFrameworkMigration", "domain": "LOGIC",
+      "ontologyType": "Derived Property",
+      "description": "Defines migration scope between content-delivery session and photonic-realism session. PRESERVE: VT/CRA/beats/ts-fsrs/10 InteractionMode types, ContentDeliveryResolver, ScaffoldEscalationLogic, MayerPrincipleChecker. REPLACE: entity visual representations (resonanceLoop→SpaceshipEntityDef, pulseShard→SpacekidEntityDef), game world metaphor (observatory→space station). EXTEND: interaction modes with CharacterDragPlacement, SpatialProximityTrigger, BoardingAnimation.",
+      "source": "src-pr-teaching-framework clm-pr-34 through clm-pr-36; decision-log q-pr-07",
+      "primitive": "DerivedProperty",
+      "semanticHeuristic": "SH-03: TeachingFrameworkMigration computes which objects are PRESERVE vs REPLACE vs EXTEND — a derived classification (no side effects). Classification: LOGIC.",
+      "evidenceIds": ["clm-pr-34", "clm-pr-35", "clm-pr-36"],
+      "migrationMatrix": {
+        "PRESERVE": ["TeachingBeat struct", "VT dimension taxonomy", "CRA micro-phase", "10 InteractionMode types", "ts-fsrs scheduling", "ContentDeliveryResolver", "ScaffoldEscalationLogic", "MayerPrincipleChecker", "CognitiveLoadGuard"],
+        "REPLACE": ["resonanceLoop geometry → SpaceshipEntityDef", "pulseShard geometry → SpacekidEntityDef", "observatory world → space station world"],
+        "EXTEND": ["CharacterDragPlacement (new pickup-drop interaction)", "SpatialProximityTrigger (new math-zone interaction)", "BoardingAnimation (new narrative sequence)", "GestureInteractionAdapter (tablet pinch/rotate)"]
+      },
+      "designPrinciples": {
+        "DDD": "PASS — migration preserves domain contracts (VT, CRA) while replacing metaphor layer",
+        "DRY": "PASS — migration scope defined once; avoids re-specifying what is preserved per component",
+        "OCP": "PASS — teaching framework (closed) extended by new interaction modes (open)",
+        "PECS": "N/A — derived classification, not code boundary"
+      },
+      "forwardPropPath": { "chain": "TeachingFrameworkMigration (LOGIC) -> guides which existing src/ files to preserve vs replace vs extend -> implementation plan", "healthStatus": "healthy" },
+      "backwardPropPath": { "chain": "InteractionTelemetry.interactionMode (LEARN) -> new mode effectiveness vs preserved modes -> migration scope validation", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-13", "name": "PerformanceBudgetPolicy", "domain": "LOGIC",
+      "ontologyType": "Derived Property",
+      "description": "Target device: Chromebook (integrated Intel Iris Xe). Budget: 60fps target, <100 draw calls, <16.7ms frame time. Policy rules: (1) n8ao halfRes=true mandatory on Chromebook, (2) DPR cap: desktop 1.0, mobile 1.5, Chromebook 1.0, (3) MeshSSSNodeMaterial selective only (validate FPS cost — gap g-pr-01), (4) SpacekidEntity LOD: ≤3 levels (LOD class), (5) BatchedMesh for static geometry clusters (clm-pr-10), (6) InstancedMesh for identical static meshes only.",
+      "source": "src-pr-performance-2025 clm-pr-26 through clm-pr-30; src-pr-threejs-api-r183 clm-pr-08 through clm-pr-10",
+      "primitive": "DerivedProperty",
+      "semanticHeuristic": "SH-03: PerformanceBudgetPolicy computes which rendering features are allowed given device capability (returns constraint set, no side effects). Classification: LOGIC.",
+      "evidenceIds": ["clm-pr-08", "clm-pr-09", "clm-pr-10", "clm-pr-26", "clm-pr-27", "clm-pr-28"],
+      "gapDependency": "g-pr-01: MeshSSSNodeMaterial FPS cost on Chromebook not benchmarked — policy rule for SSS enable/disable conditional on prototype result",
+      "designPrinciples": {
+        "DDD": "PASS — budget terms (draw calls, DPR, LOD) match Three.js/WebGL domain vocabulary",
+        "DRY": "PASS — single policy; AdaptiveDPRController reads it; PhotonicRealismPipeline reads it",
+        "OCP": "PASS — new device profiles added as policy entries without changing consuming code",
+        "PECS": "PASS — device capability (producer) provides hardware specs; PerformanceBudgetPolicy (consumer) derives constraint set"
+      },
+      "forwardPropPath": { "chain": "PerformanceBudgetPolicy (LOGIC) -> constrains PhotonicRealismPipeline.stage3_sss (conditional) + AdaptiveDPRController (ACTION) + LOD setup -> <100 draw calls target", "healthStatus": "partial", "gaps": ["gap g-pr-01: SSS cost unverified for Chromebook; policy rule conditional on prototype benchmark"] },
+      "backwardPropPath": { "chain": "AdaptiveDPRController.fpsHistory (LEARN) -> FPS below 60 → policy constraint tightening (SSS disable first)", "healthStatus": "partial", "gaps": ["Adaptive policy updates not automated"] }
+    },
+    {
+      "id": "obj-pr-14", "name": "CharacterDragPlacement", "domain": "ACTION",
+      "ontologyType": "Action Type",
+      "description": "User drags SpacekidEntity in 3D scene. Implementation pattern: (1) invisible proxy BoxMesh at character position, (2) Three.js DragControls attached to proxy array, (3) CharacterGroup.position tracks proxy.position per frame in drag:drag event, (4) grid snap: position.x = Math.round(pos.x / gridSize) * gridSize (optional), (5) drag:start → CharacterAnimationSystem.playClip('walk'), drag:end → playClip('idle'), (6) SpatialInteractionResolver.resolve() called on drag:end to check proximity triggers.",
+      "source": "src-pr-drag-interaction clm-pr-31 through clm-pr-33",
+      "primitive": "ActionType",
+      "semanticHeuristic": "SH-03: Commits edits — CharacterDragPlacement CHANGES REALITY by mutating character Group position in Three.js scene. Classification: ACTION.",
+      "evidenceIds": ["clm-pr-31", "clm-pr-32", "clm-pr-33"],
+      "implementationPattern": {
+        "proxy": "const proxy = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.1,0.1), new THREE.MeshBasicMaterial({visible:false}))",
+        "drag": "const drag = new DragControls([proxy], camera, renderer.domElement)",
+        "track": "drag.addEventListener('drag', () => characterGroup.position.copy(proxy.position))",
+        "gridSnap": "proxy.position.x = Math.round(proxy.position.x / GRID_SIZE) * GRID_SIZE",
+        "canvasSetup": "renderer.domElement.style.touchAction = 'none'  // §PE.TA-01"
+      },
+      "tabletSafetyNote": "§GEST.OS-02: 20px unsafe zones from all viewport edges (bottom 48px). Drag start points within unsafe zones should be rejected to prevent OS gesture conflicts.",
+      "designPrinciples": {
+        "DDD": "PASS — 'DragPlacement' matches spatial interaction vocabulary",
+        "DRY": "PASS — single drag handler; proxy pattern prevents per-character DragControls duplication",
+        "OCP": "PASS — grid snap, height-lock addable without modifying core drag logic",
+        "PECS": "PASS — pointer events (producer) provide drag deltas; CharacterGroup (consumer) moves"
+      },
+      "forwardPropPath": { "chain": "Pointer drag event (ACTION) -> DragControls proxy mutation -> characterGroup.position.copy(proxy) -> Three.js scene update -> SpatialInteractionResolver.resolve() on drag:end", "healthStatus": "partial", "gaps": ["DragControls proxy pattern not yet implemented in mathcrew/src/", "touch-action:none not yet applied to canvas"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry.dragEvent (LEARN) -> placement frequency + snap usage -> grid snap threshold refinement", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-15", "name": "BoardingAnimation", "domain": "ACTION",
+      "ontologyType": "Action Type",
+      "description": "Narrative sequence: SpacekidEntity walks toward spaceship and boards. Triggered by SpatialInteractionResolver BoardingTrigger. Sequence: (1) CharacterAnimationSystem.playClip('walk') + move character toward spaceship (GSAP tween or manual lerp), (2) at spaceship entrance: playClip('board-spaceship'), (3) scene transition (optional: camera pan, beat advance, teaching moment). Mutates character position + triggers beat advance.",
+      "source": "src-pr-threejs-api-r183 clm-pr-05; src-pr-teaching-framework clm-pr-35",
+      "primitive": "ActionType",
+      "semanticHeuristic": "SH-03: Commits edits — BoardingAnimation CHANGES REALITY by mutating character position over time and advancing teaching beat state. Classification: ACTION.",
+      "evidenceIds": ["clm-pr-05", "clm-pr-35"],
+      "sequenceDesign": {
+        "step1": "SpatialInteractionResolver fires BoardingTrigger on distanceTo(spacekid, spaceship) < threshold",
+        "step2": "CharacterAnimationSystem.playClip(entity, 'walk', 0.2)",
+        "step3": "tween character.position toward spaceship.boardingPoint over 1.5s (linear or ease-in)",
+        "step4": "CharacterAnimationSystem.playClip(entity, 'board-spaceship', 0.4)",
+        "step5": "onComplete: advance TeachingBeat, trigger ContentDeliveryResolver for next beat"
+      },
+      "designPrinciples": {
+        "DDD": "PASS — 'Boarding' is user-specified narrative vocabulary",
+        "DRY": "PASS — single boarding sequence; CharacterDragPlacement and SpatialProximityTrigger are separate actions",
+        "OCP": "PASS — new narrative sequences (exiting spaceship) added without modifying boarding action",
+        "PECS": "PASS — SpatialInteractionResolver (producer) emits BoardingTrigger; BoardingAnimation (consumer) executes sequence"
+      },
+      "forwardPropPath": { "chain": "BoardingTrigger event (ACTION) -> character position tween + board-spaceship animation clip -> TeachingBeat advance -> ContentDeliveryResolver next beat", "healthStatus": "partial", "gaps": ["Tween library choice not determined (GSAP vs manual lerp)", "board-spaceship clip not in GLB yet"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry.boardingCompleted (LEARN) -> narrative engagement metric -> sequence timing refinement", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-16", "name": "SpatialProximityTrigger", "domain": "ACTION",
+      "ontologyType": "Action Type",
+      "description": "Fires teaching beat or interaction event when SpacekidEntity enters math-zone. Math-zones defined in TeachingStoryFrame.spatialTriggerIds. Trigger check: Three.js Vector3.distanceTo(character.position, zone.center) < zone.radius. On trigger: (1) emit MathZoneTrigger event, (2) CharacterAnimationSystem.playClip('wave'), (3) ContentDeliveryResolver dispatches beat for that zone. Per-frame check in game-loop render loop.",
+      "source": "src-pr-drag-interaction clm-pr-33; src-pr-teaching-framework clm-pr-35",
+      "primitive": "ActionType",
+      "semanticHeuristic": "SH-03: Commits edits — SpatialProximityTrigger CHANGES REALITY by firing MathZoneTrigger event and mutating animation state. Classification: ACTION.",
+      "evidenceIds": ["clm-pr-33", "clm-pr-35"],
+      "checkPattern": {
+        "perFrame": "spatialTriggers.forEach(zone => { if (character.distanceTo(zone.center) < zone.radius && !zone.fired) { zone.fired = true; emit('MathZoneTrigger', zone.id); }})",
+        "reset": "zone.fired = false when character exits zone.radius * 1.2 (hysteresis)"
+      },
+      "designPrinciples": {
+        "DDD": "PASS — 'SpatialProximityTrigger' matches spatial game design vocabulary",
+        "DRY": "PASS — single proximity check loop; not duplicated per zone",
+        "OCP": "PASS — new zones added to TeachingStoryFrame.spatialTriggerIds; trigger loop unchanged",
+        "PECS": "PASS — TeachingStoryFrame.spatialTriggerIds (producer); SpatialProximityTrigger (consumer) checks per-frame"
+      },
+      "forwardPropPath": { "chain": "Character position per-frame (ACTION) -> distanceTo check -> MathZoneTrigger event -> ContentDeliveryResolver beat dispatch + CharacterAnimationSystem wave clip", "healthStatus": "partial", "gaps": ["math-zone center/radius definitions not yet in TeachingStoryFrame", "per-frame trigger loop not in game-loop.ts"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry.proximityTriggers (LEARN) -> zone entry frequency + dwell time -> zone placement refinement", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-17", "name": "GestureInteractionAdapter", "domain": "ACTION",
+      "ontologyType": "Action Type",
+      "description": "Adapter for tablet gesture interactions on WebGL canvas. Gestures: (1) pinch-to-scale (two-finger spread/pinch) → scale SpaceshipEntityDef or math object, (2) two-finger rotate → rotate selected object, (3) long-press → context menu / drag mode switch. Implementation: Pointer Events API (touch-action:none on canvas — §PE.TA-01). Edge safety: reject gesture start within 20px of viewport edges (bottom: 48px) — §GEST.OS-02. Scale/rotate deltas applied to Object3D.scale and .rotation via Three.js Quaternion.",
+      "source": "src-pr-drag-interaction clm-pr-31; ~/.claude/research/interaction/pointer-events-spec.md §PE.TA-01; ~/.claude/research/interaction/os-system-gestures.md §GEST.OS-02",
+      "primitive": "ActionType",
+      "semanticHeuristic": "SH-03: Commits edits — GestureInteractionAdapter CHANGES REALITY by mutating Object3D scale/rotation in Three.js scene. Classification: ACTION.",
+      "evidenceIds": ["clm-pr-31", "clm-pr-32"],
+      "safetyConstraints": {
+        "touchAction": "renderer.domElement.style.touchAction = 'none'  // prevents browser default scroll during drag",
+        "edgeUnsafeZone": "top: 20px, left: 20px, right: 20px, bottom: 48px — reject gesture starts in these zones",
+        "scaleClamp": "Math.max(0.5, Math.min(3.0, scale))  // prevent extreme scaling"
+      },
+      "designPrinciples": {
+        "DDD": "PASS — 'GestureInteractionAdapter' matches tablet interaction vocabulary",
+        "DRY": "PASS — single adapter for all gesture types; not duplicated per object type",
+        "OCP": "PASS — new gesture types (triple-tap, force-press) added without modifying existing handlers",
+        "PECS": "PASS — Pointer Events API (producer) provides gesture deltas; Object3D (consumer) applies transforms"
+      },
+      "forwardPropPath": { "chain": "Pointer Events (ACTION) -> GestureInteractionAdapter detects pinch/rotate -> Object3D.scale/.quaternion mutation -> SpatialInteractionResolver.resolve() if proximity trigger reached", "healthStatus": "partial", "gaps": ["Pointer Events API gesture detection not yet implemented in mathcrew/src/", "§GEST.OS-02 edge zone rejection not implemented"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry.gestureEvents (LEARN) -> gesture type frequency + success rate -> gesture recognition threshold refinement", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-18", "name": "PhotonicFeedbackEffect", "domain": "ACTION",
+      "ontologyType": "Action Type",
+      "description": "Visual feedback for correct/incorrect math interactions in photonicRealism style. Correct: engine glow pulse (emissive intensity 0→2.0→0.5, duration 0.6s) + particle burst from spaceship exhaust point. Incorrect: shield flicker (emissive red flash, duration 0.3s) + character stumble animation clip (if available). Implementation: GSAP tween on material.emissiveIntensity (or manual lerp in render loop). Particles: THREE.Points with custom vertex shader for burst trajectory.",
+      "source": "src-pr-threejs-api-r183 clm-pr-01; src-pr-performance-2025 clm-pr-29",
+      "primitive": "ActionType",
+      "semanticHeuristic": "SH-03: Commits edits — PhotonicFeedbackEffect CHANGES REALITY by mutating material emissive + particle system state. Classification: ACTION.",
+      "evidenceIds": ["clm-pr-01", "clm-pr-29"],
+      "fxCatalog": {
+        "correct": { "type": "engine-glow-pulse", "target": "spaceship engine pod mesh", "emissiveIntensity": "0 → 2.0 → 0.5", "duration": "0.6s", "easing": "ease-out" },
+        "incorrect": { "type": "shield-flicker", "target": "spaceship hull mesh", "emissiveColor": "#FF3333", "duration": "0.3s", "flickerCount": 3 },
+        "discovery": { "type": "particle-burst", "target": "spaceship exhaust point", "particleCount": 50, "spread": 0.5 }
+      },
+      "designPrinciples": {
+        "DDD": "PASS — 'engine-glow-pulse', 'shield-flicker' match space visual design vocabulary",
+        "DRY": "PASS — single FX catalog; ContentDeliveryResolver triggers by fxType, not per-interaction",
+        "OCP": "PASS — new FX types added to catalog without modifying dispatch logic",
+        "PECS": "PASS — interaction outcome event (producer); PhotonicFeedbackEffect (consumer) applies material mutation"
+      },
+      "forwardPropPath": { "chain": "Interaction outcome event (ACTION) -> PhotonicFeedbackEffect.play(fxType) -> material.emissiveIntensity tween + particle system -> visible Three.js scene effect", "healthStatus": "partial", "gaps": ["GSAP vs manual lerp tween choice not finalized", "particle vertex shader not designed"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry.fxPlayedId (LEARN) -> FX engagement metrics -> fxCatalog refinement", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-19", "name": "AdaptiveDPRController", "domain": "ACTION",
+      "ontologyType": "Action Type",
+      "description": "Adapts renderer.devicePixelRatio dynamically based on FPS measurement. Algorithm: measure FPS over 60-frame rolling window; if FPS < 55: reduce DPR by 0.1 (min 0.75); if FPS > 60 for 120 frames: increase DPR by 0.1 (max: desktop 1.0, mobile 1.5). Integrates with PerformanceBudgetPolicy. On Chromebook: initial DPR cap = 1.0. Calls renderer.setPixelRatio(dpr) on change.",
+      "source": "src-pr-performance-2025 clm-pr-26 through clm-pr-28",
+      "primitive": "ActionType",
+      "semanticHeuristic": "SH-03: Commits edits — AdaptiveDPRController CHANGES REALITY by mutating renderer.devicePixelRatio. Classification: ACTION.",
+      "evidenceIds": ["clm-pr-26", "clm-pr-27", "clm-pr-28"],
+      "algorithm": {
+        "fpsWindow": 60,
+        "decreaseThreshold": 55,
+        "increaseThreshold": 60,
+        "increaseSustainFrames": 120,
+        "decreaseStep": 0.1,
+        "increaseStep": 0.1,
+        "minDPR": 0.75,
+        "maxDPR_desktop": 1.0,
+        "maxDPR_mobile": 1.5,
+        "disableSSS_below": 50
+      },
+      "designPrinciples": {
+        "DDD": "PASS — 'DPR', 'devicePixelRatio' match Three.js/WebGL vocabulary",
+        "DRY": "PASS — single controller; no per-entity DPR logic",
+        "OCP": "PASS — SSS disable trigger addable without changing DPR mutation logic",
+        "PECS": "PASS — PerformanceBudgetPolicy (producer) provides caps; AdaptiveDPRController (consumer) reads limits"
+      },
+      "forwardPropPath": { "chain": "FPS measurement (ACTION) -> DPR adjustment -> renderer.setPixelRatio() -> render quality change visible to user", "healthStatus": "partial", "gaps": ["FPS rolling window measurement not yet in game-loop.ts"] },
+      "backwardPropPath": { "chain": "AdaptiveDPRController.dprHistory (LEARN) -> device performance profile -> PerformanceBudgetPolicy refinement for device class", "healthStatus": "partial", "gaps": [] }
+    },
+    {
+      "id": "obj-pr-20", "name": "InteractionTelemetry", "domain": "LEARN",
+      "ontologyType": "Audit Record",
+      "description": "Captures photonicRealism interaction events for backward propagation and refinement. Fields: sessionId, interactionMode, entityId, componentId, eventType ('drag-placed'|'proximity-trigger'|'boarding-completed'|'gesture-applied'|'fx-played'|'clip-played'), position3D, timestamp, beatIndex, teachingOutcome. Extends ContentEngagement with spatial + character-specific fields.",
+      "source": "src-pr-teaching-framework clm-pr-34; decision-log q-pr-07",
+      "primitive": "Struct",
+      "semanticHeuristic": "SH-05: Captures WHAT HAPPENED (which interaction, where in 3D space, what beat context) and WHAT WAS LEARNED (teachingOutcome). Classification: LEARN.",
+      "evidenceIds": ["clm-pr-34", "clm-pr-36"],
+      "fieldSpec": {
+        "sessionId": "string",
+        "beatIndex": "number",
+        "interactionMode": "10 InteractionMode types from existing teaching.ts",
+        "entityId": "SpaceshipEntityDef.id | SpacekidEntityDef.id",
+        "componentId": "PhotonicComponentDefinition.componentId",
+        "eventType": "'drag-placed'|'proximity-trigger'|'boarding-completed'|'gesture-applied'|'fx-played'|'clip-played'",
+        "position3D": "THREE.Vector3 serialized",
+        "timestamp": "number (performance.now())",
+        "teachingOutcome": "'correct'|'incorrect'|'neutral'|'discovery'"
+      },
+      "designPrinciples": {
+        "DDD": "PASS — telemetry vocabulary matches interaction + teaching domain terms",
+        "DRY": "PASS — extends ContentEngagement; does not duplicate base engagement fields",
+        "OCP": "PASS — new event types added to eventType union without changing existing records",
+        "PECS": "PASS — game-loop (producer) emits InteractionTelemetry; eval-runner (consumer) aggregates"
+      },
+      "forwardPropPath": { "chain": "InteractionTelemetry (LEARN) -> eval-results.json -> PhotonicComponentUsageMetrics -> backward prop to entity/animation/material refinement", "healthStatus": "partial", "gaps": ["Telemetry emit not yet in game-loop.ts", "position3D serialization pattern not defined"] },
+      "backwardPropPath": { "chain": "InteractionTelemetry IS the lineage record. eventType + teachingOutcome -> interaction effectiveness scoring -> ContentDeliveryResolver rule update", "healthStatus": "healthy" }
+    },
+    {
+      "id": "obj-pr-21", "name": "PhotonicComponentUsageMetrics", "domain": "LEARN",
+      "ontologyType": "Audit Record",
+      "description": "Aggregated metrics per PhotonicComponentDefinition from InteractionTelemetry. Fields: componentId, totalInteractions, interactionsByMode{}, averageTeachingOutcomeScore, fpsImpactProfile (DPR changes coincident with component presence), sssEnabled (was SSS active during session), clipUsageFrequency{}. Used by evaluator for R9 evidence sufficiency gate and backward propagation to material/animation refinement.",
+      "source": "decision-log q-pr-06",
+      "primitive": "Struct",
+      "semanticHeuristic": "SH-05: Captures WHAT WAS LEARNED about component usage patterns and their teaching effectiveness. Classification: LEARN.",
+      "evidenceIds": ["clm-pr-34"],
+      "metricsSpec": {
+        "componentId": "PhotonicComponentDefinition.componentId",
+        "totalInteractions": "number",
+        "interactionsByMode": "Record<InteractionMode, number>",
+        "averageTeachingOutcomeScore": "number (0.0-1.0)",
+        "fpsImpactProfile": "{ sssActive: boolean, avgDPR: number, avgFPS: number }",
+        "clipUsageFrequency": "Record<string, number>  // clipId → count"
+      },
+      "designPrinciples": {
+        "DDD": "PASS — metrics vocabulary matches component + teaching domain",
+        "DRY": "PASS — aggregated record; InteractionTelemetry raw events not duplicated",
+        "OCP": "PASS — new metric dimensions added without changing existing aggregation logic",
+        "PECS": "PASS — InteractionTelemetry[] (producer); PhotonicComponentUsageMetrics aggregator (consumer) reduces"
+      },
+      "forwardPropPath": { "chain": "PhotonicComponentUsageMetrics (LEARN) -> evaluator R9 evidence check -> blueprint confidence scoring", "healthStatus": "partial", "gaps": ["Aggregation not yet implemented"] },
+      "backwardPropPath": { "chain": "PhotonicComponentUsageMetrics IS the learning signal. averageTeachingOutcomeScore -> SpaceshipEntityDef/SpacekidEntityDef material preset refinement; fpsImpactProfile -> PerformanceBudgetPolicy tightening", "healthStatus": "healthy" }
+    },
+    {
+      "id": "obj-pr-22", "name": "NewResearchGapRegistry", "domain": "LEARN",
+      "ontologyType": "Audit Record",
+      "description": "photonicRealism-session research gaps (extends ResearchGapRegistry from content-delivery session). g-pr-01: MeshSSSNodeMaterial FPS cost on Chromebook (Intel Iris Xe) — no benchmark available. g-pr-02: SkinnedMesh multi-instance performance (SkeletonUtils.clone() vs BatchedMesh) — Three.js r183 BatchedMesh animated support unconfirmed. g-pr-03: DragControls proxy pattern + SkinnedMesh concurrent interaction — no reference implementation found.",
+      "source": "researcher gap analysis q-pr-01 through q-pr-06",
+      "primitive": "Struct",
+      "semanticHeuristic": "SH-05: Captures WHAT WAS LEARNED about limits of current evidence. Classification: LEARN.",
+      "evidenceIds": ["clm-pr-26", "clm-pr-07", "clm-pr-31"],
+      "gaps": [
+        { "id": "g-pr-01", "severity": "high", "description": "MeshSSSNodeMaterial FPS cost on Chromebook (Intel Iris Xe integrated GPU) not benchmarked. SSS adds fragment shader ALU cost — could drop below 60fps target.", "affectedDecision": "selective SSS adoption for spacesuit-fabric preset", "resolution": "Prototype FPS benchmark in T7: add SSS material to scene + measure fps via stats.js on Chromebook-class GPU" },
+        { "id": "g-pr-02", "severity": "high", "description": "Three.js r183 BatchedMesh animated SkinnedMesh support unconfirmed. SkeletonUtils.clone() creates independent objects (not batched) — may not achieve draw call budget for 5+ character instances.", "affectedDecision": "SpacekidEntity multi-instance architecture", "resolution": "Prototype: test SkeletonUtils.clone() x5 in T7; measure draw calls + FPS" },
+        { "id": "g-pr-03", "severity": "medium", "description": "DragControls proxy pattern with concurrent SkinnedMesh character (AnimationMixer.update() during drag) — no reference implementation. Risk: position jitter from proxy tracking during animation blending.", "affectedDecision": "CharacterDragPlacement implementation", "resolution": "Prototype: implement proxy drag + animated SkinnedMesh in T7; observe jitter" }
+      ],
+      "designPrinciples": {
+        "DDD": "PASS — gap vocabulary matches research pipeline standards",
+        "DRY": "PASS — extends ResearchGapRegistry (obj-cd-21); new gaps only",
+        "OCP": "PASS — new gaps added without changing existing g-01, g-02, g-03 structure",
+        "PECS": "N/A — registry record"
+      },
+      "forwardPropPath": { "chain": "NewResearchGapRegistry (LEARN) -> g-pr-01/g-pr-02/g-pr-03 severity drives prototype task priority in T7/T8 -> evaluator R1 gate (low-tier dependency for high-severity gaps)", "healthStatus": "healthy" },
+      "backwardPropPath": { "chain": "GapResolved event (after T7/T8 prototype benchmark) -> NewResearchGapRegistry updated -> affected decisions confidence upgraded -> blueprint.json confidence score updated", "healthStatus": "healthy" }
     }
   ],
   "domains": {
-    "data": ["obj-cd-01", "obj-cd-02", "obj-cd-03", "obj-cd-04", "obj-cd-05", "obj-cd-06", "obj-cd-07"],
-    "logic": ["obj-cd-08", "obj-cd-09", "obj-cd-10", "obj-cd-11", "obj-cd-12", "obj-cd-13"],
-    "action": ["obj-cd-14", "obj-cd-15", "obj-cd-16", "obj-cd-17", "obj-cd-18"],
+    "data": ["obj-cd-01", "obj-cd-02", "obj-cd-03", "obj-cd-04", "obj-cd-05", "obj-cd-06", "obj-cd-07", "obj-pr-01", "obj-pr-02", "obj-pr-03", "obj-pr-04", "obj-pr-05", "obj-pr-06", "obj-pr-07"],
+    "logic": ["obj-cd-08", "obj-cd-09", "obj-cd-10", "obj-cd-11", "obj-cd-12", "obj-cd-13", "obj-pr-08", "obj-pr-09", "obj-pr-10", "obj-pr-11", "obj-pr-12", "obj-pr-13"],
+    "action": ["obj-cd-14", "obj-cd-15", "obj-cd-16", "obj-cd-17", "obj-cd-18", "obj-pr-14", "obj-pr-15", "obj-pr-16", "obj-pr-17", "obj-pr-18", "obj-pr-19"],
     "security": [],
-    "learn": ["obj-cd-19", "obj-cd-20", "obj-cd-21"]
+    "learn": ["obj-cd-19", "obj-cd-20", "obj-cd-21", "obj-pr-20", "obj-pr-21", "obj-pr-22"]
   },
-  "objectCount": { "data": 7, "logic": 6, "action": 5, "security": 0, "learn": 3, "total": 21 },
+  "objectCount": { "data": 14, "logic": 12, "action": 11, "security": 0, "learn": 6, "total": 43 },
   "forwardPropagation": {
     "healthStatus": "partial",
-    "summary": "Core DATA->LOGIC->ACTION chain is structurally designed. Critical gaps: resolver.ts not yet implemented, troika postprocessing workaround not applied, SpatialAnnotation surfaces don't exist. CSS3DRenderer excluded path is broken by design (correct).",
+    "summary": "Core DATA->LOGIC->ACTION chain is structurally designed for both content-delivery and photonicRealism sessions. Critical gaps: PhotonicComponentFactory not yet implemented, Polyhaven HDRI not bundled, SpacekidEntity GLB not created, DragControls proxy pattern not implemented. CSS3DRenderer excluded path is broken by design (correct). photonicRealism migration scope is METAPHOR LAYER ONLY — VT/CRA/FSRS contracts preserved.",
     "paths": [
       {
         "id": "fp-01",
@@ -443,12 +938,40 @@
         "chain": "SpeechBubbleContent (DATA) -> MayerPrincipleChecker (LOGIC) -> CognitiveLoadGuard (LOGIC) -> ContentDeliveryResolver.validate() -> render blocked if violation",
         "healthStatus": "partial",
         "gaps": ["MayerPrincipleChecker not implemented", "current CRA Concrete phase VIOLATES SpatialContiguity — text bubble instead of spatial annotation on object"]
+      },
+      {
+        "id": "fp-06",
+        "name": "PhotonicRealism Entity Instantiation",
+        "chain": "PhotonicComponentDefinition (DATA) -> PhotonicComponentFactory.create() (LOGIC) -> Three.js Group (SpaceshipEntityDef procedural | SpacekidEntityDef GLTF) -> PhotonicRealismPipeline IBL binding -> n8ao SSAO -> EffectComposer render",
+        "healthStatus": "partial",
+        "gaps": ["PhotonicComponentFactory not yet implemented", "Polyhaven CC0 HDRI not in mathcrew/public/hdri/", "SpacekidEntity GLB not yet created (requires Kenney CC0 + Mixamo + Blender pipeline)"]
+      },
+      {
+        "id": "fp-07",
+        "name": "Character Drag Interaction",
+        "chain": "Pointer Events (ACTION) -> DragControls proxy BoxMesh -> characterGroup.position.copy(proxy) -> SpatialInteractionResolver.resolve() -> BoardingAnimation | SpatialProximityTrigger | idle",
+        "healthStatus": "partial",
+        "gaps": ["DragControls proxy pattern not in mathcrew/src/", "touch-action:none not applied to canvas (§PE.TA-01)", "§GEST.OS-02 edge zone rejection not implemented"]
+      },
+      {
+        "id": "fp-08",
+        "name": "Teaching Framework Preservation Path",
+        "chain": "TeachingBeat (DATA, PRESERVED) -> ContentDeliveryResolver (LOGIC, PRESERVED) -> TeachingStoryFrame narrative context -> new interactions (CharacterDragPlacement, SpatialProximityTrigger, BoardingAnimation) EXTEND existing 10 InteractionMode types",
+        "healthStatus": "partial",
+        "gaps": ["TeachingStoryFrame.storyBeatId not yet in teaching.ts", "spatial trigger definitions not in scene authoring"]
+      },
+      {
+        "id": "fp-09",
+        "name": "Adaptive Performance Management",
+        "chain": "PerformanceBudgetPolicy (LOGIC) -> AdaptiveDPRController FPS monitoring -> renderer.setPixelRatio() adjustment -> PhotonicRealismPipeline SSS disable if FPS < 50 -> <100 draw call budget maintained",
+        "healthStatus": "partial",
+        "gaps": ["AdaptiveDPRController not yet implemented", "FPS rolling window not in game-loop.ts", "gap g-pr-01: SSS FPS cost threshold for Chromebook unverified"]
       }
     ]
   },
   "backwardPropagation": {
     "healthStatus": "partial",
-    "summary": "ContentEngagement record design is solid. Game-loop emit point and telemetry type definitions not yet implemented. FSRS backward path exists but enrichment linkage (R->content-intensity) is gap g-03.",
+    "summary": "Both ContentEngagement (content-delivery) and InteractionTelemetry (photonicRealism) backward path designs are solid. Game-loop emit points and telemetry type definitions not yet implemented. FSRS backward path exists. New photonicRealism backward path: InteractionTelemetry -> PhotonicComponentUsageMetrics -> entity/material/animation refinement. Three research gaps (g-pr-01, g-pr-02, g-pr-03) require prototype validation before backward path confidence upgrades.",
     "paths": [
       {
         "id": "bp-01",
@@ -477,6 +1000,20 @@
         "chain": "ResearchGapRegistry (LEARN) -> prototype FPS benchmark (g-01) -> TroikaText confidence update -> resolver adoption with reduced risk",
         "healthStatus": "partial",
         "gaps": ["Prototype benchmark (T7/T8) is the critical next step to close g-01"]
+      },
+      {
+        "id": "bp-05",
+        "name": "PhotonicRealism Interaction Feedback Loop",
+        "chain": "InteractionTelemetry (LEARN) -> PhotonicComponentUsageMetrics aggregation -> SpaceshipEntityDef material preset refinement | CharacterAnimationClip catalog refinement | SpatialProximityTrigger zone placement refinement",
+        "healthStatus": "partial",
+        "gaps": ["InteractionTelemetry not yet emitted by game-loop", "PhotonicComponentUsageMetrics aggregation not implemented"]
+      },
+      {
+        "id": "bp-06",
+        "name": "Performance Gap Resolution",
+        "chain": "NewResearchGapRegistry g-pr-01/g-pr-02/g-pr-03 (LEARN) -> T7 prototype benchmarks -> gap severity downgrade -> PerformanceBudgetPolicy SSS enable threshold update -> AdaptiveDPRController thresholds calibrated",
+        "healthStatus": "partial",
+        "gaps": ["T7 prototype must benchmark: SSS FPS on Chromebook-class GPU, SkeletonUtils.clone() x5 draw calls, DragControls proxy + AnimationMixer jitter"]
       }
     ]
   },
@@ -485,24 +1022,41 @@
       { "object": "ContentDeliveryResolver", "analysis": "Maps CRA/VT domain concepts to rendering decisions — domain vocabulary (Concrete, Separation) not tech vocabulary (troika vs CSS)." },
       { "object": "ScaffoldEscalationLogic", "analysis": "Domain terms: nudge, visual hint, worked example, direct instruction — pedagogical escalation language preserved." },
       { "object": "MayerPrincipleChecker", "analysis": "Mayer's published principle names (SpatialContiguity, Segmenting, Coherence, Signalling, TemporalContiguity) preserved exactly." },
-      { "object": "VTDimensionMapping (in ContentDeliveryResolver)", "analysis": "Contrast, Separation, Generalization, Fusion, Integration — exact Variation Theory vocabulary." }
+      { "object": "VTDimensionMapping (in ContentDeliveryResolver)", "analysis": "Contrast, Separation, Generalization, Fusion, Integration — exact Variation Theory vocabulary." },
+      { "object": "SpacekidEntityDef", "analysis": "Name matches user-specified domain vocabulary: '우주복 입은 어린이' (child in spacesuit) → SpacekidEntity. Domain vocabulary update from pulseShard." },
+      { "object": "SpaceshipEntityDef", "analysis": "Matches user-specified domain: '우주선' (spaceship) → SpaceshipEntity. Domain vocabulary update from resonanceLoop." },
+      { "object": "PhotonicMaterialPreset", "analysis": "Preset names ('spaceship-hull', 'visor-glass', 'spacesuit-fabric') match visual design vocabulary — not raw Three.js parameter names." },
+      { "object": "CharacterAnimationClip", "analysis": "Clip names ('board-spaceship', 'gesture-point', 'wave') match character interaction narrative vocabulary." },
+      { "object": "TeachingFrameworkMigration", "analysis": "Preserves VT/CRA domain contracts — migration scope explicitly limits changes to metaphor layer only. Domain vocabulary integrity preserved." }
     ],
     "dry": [
       { "object": "ContentDeliveryResolver", "analysis": "Single dispatch eliminates per-beat approach selection scattered in game-loop." },
       { "object": "MayerPrincipleChecker", "analysis": "Single checker referenced by resolver, content design rules, and eval criteria — not duplicated per principle." },
       { "object": "ContentEngagement", "analysis": "Consolidates MiniHudTelemetry + new content delivery telemetry into single record — no parallel truth sources." },
-      { "object": "PostprocessingCompatibility", "analysis": "Single compatibility matrix — resolver reads it; approach implementations don't duplicate compatibility checks." }
+      { "object": "PostprocessingCompatibility", "analysis": "Single compatibility matrix — resolver reads it; approach implementations don't duplicate compatibility checks." },
+      { "object": "PhotonicMaterialPreset", "analysis": "Named presets prevent per-mesh material parameter duplication across scene — factory reads by presetId." },
+      { "object": "PhotonicComponentDefinition registry", "analysis": "Single registry entry per component type prevents per-scene instantiation logic duplication." },
+      { "object": "CharacterDragPlacement proxy pattern", "analysis": "Single DragControls on invisible proxy; all characters share same drag logic — not per-character DragControls." },
+      { "object": "InteractionTelemetry", "analysis": "Extends ContentEngagement — adds spatial fields without duplicating base engagement schema." }
     ],
     "ocp": [
       { "object": "ContentDeliveryResolver", "analysis": "Open for new approach variants (WebGPU text); closed for modification — existing speech bubble path unchanged." },
       { "object": "ScaffoldEscalationLogic", "analysis": "Tier 0 (proactive encouragement) addable without modifying existing 4-tier logic." },
       { "object": "SpatialSignalling", "analysis": "New signal types (haptic, sound) added via animationTypes enum; existing glow/particle implementations unchanged." },
-      { "object": "ResearchGapRegistry", "analysis": "New gaps added without changing existing gap structure." }
+      { "object": "ResearchGapRegistry", "analysis": "New gaps added without changing existing gap structure." },
+      { "object": "PhotonicComponentFactory", "analysis": "New entity types added as PhotonicComponentDefinition registry entries — Interface unchanged. Closed for factory modification, open for entity registration." },
+      { "object": "PhotonicRealismPipeline", "analysis": "New pipeline stages (bloom, depth-of-field) added as Interface extensions — existing SSAO, IBL, compose stages unchanged." },
+      { "object": "GestureInteractionAdapter", "analysis": "New gesture types (triple-tap, force-press) added without modifying existing pinch/rotate handlers." },
+      { "object": "PhotonicFeedbackEffect fxCatalog", "analysis": "New FX types ('warp-jump', 'shield-burst') added to catalog — dispatch logic reads catalog key, no code modification." }
     ],
     "pecs": [
       { "object": "FSRSRetrievabilitySignal -> ScaffoldEscalationLogic", "analysis": "ts-fsrs (producer) extends with R/S values; ScaffoldEscalationLogic (consumer super) reads R — new FSRS-7 fields don't break consumer." },
       { "object": "TeachingBeat -> ContentDeliveryResolver", "analysis": "Planet content (producer) extends TeachingBeat with new fields (audioNarrationUrl, spatialAnnotations); ContentDeliveryResolver (consumer super) reads via interface — additive, not breaking." },
-      { "object": "SpeechBubbleContent -> rendering surfaces", "analysis": "game-loop (producer) extends SpeechBubbleContent with referencedObjectId; speech-bubble.ts/diegetic-panel.ts (consumer super) ignore unknown fields." }
+      { "object": "SpeechBubbleContent -> rendering surfaces", "analysis": "game-loop (producer) extends SpeechBubbleContent with referencedObjectId; speech-bubble.ts/diegetic-panel.ts (consumer super) ignore unknown fields." },
+      { "object": "PhotonicComponentDefinition -> PhotonicComponentFactory", "analysis": "Scene authoring (producer) defines component registry entries; Factory (consumer super) creates from definition — producer can add fields without breaking factory interface." },
+      { "object": "PhotonicMaterialPreset -> PhotonicRealismPipeline", "analysis": "Scene presets (producer) provide material parameters; Pipeline (consumer super) instantiates Three.js materials — new preset fields (e.g., anisotropy) ignored by older pipeline consumers." },
+      { "object": "SpatialInteractionResolver -> BoardingAnimation/SpatialProximityTrigger", "analysis": "Resolver (producer) emits typed InteractionEvents; action handlers (consumer super) execute event-specific sequences — new event types don't break existing action handlers." },
+      { "object": "InteractionTelemetry -> PhotonicComponentUsageMetrics", "analysis": "game-loop (producer) emits raw events; Metrics aggregator (consumer super) reduces — new event type fields in InteractionTelemetry don't break aggregation." }
     ]
   }
 }

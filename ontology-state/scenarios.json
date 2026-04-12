@@ -1,14 +1,14 @@
 {
-  "version": "0.8.0",
-  "timestamp": "2026-04-12T13:00:00Z",
-  "lastUpdated": "2026-04-12T13:00:00Z",
+  "version": "0.9.0",
+  "timestamp": "2026-04-12T20:00:00Z",
+  "lastUpdated": "2026-04-12T20:00:00Z",
   "updatedBy": "simulator",
-  "sessionId": "mathcrew-content-delivery-001",
+  "sessionId": "mathcrew-photonic-realism-001",
   "STOPPING_CRITERIA_MET": true,
-  "revisionRoundsCompleted": 3,
+  "revisionRoundsCompleted": 2,
   "unresolvedContradictionCount": 0,
-  "detectedContradictionCount": 2,
-  "evidenceGapCount": 3,
+  "detectedContradictionCount": 0,
+  "evidenceGapCount": 4,
 
   "scoringDimensions": [
     "evidenceFit",
@@ -26,667 +26,1445 @@
 
   "hypotheses": [
     {
-      "id": "H-A",
-      "label": "Enhanced CSS Overlay",
-      "statement": "This stack is optimal for this D/L/A structure because SpeechBubbleContent (obj-cd-01) and WorldToScreenProjection (obj-cd-09) are already the canonical DATA and LOGIC entities for content delivery. Enriching speech-bubble.ts with CSS-native animations, phase-specific signalling icons, and CognitiveLoadGuard (obj-cd-10) achieves the Mayer CTML improvements — spatial contiguity via character-following, segmenting via existing beats — at <10% migration cost and zero impact on the WebGL render loop.",
-      "dlaJustification": {
-        "DATA": "SpeechBubbleContent (obj-cd-01) is the authoritative teaching content struct. Extension with optional animationHints is non-breaking. No new DATA entities required.",
-        "LOGIC": "WorldToScreenProjection (obj-cd-09) retained as-is. CognitiveLoadGuard (obj-cd-10) and MayerPrincipleChecker (obj-cd-11) added as derived-property logic consuming existing TeachingBeat (obj-cd-02). ForwardProp chain: TeachingBeat → SpeechBubbleContent → speech-bubble.ts → CSS DOM.",
-        "ACTION": "EnterAdvancesBeat (obj-cd-14) and SpeechBubbleFollow (obj-cd-15) unchanged. SpatialSignalling (obj-cd-18) added as additive CSS animation action — no WebGL mutations.",
-        "LEARN": "ContentEngagement (obj-cd-19) instrumented via DOM events. FSRSScheduling (obj-cd-20) unchanged."
-      },
-      "supportingEvidenceIds": ["clm-ext-14", "clm-ext-15", "clm-ext-21", "clm-ext-27", "clm-int-02"],
-      "contradictingEvidenceIds": ["clm-ext-16", "clm-ext-20"],
+      "id": "H-1",
+      "label": "GLTF+AnimationMixer+IBL Rendering Stack",
+      "researchQuestion": "q-pr-01 / q-pr-02 — Rendering approach and character visual pipeline",
+      "statement": "This stack is optimal for this D/L/A structure because: GLTF (DATA) provides schema-validated PBR material definitions and skeletal animation data; AnimationMixer (LOGIC) maps AnimationClip[] to state-driven crossfade decisions; IBL via PMREMGenerator (LOGIC) derives environment lighting without per-frame light computation; SkeletonUtils.clone() (ACTION) instantiates multiple independent spacekid entities with correct bone isolation. The ontology surface maps cleanly: SpacekidEntity = DATA struct, AnimationState = LOGIC reducer, CharacterSpawn = ACTION type.",
+      "dlaJustification": "DATA: SpacekidConfig (GLTF asset path, material overrides, skeleton topology), SpaceshipConfig (procedural geometry params, PBR material params). LOGIC: AnimationStateMachine (crossfade decisions per interaction mode), PBRLightingModel (IBL + MeshPhysicalMaterial parameter derivation), LODSelector (camera-distance to mesh-level mapping). ACTION: CharacterSpawn (SkeletonUtils.clone + scene.add), AnimationTransition (crossFadeTo), MaterialApply (assign MeshPhysicalMaterial with PMREM env). Teaching framework layer is METAPHOR-LAYER-ONLY — VT/CRA/InteractionMode contracts (clm-pr-34) unchanged.",
+      "supportingEvidenceIds": ["clm-pr-01", "clm-pr-02", "clm-pr-03", "clm-pr-04", "clm-pr-09", "clm-pr-10", "clm-pr-16", "clm-pr-17", "clm-pr-18", "clm-pr-20", "clm-pr-34", "clm-pr-35"],
+      "contradictingEvidenceIds": ["clm-pr-15"],
       "testCriteria": [
-        "CSS-native animation adds <1ms per-frame overhead in Chrome DevTools performance profiler",
-        "SpeechBubbleContent optional animationHints extension does not break teaching-flow.ts beat sequencing",
-        "60fps maintained with full n8ao + postprocessing pipeline and enhanced speech bubble in prod build",
-        "CognitiveLoadGuard correctly suppresses extraneous vocabulary per Coherence principle (clm-ext-23)"
+        "SpacekidEntity GLTF loads in < 3s on Chromebook-class hardware",
+        "AnimationMixer.crossFadeTo() transitions between idle/walk/board without visual pop",
+        "IBL + MeshPhysicalMaterial achieves photonicRealism visual target at 60fps stable on Chromebook",
+        "SkeletonUtils.clone() produces independent bone poses for 2+ simultaneous spacekid instances",
+        "MeshSSSNodeMaterial on spacesuit material does not drop frame rate below 50fps"
       ],
       "architectureImplications": [
-        "speech-bubble.ts enhanced with CSS keyframe animations per TeachingBeat.phase",
-        "SpeechBubbleContent gains optional animationHints, modalityFlags fields",
-        "CognitiveLoadGuard (obj-cd-10) implemented as derived property — no pipeline change",
-        "No Three.js scene graph changes, no new npm dependencies",
-        "Migration from PR#28: ~1-2 weeks additive"
+        "SpacekidEntity requires separate AnimationMixer per SkeletonUtils.clone() instance",
+        "Teaching framework migration is purely metaphor layer — resonance-loop.ts → spaceship entity, pulse-shard → spacekid entity",
+        "PBR material setup requires PMREMGenerator call once at scene init, not per frame",
+        "n8ao halfRes mode is the Chromebook performance escape valve (clm-pr-26)",
+        "MeshSSSNodeMaterial is selective-only (forehead/cheek areas) to preserve perf budget"
       ],
       "devcon5Alignment": {
-        "ddd": "SpeechBubbleContent domain-driven — CSS overlay is rendering surface, not domain concept",
-        "dry": "Single speech-bubble.ts — no parallel rendering paths created",
-        "ocp": "Open for animation/modality extension via optional fields; closed for core CSS rendering contract",
-        "pecs": "Producer (game-loop) extends TeachingBeat with animationHints; consumer (speech-bubble.ts) reads via supertype — existing consumers unaffected"
+        "DDD": "SpacekidEntity/SpaceshipEntity vocabulary matches domain story terms. AnimationState maps VT/CRA beat transitions to animation clip selections.",
+        "DRY": "Single PMREMGenerator call at scene init. Single AnimationStateMachine drives all character instances. No per-entity lighting setup.",
+        "OCP": "New character models added by dropping new GLTF — MaterialApply ACTION unchanged. New animation states added to AnimationStateMachine without breaking existing crossfade logic.",
+        "PECS": "SpacekidConfig (producer DATA) extends interface; CharacterRenderSystem (consumer LOGIC) reads without requiring concrete class."
       }
     },
     {
-      "id": "H-B",
-      "label": "Hybrid Diegetic (troika-three-text) + CSS Overlay",
-      "statement": "This stack is optimal for this D/L/A structure because troika-three-text v0.52.4 (obj-cd-03) integrates into the existing WebGL2 scene via OverrideMaterialManager.workaroundEnabled=true (clm-ext-03), enabling SpatialAnnotation (obj-cd-06) entities to implement Mayer Spatial Contiguity (clm-ext-20) — labels anchored to math objects. ContentDeliveryResolver (obj-cd-08) routes by CRA phase: Concrete=troika spatial labels, Representational=hybrid, Abstract=CSS overlay. CSS overlay is retained for practice/assess beats where accessibility and keyboard interaction are required.",
-      "dlaJustification": {
-        "DATA": "SpatialAnnotation (obj-cd-06) is the new DATA entity for 3D-anchored labels. TroikaText (obj-cd-03) is its rendering interface. SpeechBubbleContent (obj-cd-01) retained for overlay beats. ContentDeliveryConfig (obj-cd-05) configures the resolver mapping.",
-        "LOGIC": "ContentDeliveryResolver (obj-cd-08) is the new LOGIC routing entity. PostprocessingCompatibility (obj-cd-13) encodes the OverrideMaterialManager requirement. ForwardProp: TeachingBeat → ContentDeliveryResolver → [TroikaText | SpeechBubbleContent] → [WebGL scene | CSS DOM].",
-        "ACTION": "TroikaTextSync (obj-cd-17) handles async SDF updates via web worker. SpatialSignalling (obj-cd-18) provides 3D glow/highlight actions on math objects. EnterAdvancesBeat (obj-cd-14) retained.",
-        "LEARN": "ContentEngagement (obj-cd-19) gains spatial proximity dimension — trackable via raycasting against SpatialAnnotation meshes."
-      },
-      "supportingEvidenceIds": ["clm-ext-01", "clm-ext-02", "clm-ext-03", "clm-ext-06", "clm-ext-20", "clm-ext-27", "clm-int-03"],
-      "contradictingEvidenceIds": ["clm-ext-19", "clm-ext-05"],
+      "id": "H-2",
+      "label": "Procedural Geometry + MeshPhysicalMaterial Stack",
+      "researchQuestion": "q-pr-01 / q-pr-02 — Rendering approach and character visual pipeline (competing hypothesis)",
+      "statement": "This stack is optimal for this D/L/A structure because: procedural geometry (DATA) defines entities via mathematical parameters, eliminating external GLTF asset pipeline complexity; MeshPhysicalMaterial (LOGIC) derives PBR appearance from parameter structs with no animation rig overhead; Three.js built-in geometries (SphereGeometry, CylinderGeometry, TorusGeometry) compose to form spacekid characters with zero external dependencies; n8ao SSAO + IBL achieves photonicRealism aesthetic without skeletal animation. Simpler D/L/A surface: ProceduralCharacterSpec = DATA struct, MaterialDerivation = LOGIC DerivedProperty, GeometryBuild = ACTION type.",
+      "dlaJustification": "DATA: ProceduralCharacterSpec (body radius, helmet color, visor transmission, suit roughness), ProceduralSpaceshipSpec (ring geometry params, material arrays). LOGIC: PhotonicMaterialDeriver (DATA params → MeshPhysicalMaterial instance), ProceduralRigAnimator (time-based procedural motion — bob, float, rotate). ACTION: GeometryAssembly (assemble Group from primitives), SceneAdd, MaterialApply. No external GLTF pipeline, no Mixamo/Blender dependency.",
+      "supportingEvidenceIds": ["clm-pr-02", "clm-pr-03", "clm-pr-10", "clm-pr-16", "clm-pr-17", "clm-pr-18", "clm-pr-20", "clm-pr-35"],
+      "contradictingEvidenceIds": ["clm-pr-11", "clm-pr-12"],
       "testCriteria": [
-        "OverrideMaterialManager.workaroundEnabled=true resolves troika SDF shader discard in postprocessing EffectComposer",
-        "preloadFont() pre-warms Korean character SDF atlas before first teaching beat render",
-        "ContentDeliveryResolver CRA-phase routing correctly dispatches all 5 beat types without sequencing breaks",
-        "60fps maintained with troika labels in WebGL2 scene + n8ao + postprocessing on Chromebook-class GPU"
+        "Procedural spacekid assembly achieves comparable photonicRealism visual target as GLTF character",
+        "Procedural float/bob animations are sufficiently expressive for educational engagement",
+        "ProceduralCharacterSpec parameter space enables meaningful visual differentiation between characters",
+        "No GLTF loader required — zero external asset dependencies at runtime"
       ],
       "architectureImplications": [
-        "troika-three-text added as npm dependency (v0.52.4)",
-        "OverrideMaterialManager.workaroundEnabled=true added to renderer setup",
-        "ContentDeliveryResolver new file — TypeScript exhaustive switch on CRAMicroPhase",
-        "SpatialAnnotation added to ontology/frontend.ts and types/teaching.ts",
-        "Migration from PR#28: ~4-6 weeks, moderate complexity"
+        "No Mixamo/Blender/RPM pipeline — reduces asset production overhead but limits character expressiveness",
+        "SpaceshipEntity procedural geometry is already the correct approach per ontologist (clm-pr-35)",
+        "SpacekidEntity procedural approach sacrifices animation fidelity — educational engagement risk for character-based learning interactions",
+        "ProceduralRigAnimator requires bespoke implementation — no existing Three.js helper",
+        "Easier to scale entity count (no SkinnedMesh instancing complexity)"
       ],
       "devcon5Alignment": {
-        "ddd": "Teaching surfaces have diegetic spatial presence — spatial contiguity as a domain principle, not a rendering accident",
-        "dry": "ContentDeliveryResolver is the single dispatch point; no duplicated rendering logic per phase",
-        "ocp": "Resolver Interface open for new rendering strategies (add audio, add particle layer) without touching game-loop",
-        "pecs": "Producer (game-loop) extends TeachingBeat with spatialAnnotations; Consumer (resolver) dispatches via supertype — CSS overlay path unchanged"
+        "DDD": "ProceduralCharacterSpec uses domain terms (helmetColor, visortransmission) not raw geometry params.",
+        "DRY": "Single PhotonicMaterialDeriver creates all character materials from spec. Single ProceduralRigAnimator drives all procedural motion.",
+        "OCP": "New character variant added by extending ProceduralCharacterSpec with new params — existing GeometryAssembly ACTION unchanged.",
+        "PECS": "ProceduralCharacterSpec (producer DATA) extends interface; CharacterRenderSystem (consumer LOGIC) reads spec without concrete class binding."
       }
     },
     {
-      "id": "H-C",
-      "label": "Full WebGL-Native via three-mesh-ui",
-      "statement": "This stack achieves maximum WebGL integration by replacing speech-bubble.ts with three-mesh-ui v6.5.4 (obj-cd-04 analogue) for all content delivery. SpeechBubbleContent contract is adapted for Block+Text mesh primitives. All 10 interaction modes refactored for 3D-native surfaces. However: three-mesh-ui's last release was 2023-03-24 (clm-ext-09 — stale), it was designed for VR contexts where HTML is impossible (clm-ext-10), and WCAG 2.1 accessibility compliance requires a DOM shadow layer, partially recreating the CSS overlay dependency anyway.",
-      "dlaJustification": {
-        "DATA": "SpeechBubbleContent contract must change — three-mesh-ui uses Block+Text MSDF primitives, not CSS-compatible text. ContentMesh replaces DOM element as the rendering DATA entity. Significant contract breakage.",
-        "LOGIC": "WorldToScreenProjection (obj-cd-09) eliminated. three-mesh-ui layout engine replaces it. ThreeMeshUI.update() call added to game loop. PostprocessingCompatibility (obj-cd-13) notes: three-mesh-ui is a standard Three.js Object3D — no special workaround needed, but no postprocessing on text panels.",
-        "ACTION": "SpeechBubbleFollow (obj-cd-15) eliminated. All DOM-level actions replaced with Object3D mutations. EnterAdvancesBeat (obj-cd-14) retained but interactive input handling requires 3D raycasting instead of DOM events.",
-        "LEARN": "ContentEngagement via raycasting proximity — richer spatial telemetry, but no DOM event baseline."
-      },
-      "supportingEvidenceIds": ["clm-ext-08", "clm-ext-02"],
-      "contradictingEvidenceIds": ["clm-ext-09", "clm-ext-10", "clm-ext-15"],
+      "id": "H-3",
+      "label": "Factory+Registry Component System",
+      "researchQuestion": "q-pr-03 — Component framework architecture",
+      "statement": "This stack is optimal for this D/L/A structure because: Factory+Registry (LOGIC) enables OCP component extension for <50 entities without full ECS framework overhead; ComponentRegistry (DATA) stores createFn per component type; ComponentFactory (LOGIC) applies registered creators on demand; the D/L/A surface maps cleanly — ComponentSpec = DATA struct, ComponentFactory = LOGIC DerivedProperty, ComponentMount = ACTION type. This directly instantiates the ontologist recommendation (clm-pr-23): Factory+Registry is sufficient for mathcrew scale without miniplex/bitECS overhead.",
+      "dlaJustification": "DATA: ComponentSpec (type, config params), ComponentRegistry (Map<ComponentType, CreateFn>). LOGIC: ComponentFactory (registry lookup + createFn dispatch), ComponentQueryResolver (entity-to-component graph traversal). ACTION: ComponentMount (createFn call + scene.add), ComponentUnmount (dispose + remove), ComponentUpdate (per-frame system update call). The registry IS the ontology surface — each registered component maps to exactly one D/L/A domain object.",
+      "supportingEvidenceIds": ["clm-pr-23", "clm-pr-24", "clm-int-02", "clm-int-03"],
+      "contradictingEvidenceIds": ["clm-pr-22"],
       "testCriteria": [
-        "three-mesh-ui Block+Text renders all SpeechBubbleContent field types at target font size on 768px display",
-        "MSDF font file pre-generation for Korean characters integrates with Vite 8.0.5 + Bun build pipeline",
-        "WCAG 2.1 Level AA satisfied via hidden ARIA shadow DOM technique accepted by auditor",
-        "All 10 interaction modes function correctly with 3D-native content surface raycasting"
+        "New component type (e.g. ProximityDetector) registered with 0 changes to existing component code",
+        "ComponentFactory.create() handles SpacekidEntity + SpaceshipEntity + EnvironmentEntity types",
+        "Entity count stays under 50 — if > 50 entities required, hypothesis refuted (migrate to miniplex)"
       ],
       "architectureImplications": [
-        "speech-bubble.ts (717 LOC) replaced — significant LOC rework",
-        "three-mesh-ui MSDF font generation added to Vite build (build-time asset requirement)",
-        "SpeechBubbleContent contract partially replaced — breaking change for ontology/frontend.ts",
-        "Accessibility shadow DOM layer required — partially reintroduces DOM dependency",
-        "Migration from PR#28: ~10-14 weeks, very high complexity"
+        "Registry is the single source of truth for component types — no scattered factory functions",
+        "Each entity type (SpacekidEntity, SpaceshipEntity) has a corresponding registry entry",
+        "System functions (RenderSystem, AnimationSystem, InteractionSystem) operate over registry queries",
+        "Migration path to miniplex ECS is clean: replace registry Map with miniplex World, system functions become miniplex systems"
       ],
       "devcon5Alignment": {
-        "ddd": "Maximum DDD immersion — math objects and content panels co-exist in scene graph as first-class domain entities",
-        "dry": "Consolidates rendering to WebGL — but accessibility shadow DOM reintroduces a second truth source",
-        "ocp": "Highest future extensibility for 3D features — but breaks current contracts to achieve it",
-        "pecs": "Clean PECS in final state; migration path has coupling due to parallel shadow DOM"
+        "DDD": "Registry component types match domain vocabulary (SpacekidMaterialComponent, AnimationStateComponent, ProximityTriggerComponent).",
+        "DRY": "Single registry eliminates per-entity factory duplication. ComponentFactory.create() is called once per component type.",
+        "OCP": "New component: one registry.register() call — no changes to existing factory, query, or mount logic.",
+        "PECS": "ComponentSpec (producer DATA) extends interface; ComponentFactory (consumer LOGIC) reads spec generically."
+      }
+    },
+    {
+      "id": "H-4",
+      "label": "miniplex ECS Component System",
+      "researchQuestion": "q-pr-03 — Component framework architecture (competing hypothesis)",
+      "statement": "This stack is optimal for this D/L/A structure because: miniplex ECS (LOGIC) provides type-safe component composition using object identity (not numeric IDs), enabling idiomatic TypeScript entity management; the World object maps cleanly to the D/L/A surface — entities are plain DATA objects, systems are LOGIC functions over component queries, add/remove are ACTION calls; miniplex 6k+ stars and developer-friendly API reduces risk vs bitECS for educational game scale.",
+      "dlaJustification": "DATA: Entity objects (plain JS objects with typed component fields — { mesh, material, animation, interaction }). LOGIC: miniplex World (query engine, archetype tracking), SystemFunctions (RenderSystem, AnimationSystem, InteractionSystem). ACTION: world.add(entity), world.remove(entity), component mutation via direct entity property assignment. This is cleaner D/L/A separation than Factory+Registry — entities ARE data, systems ARE logic.",
+      "supportingEvidenceIds": ["clm-pr-21", "clm-pr-24", "clm-int-02", "clm-int-03"],
+      "contradictingEvidenceIds": ["clm-pr-23"],
+      "testCriteria": [
+        "miniplex World.with() queries return correct entity subsets for RenderSystem and AnimationSystem",
+        "Entity add/remove in miniplex does not leak Three.js resources (requires manual dispose in system)",
+        "miniplex bundle size addition is < 5KB gzipped (acceptable for mathcrew web target)"
+      ],
+      "architectureImplications": [
+        "miniplex adds external dependency (vs Factory+Registry zero dependencies)",
+        "World state is the authoritative entity registry — no parallel Map<> tracking needed",
+        "miniplex v2 API uses world.with(...components).entities — TypeScript-idiomatic",
+        "Requires explicit Three.js resource cleanup (geometry.dispose(), material.dispose()) in entity remove handler"
+      ],
+      "devcon5Alignment": {
+        "DDD": "Entity component names match domain vocabulary (SpacekidMaterialComponent, AnimationStateComponent).",
+        "DRY": "World query replaces all Map<> tracking and per-system entity lists. Single world as source of truth.",
+        "OCP": "New component type: extend entity interface with new field — existing systems ignore unknown fields.",
+        "PECS": "Entity (producer DATA) extends interface with new components; SystemFunction (consumer LOGIC) reads world query results."
+      }
+    },
+    {
+      "id": "H-5",
+      "label": "DragControls+Proxy Interaction Paradigm",
+      "researchQuestion": "q-pr-04 — Interaction paradigm for spacekid/spaceship placement",
+      "statement": "This stack is optimal for this D/L/A structure because: DragControls (ACTION) is the official Three.js built-in drag solution; proxy mesh pattern (clm-pr-30) resolves GLTF+AnimationMixer incompatibility with DragControls; grid snap formula (clm-pr-31) implements discrete placement for math manipulative gameplay; proximity triggers (clm-pr-32) via Vector3.distanceTo() implement spatial relationship detection for game logic. D/L/A surface: DragState = DATA, SnapGrid = LOGIC, DragDispatch = ACTION.",
+      "dlaJustification": "DATA: DragState (isDragging: boolean, dragTarget: EntityRef, snapPosition: Vector3), SnapGridConfig (cellSize, worldBounds). LOGIC: SnapPositionDeriver (dragPos → snapped Vector3), ProximityEvaluator (Vector3.distanceTo per entity pair → boolean). ACTION: DragStart (proxy bind), DragMove (position copy + snap apply), DragEnd (final position commit + InteractionMode trigger), ProximityEventDispatch. The proxy pattern cleanly separates DragControls binding (ACTION surface) from character Group positioning (LOGIC derive).",
+      "supportingEvidenceIds": ["clm-pr-06", "clm-pr-30", "clm-pr-31", "clm-pr-32", "clm-pr-33"],
+      "contradictingEvidenceIds": [],
+      "testCriteria": [
+        "DragControls proxy pattern correctly positions animated GLTF spacekid Group without animation disruption",
+        "Grid snap formula produces discrete placement cells matching InteractionMode board positions",
+        "Vector3.distanceTo() proximity detection fires correctly when spacekid reaches spaceship threshold",
+        "touch-action:none prevents scroll conflicts on tablet (clm-pr-33)"
+      ],
+      "architectureImplications": [
+        "Proxy mesh must match character Group bounding box for accurate click/drag targeting",
+        "SnapGrid CONFIG is DATA — it is game-design-specified, not computed per-frame",
+        "Proximity detection is per-frame O(n) — acceptable for < 50 entities, use Octree if > 50",
+        "DragEnd triggers InteractionMode state transition — ACTION → teaching framework integration point"
+      ],
+      "devcon5Alignment": {
+        "DDD": "DragState uses domain terms (dragTarget=EntityRef, not mesh ref). SnapGrid uses game design vocabulary (cellSize, not gridUnit).",
+        "DRY": "Single DragDispatch ACTION handles all entity types via EntityRef. Single ProximityEvaluator for all pair checks.",
+        "OCP": "New drag-enabled entity type: register proxy mesh — DragDispatch ACTION unchanged. New proximity threshold: update SnapGridConfig DATA — ProximityEvaluator LOGIC unchanged.",
+        "PECS": "DragState (producer DATA) extends interface; DragDispatch (consumer ACTION) reads target reference generically."
+      }
+    },
+    {
+      "id": "H-6",
+      "label": "Gesture+Spatial Proximity Interaction Paradigm",
+      "researchQuestion": "q-pr-04 — Interaction paradigm (competing hypothesis: gesture-first)",
+      "statement": "This stack is optimal for this D/L/A structure because: gesture recognition (pointer events + velocity analysis) provides more natural tablet interaction than explicit drag; spatial proximity triggers (Vector3.distanceTo) replace snap-to-grid with organic placement zones; this eliminates discrete grid dependency and supports freer entity placement for open-ended math exploration scenarios.",
+      "dlaJustification": "DATA: GestureState (startPos, currentVelocity, gestureType: 'drag'|'flick'|'tap'), PlacementZone (center: Vector3, radius: number, acceptsEntityType: EntityType[]). LOGIC: GestureClassifier (pointer event stream → GestureType), PlacementZoneEvaluator (entity position → nearest zone). ACTION: GestureEventDispatch (classified gesture → InteractionMode trigger), ZonePlacement (snap to zone center if within radius).",
+      "supportingEvidenceIds": ["clm-pr-32", "clm-pr-33"],
+      "contradictingEvidenceIds": ["clm-pr-31"],
+      "testCriteria": [
+        "GestureClassifier correctly distinguishes drag vs flick gestures on tablet",
+        "PlacementZone evaluation replaces DragControls proxy pattern without animation disruption",
+        "Gesture-based interaction achieves same InteractionMode completion rates as DragControls approach"
+      ],
+      "architectureImplications": [
+        "Gesture recognition requires custom implementation — no Three.js built-in (increases implementation complexity)",
+        "Spatial proximity zones require zone definition as DATA (design-time decision)",
+        "OS edge gesture conflicts (clm-pr-33 §GEST.OS-02) are higher risk without DragControls boundary controls",
+        "Grid snap is explicitly rejected — this changes math manipulative placement semantics (risk for structured math games)"
+      ],
+      "devcon5Alignment": {
+        "DDD": "GestureState uses interaction domain vocabulary (flick, drag, tap) not raw pointer coordinates.",
+        "DRY": "Single GestureClassifier; single PlacementZoneEvaluator — no per-entity gesture logic.",
+        "OCP": "New gesture type: add GestureType variant — GestureClassifier logic open-closed.",
+        "PECS": "GestureState (producer DATA) extends interface; GestureEventDispatch (consumer ACTION) reads gesture type generically."
       }
     }
   ],
 
   "scenarios": [
     {
-      "hypothesisId": "H-A",
-      "id": "S-A-base",
+      "hypothesisId": "H-1",
+      "id": "S-H1-BASE",
       "type": "base",
-      "revisionRound": 3,
-      "title": "H-A Base: Enhanced speech bubble ships in 2 weeks — CSS animations + CognitiveLoadGuard",
-      "description": "speech-bubble.ts gains CSS-native keyframe animations per TeachingBeat phase (motivate: pulse, demonstrate: highlight, assess: solid), phase-icon cues, and CognitiveLoadGuard suppressing extraneous vocabulary per Coherence principle. EnterAdvancesBeat retained. 60fps maintained.",
+      "label": "H-1 Base: GLTF Pipeline + IBL + AnimationMixer Integration",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "Standard GLTF pipeline (Kenney CC0 character → Blender rigging → Mixamo animation → GLB → gltfjsx compression) delivers photonicRealism spacekid with AnimationMixer crossfade and IBL via PMREMGenerator. MeshPhysicalMaterial for suit body, selective MeshSSSNodeMaterial for face/visor transmission. n8ao halfRes for Chromebook 60fps budget.",
       "assumptions": [
-        {"id": "a-A-b-1", "text": "CSS-native keyframe animations run composited off main thread and add <1ms per-frame overhead", "evidenceIds": ["clm-ext-17"]},
-        {"id": "a-A-b-2", "text": "SpeechBubbleContent (obj-cd-01) optional extension with animationHints does not break TeachingBeat sequencing", "evidenceIds": ["clm-ext-21", "clm-ext-14"]},
-        {"id": "a-A-b-3", "text": "CognitiveLoadGuard (obj-cd-10) correctly applies Coherence principle — no extraneous vocabulary in CSS bubble", "evidenceIds": ["clm-ext-23", "clm-ext-27"]},
-        {"id": "a-A-b-4", "text": "CSS overlay z-ordering over postprocessing canvas is stable across target browsers (Chrome, Firefox, WebKit)", "evidenceIds": ["clm-ext-14"]}
+        "1. GLTF file is prepared via Blender+Mixamo pipeline (clm-pr-12) with matching bone names",
+        "2. SkeletonUtils.clone() correctly produces independent AnimationMixer instances per spacekid (clm-pr-04)",
+        "3. PMREMGenerator setup at scene init (not per-frame) keeps IBL cost near-zero at runtime (clm-pr-10, clm-pr-16)",
+        "4. n8ao halfRes reduces SSAO cost sufficiently for 60fps on Chromebook (clm-pr-26)",
+        "5. Teaching framework migration is metaphor-layer-only — 10 InteractionModes preserve existing contracts (clm-pr-34)"
       ],
-      "evidenceBaseIds": ["clm-ext-14", "clm-ext-15", "clm-ext-17", "clm-ext-21", "clm-ext-23", "clm-ext-27", "clm-int-02"],
+      "evidenceBaseIds": ["clm-pr-04", "clm-pr-09", "clm-pr-10", "clm-pr-16", "clm-pr-17", "clm-pr-26", "clm-pr-34"],
       "contradictions": [
         {
-          "id": "c-A-b-1",
-          "description": "CSS overlay does not implement Spatial Contiguity (clm-ext-20) — labels are not anchored to math objects, they follow the character. For Concrete-phase beats where manipulatives are referenced, this is a Mayer violation.",
-          "status": "resolved",
-          "resolution": "Round 1: Scoped H-A to Representational/Abstract phases where spatial anchoring is less critical. Concrete-phase content delivery acknowledged as a limitation of H-A — flagged as NextExperiment NE-A-01. Scenario remains valid for its scoped claim."
+          "id": "CON-H1-BASE-01",
+          "claim": "SkeletonUtils.retarget() reliability (clm-pr-15) — community reports inverted feet/backward hands with different-proportion skeletons",
+          "resolution": "Bundle animations directly in GLB (Mixamo FBX → Blender → GLB with embedded clips) — avoid runtime retarget() call. Use GLB with pre-baked Mixamo animations.",
+          "contradictionStatus": "resolved",
+          "resolutionEvidence": "clm-pr-15 specifically flags retarget(), not pre-baked animation clip playback. GLB with embedded clips avoids retarget() entirely."
         }
       ],
       "contradictionStatus": "resolved",
       "evidenceSufficiency": "sufficient",
-      "implementationPhase": "Phase II (Operational)",
-      "devcon5AlignmentScore": 4,
-      "prototypeResult": {"prototypeId": "proto-cd-A-001", "buildStatus": "pass", "passRate": 1.0, "passedCases": 9, "totalCases": 9, "failureModes": []},
       "evaluationScores": {
         "evidenceFit": 4,
-        "implementationDifficulty": 5,
-        "riskSeverity": 5,
-        "reversibility": 5,
-        "timeToValue": 5,
+        "implementationDifficulty": 3,
+        "riskSeverity": 4,
+        "reversibility": 4,
+        "timeToValue": 3,
         "governanceCompliance": 5,
         "ecosystemMaturity": 5,
-        "dlaFit": 4,
+        "dlaFit": 5,
         "forwardPropHealth": 4,
         "agentComposability": 3,
-        "prototypeValidation": 5
+        "prototypeValidation": 3
       },
-      "scoreNotes": {
-        "evidenceFit": "4 — core assumptions backed by tier-1/2 evidence. a-A-b-4 (CSS z-order stability) is [Inference] from clm-ext-14 — needs NE-A-02 profiling.",
-        "implementationDifficulty": "5 — trivial: CSS keyframe additions to existing speech-bubble.ts. No new dependencies, no architecture change.",
-        "riskSeverity": "5 — negligible: fully reversible CSS. Zero WebGL loop risk.",
-        "reversibility": "5 — swap CSS file, zero data loss.",
-        "timeToValue": "5 — days to working demo, 1-2 weeks to production-ready.",
-        "governanceCompliance": "5 — CSS DOM has full ARIA/WCAG compatibility. No compliance gaps.",
-        "ecosystemMaturity": "5 — CSS animations: W3C standard, 15+ years stable.",
-        "dlaFit": "4 — DATA/LOGIC/ACTION/LEARN all covered. Minor gap: animationHints field not yet in ontology/frontend.ts.",
-        "forwardPropHealth": "4 — chain: TeachingBeat → SpeechBubbleContent → speech-bubble.ts → CSS DOM intact. Minor: animationHints propagation not yet in ontology.",
-        "agentComposability": "3 — CognitiveLoadGuard output could be agent-readable but CSS DOM state is not ontology-addressable currently.",
-        "prototypeValidation": "5 — proto-cd-A-001: buildStatus=pass, passRate=1.0 (9/9). All claims validated: CognitiveLoadManager 3-tier logic, CSS animation class resolution, prefers-reduced-motion gating, beat sequencing invariants, modality attributes, worldToScreen edge case (z>1). Zero failure modes."
-      }
-    },
-    {
-      "hypothesisId": "H-A",
-      "id": "S-A-best",
-      "type": "best",
-      "revisionRound": 3,
-      "prototypeResult": {"prototypeId": "proto-cd-A-001", "buildStatus": "pass", "passRate": 1.0, "passedCases": 9, "totalCases": 9, "failureModes": []},
-      "title": "H-A Best: CSS bubble + CTML-correct design achieves equivalent learning outcomes to diegetic approaches",
-      "description": "Research finding (clm-ext-27): design quality controls cognitive load, not immersion level. An enhanced CSS bubble correctly applying Spatial Contiguity (character follows math object), Segmenting (beats), Coherence (CognitiveLoadGuard), and Signalling (phase icons) achieves equivalent learning outcomes to troika-based diegetic approaches for Representational/Abstract phases. No migration to H-B needed.",
-      "assumptions": [
-        {"id": "a-A-best-1", "text": "CTML-correct CSS bubble design (clm-ext-27) achieves equivalent retention outcomes to diegetic 3D labels for Representational/Abstract teaching beats", "evidenceIds": ["clm-ext-27", "clm-ext-26"]},
-        {"id": "a-A-best-2", "text": "Character-following bubble provides sufficient spatial contiguity for Representational/Abstract phases — learner's attention is on the character, not manipulatives", "evidenceIds": ["clm-ext-20", "clm-ext-21"]},
-        {"id": "a-A-best-3", "text": "CognitiveLoadGuard (obj-cd-10) successfully suppresses extraneous content, meeting Coherence principle measurably", "evidenceIds": ["clm-ext-23", "clm-int-06"]}
-      ],
-      "evidenceBaseIds": ["clm-ext-26", "clm-ext-27", "clm-ext-20", "clm-ext-21", "clm-ext-23", "clm-int-06"],
-      "contradictions": [
-        {
-          "id": "c-A-best-1",
-          "description": "clm-ext-26 study (AR vs video, 88 participants) showed inconclusive retention/transfer results. The 'design quality controls cognitive load' finding refers to extraneous load — germane load (deep learning) difference between modalities is unresolved.",
-          "status": "detected"
-        }
-      ],
-      "contradictionStatus": "detected",
-      "evidenceSufficiency": "partial",
-      "implementationPhase": "Phase III (AI-First)",
+      "evaluationRationale": {
+        "evidenceFit": "clm-pr-04, clm-pr-09, clm-pr-10 are Official tier-1 confirmed APIs. IBL@60fps (clm-pr-17) is Synthesis tier-2. Minor gap: Chromebook-specific benchmark not available.",
+        "implementationDifficulty": "GLTF pipeline requires Blender+Mixamo workflow (moderate tooling ramp). GLTFLoader+AnimationMixer is documented. 2-3 weeks estimated.",
+        "riskSeverity": "Risk: GLTF asset pipeline dependency (Blender/Mixamo required). Mitigation: Kenney CC0 assets available, pipeline is standard.",
+        "reversibility": "Can swap GLTF model without changing AnimationMixer logic. Material overrides are per-entity DATA — reversible.",
+        "timeToValue": "GLTF pipeline + IBL setup is 2-3 weeks to working demo. Teaching integration (metaphor layer only) is additional 1-2 weeks.",
+        "governanceCompliance": "CC0 assets (Kenney, Polyhaven HDRIs) — no licensing concerns. Mixamo requires free Adobe account — acceptable.",
+        "ecosystemMaturity": "Three.js r183, GLTFLoader, AnimationMixer — all production-stable APIs with 5+ year history.",
+        "dlaFit": "SpacekidEntity (DATA), AnimationStateMachine (LOGIC), CharacterSpawn (ACTION) — clean boundaries. All 5 domains represented (no SECURITY needed, LEARN via ContentEngagement).",
+        "forwardPropHealth": "Chain: SpacekidConfig (DATA) → CharacterRenderSystem (LOGIC) → CharacterSpawn (ACTION) → Three.js scene. Gap: AnimationStateMachine not yet designed as typed LOGIC object.",
+        "agentComposability": "AnimationState transitions can be agent-driven via typed ACTION calls. Missing: formal action schemas for agent discovery.",
+        "prototypeValidation": "Not yet tested — score 3 (not yet tested, neutral pending prototype T7/T8)."
+      },
       "devcon5AlignmentScore": 4,
-      "evaluationScores": {
-        "evidenceFit": 3,
-        "implementationDifficulty": 5,
-        "riskSeverity": 5,
-        "reversibility": 5,
-        "timeToValue": 5,
-        "governanceCompliance": 5,
-        "ecosystemMaturity": 5,
-        "dlaFit": 4,
-        "forwardPropHealth": 4,
-        "agentComposability": 3,
-        "prototypeValidation": 5
-      },
-      "scoreNotes": {
-        "evidenceFit": "3 — a-A-best-1 is partially supported: clm-ext-26 (tier 1) covers extraneous load equivalence but not germane load/retention. Evidence-gap flagged as NE-A-01.",
-        "contradictionNote": "c-A-best-1 is evidence-gap-driven — requires follow-up study on retention difference between CSS overlay and diegetic for elementary math.",
-        "prototypeValidation": "5 — proto-cd-A-001 pass: SpeechBubbleContent extensibility and beat invariants validated by A-T2, A-T6, A-T9. Architecture claims in best-case hold empirically."
+      "implementationJourney": {
+        "phase1_golden_tables": "SpacekidConfig + SpaceshipConfig structs, PBR material params as DATA — define types in src/types/entities.ts",
+        "phase2_operational": "AnimationStateMachine LOGIC + CharacterSpawn ACTION + DragDispatch ACTION — operational entity system",
+        "phase3_ai_first": "Agent-composable CharacterSpawn with typed EntitySpec — agents can spawn/configure entities via ontology ACTION calls"
       }
     },
     {
-      "hypothesisId": "H-A",
-      "id": "S-A-worst",
-      "type": "worst",
-      "revisionRound": 3,
-      "prototypeResult": {"prototypeId": "proto-cd-A-001", "buildStatus": "pass", "passRate": 1.0, "passedCases": 9, "totalCases": 9, "failureModes": []},
-      "title": "H-A Worst: CSS overlay cannot satisfy Spatial Contiguity for Concrete phase — forced migration to H-B",
-      "description": "Elementary learners in Concrete phase (manipulating factor towers, divisor rings) find the character-following bubble spatially disconnected from the math objects they're interacting with. CSS overlay violates Spatial Contiguity (clm-ext-20) for Concrete-phase beats. Team must migrate Concrete-phase delivery to H-B troika labels. 2-week H-A effort is still usable for Representational/Abstract phases.",
+      "hypothesisId": "H-1",
+      "id": "S-H1-BEST",
+      "type": "best",
+      "label": "H-1 Best: Kenney CC0 + One-Day GLTF Setup + Polyhaven HDRI",
+      "revisionRound": 2,
+      "implementationPhase": "Phase I (Golden Tables)",
+      "description": "Optimal conditions: Kenney Space Kit provides ready-to-use CC0 GLTF spacekid character with basic rig. Polyhaven 1K HDRI loads in < 200ms. AnimationMixer.crossFadeTo() transitions work without pop on first prototype. n8ao halfRes maintains 60fps on both Chromebook and tablet. MeshSSSNodeMaterial selective application (forehead only) has negligible performance cost.",
       "assumptions": [
-        {"id": "a-A-worst-1", "text": "Spatial Contiguity (clm-ext-20) is critical for Concrete-phase elementary math learning — labels must appear near manipulatives, not near character", "evidenceIds": ["clm-ext-20", "clm-ext-24"]},
-        {"id": "a-A-worst-2", "text": "Character-following bubble position (near character sprite) is spatially distant from Concrete-phase math objects (divisor rings, factor towers)", "evidenceIds": ["clm-ext-14", "clm-ext-16"]},
-        {"id": "a-A-worst-3", "text": "Elementary learners (grades 2-4) cannot compensate for spatial gap between bubble and referenced objects through reading alone", "evidenceIds": ["clm-ext-27"]}
+        "1. Kenney Space Kit character is Mixamo-compatible without custom rigging (clm-pr-13)",
+        "2. MeshSSSNodeMaterial on < 10% of character surface area has < 2ms additional fragment shader cost",
+        "3. Polyhaven HDRI at 1K resolution (< 2MB) achieves acceptable IBL quality for educational context",
+        "4. crossFadeTo() transitions look correct on first implementation attempt without custom tuning",
+        "5. gltfjsx -S -T reduces Kenney character GLB to < 500KB (clm-pr-14)"
       ],
-      "evidenceBaseIds": ["clm-ext-14", "clm-ext-16", "clm-ext-20", "clm-ext-24", "clm-ext-27"],
+      "evidenceBaseIds": ["clm-pr-13", "clm-pr-14", "clm-pr-17", "clm-pr-18", "clm-pr-26"],
       "contradictions": [],
       "contradictionStatus": "resolved",
-      "evidenceSufficiency": "sufficient",
-      "implementationPhase": "Phase II (Operational)",
-      "devcon5AlignmentScore": 3,
+      "evidenceSufficiency": "partial",
       "evaluationScores": {
-        "evidenceFit": 4,
-        "implementationDifficulty": 5,
-        "riskSeverity": 4,
+        "evidenceFit": 3,
+        "implementationDifficulty": 4,
+        "riskSeverity": 5,
         "reversibility": 5,
         "timeToValue": 5,
         "governanceCompliance": 5,
         "ecosystemMaturity": 5,
-        "dlaFit": 3,
-        "forwardPropHealth": 3,
-        "agentComposability": 2,
-        "prototypeValidation": 5
+        "dlaFit": 5,
+        "forwardPropHealth": 4,
+        "agentComposability": 3,
+        "prototypeValidation": 3
       },
-      "scoreNotes": {
-        "evidenceFit": "4 — Spatial Contiguity violation for Concrete phase is well-supported by Mayer tier-3 synthesis + clm-ext-16 ([Inference] from current codebase). Core assumptions have evidence.",
-        "riskSeverity": "4 — minor: worst case is H-A partial use (Representational/Abstract) + H-B addition for Concrete. Not project failure.",
-        "dlaFit": "3 — Concrete-phase D/L/A mapping breaks: SpeechBubble (obj-cd-01) does not fit Concrete-phase LOGIC (Spatial Contiguity). Boundary ambiguity exposed.",
-        "forwardPropHealth": "3 — ForwardProp chain exists but ContentDeliveryResolver (obj-cd-08) is needed but not implemented in H-A — gap exposed in worst-case.",
-        "agentComposability": "2 — H-A without resolver is not phase-aware; agents cannot query 'which rendering mode for this CRA phase'.",
-        "prototypeValidation": "5 — proto-cd-A-001 confirms: worldToScreen path unchanged (A-T8 edge case passed), beat sequencing invariants upheld (A-T6). Worst-case scenario validated as a scoping concern, not a build failure."
+      "evaluationRationale": {
+        "evidenceFit": "Kenney Space Kit GLTF compatibility with Mixamo is assumed (clm-pr-13 says CC0 assets available, not specifically Mixamo-compatible). Gap: requires verification in prototype.",
+        "implementationDifficulty": "If CC0 character is pre-rigged for Mixamo, GLTF setup reduces to GLTFLoader + PMREMGenerator — 1-2 days.",
+        "riskSeverity": "Best case: zero licensing risk, zero perf issues. Negligible risk if Kenney character works directly.",
+        "reversibility": "Fully reversible — swap Kenney character for custom asset, same AnimationMixer code.",
+        "timeToValue": "Days — quick prototype achievable with Kenney + Polyhaven HDRI.",
+        "governanceCompliance": "All CC0 assets — fully compliant.",
+        "ecosystemMaturity": "All mature Three.js APIs.",
+        "dlaFit": "Same as base — clean D/L/A boundaries.",
+        "forwardPropHealth": "Chain valid — Kenney asset → GLTFLoader DATA → AnimationMixer LOGIC → scene ACTION.",
+        "agentComposability": "Same limitation as base — agent schemas not yet formal.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationJourney": {
+        "phase1_golden_tables": "Download Kenney Space Kit → verify Mixamo compat → define SpacekidConfig struct",
+        "phase2_operational": "IBL setup + AnimationMixer + DragControls proxy pattern — all in Phase II",
+        "phase3_ai_first": "Entity spawn via agent-callable ACTION spec — Phase III"
       }
     },
     {
-      "hypothesisId": "H-A",
-      "id": "S-A-adversarial",
-      "type": "adversarial",
-      "revisionRound": 3,
-      "prototypeResult": {"prototypeId": "proto-cd-A-001", "buildStatus": "pass", "passRate": 1.0, "passedCases": 9, "totalCases": 9, "failureModes": []},
-      "title": "H-A Adversarial: CSS animation additions violate prefers-reduced-motion, trigger WCAG 2.3 failure",
-      "description": "CSS keyframe animations added to speech bubble are not gated on prefers-reduced-motion media query. A learner with vestibular disorder uses the app. Motion causes disorientation. WCAG 2.3 (Seizures and Physical Reactions) violation is discovered post-launch. Educational platform requires remediation before continued deployment.",
+      "hypothesisId": "H-1",
+      "id": "S-H1-WORST",
+      "type": "worst",
+      "label": "H-1 Worst: GLTF Pipeline Blocking Issues",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "Worst case: Kenney character rig is incompatible with Mixamo retargeting (bone naming mismatch), requiring custom Blender rigging. MeshSSSNodeMaterial drops Chromebook framerate below 40fps. SkeletonUtils.clone() has undocumented issues with r183 that cause bone sharing artifacts. HDRI loading blocks main thread causing first-frame stutter.",
       "assumptions": [
-        {"id": "a-A-adv-1", "text": "CSS keyframe animations respect prefers-reduced-motion media query throughout all animation additions", "evidenceIds": ["clm-ext-15"]},
-        {"id": "a-A-adv-2", "text": "Phase icon cues (SVG animations) also check prefers-reduced-motion — not just primary bubble animations", "evidenceIds": ["clm-ext-15"]},
-        {"id": "a-A-adv-3", "text": "Existing Playwright test suite includes accessibility checks for WCAG 2.3 motion compliance", "evidenceIds": ["clm-ext-14"]}
+        "1. Kenney Space Kit character requires significant Blender work to achieve Mixamo compatibility (falsifies clm-pr-13)",
+        "2. MeshSSSNodeMaterial has high fragment shader cost even at selective application",
+        "3. SkeletonUtils.clone() behavior on r183 has regressions from documented pattern",
+        "4. HDRI at 1K blocks main thread on low-end Chromebook"
       ],
-      "evidenceBaseIds": ["clm-ext-14", "clm-ext-15"],
+      "evidenceBaseIds": ["clm-pr-04", "clm-pr-15", "clm-pr-26"],
       "contradictions": [
         {
-          "id": "c-A-adv-1",
-          "description": "a-A-adv-3 assumes Playwright tests cover WCAG 2.3 motion compliance — current test suite covers functional flow only, not accessibility compliance.",
-          "status": "resolved",
-          "resolution": "Round 1: Implementation spec mandated prefers-reduced-motion check on ALL CSS animation additions. Playwright axe-core integration added to implementation plan for WCAG compliance testing. Risk downgraded from critical to moderate."
+          "id": "CON-H1-WORST-01",
+          "claim": "SkeletonUtils.retarget() issues (clm-pr-15) may indicate broader skeleton system instability in r183",
+          "resolution": "clm-pr-15 is specifically about retarget() (different skeleton proportions), not clone(). clone() is a well-tested pattern per clm-pr-04. This is an irreconcilable concern until prototype test.",
+          "contradictionStatus": "unresolvable"
         }
       ],
+      "contradictionStatus": "unresolvable",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 2,
+        "riskSeverity": 2,
+        "reversibility": 3,
+        "timeToValue": 2,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 4,
+        "forwardPropHealth": 3,
+        "agentComposability": 2,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Worst-case assumptions are speculative — evidence supports the opposite (clm-pr-04 confirms clone() works). Score 2 = speculative scenario.",
+        "implementationDifficulty": "If GLTF rig requires custom Blender work: 1-2 months. Blocks Phase II.",
+        "riskSeverity": "Severe: custom rig work delays prototype significantly. MeshSSSNodeMaterial perf issue would require architecture redesign.",
+        "reversibility": "Can fall back to H-2 (procedural geometry) if GLTF pipeline fails — weeks of rework but not catastrophic.",
+        "timeToValue": "1-2 months if Blender custom rigging required.",
+        "governanceCompliance": "No compliance issues in worst case.",
+        "ecosystemMaturity": "Three.js is still mature — ecosystem concern not the failure mode here.",
+        "dlaFit": "D/L/A design remains valid even if implementation is harder.",
+        "forwardPropHealth": "HDRI load blocking would break Phase I golden tables path.",
+        "agentComposability": "Worse if clone() issues prevent reliable entity spawning.",
+        "prototypeValidation": "Not yet tested — these are hypothesis failure modes to verify in T7."
+      },
+      "devcon5AlignmentScore": 3,
+      "implementationJourney": {
+        "phase1_golden_tables": "BLOCKED if Blender rigging required — Kenney compatibility must be verified first",
+        "phase2_operational": "Delayed by 4-8 weeks in worst case",
+        "phase3_ai_first": "Cannot reach Phase III until Phase II operational"
+      }
+    },
+    {
+      "hypothesisId": "H-1",
+      "id": "S-H1-ADVERSARIAL",
+      "type": "adversarial",
+      "label": "H-1 Adversarial: Asset Pipeline Complexity Creep",
+      "revisionRound": 2,
+      "implementationPhase": "Phase I (Golden Tables)",
+      "description": "Adversarial scenario: GLTF pipeline (RPM → Blender → Mixamo → GLB → gltfjsx) introduces scope creep. Each step adds a tool dependency. RPM requires API key for advanced features. Mixamo requires Adobe account. Blender version mismatch causes export issues. gltfjsx CLI has compatibility issues with r183. The educational team ends up maintaining 5 separate tool setups instead of coding.",
+      "assumptions": [
+        "1. RPM API key management introduces CI/CD complexity (clm-pr-11 requires RPM account)",
+        "2. Mixamo account dependency creates bus-factor risk (one person's Adobe account)",
+        "3. Blender version pinning required for reproducible GLB exports",
+        "4. gltfjsx CLI output requires manual TypeScript adjustments per r183 API changes"
+      ],
+      "evidenceBaseIds": ["clm-pr-11", "clm-pr-12", "clm-pr-14", "clm-pr-15"],
+      "contradictions": [],
       "contradictionStatus": "resolved",
       "evidenceSufficiency": "partial",
-      "implementationPhase": "Phase II (Operational)",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 2,
+        "riskSeverity": 3,
+        "reversibility": 3,
+        "timeToValue": 2,
+        "governanceCompliance": 4,
+        "ecosystemMaturity": 4,
+        "dlaFit": 4,
+        "forwardPropHealth": 3,
+        "agentComposability": 2,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Tool dependency risk is real but mitigatable. Kenney CC0 (clm-pr-13) avoids RPM/Mixamo complexity for initial prototype.",
+        "implementationDifficulty": "Pipeline complexity overhead: 1-2 months if full RPM+Mixamo+Blender pipeline required. Kenney shortcut reduces to days.",
+        "riskSeverity": "Moderate: tool complexity is manageable with documented pipeline. Not project-fatal.",
+        "reversibility": "Mitigation: use Kenney CC0 assets directly. Fallback to H-2 procedural if GLTF pipeline blocks.",
+        "timeToValue": "Full RPM+Mixamo pipeline: 1-2 months before prototype. Kenney shortcut: days.",
+        "governanceCompliance": "Mixamo free account is acceptable. RPM commercial terms require review for educational product.",
+        "ecosystemMaturity": "Individual tools are mature but pipeline integration is fragile.",
+        "dlaFit": "Pipeline complexity doesn't change D/L/A design quality.",
+        "forwardPropHealth": "Tool complexity doesn't break the ontology chain but delays implementation.",
+        "agentComposability": "Agent-driven pipeline management would require additional tooling.",
+        "prototypeValidation": "Not yet tested."
+      },
       "devcon5AlignmentScore": 3,
+      "nextExperiment": {
+        "id": "NE-H1-ADV-01",
+        "description": "Verify: can Kenney Space Kit character be used directly with Three.js AnimationMixer using pre-included idle/walk animations (no Mixamo required)? If yes, adversarial scenario risk is largely mitigated.",
+        "evidenceGap": "g-pr-01",
+        "priority": "high"
+      },
+      "implementationJourney": {
+        "phase1_golden_tables": "Start with Kenney CC0 — validate GLTF compat BEFORE committing to full RPM pipeline",
+        "phase2_operational": "Only adopt full pipeline after Kenney validation proves insufficient",
+        "phase3_ai_first": "Pipeline automation reduces risk if CI/CD bakes asset steps"
+      }
+    },
+
+    {
+      "hypothesisId": "H-2",
+      "id": "S-H2-BASE",
+      "type": "base",
+      "label": "H-2 Base: Procedural Geometry + IBL + ProceduralRigAnimator",
+      "revisionRound": 2,
+      "implementationPhase": "Phase I (Golden Tables)",
+      "description": "Procedural spacekid assembled from Three.js primitives (SphereGeometry for helmet, CylinderGeometry for body, TorusGeometry for ring details). MeshPhysicalMaterial applied per-part with IBL. ProceduralRigAnimator provides time-based float/bob/rotate motion. SpaceshipEntity uses procedural geometry (already the correct design per ontologist). No GLTF loader, no Blender/Mixamo dependency.",
+      "assumptions": [
+        "1. Procedural geometry can achieve sufficient visual appeal for educational engagement in spacecraft context",
+        "2. ProceduralRigAnimator time-based motion is sufficient for character expressiveness",
+        "3. MeshPhysicalMaterial + IBL achieves photonicRealism without skeletal animation",
+        "4. Zero external GLTF asset dependency reduces implementation complexity significantly (clm-pr-23)"
+      ],
+      "evidenceBaseIds": ["clm-pr-02", "clm-pr-10", "clm-pr-17", "clm-pr-19", "clm-pr-23", "clm-pr-35"],
+      "contradictions": [
+        {
+          "id": "CON-H2-BASE-01",
+          "claim": "Procedural geometry for spacekid lacks the expressive character required for pedagogically engaging character-based learning interactions",
+          "resolution": "This is irreconcilable without user study evidence. Pedagogical engagement with procedural characters vs rigged characters is an open research question. Cannot be resolved with technical evidence alone.",
+          "contradictionStatus": "unresolvable"
+        }
+      ],
+      "contradictionStatus": "unresolvable",
+      "evidenceSufficiency": "partial",
       "evaluationScores": {
         "evidenceFit": 3,
         "implementationDifficulty": 4,
         "riskSeverity": 3,
         "reversibility": 5,
-        "timeToValue": 4,
-        "governanceCompliance": 4,
+        "timeToValue": 5,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 4,
+        "forwardPropHealth": 4,
+        "agentComposability": 4,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Procedural approach is supported by clm-pr-35 (SpaceshipEntity is procedural — same pattern). Missing: evidence that procedural character achieves educational engagement target.",
+        "implementationDifficulty": "Simpler than GLTF pipeline — no external tools. ProceduralRigAnimator is bespoke but straightforward. 1-2 weeks.",
+        "riskSeverity": "Moderate: pedagogical engagement risk if procedural character is insufficiently expressive.",
+        "reversibility": "Fully reversible — swap procedural character for GLTF at any time. Materials/IBL code unchanged.",
+        "timeToValue": "Days to working procedural spacekid with IBL. Fast prototype.",
+        "governanceCompliance": "Zero external asset dependencies — fully compliant.",
+        "ecosystemMaturity": "Procedural Three.js geometry is foundational, mature API.",
+        "dlaFit": "ProceduralCharacterSpec (DATA), PhotonicMaterialDeriver (LOGIC), GeometryAssembly (ACTION) — clean boundaries.",
+        "forwardPropHealth": "Chain: ProceduralCharacterSpec → MaterialDeriver → GeometryAssembly → scene. Clean forward propagation.",
+        "agentComposability": "ProceduralCharacterSpec is a plain DATA struct — highly agent-composable. Agent can specify any visual variant via typed params.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationJourney": {
+        "phase1_golden_tables": "ProceduralCharacterSpec struct definition — fast path, data-first",
+        "phase2_operational": "PhotonicMaterialDeriver LOGIC + GeometryAssembly ACTION — operational in Phase II",
+        "phase3_ai_first": "Agent-parameterizable characters via typed ProceduralCharacterSpec — strong Phase III composability"
+      }
+    },
+    {
+      "hypothesisId": "H-2",
+      "id": "S-H2-BEST",
+      "type": "best",
+      "label": "H-2 Best: Procedural Geometry Fast Path to Photonicrealism",
+      "revisionRound": 2,
+      "implementationPhase": "Phase I (Golden Tables)",
+      "description": "Best case: procedural geometry + IBL achieves photonicRealism target in 1-2 days. ProceduralRigAnimator float/bob motion is visually appealing in educational context. Zero external tool dependencies. Teaching framework integration (metaphor layer only) takes 1 additional day. Full working prototype before H-1 GLTF pipeline is even set up.",
+      "assumptions": [
+        "1. Procedural spacekid is visually sufficient for planned math interactions (clm-pr-35)",
+        "2. IBL + PBR achieves photonicRealism for round/cylinder geometries (confirmed by clm-pr-16, clm-pr-17)",
+        "3. ProceduralRigAnimator implementation takes < 1 day (straightforward sin/cos time animation)"
+      ],
+      "evidenceBaseIds": ["clm-pr-17", "clm-pr-18", "clm-pr-35"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 5,
+        "riskSeverity": 5,
+        "reversibility": 5,
+        "timeToValue": 5,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 4,
+        "forwardPropHealth": 4,
+        "agentComposability": 4,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Partial: SpaceshipEntity procedural approach is confirmed correct (clm-pr-35). SpacekidEntity procedural approach is inferred — not explicitly validated.",
+        "implementationDifficulty": "Trivial — built-in geometries, 1 day to working prototype.",
+        "riskSeverity": "Negligible — pure Three.js primitives, no external dependencies.",
+        "reversibility": "Fully reversible.",
+        "timeToValue": "Days — fastest path to working visual.",
+        "governanceCompliance": "No concerns.",
+        "ecosystemMaturity": "Foundational Three.js.",
+        "dlaFit": "Clean D/L/A mapping.",
+        "forwardPropHealth": "Healthy chain.",
+        "agentComposability": "Strong — pure DATA spec drives everything.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationJourney": {
+        "phase1_golden_tables": "Immediate — define ProceduralCharacterSpec, implement GeometryAssembly in Phase I",
+        "phase2_operational": "Add ProceduralRigAnimator (LOGIC) + interaction triggers (ACTION) — Phase II",
+        "phase3_ai_first": "Agent creates character variants via ProceduralCharacterSpec params — Phase III"
+      }
+    },
+    {
+      "hypothesisId": "H-2",
+      "id": "S-H2-WORST",
+      "type": "worst",
+      "label": "H-2 Worst: Procedural Characters Fail Engagement Benchmark",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "Worst case: procedural spacekid geometry achieves photonicRealism aesthetic but fails educational engagement benchmark. Students disengage with non-expressive characters. Teaching framework interaction modes that depend on character facial expression or gesture cannot be implemented. Decision-log requirement req-pr-01 (entity visual transformation) not achievable with static procedural geometry.",
+      "assumptions": [
+        "1. Educational engagement requires expressive character animation (not proven by current evidence)",
+        "2. 10 InteractionMode types include character-specific interactions that fail with procedural geometry",
+        "3. Pedagogical effectiveness of procedural vs rigged characters is negative for target age group (Korean elementary school)"
+      ],
+      "evidenceBaseIds": ["clm-pr-35"],
+      "contradictions": [
+        {
+          "id": "CON-H2-WORST-01",
+          "claim": "Current codebase uses abstract shapes (pulse-shards = rings) for math manipulatives — educational effectiveness is already proven without expressive characters",
+          "resolution": "This argues AGAINST the worst case. The current codebase shows abstract geometry is acceptable for math objects (rings = pulse-shards). However spacekid is a teaching CHARACTER, not a math manipulative — different pedagogical role. Evidence gap: no data on character expressiveness requirement for Korean elementary math.",
+          "contradictionStatus": "resolved",
+          "resolutionEvidence": "clm-pr-35 confirms current codebase uses abstract shapes successfully. Different role (character vs manipulative) remains an unresolved design question but not a contradiction."
+        }
+      ],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "insufficient",
+      "evaluationScores": {
+        "evidenceFit": 1,
+        "implementationDifficulty": 4,
+        "riskSeverity": 2,
+        "reversibility": 4,
+        "timeToValue": 5,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 3,
+        "forwardPropHealth": 3,
+        "agentComposability": 4,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "evidenceSufficiency insufficient — worst case assumption about character expressiveness requirement has no evidence base.",
+        "implementationDifficulty": "Implementation is easy (procedural geometry), failure would be discovered post-implementation.",
+        "riskSeverity": "Severe if character engagement fails — would require migration to H-1 GLTF pipeline mid-project.",
+        "reversibility": "Mostly reversible — can add GLTF character on top of procedural geometry code.",
+        "timeToValue": "Fast to implement, but engagement failure discovered late.",
+        "governanceCompliance": "No issues.",
+        "ecosystemMaturity": "No issues.",
+        "dlaFit": "D/L/A design remains valid. Risk is pedagogical not structural.",
+        "forwardPropHealth": "Chain valid — risk is in outcome, not propagation.",
+        "agentComposability": "No impact.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 3,
+      "nextExperiment": {
+        "id": "NE-H2-WORST-01",
+        "description": "Conduct informal usability test: show Korean elementary school student both procedural spacekid and GLTF spacekid. Measure engagement preference. This resolves the pedagogical expressiveness gap.",
+        "evidenceGap": "g-pr-02",
+        "priority": "medium"
+      },
+      "implementationJourney": {
+        "phase1_golden_tables": "Fast path — ProceduralCharacterSpec defined immediately",
+        "phase2_operational": "Engagement failure risk manifests in Phase II user testing",
+        "phase3_ai_first": "Phase III blocked if Phase II engagement benchmark fails"
+      }
+    },
+    {
+      "hypothesisId": "H-2",
+      "id": "S-H2-ADVERSARIAL",
+      "type": "adversarial",
+      "label": "H-2 Adversarial: Procedural Geometry Visual Parity Gap",
+      "revisionRound": 2,
+      "implementationPhase": "Phase I (Golden Tables)",
+      "description": "Adversarial: procedural geometry achieves photonicRealism for SpaceshipEntity (as planned) but fails visual parity for SpacekidEntity. The character requires fine-grained detail (fingers for pointing, face for expression) that procedural primitive geometry cannot provide. IBL highlights look beautiful on smooth sphere-helmet but artificial on combined cylinder-body geometry.",
+      "assumptions": [
+        "1. MeshPhysicalMaterial + IBL looks good on SphereGeometry (confirmed: clm-pr-17)",
+        "2. Multi-part combined geometry (5-10 primitives) has uncanny valley effect for character representation",
+        "3. SpacekidEntity character detail requirement exceeds what procedural primitives can express"
+      ],
+      "evidenceBaseIds": ["clm-pr-17", "clm-pr-35"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 4,
+        "riskSeverity": 3,
+        "reversibility": 5,
+        "timeToValue": 5,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 4,
+        "forwardPropHealth": 4,
+        "agentComposability": 4,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Adversarial assumption not supported by evidence — no data on multi-part primitive visual quality for educational characters.",
+        "implementationDifficulty": "Visual concern is discovered fast in prototype — no significant implementation cost before failure.",
+        "riskSeverity": "Moderate: aesthetic concern. Mitigation: use H-1 GLTF for SpacekidEntity, keep H-2 procedural for SpaceshipEntity.",
+        "reversibility": "Fully reversible — replace procedural SpacekidEntity with GLTF variant, procedural SpaceshipEntity unchanged.",
+        "timeToValue": "Fast to prototype and evaluate.",
+        "governanceCompliance": "No issues.",
+        "ecosystemMaturity": "No issues.",
+        "dlaFit": "D/L/A design supports hybrid (GLTF SpacekidEntity + procedural SpaceshipEntity).",
+        "forwardPropHealth": "Hybrid approach valid — different rendering paths per entity type.",
+        "agentComposability": "No impact.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationJourney": {
+        "phase1_golden_tables": "Prototype both procedural SpacekidEntity and SpaceshipEntity — compare visual fidelity",
+        "phase2_operational": "Hybrid decision: procedural SpaceshipEntity (confirmed), GLTF SpacekidEntity if procedural fails",
+        "phase3_ai_first": "Agent can switch entity rendering path via EntitySpec DATA field"
+      }
+    },
+
+    {
+      "hypothesisId": "H-3",
+      "id": "S-H3-BASE",
+      "type": "base",
+      "label": "H-3 Base: Factory+Registry Standard Operation",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "ComponentRegistry Map<ComponentType, CreateFn> manages all entity types (SpacekidEntity, SpaceshipEntity, EnvironmentEntity, DragProxyEntity). ComponentFactory.create() dispatches to registered creators. Systems (RenderSystem, AnimationSystem, InteractionSystem) query registry and iterate over registered entities. All entity logic routes through typed registry interface.",
+      "assumptions": [
+        "1. Entity count stays under 50 throughout mathcrew development (clm-pr-23)",
+        "2. ComponentRegistry Map<> lookup is O(1) and has no performance overhead for < 50 entities",
+        "3. TypeScript Map<ComponentType, CreateFn> provides sufficient type safety without ECS framework",
+        "4. Teaching framework InteractionMode callbacks integrate cleanly with ComponentFactory event system"
+      ],
+      "evidenceBaseIds": ["clm-pr-23", "clm-pr-24", "clm-int-02", "clm-int-03"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 5,
+        "riskSeverity": 4,
+        "reversibility": 5,
+        "timeToValue": 5,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 4,
+        "forwardPropHealth": 4,
+        "agentComposability": 3,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "clm-pr-23 is Inference tier (confidence 0.75) — Factory+Registry adequacy for mathcrew scale is inferred, not benchmarked.",
+        "implementationDifficulty": "Trivial — Map<> + factory functions. No external dependencies. < 1 week.",
+        "riskSeverity": "Minor — if entity count exceeds 50, migration to miniplex is clean and low-risk.",
+        "reversibility": "Fully reversible — replace Map<> with miniplex World, factory functions become systems.",
+        "timeToValue": "Days — no setup required beyond TypeScript Map<>.",
+        "governanceCompliance": "Zero dependencies.",
+        "ecosystemMaturity": "TypeScript built-in pattern.",
+        "dlaFit": "ComponentSpec (DATA), ComponentFactory (LOGIC DerivedProperty), ComponentMount (ACTION) — clean boundaries.",
+        "forwardPropHealth": "Chain: ComponentSpec (DATA) → ComponentFactory.create() (LOGIC) → ComponentMount (ACTION) → scene. Clean.",
+        "agentComposability": "Factory can be called by agent via typed ComponentSpec. Missing: formal schema for agent discovery.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationJourney": {
+        "phase1_golden_tables": "Define ComponentSpec types for all entity types — data-first registry",
+        "phase2_operational": "Register CreateFn per component type — operational factory",
+        "phase3_ai_first": "Expose ComponentSpec as agent-readable ontology action schema"
+      }
+    },
+    {
+      "hypothesisId": "H-3",
+      "id": "S-H3-BEST",
+      "type": "best",
+      "label": "H-3 Best: Zero-Dependency Entity Management",
+      "revisionRound": 2,
+      "implementationPhase": "Phase I (Golden Tables)",
+      "description": "Best case: Factory+Registry implemented in < 2 hours using TypeScript Map<> and discriminated union ComponentType. All entity types registered on init. ComponentFactory.create() handles SpacekidEntity + SpaceshipEntity + 3 environment types. Teaching framework integration requires zero changes to InteractionMode contracts.",
+      "assumptions": [
+        "1. Entity types are stable for Phase I — no new types required during initial implementation",
+        "2. ComponentType discriminated union provides sufficient type safety",
+        "3. InteractionMode callbacks are already callable without registry changes"
+      ],
+      "evidenceBaseIds": ["clm-pr-23", "clm-int-02"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "sufficient",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 5,
+        "riskSeverity": 5,
+        "reversibility": 5,
+        "timeToValue": 5,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 4,
+        "forwardPropHealth": 4,
+        "agentComposability": 3,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "clm-pr-23 confidence 0.75 (Inference) — adequate but not high-confidence evidence.",
+        "implementationDifficulty": "Trivial: 2-4 hours.",
+        "riskSeverity": "Negligible in best case.",
+        "reversibility": "Complete.",
+        "timeToValue": "Hours.",
+        "governanceCompliance": "No dependencies.",
+        "ecosystemMaturity": "TypeScript built-in.",
+        "dlaFit": "Same as base.",
+        "forwardPropHealth": "Same as base.",
+        "agentComposability": "Same limitation — agent schemas not yet formal.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationJourney": {
+        "phase1_golden_tables": "Immediate — TypeScript Map<> is a Phase I data structure",
+        "phase2_operational": "Register systems and factory functions — Phase II",
+        "phase3_ai_first": "Expose registry as ontology surface — Phase III"
+      }
+    },
+    {
+      "hypothesisId": "H-3",
+      "id": "S-H3-WORST",
+      "type": "worst",
+      "label": "H-3 Worst: Entity Count Exceeds Registry Design Limit",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "Worst case: entity count grows beyond 50 as teaching framework expands (fractional spacekids, multiple spaceship types per level, environment detail objects). Factory+Registry Map<> becomes a performance bottleneck. Missing change tracking (no reactive updates) causes rendering inconsistencies. InteractionMode state management requires per-entity tracking that the registry pattern doesn't natively support.",
+      "assumptions": [
+        "1. Level design requires > 50 simultaneous entities",
+        "2. InteractionMode state requires entity-level change detection not available in Map<> pattern",
+        "3. Factory+Registry has no reactive update mechanism — all updates are imperative"
+      ],
+      "evidenceBaseIds": ["clm-pr-23"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 3,
+        "riskSeverity": 3,
+        "reversibility": 4,
+        "timeToValue": 5,
+        "governanceCompliance": 5,
         "ecosystemMaturity": 5,
         "dlaFit": 3,
         "forwardPropHealth": 3,
         "agentComposability": 2,
-        "prototypeValidation": 5
+        "prototypeValidation": 3
       },
-      "scoreNotes": {
-        "evidenceFit": "3 — a-A-adv-3 (Playwright accessibility coverage) is not evidenced in source-map. Partial.",
-        "riskSeverity": "3 — moderate: prefers-reduced-motion mandate in implementation spec reduces risk. Axe-core integration in Playwright catches pre-launch.",
-        "governanceCompliance": "4 — mostly compliant after implementation spec update. Minor gap: axe-core integration not yet implemented.",
-        "prototypeValidation": "5 — proto-cd-A-001 confirms: A-T5 (prefers-reduced-motion → empty animation class) passed explicitly. WCAG 2.3 adversarial scenario is mitigated at the prototype level."
+      "evaluationRationale": {
+        "evidenceFit": "Worst case assumption (>50 entities) contradicts clm-pr-23 which explicitly states <50 entities for mathcrew. Speculative.",
+        "implementationDifficulty": "Migration from Map<> to miniplex is documented and clean — moderate difficulty.",
+        "riskSeverity": "Moderate: performance degradation. Mitigation: migrate to miniplex (clean path).",
+        "reversibility": "Mostly reversible — miniplex migration is mechanical.",
+        "timeToValue": "Fast to initial implementation — failure is discovered in Phase II.",
+        "governanceCompliance": "No issues.",
+        "ecosystemMaturity": "No issues.",
+        "dlaFit": "Worst case reveals missing reactive update pattern in D/L/A design.",
+        "forwardPropHealth": "Imperative update model is a ForwardProp gap if reactive updates needed.",
+        "agentComposability": "Without reactive updates, agent-driven state changes are harder to observe.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 3,
+      "implementationJourney": {
+        "phase1_golden_tables": "Define entity count budget in ComponentSpec DATA — make it explicit",
+        "phase2_operational": "Monitor entity count in Phase II — trigger miniplex migration if > 40",
+        "phase3_ai_first": "AI-First requires reactive entity model — consider miniplex regardless of count"
       }
     },
-
     {
-      "hypothesisId": "H-B",
-      "id": "S-B-base",
-      "type": "base",
-      "revisionRound": 3,
-      "title": "H-B Base: troika-three-text spatial labels ship for Concrete phase — renderBeforeCompositor=true validated",
-      "description": "troika-three-text v0.52.4 SDF labels attach to divisor rings and factor towers for Concrete-phase beats (motivate/explain/demonstrate). renderBeforeCompositor=true (validated by B-T8) resolves postprocessing EffectComposer pass ordering. preloadFont() pre-warms Korean character atlas (clm-ext-06). ContentDeliveryResolver (obj-cd-08) routes: motivate/explain/demonstrate → diegetic, practice/assess → css-overlay. Graceful CSS fallback when troikaReady=false (validated by B-T6). 60fps maintained via web-worker SDF offload.",
-      "assumptions": [
-        {"id": "a-B-b-1", "text": "OverrideMaterialManager.workaroundEnabled=true (clm-ext-03) resolves troika SDF shader discard in postprocessing 6.36.7 + n8ao 1.10.1 EffectComposer", "evidenceIds": ["clm-ext-03"]},
-        {"id": "a-B-b-2", "text": "Web-worker SDF atlas generation (clm-ext-01) keeps troika text update off main thread — no frame budget impact at beat transitions", "evidenceIds": ["clm-ext-01", "clm-ext-05"]},
-        {"id": "a-B-b-3", "text": "preloadFont() for Korean character set eliminates first-render latency for teaching beats (clm-ext-06)", "evidenceIds": ["clm-ext-06"]},
-        {"id": "a-B-b-4", "text": "ContentDeliveryResolver exhaustive TypeScript switch on CRAMicroPhase correctly routes all Concrete/Representational/Abstract beats", "evidenceIds": ["clm-int-03", "clm-int-02"]}
-      ],
-      "evidenceBaseIds": ["clm-ext-01", "clm-ext-03", "clm-ext-05", "clm-ext-06", "clm-ext-20", "clm-int-02", "clm-int-03"],
-      "contradictions": [
-        {
-          "id": "c-B-b-1",
-          "description": "clm-ext-19: troika SDF atlas sampling adds fragment shader cost per draw call. Specific FPS impact with n8ao + postprocessing at full mathcrew scene complexity not benchmarked.",
-          "status": "resolved",
-          "resolution": "Round 3: Prototype B-T8 validated renderBeforeCompositor=true contract — all troika configs correctly set this invariant, confirming EffectComposer pass ordering is safe. GPU overhead (clm-ext-19) remains unvalidated at production scene complexity but graceful CSS fallback (B-T6) provides a mitigation path. Contradiction reclassified: postprocessing integration is resolved; remaining FPS gap is evidence-gap for NE-B-01 device profiling."
-        }
-      ],
-      "contradictionStatus": "resolved",
-      "evidenceSufficiency": "partial",
+      "hypothesisId": "H-3",
+      "id": "S-H3-ADVERSARIAL",
+      "type": "adversarial",
+      "label": "H-3 Adversarial: Registry Becomes Parallel Truth Source",
+      "revisionRound": 2,
       "implementationPhase": "Phase II (Operational)",
-      "devcon5AlignmentScore": 5,
-      "prototypeResult": {"prototypeId": "proto-cd-B-001", "buildStatus": "pass", "passRate": 1.0, "passedCases": 8, "totalCases": 8, "failureModes": []},
-      "evaluationScores": {
-        "evidenceFit": 4,
-        "implementationDifficulty": 3,
-        "riskSeverity": 4,
-        "reversibility": 4,
-        "timeToValue": 3,
-        "governanceCompliance": 5,
-        "ecosystemMaturity": 4,
-        "dlaFit": 5,
-        "forwardPropHealth": 5,
-        "agentComposability": 4,
-        "prototypeValidation": 5
-      },
-      "scoreNotes": {
-        "evidenceFit": "4 — renderBeforeCompositor=true contract validated by B-T8. SDF worker offload (clm-ext-01) tier-1. GPU FPS impact on low-end hardware still evidence-gap (NE-B-01).",
-        "implementationDifficulty": "3 — moderate: ContentDeliveryResolver new file, troika scene integration, preloadFont setup. Clear docs available (tier-1 troika source).",
-        "riskSeverity": "4 — minor: if FPS regression occurs, OverrideMaterialManager workaround is one-line toggle. Fallback: disable troika labels for affected device tier.",
-        "reversibility": "4 — mostly reversible: remove troika dependency + ContentDeliveryResolver in days. CSS overlay path unchanged.",
-        "ecosystemMaturity": "4 — troika-three-text v0.52.4: released 2025-04-02, 2.4M weekly downloads, active maintenance (clm-ext-07).",
-        "dlaFit": "5 — full D/L/A/LEARN: SpatialAnnotation (DATA), ContentDeliveryResolver (LOGIC), TroikaTextSync (ACTION), ContentEngagement (LEARN). All 5 domains mapped.",
-        "forwardPropHealth": "5 — chain: TeachingBeat → ContentDeliveryResolver → [TroikaText | SpeechBubbleContent] → rendering surface. B-T1 through B-T3 confirm all 5 phases route correctly. SpatialAnnotation gap in ontology/frontend.ts remains minor.",
-        "agentComposability": "4 — ContentDeliveryResolver exposes routing logic as ontology-queryable Interface; SpatialAnnotation entities are agent-addressable.",
-        "prototypeValidation": "5 — proto-cd-B-001: buildStatus=pass, passRate=1.0 (8/8). ContentDeliveryResolver exhaustive routing (B-T3), SpatialAnnotation phase filtering (B-T4), troika fontSize config (B-T5), graceful CSS fallback (B-T6), renderBeforeCompositor invariant (B-T8) all pass. Zero failure modes."
-      }
-    },
-    {
-      "hypothesisId": "H-B",
-      "id": "S-B-best",
-      "type": "best",
-      "revisionRound": 3,
-      "prototypeResult": {"prototypeId": "proto-cd-B-001", "buildStatus": "pass", "passRate": 1.0, "passedCases": 8, "totalCases": 8, "failureModes": []},
-      "title": "H-B Best: Diegetic troika labels make math objects self-annotating — Spatial Contiguity fully realized",
-      "description": "troika-three-text labels on divisor rings, factor towers, and constellation objects implement Mayer Spatial Contiguity (clm-ext-20) exactly — vocabulary terms appear anchored to the mathematical objects they describe. CRA progression is spatially visible: Concrete objects have labels, Representational diagrams have hybrid annotation, Abstract beat uses CSS bubble for full text reasoning. ContentEngagement (obj-cd-19) tracks spatial dwell time near annotated objects.",
+      "description": "Adversarial: developers bypass ComponentFactory.create() and instantiate entities directly (new THREE.Group() + manual add to scene). Registry becomes out of sync. Debugging is hard because some entities are registry-tracked and some are not. This is a classic OCP violation — the architecture is correct but developer discipline breaks the contract.",
       "assumptions": [
-        {"id": "a-B-best-1", "text": "Spatial anchoring of 'factor', 'divisor', 'multiple' labels to math objects (clm-ext-20 Spatial Contiguity) measurably improves Concrete-phase concept acquisition vs floating bubble", "evidenceIds": ["clm-ext-20", "clm-ext-26", "clm-ext-27"]},
-        {"id": "a-B-best-2", "text": "troika-three-text features (curveRadius, outlineWidth, depthOffset — clm-ext-04) enable speech-bubble-panel-style in-world boxes readable at classroom display distances", "evidenceIds": ["clm-ext-04"]},
-        {"id": "a-B-best-3", "text": "ContentDeliveryResolver dual-mode routing (Concrete=troika, Abstract=CSS) feels seamless — learner does not perceive a jarring switch between rendering modes", "evidenceIds": ["clm-int-07"]}
+        "1. Development team creates entities outside ComponentFactory in time-pressed feature development",
+        "2. No enforcement mechanism prevents direct instantiation",
+        "3. Registry becomes stale — ComponentFactory.create() has ghost entries"
       ],
-      "evidenceBaseIds": ["clm-ext-04", "clm-ext-20", "clm-ext-26", "clm-ext-27", "clm-int-07"],
+      "evidenceBaseIds": ["clm-int-02"],
       "contradictions": [],
       "contradictionStatus": "resolved",
       "evidenceSufficiency": "partial",
-      "implementationPhase": "Phase III (AI-First)",
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 4,
+        "riskSeverity": 3,
+        "reversibility": 3,
+        "timeToValue": 5,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 2,
+        "forwardPropHealth": 2,
+        "agentComposability": 1,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Process risk (developer bypass) is not addressed by technical evidence.",
+        "implementationDifficulty": "Architecture requires TypeScript enforcement to prevent bypass — consider sealed factory pattern.",
+        "riskSeverity": "Moderate: registry staleness causes debugging overhead.",
+        "reversibility": "Difficult: if bypass becomes widespread, refactoring all entity instantiation is weeks of work.",
+        "timeToValue": "Instant — this scenario emerges gradually over development.",
+        "governanceCompliance": "No compliance issues.",
+        "ecosystemMaturity": "No issues.",
+        "dlaFit": "D/L/A mapping breaks down if entities exist outside registry — domain objects disconnected from ontology.",
+        "forwardPropHealth": "ForwardProp chain broken: entities without registry entries cannot participate in system updates.",
+        "agentComposability": "Agents cannot discover or operate on non-registry entities — agent composability fails.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 2,
+      "nextExperiment": {
+        "id": "NE-H3-ADV-01",
+        "description": "Add TypeScript-enforced factory pattern: entity types are opaque (factory returns readonly interface, not class). This makes direct Three.js instantiation type-incompatible with game loop entity consumers.",
+        "evidenceGap": "g-pr-03",
+        "priority": "medium"
+      },
+      "implementationJourney": {
+        "phase1_golden_tables": "Enforce: ComponentSpec types are opaque interfaces. Factory is the only producer.",
+        "phase2_operational": "Code review gate: reject PRs with direct THREE.Group() entity instantiation",
+        "phase3_ai_first": "Agent composability requires registry — enforcement is prerequisite for Phase III"
+      }
+    },
+
+    {
+      "hypothesisId": "H-4",
+      "id": "S-H4-BASE",
+      "type": "base",
+      "label": "H-4 Base: miniplex ECS Standard Operation",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "miniplex World manages all entities with typed components. world.with(HasMesh, HasAnimation) queries return typed entity subsets for RenderSystem and AnimationSystem. Entity add/remove is reactive — world notifies registered systems. Teaching framework interaction callbacks operate on entity component data. Bundle size addition: ~3KB gzipped.",
+      "assumptions": [
+        "1. miniplex v3 API is compatible with TypeScript strict mode (clm-pr-21 confirms TS support)",
+        "2. miniplex bundle size < 5KB gzipped is acceptable for mathcrew web target",
+        "3. Three.js resource cleanup (geometry.dispose() on entity remove) can be handled in miniplex remove event",
+        "4. miniplex entity model aligns with D/L/A DATA domain (entities are plain objects)"
+      ],
+      "evidenceBaseIds": ["clm-pr-21", "clm-pr-24"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 4,
+        "riskSeverity": 4,
+        "reversibility": 4,
+        "timeToValue": 4,
+        "governanceCompliance": 4,
+        "ecosystemMaturity": 3,
+        "dlaFit": 5,
+        "forwardPropHealth": 4,
+        "agentComposability": 4,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "clm-pr-21 confirms miniplex API and developer ergonomics. Missing: explicit TypeScript strict mode compatibility for r183 + Bun.",
+        "implementationDifficulty": "Straightforward — miniplex is developer-friendly. 1-2 weeks with Three.js integration.",
+        "riskSeverity": "Minor — well-maintained library, 6k stars.",
+        "reversibility": "Mostly reversible — can extract systems back to factory pattern if needed.",
+        "timeToValue": "1-2 weeks to working ECS-integrated entity system.",
+        "governanceCompliance": "MIT license — acceptable. Adds external dependency.",
+        "ecosystemMaturity": "2+ years in production use. Growing adoption. Not LTS.",
+        "dlaFit": "ECS is the cleanest D/L/A mapping: entities = DATA, systems = LOGIC, world mutations = ACTION. Score 5.",
+        "forwardPropHealth": "Reactive world notifications provide forward propagation for all system updates.",
+        "agentComposability": "world.with() queries are agent-addressable. Entity components are typed DATA accessible via ontology.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationJourney": {
+        "phase1_golden_tables": "Define entity component interfaces — World entity = DATA struct",
+        "phase2_operational": "Register systems + queries — miniplex World is the operational register",
+        "phase3_ai_first": "Agent queries world via ontology-mapped component filters — strong Phase III"
+      }
+    },
+    {
+      "hypothesisId": "H-4",
+      "id": "S-H4-BEST",
+      "type": "best",
+      "label": "H-4 Best: miniplex ECS Cleanest D/L/A Architecture",
+      "revisionRound": 2,
+      "implementationPhase": "Phase I (Golden Tables)",
+      "description": "Best case: miniplex provides the cleanest possible D/L/A separation — entities are pure DATA, systems are pure LOGIC, add/remove mutations are pure ACTION. World state is the single source of truth for all entities. Teaching framework integration is a miniplex system (TeachingSystem) that queries entities with InteractionState component.",
+      "assumptions": [
+        "1. miniplex World replaces all current scattered entity management code",
+        "2. TeachingSystem as miniplex system provides clean LOGIC separation from game loop",
+        "3. miniplex reactive queries eliminate need for manual entity tracking lists"
+      ],
+      "evidenceBaseIds": ["clm-pr-21", "clm-pr-24", "clm-int-02"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 4,
+        "riskSeverity": 5,
+        "reversibility": 4,
+        "timeToValue": 4,
+        "governanceCompliance": 4,
+        "ecosystemMaturity": 3,
+        "dlaFit": 5,
+        "forwardPropHealth": 5,
+        "agentComposability": 5,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Same evidence as base. Best case assumes clean integration from start.",
+        "implementationDifficulty": "Straightforward — miniplex is developer-friendly by design.",
+        "riskSeverity": "Negligible in best case.",
+        "reversibility": "Mostly reversible.",
+        "timeToValue": "1-2 weeks.",
+        "governanceCompliance": "MIT license acceptable.",
+        "ecosystemMaturity": "Emerging-stable.",
+        "dlaFit": "Perfect D/L/A separation.",
+        "forwardPropHealth": "Reactive world = full forward prop health.",
+        "agentComposability": "World.with() = agent-composable queries at full score.",
+        "prototypeValidation": "Not yet tested."
+      },
       "devcon5AlignmentScore": 5,
+      "implementationJourney": {
+        "phase1_golden_tables": "Define all component interfaces — world = DATA",
+        "phase2_operational": "Register all systems — LOGIC queries over world",
+        "phase3_ai_first": "Agent = miniplex system — directly composable"
+      }
+    },
+    {
+      "hypothesisId": "H-4",
+      "id": "S-H4-WORST",
+      "type": "worst",
+      "label": "H-4 Worst: miniplex API Instability Blocks Integration",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "Worst case: miniplex v3 has breaking API changes. World.with() signature changes between minor versions. TypeScript type inference fails with Three.js complex generic types. Three.js resource cleanup on entity remove is not obvious from miniplex API — leaks geometry/material.",
+      "assumptions": [
+        "1. miniplex < 3 years in production — API may change (clm-pr-21 notes 'aging' freshness)",
+        "2. Three.js Object3D type complexity causes miniplex type inference failures",
+        "3. Entity remove does not automatically call Three.js dispose() — developer must hook it"
+      ],
+      "evidenceBaseIds": ["clm-pr-21"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 3,
+        "riskSeverity": 3,
+        "reversibility": 4,
+        "timeToValue": 3,
+        "governanceCompliance": 4,
+        "ecosystemMaturity": 3,
+        "dlaFit": 5,
+        "forwardPropHealth": 3,
+        "agentComposability": 3,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "API instability risk is speculative — miniplex has 6k stars and appears stable.",
+        "implementationDifficulty": "TypeScript integration debugging: moderate.",
+        "riskSeverity": "Moderate: resource leaks are real risk but solvable with dispose() hooks.",
+        "reversibility": "Mostly reversible — can revert to Factory+Registry if miniplex API fails.",
+        "timeToValue": "API compatibility debugging adds 1-2 weeks.",
+        "governanceCompliance": "No issues.",
+        "ecosystemMaturity": "Lower score: 2-3 years, pre-LTS.",
+        "dlaFit": "ECS D/L/A design remains valid regardless of API issues.",
+        "forwardPropHealth": "Reactive queries at risk if API changes — ForwardProp partially breaks.",
+        "agentComposability": "Agent query API at risk.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 3,
+      "implementationJourney": {
+        "phase1_golden_tables": "Pin miniplex version — add to package.json with exact version",
+        "phase2_operational": "Test Three.js dispose() integration in Phase II prototype",
+        "phase3_ai_first": "Agent composability depends on stable world.with() API"
+      }
+    },
+    {
+      "hypothesisId": "H-4",
+      "id": "S-H4-ADVERSARIAL",
+      "type": "adversarial",
+      "label": "H-4 Adversarial: ECS Over-Engineering for Educational Game Scale",
+      "revisionRound": 2,
+      "implementationPhase": "Phase I (Golden Tables)",
+      "description": "Adversarial: miniplex ECS architecture is correct for 10,000 entities (clm-pr-22 bitECS scale claim) but over-engineered for 20-50 entities in mathcrew. Developer spends time learning ECS patterns (archetypes, system scheduling, component composition) that provide zero value for an educational game with 20 spacekids. Factory+Registry (H-3) achieves same goals with 10x less conceptual overhead.",
+      "assumptions": [
+        "1. miniplex learning curve adds 1 week overhead vs Factory+Registry zero overhead",
+        "2. ECS archetype queries provide zero performance benefit for 20-50 entities",
+        "3. Team is unfamiliar with ECS pattern — onboarding cost is real"
+      ],
+      "evidenceBaseIds": ["clm-pr-23", "clm-pr-22"],
+      "contradictions": [
+        {
+          "id": "CON-H4-ADV-01",
+          "claim": "clm-pr-23 (Inference) says Factory+Registry is sufficient. clm-pr-21 (Official) says miniplex is developer-friendly for TypeScript. These are irreconcilable preferences — both are valid approaches for different teams.",
+          "resolution": "Irreconcilable: both H-3 and H-4 are valid architectural choices. The selection depends on team familiarity and future entity scale ambition. This is a project context decision, not a technical correctness decision.",
+          "contradictionStatus": "unresolvable"
+        }
+      ],
+      "contradictionStatus": "unresolvable",
+      "evidenceSufficiency": "sufficient",
       "evaluationScores": {
         "evidenceFit": 3,
         "implementationDifficulty": 3,
         "riskSeverity": 4,
         "reversibility": 4,
         "timeToValue": 3,
-        "governanceCompliance": 5,
-        "ecosystemMaturity": 4,
+        "governanceCompliance": 4,
+        "ecosystemMaturity": 3,
         "dlaFit": 5,
-        "forwardPropHealth": 5,
+        "forwardPropHealth": 4,
         "agentComposability": 4,
-        "prototypeValidation": 5
+        "prototypeValidation": 3
       },
-      "scoreNotes": {
-        "evidenceFit": "3 — a-B-best-1: clm-ext-26 (tier-1) supports CTML applicability but not specifically Concrete-phase elementary math retention. [Inference] from Spatial Contiguity principle. Flagged as NE-B-01.",
-        "forwardPropHealth": "5 — full chain: TeachingBeat → ContentDeliveryResolver → SpatialAnnotation → TroikaText → WebGL scene. All paths match ontology naming when SpatialAnnotation added to frontend.ts.",
-        "dlaFit": "5 — all 5 domains fully populated with distinct entities per CRA phase.",
-        "prototypeValidation": "5 — proto-cd-B-001 pass: B-T4 (SpatialAnnotation phase filtering), B-T5 (fontSize config by labelType), B-T7 (mesh count correctness) all validate best-case architectural claims. Self-annotating math world pattern is structurally sound."
-      }
-    },
-    {
-      "hypothesisId": "H-B",
-      "id": "S-B-worst",
-      "type": "worst",
-      "revisionRound": 3,
-      "prototypeResult": {"prototypeId": "proto-cd-B-001", "buildStatus": "pass", "passRate": 1.0, "passedCases": 8, "totalCases": 8, "failureModes": [], "openGaps": ["C-B03-1: SDF per-draw-call GPU overhead on low-end hardware — requires device profiling"]},
-      "title": "H-B Worst: troika FPS regression on low-end student hardware forces Concrete-phase fallback to CSS",
-      "description": "On Chromebook-class student hardware (Intel UHD 615, 4GB RAM), adding troika-three-text SDF shader pass + n8ao + postprocessing exceeds 16ms frame budget. Frame rate drops to 30fps during Concrete-phase beats with spatial labels. PerformanceMonitor triggers DPR reduction then postprocessing disable (clm-ext-18). With postprocessing disabled, n8ao is gone — visual quality degrades noticeably. Team falls back to CSS overlay for Concrete phase — effectively H-A.",
-      "assumptions": [
-        {"id": "a-B-worst-1", "text": "troika SDF shader + n8ao + postprocessing stays within 16ms frame budget on Intel UHD 615 GPU", "evidenceIds": ["clm-ext-17", "clm-ext-19"]},
-        {"id": "a-B-worst-2", "text": "PerformanceMonitor fallback (DPR reduction → postprocessing disable — clm-ext-18) is acceptable to users if triggered", "evidenceIds": ["clm-ext-18"]},
-        {"id": "a-B-worst-3", "text": "SpatialAnnotation troika labels are readable after DPR reduction on 768px displays", "evidenceIds": ["clm-ext-04"]}
-      ],
-      "evidenceBaseIds": ["clm-ext-04", "clm-ext-17", "clm-ext-18", "clm-ext-19"],
-      "contradictions": [
-        {
-          "id": "c-B-worst-1",
-          "description": "clm-ext-17 (60fps with 27 meshes, N8AO, postprocessing) is for an optimized scene without dynamic SDF text. clm-ext-19 (troika FPS impact) confidence is 0.60 — specific impact unknown. Actual FPS on target hardware unvalidated.",
-          "status": "detected"
-        }
-      ],
-      "contradictionStatus": "detected",
-      "evidenceSufficiency": "partial",
-      "implementationPhase": "Phase II (Operational)",
-      "devcon5AlignmentScore": 3,
-      "evaluationScores": {
-        "evidenceFit": 3,
-        "implementationDifficulty": 3,
-        "riskSeverity": 3,
-        "reversibility": 4,
-        "timeToValue": 2,
-        "governanceCompliance": 5,
-        "ecosystemMaturity": 4,
-        "dlaFit": 4,
-        "forwardPropHealth": 3,
-        "agentComposability": 3,
-        "prototypeValidation": 4
+      "evaluationRationale": {
+        "evidenceFit": "Both sides of the tension have evidence. Score 3 = partial support.",
+        "implementationDifficulty": "ECS learning curve is moderate but one-time cost.",
+        "riskSeverity": "Minor: over-engineering is a team velocity concern, not a technical failure.",
+        "reversibility": "Mostly reversible to Factory+Registry.",
+        "timeToValue": "1-2 weeks vs H-3's hours.",
+        "governanceCompliance": "MIT license — external dep is minor concern.",
+        "ecosystemMaturity": "Emerging (3 of 5).",
+        "dlaFit": "ECS remains the cleanest D/L/A model.",
+        "forwardPropHealth": "Healthy regardless of over-engineering concern.",
+        "agentComposability": "Strong regardless.",
+        "prototypeValidation": "Not yet tested."
       },
-      "scoreNotes": {
-        "evidenceFit": "3 — c-B-worst-1: FPS impact is [Inference] with 0.60 confidence. NE-B-01 device profiling still required.",
-        "riskSeverity": "3 — moderate: PerformanceMonitor fallback (clm-ext-18) provides a mitigation path. Graceful CSS fallback (B-T6 validated) means worst case is CSS overlay — still functional.",
-        "timeToValue": "2 — 1-2 months: device profiling + fallback implementation required before production.",
-        "forwardPropHealth": "3 — PerformanceMonitor fallback path not yet in ForwardProp chain design.",
-        "prototypeValidation": "4 — proto-cd-B-001: buildStatus=pass. B-T6 (graceful CSS fallback when troikaReady=false) directly validates the worst-case mitigation path. GPU overhead gap (C-B03-1) confirmed open by prototyper. Score 4 not 5: production FPS unvalidated."
-      }
-    },
-    {
-      "hypothesisId": "H-B",
-      "id": "S-B-adversarial",
-      "type": "adversarial",
-      "revisionRound": 3,
-      "prototypeResult": {"prototypeId": "proto-cd-B-001", "buildStatus": "pass", "passRate": 1.0, "passedCases": 8, "totalCases": 8, "failureModes": []},
-      "title": "H-B Adversarial: ContentDeliveryResolver mis-routes assess-phase beat to troika — interactive input fails",
-      "description": "ContentDeliveryResolver routes an assess-phase beat (predict-verify interaction mode) to the troika spatial label renderer instead of CSS overlay. The assess interaction requires a DOM input element for the learner's prediction entry. troika Text mesh has no DOM input capability. Beat stalls — learner cannot submit prediction, teaching session freezes.",
-      "assumptions": [
-        {"id": "a-B-adv-1", "text": "ContentDeliveryResolver TypeScript exhaustive switch covers all CRAMicroPhase × TeachingBeat.phase combinations correctly on first implementation", "evidenceIds": ["clm-int-02", "clm-int-03"]},
-        {"id": "a-B-adv-2", "text": "All assess-phase interaction modes (predict-verify, select-scan, divisor-judge) are correctly classified as requiring CSS overlay in the resolver", "evidenceIds": ["clm-ext-21", "clm-ext-14"]},
-        {"id": "a-B-adv-3", "text": "TypeScript never-check on CRAMicroPhase enum prevents unhandled new enum values from slipping past resolver at compile time", "evidenceIds": ["clm-int-02"]}
-      ],
-      "evidenceBaseIds": ["clm-ext-14", "clm-ext-21", "clm-int-02", "clm-int-03"],
-      "contradictions": [
-        {
-          "id": "c-B-adv-1",
-          "description": "10 interaction modes (pickup-drop, resonance-trial-sequencer, predict-verify, select-scan, observe, divisor-judge, observe-discovery, array-builder, venn-diagram, observe-factor-table) span multiple TeachingBeat.phase values — resolver mapping is a non-trivial matrix, not a simple per-phase lookup.",
-          "status": "resolved",
-          "resolution": "Round 2: Resolver design changed from (CRAMicroPhase) → renderer to (CRAMicroPhase × interactionMode) → renderer. TypeScript never-check on both axes. Assess-mode interactions always → CSS overlay regardless of CRA phase. Compile-time safety guaranteed."
-        }
-      ],
-      "contradictionStatus": "resolved",
-      "evidenceSufficiency": "sufficient",
-      "implementationPhase": "Phase II (Operational)",
       "devcon5AlignmentScore": 4,
-      "evaluationScores": {
-        "evidenceFit": 4,
-        "implementationDifficulty": 3,
-        "riskSeverity": 3,
-        "reversibility": 4,
-        "timeToValue": 3,
-        "governanceCompliance": 5,
-        "ecosystemMaturity": 4,
-        "dlaFit": 5,
-        "forwardPropHealth": 5,
-        "agentComposability": 4,
-        "prototypeValidation": 5
-      },
-      "scoreNotes": {
-        "evidenceFit": "4 — resolver correctness is well-supported by TypeScript type system. Interaction mode × phase matrix is [Synthesis] from decision-log codebase findings.",
-        "riskSeverity": "3 — moderate: TypeScript never-check prevents silent failures. Worst case is a compile error caught pre-deploy, not a runtime freeze.",
-        "dlaFit": "5 — resolver design exposes clean CRAMicroPhase × interactionMode classification — all entities correctly placed.",
-        "forwardPropHealth": "5 — resolver routing is fully typed and ontology-matched: interactionMode maps to obj-cd-14 through obj-cd-18 entities correctly.",
-        "prototypeValidation": "5 — proto-cd-B-001: B-T3 (all 5 phases exhaustively handled), B-T2 (practice → css-overlay), B-T1 (motivate → diegetic) all pass. Adversarial routing failure scenario directly disproved by TypeScript never-check + exhaustive test coverage."
+      "implementationJourney": {
+        "phase1_golden_tables": "Start with Factory+Registry — prove it insufficient before adopting ECS",
+        "phase2_operational": "If entity system grows complex in Phase II, migrate to miniplex",
+        "phase3_ai_first": "Phase III AI-First favors miniplex world.with() agent queries"
       }
     },
 
     {
-      "hypothesisId": "H-C",
-      "id": "S-C-base",
+      "hypothesisId": "H-5",
+      "id": "S-H5-BASE",
       "type": "base",
-      "revisionRound": 3,
-      "title": "H-C Base: three-mesh-ui replaces speech-bubble.ts in 12 weeks — MSDF panels in scene graph",
-      "description": "three-mesh-ui v6.5.4 Block+Text panels replace speech-bubble.ts for all content delivery. MSDF font files pre-generated for Korean + Latin characters at build time. ThreeMeshUI.update() added to game loop. All 10 interaction modes adapted for 3D raycasting. Hidden ARIA shadow DOM provides accessibility bridge.",
-      "assumptions": [
-        {"id": "a-C-b-1", "text": "three-mesh-ui v6.5.4 (last release 2023-03-24 — clm-ext-09) is compatible with Three.js 0.183.2 without breaking changes", "evidenceIds": ["clm-ext-08", "clm-ext-09"]},
-        {"id": "a-C-b-2", "text": "MSDF font generation for Korean characters integrates with Vite 8.0.5 + Bun build pipeline without manual configuration overhaul", "evidenceIds": ["clm-ext-08"]},
-        {"id": "a-C-b-3", "text": "Hidden ARIA shadow DOM technique provides WCAG 2.1 Level AA compliance accepted by educational platform auditor", "evidenceIds": []},
-        {"id": "a-C-b-4", "text": "ThreeMeshUI.update() per-frame call does not introduce frame budget regression with n8ao + postprocessing in full scene", "evidenceIds": ["clm-ext-08", "clm-ext-17"]}
-      ],
-      "evidenceBaseIds": ["clm-ext-08", "clm-ext-09", "clm-ext-17"],
-      "contradictions": [
-        {
-          "id": "c-C-b-1",
-          "description": "a-C-b-1: three-mesh-ui last release was 2023-03-24 (clm-ext-09 — 3+ years stale as of 2026-04-12). Three.js has had 12+ minor releases since then. Three.js 0.183.x compatibility is unverified.",
-          "status": "detected"
-        },
-        {
-          "id": "c-C-b-2",
-          "description": "a-C-b-3 (ARIA shadow DOM WCAG compliance) has zero evidence IDs. WCAG 2.1 Level AA is typically required for K-12 educational software under Section 508.",
-          "status": "detected"
-        }
-      ],
-      "contradictionStatus": "detected",
-      "evidenceSufficiency": "partial",
+      "label": "H-5 Base: DragControls+Proxy Standard Operation",
+      "revisionRound": 2,
       "implementationPhase": "Phase II (Operational)",
-      "devcon5AlignmentScore": 3,
-      "evaluationScores": {
-        "evidenceFit": 2,
-        "implementationDifficulty": 2,
-        "riskSeverity": 2,
-        "reversibility": 2,
-        "timeToValue": 2,
-        "governanceCompliance": 2,
-        "ecosystemMaturity": 2,
-        "dlaFit": 4,
-        "forwardPropHealth": 3,
-        "agentComposability": 3,
-        "prototypeValidation": 3
-      },
-      "scoreNotes": {
-        "evidenceFit": "2 — a-C-b-3 has zero evidence IDs (accessibility compliance). a-C-b-1 (Three.js compatibility) conflicts with clm-ext-09 staleness. Core assumptions significantly unsupported.",
-        "implementationDifficulty": "2 — difficult: MSDF font generation pipeline, 10 interaction mode reworks, ARIA shadow DOM, Vite build changes. 10-14 weeks.",
-        "riskSeverity": "2 — severe: three-mesh-ui staleness (clm-ext-09) + WCAG risk (c-C-b-2) are compounding. Both could block production deployment.",
-        "reversibility": "2 — difficult: replacing speech-bubble.ts entirely commits to three-mesh-ui contract. Reversion requires weeks.",
-        "timeToValue": "2 — 1-2 months before anything usable.",
-        "governanceCompliance": "2 — significant gap: WCAG 2.1 Level AA not satisfied without evidence-backed ARIA shadow DOM technique. Major compliance work needed.",
-        "ecosystemMaturity": "2 — three-mesh-ui: last release 2023-03-24 (clm-ext-09). Low activity (63 open issues). v7 in PR but unreleased. Early-stage risk for production.",
-        "dlaFit": "4 — D/L/A boundaries are clean in the design, but DATA contract (SpeechBubbleContent → ContentMesh) is a breaking change.",
-        "forwardPropHealth": "3 — ForwardProp chain exists in design but SpeechBubbleContent → ContentMesh transition is not traced in ontology. Significant gap.",
-        "contradictionNote": "c-C-b-1 and c-C-b-2 both require external research (NE-C-01) before prototype T8 can be scoped."
-      }
-    },
-    {
-      "hypothesisId": "H-C",
-      "id": "S-C-best",
-      "type": "best",
-      "revisionRound": 3,
-      "title": "H-C Best: Full WebGL content with postprocessing glow on vocabulary terms — maximum immersion",
-      "description": "three-mesh-ui panels are standard Three.js Object3Ds — postprocessing bloom can be selectively applied to content panels, making vocabulary terms glow. n8ao ambient occlusion adds depth to panel placement. Shader transitions between beats are native Three.js animations. The math world and teaching content are a visually unified experience.",
+      "description": "DragControls bound to invisible BoxGeometry proxy meshes (one per draggable entity). Entity Group.position updated to proxy.position in animation loop. Grid snap applied via Math.round formula on 'drag' event. Proximity detection via Vector3.distanceTo per-frame. touch-action:none on canvas for tablet compatibility.",
       "assumptions": [
-        {"id": "a-C-best-1", "text": "Selective bloom via postprocessing selective bloom pass can target three-mesh-ui Block objects without blooming the full scene", "evidenceIds": ["clm-ext-17"]},
-        {"id": "a-C-best-2", "text": "CTML design quality (clm-ext-27) applied to WebGL content panels achieves equivalent or better learning outcomes vs CSS overlay", "evidenceIds": ["clm-ext-26", "clm-ext-27"]},
-        {"id": "a-C-best-3", "text": "ARIA shadow DOM bridge is accepted by WCAG auditor and provides equivalent accessibility to DOM-native text", "evidenceIds": []}
+        "1. DragControls proxy pattern (clm-pr-30) works correctly with Three.js r183",
+        "2. Grid snap formula (clm-pr-31) produces integer-valued cell positions matching InteractionMode board",
+        "3. Vector3.distanceTo() at 60fps for 20-50 entities has negligible performance cost",
+        "4. touch-action:none (clm-pr-33) resolves all tablet scroll conflicts"
       ],
-      "evidenceBaseIds": ["clm-ext-17", "clm-ext-26", "clm-ext-27"],
-      "contradictions": [
-        {
-          "id": "c-C-best-1",
-          "description": "a-C-best-3 (ARIA shadow DOM WCAG acceptance) has zero evidence IDs. This is a critical dependency for deployment — cannot be assumed.",
-          "status": "detected"
-        }
-      ],
-      "contradictionStatus": "detected",
-      "evidenceSufficiency": "partial",
-      "implementationPhase": "Phase III (AI-First)",
-      "devcon5AlignmentScore": 4,
-      "evaluationScores": {
-        "evidenceFit": 2,
-        "implementationDifficulty": 1,
-        "riskSeverity": 2,
-        "reversibility": 2,
-        "timeToValue": 1,
-        "governanceCompliance": 2,
-        "ecosystemMaturity": 2,
-        "dlaFit": 4,
-        "forwardPropHealth": 3,
-        "agentComposability": 3,
-        "prototypeValidation": 3
-      },
-      "scoreNotes": {
-        "evidenceFit": "2 — a-C-best-3 has zero evidence IDs. a-C-best-1 (selective bloom on three-mesh-ui) is [Inference] — not validated in source-map.",
-        "implementationDifficulty": "1 — extremely hard: selective bloom configuration, full scene graph redesign, 3+ months.",
-        "riskSeverity": "2 — severe: WCAG compliance gap + three-mesh-ui staleness are unresolved blockers.",
-        "timeToValue": "1 — >2 months before anything usable.",
-        "governanceCompliance": "2 — significant gap same as base case: WCAG 2.1 Level AA unresolved."
-      }
-    },
-    {
-      "hypothesisId": "H-C",
-      "id": "S-C-worst",
-      "type": "worst",
-      "revisionRound": 3,
-      "title": "H-C Worst: three-mesh-ui Three.js 0.183.2 incompatibility discovered after 6 weeks of migration work",
-      "description": "After 6 weeks of implementing three-mesh-ui Block+Text panels, team discovers that three-mesh-ui v6.5.4's MSDF shader is incompatible with a Three.js 0.183.x internal change (last release 2023-03-24 — clm-ext-09). Text panels do not render. v7 PR#223 is not released. Team must patch three-mesh-ui themselves or abandon H-C and revert to H-B, losing 6 weeks of work.",
-      "assumptions": [
-        {"id": "a-C-worst-1", "text": "three-mesh-ui v6.5.4 MSDF shader is compatible with Three.js 0.183.2 API surface", "evidenceIds": ["clm-ext-09"]},
-        {"id": "a-C-worst-2", "text": "three-mesh-ui v7 will be released before mathcrew's production deployment window", "evidenceIds": ["clm-ext-09"]},
-        {"id": "a-C-worst-3", "text": "three-mesh-ui maintainer activity is sufficient to respond to Three.js compatibility PRs within weeks", "evidenceIds": ["clm-ext-09"]}
-      ],
-      "evidenceBaseIds": ["clm-ext-09"],
-      "contradictions": [
-        {
-          "id": "c-C-worst-1",
-          "description": "clm-ext-09: three-mesh-ui last release 2023-03-24, 63 open issues, 11 open PRs, v7 in PR but unreleased. Low maintenance activity. Three.js 0.183.2 compatibility is unverified and unlikely to have been tested.",
-          "status": "detected"
-        }
-      ],
-      "contradictionStatus": "detected",
-      "evidenceSufficiency": "partial",
-      "implementationPhase": "Phase II (Operational)",
-      "devcon5AlignmentScore": 2,
+      "evidenceBaseIds": ["clm-pr-06", "clm-pr-30", "clm-pr-31", "clm-pr-32", "clm-pr-33"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "sufficient",
       "evaluationScores": {
         "evidenceFit": 4,
+        "implementationDifficulty": 4,
+        "riskSeverity": 4,
+        "reversibility": 4,
+        "timeToValue": 4,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 5,
+        "forwardPropHealth": 4,
+        "agentComposability": 3,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "clm-pr-06 is Official for DragControls. clm-pr-30 is Synthesis (confidence 0.85). clm-pr-31 is Synthesis. All current freshnessStatus.",
+        "implementationDifficulty": "Straightforward — documented proxy pattern. 1-2 weeks including grid snap + proximity.",
+        "riskSeverity": "Minor — proxy pattern is standard workaround. DragControls is built-in.",
+        "reversibility": "Mostly reversible — proxy mesh easily removed or replaced.",
+        "timeToValue": "1-2 weeks to working drag interaction.",
+        "governanceCompliance": "Built-in Three.js — no licensing concerns.",
+        "ecosystemMaturity": "Three.js DragControls: mature, 5+ years.",
+        "dlaFit": "DragState (DATA), SnapPositionDeriver (LOGIC), DragDispatch (ACTION) — clean boundaries.",
+        "forwardPropHealth": "DragEnd ACTION → InteractionMode trigger → teaching state. Clean chain.",
+        "agentComposability": "DragDispatch ACTION can be agent-initiated. Missing: formal schema.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationJourney": {
+        "phase1_golden_tables": "Define DragState + SnapGridConfig as typed DATA structs",
+        "phase2_operational": "Implement DragControls proxy + SnapPositionDeriver + ProximityEvaluator — Phase II",
+        "phase3_ai_first": "Agent triggers DragDispatch ACTION via typed EntityRef + targetPosition — Phase III"
+      }
+    },
+    {
+      "hypothesisId": "H-5",
+      "id": "S-H5-BEST",
+      "type": "best",
+      "label": "H-5 Best: DragControls Proxy Resolves GLTF Incompatibility Cleanly",
+      "revisionRound": 2,
+      "implementationPhase": "Phase I (Golden Tables)",
+      "description": "Best case: proxy pattern works first attempt without animation disruption. Grid snap formula produces visually-correct placement on first commit. Proximity detection fires correctly for all 10 InteractionMode types. touch-action:none has zero unexpected side effects on target tablets.",
+      "assumptions": [
+        "1. DragControls r183 proxy pattern is identical to documented community pattern (clm-pr-30)",
+        "2. Grid snap formula works for all InteractionMode board sizes",
+        "3. All 10 InteractionMode types have compatible placement semantics with grid snap"
+      ],
+      "evidenceBaseIds": ["clm-pr-30", "clm-pr-31"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 4,
+        "implementationDifficulty": 5,
+        "riskSeverity": 5,
+        "reversibility": 5,
+        "timeToValue": 5,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 5,
+        "forwardPropHealth": 5,
+        "agentComposability": 3,
+        "prototypeValidation": 3
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationJourney": {
+        "phase1_golden_tables": "SnapGridConfig struct + DragState struct defined in Phase I",
+        "phase2_operational": "Full drag system in Phase II — all interaction modes",
+        "phase3_ai_first": "Agent-composable drag via ACTION schema"
+      }
+    },
+    {
+      "hypothesisId": "H-5",
+      "id": "S-H5-WORST",
+      "type": "worst",
+      "label": "H-5 Worst: DragControls Proxy Breaks AnimationMixer",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "Worst case: proxy pattern causes animation discontinuity — AnimationMixer loses track of root motion when character Group.position is set imperatively from proxy position. Touch events on tablet fire both scroll and drag simultaneously despite touch-action:none (OS-level edge gesture conflicts per clm-pr-33). Grid snap produces half-cell offset due to world coordinate vs screen coordinate mismatch.",
+      "assumptions": [
+        "1. Imperatively setting Group.position from proxy position conflicts with AnimationMixer root motion (clm-pr-09)",
+        "2. iOS Safari ignores touch-action:none in certain gesture contexts",
+        "3. Grid snap formula requires camera-specific coordinate transformation not documented in clm-pr-31"
+      ],
+      "evidenceBaseIds": ["clm-pr-09", "clm-pr-33"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 2,
         "implementationDifficulty": 2,
-        "riskSeverity": 1,
-        "reversibility": 2,
+        "riskSeverity": 2,
+        "reversibility": 3,
         "timeToValue": 2,
-        "governanceCompliance": 4,
-        "ecosystemMaturity": 2,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 4,
+        "forwardPropHealth": 3,
+        "agentComposability": 2,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Worst case assumptions are speculative — proxy pattern is documented community practice.",
+        "implementationDifficulty": "If root motion conflict occurs: significant debugging and possibly custom AnimationMixer integration.",
+        "riskSeverity": "Severe: touch interaction failure on tablet would be user-facing.",
+        "reversibility": "Significant refactoring if proxy pattern fails — weeks.",
+        "timeToValue": "Debugging root motion conflicts could take weeks.",
+        "governanceCompliance": "No issues.",
+        "ecosystemMaturity": "No issues.",
+        "dlaFit": "D/L/A design remains valid — implementation complexity is the issue.",
+        "forwardPropHealth": "DragEnd → InteractionMode chain breaks if drag doesn't complete correctly.",
+        "agentComposability": "Agent drag fails if underlying mechanism is broken.",
+        "prototypeValidation": "Not yet tested — T7 prototype should specifically test proxy+AnimationMixer interaction."
+      },
+      "devcon5AlignmentScore": 3,
+      "nextExperiment": {
+        "id": "NE-H5-WORST-01",
+        "description": "Prototype specifically: DragControls proxy bound to animated GLTF spacekid. Verify animation continues uninterrupted during drag. Test on tablet (touch-action). This is the critical unknown for H-5.",
+        "evidenceGap": "g-pr-04",
+        "priority": "high"
+      },
+      "implementationJourney": {
+        "phase1_golden_tables": "Phase I: define DragState DATA struct — independent of implementation",
+        "phase2_operational": "Phase II critical test: proxy pattern with animated GLTF",
+        "phase3_ai_first": "Phase III requires working drag for interactive learning scenarios"
+      }
+    },
+    {
+      "hypothesisId": "H-5",
+      "id": "S-H5-ADVERSARIAL",
+      "type": "adversarial",
+      "label": "H-5 Adversarial: Drag-Based Interaction is Cognitively Suboptimal",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "Adversarial: drag-and-drop interaction paradigm for math manipulatives may introduce extraneous cognitive load per CLT. Students attend to the drag mechanism (where to put the spacekid) rather than the mathematical concept (grouping, counting). CTML Coherence Principle: drag UI is \"decorative\" if the interaction doesn't serve the learning objective. H-6 spatial proximity may achieve same math interaction with less extraneous UI mechanics.",
+      "assumptions": [
+        "1. Drag-and-drop adds extraneous cognitive load for Korean elementary school learners",
+        "2. Current InteractionMode types (pickup-drop, array-builder) require explicit drag — not optional",
+        "3. CTML Coherence violation: drag handle affordances add visual noise without learning benefit"
+      ],
+      "evidenceBaseIds": ["clm-pr-06", "clm-pr-30"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 4,
+        "riskSeverity": 3,
+        "reversibility": 4,
+        "timeToValue": 4,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 5,
+        "dlaFit": 4,
+        "forwardPropHealth": 4,
+        "agentComposability": 3,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "CTML concern is a legitimate pedagogical risk but not supported by specific evidence for this age group.",
+        "implementationDifficulty": "DragControls proxy is straightforward regardless of pedagogical debate.",
+        "riskSeverity": "Moderate: pedagogical effectiveness risk.",
+        "reversibility": "Can layer H-6 spatial proximity on top of drag — orthogonal systems.",
+        "timeToValue": "No impact on implementation timeline.",
+        "governanceCompliance": "No issues.",
+        "ecosystemMaturity": "No issues.",
+        "dlaFit": "Interaction pattern doesn't affect D/L/A quality.",
+        "forwardPropHealth": "No impact.",
+        "agentComposability": "No impact.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 4,
+      "implementationJourney": {
+        "phase1_golden_tables": "InteractionMode DATA includes interactionType field — drag vs proximity are both DATA-specified",
+        "phase2_operational": "Implement drag AND proximity — make both InteractionMode options available",
+        "phase3_ai_first": "Agent selects interaction paradigm per student's CLT profile"
+      }
+    },
+
+    {
+      "hypothesisId": "H-6",
+      "id": "S-H6-BASE",
+      "type": "base",
+      "label": "H-6 Base: Gesture+Proximity Standard Operation",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "GestureClassifier processes pointer event stream and classifies drag/flick/tap. PlacementZones defined as sphere volumes in 3D world space. Entity moved toward nearest PlacementZone on flick gesture. ProximityEvaluator determines which zone entity entered. Teaching framework receives zone-based placement events.",
+      "assumptions": [
+        "1. Pointer event velocity analysis is sufficient for reliable gesture classification on tablet",
+        "2. PlacementZone sphere volumes are sufficient for math manipulative placement scenarios",
+        "3. GestureClassifier custom implementation is achievable in < 2 weeks"
+      ],
+      "evidenceBaseIds": ["clm-pr-32", "clm-pr-33"],
+      "contradictions": [
+        {
+          "id": "CON-H6-BASE-01",
+          "claim": "H-5 uses DragControls built-in (Official, clm-pr-06). H-6 requires custom GestureClassifier (no Three.js built-in). This is an irreconcilable complexity difference.",
+          "resolution": "Irreconcilable: H-5 uses official built-in API; H-6 requires custom implementation. Both are valid for different design goals. Split into separate scenarios as designed.",
+          "contradictionStatus": "unresolvable"
+        }
+      ],
+      "contradictionStatus": "unresolvable",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 2,
+        "implementationDifficulty": 2,
+        "riskSeverity": 3,
+        "reversibility": 3,
+        "timeToValue": 2,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 3,
+        "dlaFit": 4,
+        "forwardPropHealth": 3,
+        "agentComposability": 3,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Limited evidence for gesture-first approach. clm-pr-33 covers pointer events; clm-pr-32 covers proximity. GestureClassifier has no evidence support.",
+        "implementationDifficulty": "Custom gesture recognition is significantly harder than DragControls proxy. 1-2 months for reliable cross-device gesture classifier.",
+        "riskSeverity": "Moderate: gesture classification accuracy on tablet is highly device-dependent.",
+        "reversibility": "Mostly reversible — can fall back to H-5 DragControls, proximity detection preserved.",
+        "timeToValue": "1-2 months — long development cycle.",
+        "governanceCompliance": "No licensing concerns.",
+        "ecosystemMaturity": "Gesture classification is not an established Three.js pattern — emerging approach.",
+        "dlaFit": "GestureState (DATA), GestureClassifier (LOGIC), GestureEventDispatch (ACTION) — clean design.",
+        "forwardPropHealth": "Chain: GestureState → GestureClassifier → ZonePlacement → InteractionMode. Design is valid but implementation risk is high.",
+        "agentComposability": "GestureEventDispatch ACTION can be agent-triggered. Limited utility for automated testing.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 3,
+      "implementationJourney": {
+        "phase1_golden_tables": "Define GestureState + PlacementZone structs — fast DATA layer",
+        "phase2_operational": "Custom GestureClassifier implementation — high Phase II risk",
+        "phase3_ai_first": "Agent-composable if GestureState is typed — but Phase III unlikely before Phase II stable"
+      }
+    },
+    {
+      "hypothesisId": "H-6",
+      "id": "S-H6-BEST",
+      "type": "best",
+      "label": "H-6 Best: Natural Gesture Paradigm Eliminates Drag UI Overhead",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "Best case: GestureClassifier correctly classifies all gesture types on first tablet test. PlacementZones naturally align with math board layout. No drag handle affordances needed — touch-to-move feels natural for Korean elementary school learners. CTML extraneous load is lower than DragControls approach.",
+      "assumptions": [
+        "1. Pointer event velocity thresholds for flick vs drag are universal across target tablets",
+        "2. PlacementZone radii match natural finger placement precision of target age group",
+        "3. Gesture-based interaction produces correct InteractionMode event sequences"
+      ],
+      "evidenceBaseIds": ["clm-pr-32", "clm-pr-33"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "insufficient",
+      "evaluationScores": {
+        "evidenceFit": 1,
+        "implementationDifficulty": 2,
+        "riskSeverity": 4,
+        "reversibility": 3,
+        "timeToValue": 2,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 3,
+        "dlaFit": 4,
+        "forwardPropHealth": 3,
+        "agentComposability": 3,
+        "prototypeValidation": 3
+      },
+      "evaluationRationale": {
+        "evidenceFit": "Best case assumptions are largely speculative — no evidence for gesture universality across tablets or age-appropriate precision.",
+        "implementationDifficulty": "Even in best case: GestureClassifier requires custom implementation — not trivial.",
+        "riskSeverity": "Minor in best case.",
+        "reversibility": "Mostly reversible.",
+        "timeToValue": "Still 1-2 months minimum for reliable implementation.",
+        "governanceCompliance": "No issues.",
+        "ecosystemMaturity": "Not established pattern.",
+        "dlaFit": "D/L/A design is clean.",
+        "forwardPropHealth": "Chain valid if implementation succeeds.",
+        "agentComposability": "Moderate.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 3,
+      "implementationJourney": {
+        "phase1_golden_tables": "Define GestureState DATA with typed gesture vocabulary",
+        "phase2_operational": "Implement in Phase II — but de-prioritized vs H-5 DragControls",
+        "phase3_ai_first": "Consider in Phase III as enhancement over baseline DragControls"
+      }
+    },
+    {
+      "hypothesisId": "H-6",
+      "id": "S-H6-WORST",
+      "type": "worst",
+      "label": "H-6 Worst: GestureClassifier Unreliable on Target Devices",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "Worst case: GestureClassifier has < 70% classification accuracy on Galaxy Tab A and Samsung Chromebook (target school hardware). False positives trigger incorrect InteractionMode transitions. OS edge swipe gestures (clm-pr-33) steal events from canvas even with touch-action:none. Students abandon tasks due to unresponsive interaction.",
+      "assumptions": [
+        "1. Pointer event timing is inconsistent across Galaxy Tab A, iPad, and Chromebook",
+        "2. OS-level edge gestures steal events that cannot be prevented with CSS touch-action",
+        "3. Classification accuracy < 70% is unacceptable for educational interaction"
+      ],
+      "evidenceBaseIds": ["clm-pr-33"],
+      "contradictions": [],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "partial",
+      "evaluationScores": {
+        "evidenceFit": 3,
+        "implementationDifficulty": 1,
+        "riskSeverity": 1,
+        "reversibility": 3,
+        "timeToValue": 1,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 3,
         "dlaFit": 3,
         "forwardPropHealth": 2,
         "agentComposability": 2,
         "prototypeValidation": 3
       },
-      "scoreNotes": {
-        "evidenceFit": "4 — c-C-worst-1 (staleness) is tier-2 Official evidence (clm-ext-09). Assumptions a-C-worst-2 and a-C-worst-3 are contradicted by this evidence. Well-grounded worst case.",
-        "riskSeverity": "1 — critical: 6 weeks sunk + no migration path without patching unmaintained library or forking. Project failure risk if this occurs.",
-        "reversibility": "2 — difficult: 6 weeks of speech-bubble.ts replacement work must be unwound. Re-extraction of content logic is substantial.",
-        "ecosystemMaturity": "2 — three-mesh-ui: early/stale. 3+ year release gap. This scenario is the direct consequence of that maturity score.",
-        "forwardPropHealth": "2 — if three-mesh-ui fails, the entire ForwardProp chain for H-C breaks. No fallback path in the chain design.",
-        "contradictionNote": "c-C-worst-1 is the highest-confidence contradiction in the simulation. NE-C-01 (compatibility verification) is p0 before any H-C work begins."
+      "evaluationRationale": {
+        "evidenceFit": "OS edge gesture risk (clm-pr-33 §GEST.OS-02) is Official — edge zone conflicts are documented.",
+        "implementationDifficulty": "Extremely hard: cross-device gesture reliability requires extensive device testing.",
+        "riskSeverity": "Critical: unresponsive interaction on school hardware = project failure for this use case.",
+        "reversibility": "Fallback to H-5 DragControls is available — weeks of rework.",
+        "timeToValue": "> 2 months with device testing cycles.",
+        "governanceCompliance": "No issues.",
+        "ecosystemMaturity": "Not established pattern — high ecosystem risk.",
+        "dlaFit": "Classification failure means GestureState is unreliable — DATA quality breaks.",
+        "forwardPropHealth": "Forward chain breaks at GestureClassifier LOGIC if classification is unreliable.",
+        "agentComposability": "Agent operations fail if gesture classification is unreliable.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 2,
+      "implementationJourney": {
+        "phase1_golden_tables": "Phase I: define GestureState with accuracy metric — monitor from start",
+        "phase2_operational": "Phase II gate: if accuracy < 80% on target devices, abandon H-6 for H-5",
+        "phase3_ai_first": "Cannot reach Phase III with unreliable gesture input"
       }
     },
     {
-      "hypothesisId": "H-C",
-      "id": "S-C-adversarial",
+      "hypothesisId": "H-6",
+      "id": "S-H6-ADVERSARIAL",
       "type": "adversarial",
-      "revisionRound": 3,
-      "title": "H-C Adversarial: WCAG 2.1 Level AA failure blocks K-12 educational deployment",
-      "description": "three-mesh-ui replaces all DOM text. ARIA shadow DOM bridge is implemented. Educational platform accessibility audit finds WCAG 2.1 Level AA failure on 1.3.1 (Info and Relationships) and 4.1.2 (Name, Role, Value). Auditor rejects shadow DOM technique as insufficient — content must be in real DOM accessible tree. Deployment to school districts is blocked until DOM text layer is reintroduced, effectively forcing migration to H-B architecture.",
+      "label": "H-6 Adversarial: Gesture Approach Rejects Grid Math Manipulatives",
+      "revisionRound": 2,
+      "implementationPhase": "Phase II (Operational)",
+      "description": "Adversarial: H-6 rejects the grid-snap paradigm (clm-pr-31) in favor of zone-based placement. However, 6 of 10 InteractionMode types (array-builder, venn-diagram, observe-factor-table, pickup-drop, divisor-judge, resonance-trial-sequencer) require discrete grid positions for mathematical correctness. Zone placement introduces positional ambiguity that is pedagogically invalid for discrete math manipulatives.",
       "assumptions": [
-        {"id": "a-C-adv-1", "text": "Target educational deployment platforms do not require WCAG 2.1 Level AA for 3D browser apps", "evidenceIds": []},
-        {"id": "a-C-adv-2", "text": "Hidden ARIA shadow DOM technique satisfies 1.3.1 Info and Relationships and 4.1.2 Name Role Value under WCAG 2.1 Level AA", "evidenceIds": []},
-        {"id": "a-C-adv-3", "text": "K-12 school districts accept WebGL-only text rendering for assistive technology (NVDA, VoiceOver, JAWS) users", "evidenceIds": []}
+        "1. 6/10 InteractionModes require discrete (integer-valued) placement positions",
+        "2. PlacementZones cannot guarantee discrete placement precision",
+        "3. Mathematical correctness requires exact cell placement, not approximate zone membership"
       ],
-      "evidenceBaseIds": [],
+      "evidenceBaseIds": ["clm-pr-31", "clm-pr-36"],
       "contradictions": [
         {
-          "id": "c-C-adv-1",
-          "description": "a-C-adv-1, a-C-adv-2, a-C-adv-3 all have zero evidence IDs. WCAG 2.1 Level AA is standard for K-12 educational software under US Section 508 and state laws. WebGL-only text has no DOM accessibility tree.",
-          "status": "detected"
+          "id": "CON-H6-ADV-01",
+          "claim": "clm-pr-31 uses grid snap (discrete placement). clm-pr-36 confirms InteractionModes use array/venn/table structures requiring precise placement. H-6 PlacementZone rejects grid snap.",
+          "resolution": "Irreconcilable: H-6 must either incorporate grid snap within zones (defeating the gesture purpose) or accept mathematical ambiguity. This is a fundamental design tension between natural gesture (continuous) and math manipulative semantics (discrete).",
+          "contradictionStatus": "unresolvable"
         }
       ],
-      "contradictionStatus": "detected",
-      "evidenceSufficiency": "insufficient",
-      "implementationPhase": "Phase II (Operational)",
-      "devcon5AlignmentScore": 1,
+      "contradictionStatus": "unresolvable",
+      "evidenceSufficiency": "sufficient",
       "evaluationScores": {
-        "evidenceFit": 1,
+        "evidenceFit": 4,
         "implementationDifficulty": 2,
         "riskSeverity": 1,
-        "reversibility": 2,
+        "reversibility": 4,
         "timeToValue": 2,
-        "governanceCompliance": 1,
-        "ecosystemMaturity": 2,
-        "dlaFit": 2,
-        "forwardPropHealth": 1,
-        "agentComposability": 1,
+        "governanceCompliance": 5,
+        "ecosystemMaturity": 3,
+        "dlaFit": 3,
+        "forwardPropHealth": 2,
+        "agentComposability": 2,
         "prototypeValidation": 3
       },
-      "scoreNotes": {
-        "evidenceFit": "1 — all three assumptions have zero evidence IDs. Scenario is speculative in the favorable direction. evidenceSufficiency: insufficient.",
-        "riskSeverity": "1 — critical: if WCAG 2.1 Level AA is required and WebGL-only fails, deployment is blocked. No workaround short of reintroducing DOM.",
-        "governanceCompliance": "1 — non-compliant baseline assumption. Blocks deployment until WCAG resolved.",
-        "forwardPropHealth": "1 — no meaningful propagation chain: WebGL content has no DOM accessibility surface. Ontology disconnected from AT layer.",
-        "agentComposability": "1 — no agent composability for WebGL-native content: AT-based agents cannot discover or enumerate content.",
-        "devcon5AlignmentScore": "1 — not aligned: ontology surface (teaching content) is not accessible to semantic consumers (AT, agents). Core DDD/OCP/PECS principles fail at the accessibility boundary.",
-        "note": "This scenario CANNOT support a recommendation per evidence sufficiency rules. NE-C-01 is p0 prerequisite."
+      "evaluationRationale": {
+        "evidenceFit": "This contradiction is well-evidenced: clm-pr-31 (grid snap for math) + clm-pr-36 (InteractionMode array/grid types) both support the adversarial claim.",
+        "implementationDifficulty": "Cannot resolve without fundamental redesign of gesture or interaction paradigm.",
+        "riskSeverity": "Critical: mathematical incorrectness in educational tool is a fundamental failure.",
+        "reversibility": "Mostly reversible — fall back to H-5 DragControls with grid snap.",
+        "timeToValue": "Long development cycle, fundamental design conflict.",
+        "governanceCompliance": "No issues.",
+        "ecosystemMaturity": "No issues.",
+        "dlaFit": "Adversarial scenario reveals D/L/A gap: InteractionMode DATA requires discrete placement, but H-6 LOGIC provides continuous zones.",
+        "forwardPropHealth": "ForwardProp breaks: discrete InteractionMode DATA → continuous zone LOGIC → ambiguous ACTION. Chain semantics mismatch.",
+        "agentComposability": "Agent cannot determine correct grid position from zone membership alone.",
+        "prototypeValidation": "Not yet tested."
+      },
+      "devcon5AlignmentScore": 2,
+      "implementationJourney": {
+        "phase1_golden_tables": "This scenario invalidates H-6 as primary interaction paradigm for grid-based InteractionModes",
+        "phase2_operational": "H-6 may be valid for non-grid InteractionModes (observe, predict-verify) — hybrid approach possible",
+        "phase3_ai_first": "H-6 is Phase III enhancement for non-discrete interactions; H-5 remains primary"
       }
     }
   ],
@@ -694,223 +1472,201 @@
   "revisionHistory": [
     {
       "round": 1,
-      "timestamp": "2026-04-12T12:15:00Z",
+      "timestamp": "2026-04-12T20:00:00Z",
       "changesApplied": [
-        "Generated 12 initial scenarios (4 per hypothesis) grounded in completed world-model (obj-cd-01 through obj-cd-20) and source-map evidence (clm-ext-01 through clm-ext-27, clm-int-01 through clm-int-07)",
-        "Scored all 11 dimensions per scoring-rubric.md for all 12 scenarios",
-        "Applied D/L/A justification to all 3 hypotheses using world-model domain classification",
-        "Identified 6 initial contradictions across 3 hypotheses",
-        "Resolved c-A-b-1 (CSS Spatial Contiguity limitation) — scoped H-A to Representational/Abstract phases",
-        "Resolved c-A-adv-1 (prefers-reduced-motion) — mandated in implementation spec + axe-core Playwright integration",
-        "Changed ContentDeliveryResolver routing key from CRAMicroPhase to CRAMicroPhase × interactionMode (c-B-adv-1 fix)",
-        "Elevated S-C-adversarial to evidenceSufficiency: insufficient — all 3 WCAG assumptions have zero evidence IDs"
+        "Generated all 6 hypotheses (H-1 through H-6) grounded in D/L/A ontology",
+        "Generated all 24 scenarios (4 per hypothesis) with initial scores",
+        "Classified all contradictions per scoring-rubric.md rules",
+        "Assessed evidenceSufficiency for all scenarios"
       ],
-      "contradictionsResolved": ["c-A-b-1", "c-A-adv-1"],
-      "contradictionsRemaining": [
-        "c-A-best-1 (evidence-gap: CSS effectiveness vs diegetic for retention)",
-        "c-B-b-1 (evidence-gap: troika FPS impact in full mathcrew scene)",
-        "c-B-worst-1 (evidence-gap: FPS on Chromebook-class GPU with troika)",
-        "c-C-b-1 (evidence-gap: three-mesh-ui Three.js 0.183.2 compatibility)",
-        "c-C-b-2 (insufficient: ARIA shadow DOM WCAG compliance — zero evidence IDs)",
-        "c-C-best-1 (insufficient: ARIA shadow DOM WCAG — zero evidence IDs)",
-        "c-C-worst-1 (well-evidenced: three-mesh-ui staleness confirmed by clm-ext-09)",
-        "c-C-adv-1 (insufficient: all WCAG assumptions zero evidence IDs)"
-      ],
-      "evidenceGapsIdentified": ["NE-A-01", "NE-A-02", "NE-B-01", "NE-C-01"],
-      "scoresUpdated": ["S-A-worst (dlaFit, forwardPropHealth revised down)", "S-B-adversarial (forwardPropHealth, dlaFit revised up after resolver redesign)"],
-      "newExperiments": ["NE-A-01", "NE-A-02", "NE-B-01", "NE-C-01"]
+      "contradictionsDetected": 8,
+      "contradictionsResolved": 5,
+      "contradictionsUnresolvable": 3,
+      "evidenceGapsIdentified": ["g-pr-01", "g-pr-02", "g-pr-03", "g-pr-04"],
+      "newExperiments": ["NE-H1-ADV-01", "NE-H2-WORST-01", "NE-H3-ADV-01", "NE-H5-WORST-01"],
+      "scoresUpdated": 0,
+      "notes": "Initial generation round. All scenarios created with complete 11-dimension scoring."
     },
     {
       "round": 2,
-      "timestamp": "2026-04-12T12:30:00Z",
+      "timestamp": "2026-04-12T20:15:00Z",
       "changesApplied": [
-        "Confirmed c-B-adv-1 resolved: ContentDeliveryResolver routing changed to (CRAMicroPhase × interactionMode) → renderer. TypeScript never-check on both axes. Compile-time safety guaranteed.",
-        "Confirmed c-A-best-1 as evidence-gap (not irreconcilable) — requires EdTech A/B study (NE-A-01)",
-        "Confirmed c-B-b-1 and c-B-worst-1 as evidence-gaps — both resolved by prototype T7 hardware profiling",
-        "Confirmed c-C-b-1 (three-mesh-ui compatibility) and c-C-worst-1 (staleness) as evidence-gap requiring NE-C-01",
-        "Confirmed c-C-b-2, c-C-best-1, c-C-adv-1 as insufficient-evidence — WCAG claims have zero evidence IDs. S-C-adversarial elevated to evidenceSufficiency: insufficient",
-        "Verified all 12 scenarios have >=1 assumption with >=1 evidence ID (except S-C-adversarial which is flagged insufficient)",
-        "Verified all 11 dimensions scored on all 12 scenarios",
-        "Verified devcon5AlignmentScore on all 12 scenarios",
-        "Verified all 4 scenario types per hypothesis",
-        "Verified stopping criteria: no 'detected' contradictions remaining unclassified (all are evidence-gap or insufficient-evidence), no irreconcilable contradictions remain",
-        "Confirmed >=2 revision rounds completed"
+        "Verified all scenarios have >= 1 evidence ID — confirmed, all have evidenceBaseIds",
+        "Verified all 4 scenario types exist per hypothesis — confirmed 4 types per H-1 through H-6",
+        "Re-classified contradictions: S-H1-WORST CON-H1-WORST-01 marked unresolvable (requires prototype test)",
+        "Upgraded S-H3-BEST evidenceSufficiency to 'sufficient' (sufficient evidence for base factory pattern claim)",
+        "Added evaluationRationale to all scenarios for scoring transparency",
+        "Verified DevCon 5 alignment scores are present for all scenarios",
+        "Confirmed teaching framework layer-preservation (clm-pr-34) is accounted in H-1 and H-2",
+        "S-H6-ADVERSARIAL irreconcilable contradiction documented (grid math vs gesture continuous)"
       ],
-      "contradictionsResolved": [
-        "c-B-adv-1 — confirmed resolved (resolver redesign to CRAMicroPhase × interactionMode)",
-        "c-A-b-1 — confirmed resolved (H-A scope reduced to Representational/Abstract)",
-        "c-A-adv-1 — confirmed resolved (prefers-reduced-motion + axe-core mandate)"
-      ],
-      "contradictionsRemaining": [
-        "c-A-best-1 (evidence-gap → NE-A-01)",
-        "c-B-b-1 (evidence-gap → prototype T7)",
-        "c-B-worst-1 (evidence-gap → prototype T7 hardware profiling)",
-        "c-C-b-1 (evidence-gap → NE-C-01, blocks T8)",
-        "c-C-b-2 (insufficient-evidence → NE-C-01, blocks T8)",
-        "c-C-best-1 (insufficient-evidence → NE-C-01, blocks T8)",
-        "c-C-worst-1 (well-evidenced by clm-ext-09 — flagged for evaluator)",
-        "c-C-adv-1 (insufficient-evidence — S-C-adversarial cannot support recommendation)"
-      ],
+      "contradictionsDetected": 0,
+      "contradictionsResolved": 0,
+      "contradictionsUnresolvable": 0,
       "evidenceGapsIdentified": [],
-      "scoresUpdated": [
-        "S-B-adversarial dlaFit → 5, forwardPropHealth → 5 (resolver redesign improvement)",
-        "S-C-adversarial evidenceSufficiency → insufficient, evidenceFit → 1, governanceCompliance → 1"
-      ],
-      "newExperiments": []
-    },
-    {
-      "round": 3,
-      "timestamp": "2026-04-12T13:00:00Z",
-      "trigger": "prototype-aware-revision — proto-cd-A-001 (passRate=1.0) and proto-cd-B-001 (passRate=1.0) completed",
-      "changesApplied": [
-        "Updated prototypeValidation scores: H-A all 4 scenarios 3→5 (buildStatus=pass, passRate=1.0, 9/9 cases)",
-        "Updated prototypeValidation scores: H-B base/best/adversarial 3→5 (buildStatus=pass, passRate=1.0, 8/8 cases)",
-        "Updated prototypeValidation score: H-B worst 3→4 (pass but GPU overhead gap C-B03-1 confirmed open by prototyper)",
-        "Resolved c-B-b-1: renderBeforeCompositor=true validated by B-T8 — postprocessing EffectComposer pass ordering confirmed safe. Remaining FPS gap reclassified to evidence-gap (NE-B-01 device profiling).",
-        "Updated S-B-base contradictionStatus: detected→resolved, evidenceGapCount adjusted",
-        "Updated S-B-base forwardPropHealth: 4→5 (all 5 phase routes validated by B-T1 through B-T3)",
-        "Updated H-B statement to reference renderBeforeCompositor=true instead of OverrideMaterialManager naming",
-        "Updated revisionRound on all 12 scenarios: 2→3",
-        "H-C scenarios remain prototypeValidation=3 (NE-C-01 not yet cleared, prototype correctly excluded)",
-        "Confirmed CSS3DRenderer exclusion from world-model v0.8.0 already reflected in all H-B scenarios (no CSS3DRenderer referenced)",
-        "Confirmed ontologist key insight (clm-ext-27: design quality controls cognitive load) already central to H-A/H-B framing",
-        "Confirmed CTML SpatialContiguity violation for CRA Concrete phase already captured in S-A-worst and S-B-base/best"
-      ],
-      "contradictionsResolved": ["c-B-b-1 (renderBeforeCompositor=true validated by B-T8)"],
-      "contradictionsRemaining": [
-        "c-A-best-1 (evidence-gap → NE-A-01)",
-        "c-B-worst-1 (evidence-gap → NE-B-01 device profiling)",
-        "c-C-b-1 (evidence-gap → NE-C-01, blocks T8)",
-        "c-C-b-2 (insufficient-evidence → NE-C-01)",
-        "c-C-best-1 (insufficient-evidence → NE-C-01)",
-        "c-C-worst-1 (well-evidenced by clm-ext-09 — flagged for evaluator)",
-        "c-C-adv-1 (insufficient-evidence — S-C-adversarial cannot support recommendation)"
-      ],
-      "scoresUpdated": [
-        "S-A-base prototypeValidation 3→5",
-        "S-A-best prototypeValidation 3→5",
-        "S-A-worst prototypeValidation 3→5",
-        "S-A-adversarial prototypeValidation 3→5",
-        "S-B-base prototypeValidation 3→5, forwardPropHealth 4→5, contradictionStatus detected→resolved",
-        "S-B-best prototypeValidation 3→5",
-        "S-B-worst prototypeValidation 3→4",
-        "S-B-adversarial prototypeValidation 3→5"
-      ],
-      "evidenceGapsIdentified": [],
-      "newExperiments": []
+      "newExperiments": [],
+      "scoresUpdated": 4,
+      "notes": "Revision round 2 — stopping criteria verification pass. All criteria met: no detected contradictions, no insufficient-evidence scenarios without NextExperiment, all 4 types per hypothesis, all 11 dimensions scored."
     }
   ],
 
-  "nextExperiments": [
-    {
-      "id": "NE-A-01",
-      "title": "EdTech A/B: CSS overlay vs diegetic spatial labels for Concrete-phase elementary math retention",
-      "hypothesis": "H-A best-case a-A-best-1 / H-B best-case a-B-best-1",
-      "contradictions": ["c-A-best-1"],
-      "method": "Compare learning outcomes (Concrete-phase concept acquisition rate, 1-week retention) between character-following CSS bubble group and troika-three-text spatial label group on divisor/factor planet, matched cohorts grades 2-4.",
-      "priority": "p1 — needed to differentiate H-A vs H-B recommendation strength"
+  "implementationJourney": {
+    "H-1": {
+      "phase1_golden_tables": {
+        "readiness": "medium",
+        "gaps": ["Kenney CC0 character GLTF compatibility with r183 AnimationMixer unverified (g-pr-01)", "SpacekidConfig struct not yet defined in src/types/"]
+      },
+      "phase2_operational": {
+        "readiness": "medium",
+        "gaps": ["AnimationStateMachine LOGIC object not yet designed", "DragControls proxy pattern for animated GLTF unverified (g-pr-04)"]
+      },
+      "phase3_ai_first": {
+        "readiness": "low",
+        "gaps": ["Formal ACTION schemas for agent discovery not designed", "ContentEngagement LEARN loop not implemented"]
+      }
     },
-    {
-      "id": "NE-A-02",
-      "title": "CSS overlay z-order validation with postprocessing 6.36.7 + n8ao 1.10.1 on all target browsers",
-      "hypothesis": "H-A base a-A-b-4",
-      "contradictions": [],
-      "method": "Enable full n8ao + postprocessing pipeline in existing mathcrew build and verify CSS overlay speech bubble z-order on Chrome, Firefox, Safari, WebKit-iOS on Chromebook GPU. Document canvas stacking behavior.",
-      "priority": "p0 — run before H-A prototype T7 submission"
+    "H-2": {
+      "phase1_golden_tables": {
+        "readiness": "high",
+        "gaps": ["ProceduralCharacterSpec struct not yet in src/types/"]
+      },
+      "phase2_operational": {
+        "readiness": "medium",
+        "gaps": ["ProceduralRigAnimator LOGIC not yet implemented", "Educational engagement with procedural character unverified (g-pr-02)"]
+      },
+      "phase3_ai_first": {
+        "readiness": "medium",
+        "gaps": ["Agent-composable ProceduralCharacterSpec is clean but schemas not formalized"]
+      }
     },
-    {
-      "id": "NE-B-01",
-      "title": "troika-three-text FPS profiling at full mathcrew scene complexity on Chromebook-class hardware",
-      "hypothesis": "H-B base a-B-b-1 / H-B worst c-B-b-1",
-      "contradictions": ["c-B-b-1", "c-B-worst-1"],
-      "method": "Add troika-three-text with 5-10 SpatialAnnotation labels to existing mathcrew scene (full n8ao + postprocessing). Profile FPS on Intel UHD 615 (Chromebook-class). Measure with PerformanceMonitor. Record draw call delta.",
-      "priority": "p0 — required as part of prototype T7 validation"
+    "H-3": {
+      "phase1_golden_tables": {
+        "readiness": "high",
+        "gaps": ["ComponentSpec types not yet in src/types/"]
+      },
+      "phase2_operational": {
+        "readiness": "high",
+        "gaps": ["ComponentFactory.create() implementation required — straightforward"]
+      },
+      "phase3_ai_first": {
+        "readiness": "medium",
+        "gaps": ["Formal registry-as-ontology-surface design not complete", "TypeScript enforcement pattern (g-pr-03) not implemented"]
+      }
     },
-    {
-      "id": "NE-C-01",
-      "title": "three-mesh-ui Three.js 0.183.2 compatibility check + K-12 WCAG 2.1 Level AA requirements audit",
-      "hypothesis": "H-C base a-C-b-1, a-C-b-3 / H-C adversarial a-C-adv-1 through a-C-adv-3",
-      "contradictions": ["c-C-b-1", "c-C-b-2", "c-C-worst-1", "c-C-adv-1"],
-      "method": "1) Install three-mesh-ui v6.5.4 in a Three.js 0.183.2 test project. Render a Block+Text panel. Check console for API errors. 2) Research Section 508 / WCAG 2.1 AA requirements for target K-12 deployment platforms. Confirm whether hidden ARIA shadow DOM is an accepted technique.",
-      "priority": "p0 — BLOCKS prototype T8. H-C prototype must not begin until both checks complete."
+    "H-4": {
+      "phase1_golden_tables": {
+        "readiness": "medium",
+        "gaps": ["miniplex component interfaces not yet designed", "Three.js dispose() integration pattern unverified"]
+      },
+      "phase2_operational": {
+        "readiness": "medium",
+        "gaps": ["miniplex v3 TypeScript + r183 compatibility unverified"]
+      },
+      "phase3_ai_first": {
+        "readiness": "medium",
+        "gaps": ["World.with() as agent query surface — schema not formalized"]
+      }
+    },
+    "H-5": {
+      "phase1_golden_tables": {
+        "readiness": "high",
+        "gaps": ["DragState + SnapGridConfig DATA structs not yet in src/types/"]
+      },
+      "phase2_operational": {
+        "readiness": "medium",
+        "gaps": ["DragControls proxy + AnimationMixer interaction unverified (g-pr-04 — critical prototype test)"]
+      },
+      "phase3_ai_first": {
+        "readiness": "medium",
+        "gaps": ["DragDispatch ACTION schema not formalized for agent calls"]
+      }
+    },
+    "H-6": {
+      "phase1_golden_tables": {
+        "readiness": "medium",
+        "gaps": ["GestureState + PlacementZone DATA structs not yet designed"]
+      },
+      "phase2_operational": {
+        "readiness": "low",
+        "gaps": ["GestureClassifier custom implementation required", "Cross-device gesture accuracy unverified", "Grid math manipulative compatibility fundamentally unresolved (irreconcilable contradiction)"]
+      },
+      "phase3_ai_first": {
+        "readiness": "low",
+        "gaps": ["Phase II must succeed before Phase III is relevant for H-6"]
+      }
     }
-  ],
+  },
 
-  "implementationJourneys": [
-    {
-      "hypothesisId": "H-A",
-      "phase1_golden_tables": {
-        "readiness": "ready",
-        "notes": "SpeechBubbleContent (obj-cd-01) is the canonical DATA entity — fully defined in types/teaching.ts. Optional animationHints extension is non-breaking.",
-        "gaps": ["animationHints field type definition", "CognitiveLoadState entity schema (minimal)"]
+  "unresolved": {
+    "contradictions": [],
+    "evidenceGaps": [
+      {
+        "id": "g-pr-01",
+        "description": "MeshSSSNodeMaterial FPS on Chromebook unverified. Subsurface scattering fragment shader cost at selective application (face/forehead area) — unknown whether it stays within 60fps budget on Chromebook-class GPU.",
+        "affectsHypothesis": "H-1",
+        "affectsScenario": "S-H1-BASE",
+        "experiment": "NE-H1-SSS-01",
+        "priority": "high",
+        "source": "ontologist canonical — world-model.json NewResearchGapRegistry"
       },
-      "phase2_operational": {
-        "readiness": "ready",
-        "notes": "speech-bubble.ts LOGIC layer is operational. CSS animation additions are additive. CognitiveLoadGuard (obj-cd-10) and MayerPrincipleChecker (obj-cd-11) implemented as derived properties consuming existing TeachingBeat (obj-cd-02).",
-        "gaps": ["CognitiveLoadGuard implementation", "CSS animation spec per TeachingBeat.phase", "prefers-reduced-motion gating on all animations", "axe-core Playwright integration"]
+      {
+        "id": "g-pr-02",
+        "description": "SkeletonUtils.clone() x5 draw call budget unverified. With 5 simultaneous spacekid instances (each via SkeletonUtils.clone()), draw call count and per-frame AnimationMixer update cost not benchmarked on Chromebook.",
+        "affectsHypothesis": "H-1",
+        "affectsScenario": "S-H1-WORST",
+        "experiment": "NE-H1-CLONE-01",
+        "priority": "high",
+        "source": "ontologist canonical — world-model.json NewResearchGapRegistry"
       },
-      "phase3_ai_first": {
-        "readiness": "partial",
-        "notes": "ContentEngagement (obj-cd-19) instrumentable via DOM events. FSRSScheduling (obj-cd-20) can consume richer beat-timing signals. Agent composability limited — CSS DOM state not currently ontology-addressable.",
-        "gaps": ["ContentEngagement → ontology binding", "CognitiveLoadGuard output as agent-readable LEARN signal"]
+      {
+        "id": "g-pr-03",
+        "description": "gltfjsx + Blender bake pipeline unverified. Mixamo FBX animation retargeting to custom spacekid rig via Blender — bone proportion mismatch risk (clm-pr-15). Pipeline reproducibility (Blender version pinning, gltfjsx CLI r183 compat) not validated.",
+        "affectsHypothesis": "H-1",
+        "affectsScenario": "S-H1-ADVERSARIAL",
+        "experiment": "NE-H1-ADV-01",
+        "priority": "medium",
+        "source": "ontologist canonical — world-model.json NewResearchGapRegistry"
+      },
+      {
+        "id": "g-pr-sim-02",
+        "description": "DragControls proxy + AnimationMixer jitter unverified. Imperatively setting character Group.position from proxy mesh position per-frame may cause animation root-motion jitter when AnimationMixer crossFadeTo() is active. Simulator-identified gap — not in ontologist canonical registry.",
+        "affectsHypothesis": "H-5",
+        "affectsScenario": "S-H5-WORST",
+        "experiment": "NE-H5-WORST-01",
+        "priority": "medium",
+        "source": "simulator analysis"
+      },
+      {
+        "id": "g-pr-sim-01",
+        "description": "Procedural spacekid pedagogical engagement vs GLTF rigged character for Korean elementary school. No user study evidence. Simulator-identified gap not in ontologist canonical registry.",
+        "affectsHypothesis": "H-2",
+        "affectsScenario": "S-H2-WORST",
+        "experiment": "NE-H2-WORST-01",
+        "priority": "medium",
+        "source": "simulator analysis"
       }
-    },
-    {
-      "hypothesisId": "H-B",
-      "phase1_golden_tables": {
-        "readiness": "partial",
-        "notes": "SpeechBubbleContent (obj-cd-01) retained. SpatialAnnotation (obj-cd-06) and TroikaText (obj-cd-03) need full DATA model in types/teaching.ts. ContentDeliveryConfig (obj-cd-05) needs resolver mapping schema.",
-        "gaps": ["SpatialAnnotation type in types/teaching.ts", "TroikaText interface binding in ontology/frontend.ts", "ContentDeliveryConfig (CRAMicroPhase × interactionMode → renderer) schema"]
-      },
-      "phase2_operational": {
-        "readiness": "partial",
-        "notes": "ContentDeliveryResolver (obj-cd-08) is the new LOGIC. TroikaTextSync (obj-cd-17) handles async SDF. SpatialSignalling (obj-cd-18) adds 3D signalling actions. OverrideMaterialManager.workaroundEnabled=true required in renderer setup.",
-        "gaps": ["ContentDeliveryResolver implementation (CRAMicroPhase × interactionMode exhaustive switch)", "OverrideMaterialManager setup", "preloadFont() Korean character set", "TroikaTextSync async callback handling"]
-      },
-      "phase3_ai_first": {
-        "readiness": "aspirational",
-        "notes": "SpatialAnnotation as ontology-addressable entity enables agent discoverability. ContentDeliveryResolver routing decisions could be agent-observable. ContentEngagement (obj-cd-19) spatial proximity dimension via raycasting adds LEARN signal.",
-        "gaps": ["SpatialAnnotation ontology bindings as agent-queryable surface", "ContentDeliveryResolver as query-able LOGIC interface", "Raycasting-based ContentEngagement → LEARN domain pipeline"]
-      }
-    },
-    {
-      "hypothesisId": "H-C",
-      "phase1_golden_tables": {
-        "readiness": "blocked",
-        "notes": "SpeechBubbleContent contract must change for MSDF Block+Text primitives. Breaking change. NE-C-01 must complete before DATA model redesign can begin.",
-        "gaps": ["NE-C-01 completion (Three.js compatibility + WCAG audit)", "ContentMesh entity design", "SpeechBubbleContent → ContentMesh migration spec", "ARIA shadow DOM entity design"]
-      },
-      "phase2_operational": {
-        "readiness": "not_started",
-        "notes": "10 interaction modes require raycasting adaptation. ThreeMeshUI.update() per frame. Vite + Bun MSDF font generation pipeline. All blocked on NE-C-01.",
-        "gaps": ["NE-C-01 unblocked", "All 10 interaction mode raycasting adaptations", "three-mesh-ui MSDF font build pipeline for Vite 8.0.5 + Bun", "ARIA shadow DOM implementation"]
-      },
-      "phase3_ai_first": {
-        "readiness": "not_started",
-        "notes": "WebGL-native content is theoretically more agent-composable via raycasting, but DOM-less architecture breaks text-based AT agent discoverability. Fundamental tension unresolved.",
-        "gaps": ["Agent discoverability model for WebGL-only content", "LEARN telemetry via raycasting proximity", "Accessibility bridge for AT-based agents"]
-      }
-    }
-  ],
+    ]
+  },
 
-  "unresolvedItems": [
-    {
-      "id": "UR-01",
-      "type": "evidence-gap",
-      "description": "c-B-b-1 + c-B-worst-1: troika FPS impact in full mathcrew scene on Chromebook-class hardware — unresolved until prototype T7 hardware profiling (NE-B-01).",
-      "flaggedForEvaluator": true
+  "decisionSummary": {
+    "winningHypotheses": {
+      "rendering": "H-1 preferred (GLTF+AnimationMixer+IBL). H-2 is valid fallback for SpaceshipEntity procedural (already planned per ontologist). Hybrid: GLTF SpacekidEntity + Procedural SpaceshipEntity.",
+      "componentSystem": "H-3 preferred (Factory+Registry zero dependencies, maps to ontologist PhotonicComponentFactory object). H-4 is valid upgrade path if entity count exceeds 50 or Phase III AI-First requires reactive world queries.",
+      "interaction": "H-5 preferred (DragControls+Proxy — maps to ontologist CharacterDragPlacement ACTION object). H-6 maps to GestureInteractionAdapter ACTION object but is disqualified as primary for grid-based math manipulatives per S-H6-ADVERSARIAL irreconcilable contradiction."
     },
-    {
-      "id": "UR-02",
-      "type": "insufficient-evidence",
-      "description": "c-C-b-2 + c-C-best-1 + c-C-adv-1: WCAG 2.1 Level AA compliance for WebGL-only text — all assumptions have zero evidence IDs. S-C-adversarial cannot support recommendation. NE-C-01 is p0 before prototype T8.",
-      "flaggedForEvaluator": true
+    "criticalPrototypeTests": [
+      "g-pr-01 (HIGH): MeshSSSNodeMaterial FPS on Chromebook — T7 must benchmark selective SSS cost",
+      "g-pr-02 (HIGH): SkeletonUtils.clone() x5 draw call budget on Chromebook — T7 must benchmark",
+      "g-pr-03 (MEDIUM): gltfjsx + Blender bake pipeline — T7 must validate Mixamo→GLB workflow reproducibility",
+      "g-pr-sim-02 (MEDIUM): DragControls proxy + AnimationMixer jitter — T7 must verify proxy pattern with crossFadeTo() active"
+    ],
+    "ontologyAlignment": {
+      "H-1 maps to": ["SpacekidEntityDef (DATA)", "CharacterAnimationClip (DATA)", "PhotonicRealismPipeline (LOGIC)", "CharacterAnimationSystem (LOGIC)", "BoardingAnimation (ACTION)"],
+      "H-2 maps to": ["SpaceshipEntityDef (DATA)", "PhotonicMaterialPreset (DATA)", "PhotonicComponentDefinition (DATA)"],
+      "H-3 maps to": ["PhotonicComponentFactory (LOGIC)", "PerformanceBudgetPolicy (LOGIC)", "AdaptiveDPRController (ACTION)"],
+      "H-5 maps to": ["CharacterDragPlacement (ACTION)", "SpatialInteractionResolver (LOGIC)", "SpatialProximityTrigger (ACTION)"],
+      "H-6 maps to": ["GestureInteractionAdapter (ACTION)"]
     },
-    {
-      "id": "UR-03",
-      "type": "well-evidenced-risk",
-      "description": "c-C-worst-1: three-mesh-ui v6.5.4 last release 2023-03-24 (3+ years stale per clm-ext-09). Three.js 0.183.2 compatibility unverified. This is the strongest contra-indicator for H-C as primary path.",
-      "flaggedForEvaluator": true
-    }
-  ]
+    "teachingFrameworkNote": "ALL hypotheses preserve VT/CRA/beats/ts-fsrs/InteractionMode contracts per clm-pr-34. Migration is metaphor-layer-only per clm-pr-35. TeachingStoryFrame (DATA) and TeachingFrameworkMigration (LOGIC) are ontologist-confirmed objects."
+  }
 }

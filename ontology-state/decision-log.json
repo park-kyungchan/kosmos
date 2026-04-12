@@ -1,15 +1,15 @@
 {
-  "version": "0.7.0",
-  "lastUpdated": "2026-04-12T10:00:00Z",
-  "sessionId": "mathcrew-content-delivery-001",
-  "previousBenchmarks": ["jsxgraph-sequencer-001"],
+  "version": "0.8.0",
+  "lastUpdated": "2026-04-12T18:00:00Z",
+  "sessionId": "mathcrew-photonic-realism-001",
+  "previousBenchmarks": ["jsxgraph-sequencer-001", "mathcrew-content-delivery-001"],
   "entries": [
     {
       "type": "decomposition",
-      "timestamp": "2026-04-12T10:00:00Z",
+      "timestamp": "2026-04-12T18:00:00Z",
       "agent": "lead",
-      "objective": "mathcrew PR#28 Speech Bubble 기반 교육콘텐츠 전달방식 검토 + 현재 기술스택(Three.js 0.183.2 + WebGL2 + TS + Bun + Vite + ts-fsrs) 위에서 최신/최선의 교육콘텐츠 전달방식 리서치",
-      "rationale": "mathcrew v2는 3D 수학학습 월드(5개 행성)에서 약수/배수 개념을 VT(Variation Theory) + CRA(Concrete-Representational-Abstract) 프레임워크로 가르침. PR#28은 고정 HUD 패널에서 캐릭터 추종 말풍선으로의 마이그레이션을 완료. 이 리서치는 말풍선 이외에 3D 교육환경에서 콘텐츠를 더 효과적으로 전달할 수 있는 최신/최선의 방법이 있는지 조사함.",
+      "objective": "mathcrew/src 전체 점검 + 교육용 컴포넌트 추가/개선. 공명고리→우주선, 펄스조각→우주복 입은 어린이 등 photonicRealism 형태로 코드 생성하면서 interactive 훨씬 강화. 재사용 가능한 photonicRealism 컴포넌트 프레임워크까지 설계.",
+      "rationale": "현재 mathcrew는 추상적 관측소 메타포(공명고리=원형토러스, 펄스조각=크리스탈/오비터)로 약수/배수를 가르침. 사용자는 이를 캐릭터 기반 photonicRealism(우주선, 우주복어린이)으로 전환하여 몰입감+인터랙티브성을 대폭 강화하고, 여러 수학 개념에 재사용 가능한 컴포넌트 프레임워크를 만들려 함.",
       "currentCodebaseFindings": {
         "techStack": {
           "renderer": "Three.js 0.183.2 (WebGL2)",
@@ -18,125 +18,138 @@
           "build": "Vite 8.0.5 + TypeScript 5.9.3 + Bun",
           "testing": "Playwright 1.59.1"
         },
-        "currentApproach": {
-          "name": "Character-following CSS Speech Bubble",
-          "file": "src/hud/speech-bubble.ts (717 LOC)",
-          "projection": "Vector3.project → CSS transform (worldToScreen)",
-          "dataModel": "SpeechBubbleContent (title, body, phase, vocabularyIntro, successCriteria, promptText, promptKey, beatIndex, totalBeats)",
-          "hudSlimmed": "src/hud/hud.ts (530 LOC — progress bar, mini-telemetry, victory, dev panel)",
-          "architecture": "game-loop → SpeechBubbleContent → speech-bubble.ts (follows character) + HudUpdateData → hud.ts"
+        "currentEntityArchitecture": {
+          "resonanceLoop": {
+            "file": "src/scene/entities/create-resonance-loop.ts (217 LOC)",
+            "shape": "CylinderGeometry deck + TorusGeometry loops + CylinderGeometry masts + dish receivers + orbital arcs",
+            "materials": "MeshStandardMaterial + MeshPhysicalMaterial + ShaderMaterial (grid-floor, glow, holographic)",
+            "role": "Equal-grouping teaching surface — holds groups of pulse shards",
+            "metaphor": "관측 장비 (observatory instrument)"
+          },
+          "pulseShard": {
+            "file": "src/scene/entities/create-pulse-shard.ts (247 LOC)",
+            "shape": "CylinderGeometry crystal OR IcosahedronGeometry orbiter + fins + orbital rings",
+            "materials": "holographic ShaderMaterial + glow MeshBasicMaterial",
+            "variants": "crystal (hexagonal prism) | orbiter (icosahedron satellite)",
+            "role": "Manipulable counting unit — represents dividend number",
+            "metaphor": "신호 단위 (signal unit)"
+          },
+          "player": {
+            "file": "src/scene/entities/create-player.ts + player/*.ts",
+            "shape": "Geometric primitive avatar: torso, helmet, instrument-pack, arms, legs",
+            "role": "Student avatar — observatory cadet",
+            "metaphor": "공명 탐사 파일럿 (resonance exploration pilot)"
+          }
+        },
+        "currentRenderingPipeline": {
+          "materials": "Centralized in src/rendering/materials.ts — PBR (standard/physical) + custom shaders (holographic, grid-floor, glow, energy-beam, warp-ring, atmosphere, sky, starfield)",
+          "postprocessing": "n8ao SSAO + EffectComposer pipeline",
+          "shaders": "8 custom shader pairs (vert+frag) for holographic, grid-floor, energy-beam, warp-ring, atmosphere, sky, starfield, holographic-board"
+        },
+        "interactionModes": {
+          "count": 10,
+          "list": ["pickup-drop", "resonance-trial-sequencer", "predict-verify", "select-scan", "observe", "divisor-judge", "observe-discovery", "array-builder", "venn-diagram", "observe-factor-table"],
+          "architecture": "registerMode() pattern in interaction-controller.ts, each mode implements InteractionMode interface"
         },
         "teachingFramework": {
-          "beats": "TeachingBeat with 5 phases: motivate/explain/demonstrate/practice/assess",
-          "craMicroPhases": "C (Concrete) / R (Representational) / A (Abstract)",
-          "variationTheory": "contrast/separation/generalization/fusion/integration per planet",
-          "interactionModes": "pickup-drop, resonance-trial-sequencer, predict-verify, select-scan, observe, divisor-judge, observe-discovery, array-builder, venn-diagram, observe-factor-table",
-          "surfaces": "signal-console, constellation-triptych, resonance-loop, beacon-anchored, observatory-overview, orbital-array-deck, intersection-lens, number-line-rail",
-          "storyworlds": "observatory-approach, resonance-observatory, signal-console-hall, constellation-atlas, orbital-recap"
+          "beats": "5-phase (motivate/explain/demonstrate/practice/assess)",
+          "craMicroPhases": "C/R/A (Concrete/Representational/Abstract)",
+          "vtDimensions": "5 VT axes across 5 planets (contrast→integration)",
+          "surfaces": "8 teaching surface types (signal-console, resonance-loop, etc.)",
+          "storyworlds": "5 storyworld regions",
+          "storyFrame": "공명 관측소 (Resonance Observatory)",
+          "metaphorMap": "observatory/resonance language → math concepts"
         },
-        "pr28Impact": {
-          "additions": 1205,
-          "deletions": 1184,
-          "keyFiles": [
-            "src/hud/speech-bubble.ts (NEW, 717 LOC)",
-            "src/hud/hud.ts (2089 → 530 LOC, -74%)",
-            "src/game-loop.ts (+85/-42)",
-            "src/types/teaching.ts (+50/-3)",
-            "ontology/frontend.ts (+15/-3)",
-            "ontology/runtime.ts (+30/-17)"
-          ],
-          "verdict": "HUD 고정패널 → 캐릭터추종 말풍선 마이그레이션 완료. Enter-advances-beat 프레임워크 및 teaching-flow.ts 미변경."
-        },
-        "identifiedGaps": [
-          "Speech bubble is CSS overlay — no 3D depth integration or occlusion",
-          "Text rendering is DOM-based — no in-world diegetic UI",
-          "No spatial audio cues for teaching content transitions",
-          "No adaptive content pacing based on learner behavior",
-          "No micro-animation or visual storytelling for abstract concepts",
-          "No multi-modal content (only text + key prompts in bubble)",
-          "Vocabulary terms shown inline — no spatial/3D highlighting of referenced objects",
-          "Mini-telemetry is HUD-only — no in-world feedback visualization"
+        "identifiedTransformationScope": [
+          "ENTITY VISUAL TRANSFORMATION: 공명고리(TorusGeometry) → 우주선(GLTF/procedural spaceship). 펄스조각(Crystal/Orbiter) → 우주복 어린이(character model)",
+          "MATERIAL SYSTEM: holographic/glow abstractions → photonicRealism (PBR + environment maps + subsurface scattering + fresnel)",
+          "METAPHOR FRAMEWORK: 관측소 메타포 → 우주탐험/캐릭터 메타포. teaching-story-framework.ts 전면 재설계",
+          "INTERACTION UPGRADE: number-input sequencer → character-based spatial interaction (drag characters into spaceships, etc.)",
+          "COMPONENT FRAMEWORK: entity factory → reusable PhotonicRealism component registry with math-concept agnostic primitives",
+          "ANIMATION SYSTEM: static geometry + per-frame shader params → character animation (skeletal, morph targets, or procedural)",
+          "RENDERING PIPELINE: existing n8ao+postprocessing compatible photonicRealism materials"
         ]
       }
     },
     {
       "type": "routing",
-      "timestamp": "2026-04-12T10:00:01Z",
+      "timestamp": "2026-04-12T18:00:01Z",
       "agent": "lead",
       "decisions": {
-        "RQ1": "external — EdTech UX research + 3D education platforms + game-based learning studies for content delivery patterns",
-        "RQ2": "external+context7 — Three.js text/UI rendering libraries (troika-three-text, CSS3DRenderer, three-mesh-ui, htmlmesh)",
-        "RQ3": "external+internal — Interaction paradigms for educational pacing (spatial triggers, adaptive timing, multi-modal cues)",
-        "RQ4": "external — Cognitive load theory + Mayer multimedia learning principles applied to 3D educational spaces",
-        "RQ5": "external+context7 — Three.js ecosystem tools for enhanced content delivery (three-mesh-ui, troika, lottie-three)",
-        "RQ6": "internal+external — Teaching flow architecture adaptation paths for richer multimodal delivery",
-        "RQ7": "external — Performance comparison: CSS overlay vs CSS3DRenderer vs WebGL-native text with n8ao+postprocessing pipeline"
+        "RQ1": "external+context7 — Three.js GLTF character models + procedural character generation for educational 3D",
+        "RQ2": "external+scrapling — photonicRealism rendering patterns in Three.js (PBR workflow, PMREM, subsurface scattering, atmosphere)",
+        "RQ3": "external+context7 — Three.js animation systems for character-based entities (skeletal, morph, procedural)",
+        "RQ4": "external+scrapling — reusable 3D component architecture patterns for educational games (composition, factory, ECS)",
+        "RQ5": "external — interactive 3D character manipulation in educational contexts (drag, gesture, spatial triggers)",
+        "RQ6": "internal+external — teaching framework adaptation: observatory metaphor → character-based spacecraft metaphor migration",
+        "RQ7": "external — performance optimization for photonicRealism rendering on education-target devices (Chromebook, tablet)"
       }
     }
   ],
   "requirements": [
-    { "id": "req-cd-01", "description": "Identify content delivery approaches superior to CSS speech bubble for 3D math education", "category": "functional", "priority": "p0", "domain": "LOGIC" },
-    { "id": "req-cd-02", "description": "Evaluate in-world (diegetic) vs overlay (non-diegetic) content rendering for teaching effectiveness", "category": "functional", "priority": "p0", "domain": "DATA" },
-    { "id": "req-cd-03", "description": "Assess Three.js ecosystem libraries for advanced text/UI rendering (troika-three-text, three-mesh-ui, CSS3DRenderer)", "category": "functional", "priority": "p0", "domain": "DATA" },
-    { "id": "req-cd-04", "description": "Design interaction patterns that improve educational pacing beyond Enter-advances-beat", "category": "functional", "priority": "p1", "domain": "ACTION" },
-    { "id": "req-cd-05", "description": "Apply cognitive load theory and Mayer's multimedia learning principles to content delivery design", "category": "non-functional", "priority": "p1", "domain": "LOGIC" },
-    { "id": "req-cd-06", "description": "Maintain 60fps rendering performance with enhanced content delivery in n8ao+postprocessing pipeline", "category": "non-functional", "priority": "p0", "domain": "ACTION" },
-    { "id": "req-cd-07", "description": "Preserve compatibility with existing teaching flow (beats, CRA, VT) and ts-fsrs spaced repetition", "category": "constraint", "priority": "p0", "domain": "LOGIC" },
-    { "id": "req-cd-08", "description": "Support multimodal content delivery (text, visual cues, spatial highlighting, micro-animation)", "category": "functional", "priority": "p1", "domain": "ACTION" }
+    { "id": "req-pr-01", "description": "공명고리(TorusGeometry)를 우주선(spaceship) 형태의 photonicRealism 엔티티로 변환 — 약수 그룹핑 교육 기능 유지", "category": "functional", "priority": "p0", "domain": "DATA" },
+    { "id": "req-pr-02", "description": "펄스조각(crystal/orbiter)을 우주복 입은 어린이(child in spacesuit) 캐릭터로 변환 — 조작 가능한 counting unit 기능 유지", "category": "functional", "priority": "p0", "domain": "DATA" },
+    { "id": "req-pr-03", "description": "photonicRealism 렌더링 파이프라인: PBR materials, environment maps, 적절한 lighting으로 사실감 있는 3D 교육 환경 구현", "category": "functional", "priority": "p0", "domain": "LOGIC" },
+    { "id": "req-pr-04", "description": "여러 수학 개념(약수, 배수, 분수, 비율 등)에 재사용 가능한 photonicRealism 컴포넌트 프레임워크 설계", "category": "functional", "priority": "p0", "domain": "LOGIC" },
+    { "id": "req-pr-05", "description": "interactive 대폭 강화: 캐릭터 드래그/배치, 우주선 탑승, 공간 트리거, 제스처 기반 조작 등 3D 캐릭터 인터랙션", "category": "functional", "priority": "p0", "domain": "ACTION" },
+    { "id": "req-pr-06", "description": "기존 teaching framework 호환: VT/CRA/beats 구조, ts-fsrs, 10개 interaction mode 계약 유지하며 확장", "category": "constraint", "priority": "p0", "domain": "LOGIC" },
+    { "id": "req-pr-07", "description": "교육 대상 디바이스(Chromebook, 태블릿)에서 60fps 유지하는 성능 최적화", "category": "non-functional", "priority": "p0", "domain": "ACTION" },
+    { "id": "req-pr-08", "description": "캐릭터 애니메이션 시스템: 우주복 어린이의 자연스러운 움직임(걷기, 탑승, 반응 동작)", "category": "functional", "priority": "p1", "domain": "ACTION" },
+    { "id": "req-pr-09", "description": "teaching-story-framework.ts 전면 재설계: 관측소 메타포 → 우주탐험/캐릭터 메타포", "category": "functional", "priority": "p1", "domain": "DATA" }
   ],
   "questions": [
     {
-      "id": "q-cd-01",
-      "text": "What are the current best-practice UI patterns for delivering educational content in 3D learning environments? (diegetic UI, spatial UI, AR-like annotations, visual novel panels, proximity-triggered overlays)",
-      "domain": "DATA",
-      "priority": "p0",
-      "route": "external",
-      "status": "open"
-    },
-    {
-      "id": "q-cd-02",
-      "text": "How do modern Three.js text/UI rendering libraries compare for in-world educational content delivery? (troika-three-text SDF, CSS3DRenderer, three-mesh-ui, CanvasTexture, HTML overlay)",
-      "domain": "LOGIC",
-      "priority": "p0",
-      "route": "external+context7",
-      "status": "open"
-    },
-    {
-      "id": "q-cd-03",
-      "text": "What interaction paradigms best support educational pacing in 3D game environments? (auto-advance timing, spatial proximity triggers, gesture-based, adaptive AI-driven pacing, multi-modal cues)",
-      "domain": "ACTION",
-      "priority": "p1",
-      "route": "external+internal",
-      "status": "open"
-    },
-    {
-      "id": "q-cd-04",
-      "text": "How do cognitive load theory and Mayer's multimedia learning principles inform the design of content delivery UX in 3D educational spaces for elementary math?",
-      "domain": "LOGIC",
-      "priority": "p1",
-      "route": "external",
-      "status": "open"
-    },
-    {
-      "id": "q-cd-05",
-      "text": "What Three.js ecosystem tools could enhance the current content delivery pipeline? (troika-three-text, three-mesh-ui, htmlmesh, drei text patterns, postprocessing text effects)",
+      "id": "q-pr-01",
+      "text": "Three.js WebGL2 환경에서 교육용 캐릭터 모델(우주복 어린이)을 어떻게 구현하는 것이 최선인가? GLTF import vs procedural geometry vs hybrid. Sketchfab/Ready Player Me/Mixamo 등 기존 에셋 파이프라인 활용 가능성.",
       "domain": "DATA",
       "priority": "p0",
       "route": "external+context7",
       "status": "open"
     },
     {
-      "id": "q-cd-06",
-      "text": "How can the existing teaching flow architecture (beats + CRA phases + VT dimensions + interaction modes) be adapted for richer multimodal content delivery while preserving the existing SpeechBubbleContent/TeachingBeat contract?",
+      "id": "q-pr-02",
+      "text": "photonicRealism 렌더링이란 Three.js 맥락에서 구체적으로 무엇인가? PBR workflow(metalness/roughness), Environment Map(PMREM), subsurface scattering, fresnel 효과, atmosphere shader의 최신 구현 패턴과 Three.js r183 호환성.",
+      "domain": "LOGIC",
+      "priority": "p0",
+      "route": "external+scrapling",
+      "status": "open"
+    },
+    {
+      "id": "q-pr-03",
+      "text": "교육용 3D 캐릭터에 적합한 애니메이션 시스템은? Three.js AnimationMixer + skeletal animation(GLTF), morph target animation, 절차적(procedural) 모션 생성. 각각의 trade-off와 교육 맥락 적합성.",
       "domain": "ACTION",
+      "priority": "p0",
+      "route": "external+context7",
+      "status": "open"
+    },
+    {
+      "id": "q-pr-04",
+      "text": "수학 개념 독립적으로 재사용 가능한 photonicRealism 컴포넌트 아키텍처는 어떻게 설계하는가? Composition pattern, Component Registry, ECS(Entity-Component-System), 또는 React Three Fiber/drei 컴포넌트 패턴 중 무엇이 적합한가?",
+      "domain": "LOGIC",
+      "priority": "p0",
+      "route": "external+scrapling",
+      "status": "open"
+    },
+    {
+      "id": "q-pr-05",
+      "text": "3D 캐릭터 기반 교육 인터랙션의 best practice는? 캐릭터 드래그/배치, 공간 트리거, 제스처 인식, 프록시미티 기반 이벤트, 캐릭터-오브젝트 관계 시스템.",
+      "domain": "ACTION",
+      "priority": "p0",
+      "route": "external",
+      "status": "open"
+    },
+    {
+      "id": "q-pr-06",
+      "text": "기존 teaching framework(VT/CRA/beats, 10 interaction modes, teaching-story-framework.ts)를 관측소 메타포에서 우주탐험/캐릭터 메타포로 마이그레이션할 때 영향 범위와 최적 전략은?",
+      "domain": "LOGIC",
       "priority": "p1",
       "route": "internal+external",
       "status": "open"
     },
     {
-      "id": "q-cd-07",
-      "text": "What performance trade-offs exist between CSS overlay, CSS3DRenderer, and WebGL-native text rendering for 60fps educational content in scenes with n8ao + postprocessing effects pipeline?",
-      "domain": "LOGIC",
+      "id": "q-pr-07",
+      "text": "교육용 디바이스(Chromebook, 태블릿)에서 photonicRealism 3D + n8ao SSAO + 캐릭터 모델 다수를 60fps로 렌더링하기 위한 성능 최적화 전략은? LOD, instancing, texture atlas, GPU budget, draw call 최적화.",
+      "domain": "ACTION",
       "priority": "p0",
       "route": "external",
       "status": "open"
@@ -145,140 +158,167 @@
   "projectScope": {
     "backend": {
       "data": [
-        "SpeechBubbleContent (current: title, body, phase, vocabularyIntro, successCriteria, promptText, promptKey)",
-        "TeachingBeat (phase, craMicroPhase, interactionMode, successCriteria, vocabularyIntro)",
-        "PlanetTeachingContent (planetId, conceptId, vtDimension, beats, mathParams)",
-        "TeachingSurfaceStrategy (modeId, primarySurface, storyworldId)",
-        "MiniHudTelemetry (masteryScore, attemptCount, interactionProgress, discoveryTable)",
-        "ContentDeliveryConfig (NEW: rendering approach, interaction model, animation settings)",
-        "SpatialAnnotation (NEW: 3D-anchored educational annotations)"
+        "SpaceshipEntity (NEW: 공명고리 대체 — 우주선형 teaching surface, GLTF or procedural)",
+        "SpacekidEntity (NEW: 펄스조각 대체 — 우주복 어린이 캐릭터, manipulable counting unit)",
+        "PhotonicMaterialPreset (NEW: PBR material config per entity type — metalness, roughness, envMap intensity)",
+        "PhotonicComponentDefinition (NEW: math-concept-agnostic component spec — shape, material, animation, interaction)",
+        "CharacterAnimationClip (NEW: GLTF animation clips for spacekid — idle, walk, board, celebrate, error)",
+        "TeachingStoryFrame (MODIFIED: 관측소→우주탐험 메타포 전환)",
+        "TeachingWorldTerms (MODIFIED: 공명고리→우주선, 펄스조각→우주복어린이 등)",
+        "MetaphorMapping (MODIFIED: 우주탐험 메타포 기반 action-to-math 브릿지)",
+        "PlanetTeachingContent (PRESERVED: planetId, conceptId, vtDimension, beats, mathParams)",
+        "TeachingBeat (PRESERVED: phase, craMicroPhase, interactionMode, successCriteria)"
       ],
       "logic": [
-        "WorldToScreenProjection (Vector3.project → CSS transform — current approach)",
-        "ContentRenderingPipeline (game-loop → SpeechBubbleContent → speech-bubble.ts)",
-        "TeachingBeatProgression (beat sequencing, CRA micro-phase advancement)",
-        "FSRSScheduling (ts-fsrs spaced repetition for mastery tracking)",
-        "ContentDeliveryResolver (NEW: select rendering approach per teaching phase/context)",
-        "CognitiveLoadManager (NEW: adapt content density based on learner state)"
+        "PhotonicRealismPipeline (NEW: PBR material system + environment map + post-processing integration)",
+        "PhotonicComponentFactory (NEW: componentType→entity instantiation with material presets)",
+        "CharacterAnimationSystem (NEW: AnimationMixer or procedural motion controller)",
+        "SpatialInteractionResolver (NEW: character-to-surface spatial relationships, boarding, placement)",
+        "ContentRenderingPipeline (MODIFIED: game-loop → PhotonicEntity rendering)",
+        "TeachingBeatProgression (PRESERVED: beat sequencing logic unchanged)",
+        "FSRSScheduling (PRESERVED: spaced repetition unchanged)"
       ],
       "action": [
-        "EnterAdvancesBeat (current Enter key handler)",
-        "InteractionModeDispatch (10 interaction modes per teaching surface)",
-        "SpeechBubbleFollow (per-frame worldToScreen update)",
-        "HudUpdate (progress bar, telemetry, victory overlay)",
-        "SpatialContentTrigger (NEW: proximity/gaze-based content activation)",
-        "MicroAnimationSequencer (NEW: visual storytelling for abstract concepts)"
+        "CharacterDragPlacement (NEW: drag spacekid characters into spaceships)",
+        "BoardingAnimation (NEW: spacekid enters/exits spaceship animation trigger)",
+        "SpatialProximityTrigger (NEW: proximity-based teaching content activation)",
+        "GestureInteraction (NEW: touch/pointer gesture recognition for character manipulation)",
+        "PhotonicFeedbackEffect (NEW: photonic-style visual feedback for correct/error/hint)",
+        "InteractionModeDispatch (MODIFIED: existing 10 modes adapted for character entities)",
+        "EnterAdvancesBeat (PRESERVED: core beat advancement unchanged)"
       ],
       "security": [],
       "learn": [
-        "MiniHudTelemetry (mastery, attempts, progress tracking)",
-        "FSRSReviewLog (spaced repetition review history)",
-        "InteractionTelemetry (NEW: content delivery mode effectiveness tracking)",
-        "ContentEngagement (NEW: time-on-content, interaction depth, visual attention heuristic)"
+        "InteractionTelemetry (MODIFIED: track character-based interaction patterns)",
+        "PhotonicComponentUsageMetrics (NEW: which components engage learners most)",
+        "MiniHudTelemetry (PRESERVED: mastery, attempts, progress)",
+        "FSRSReviewLog (PRESERVED: spaced repetition history)"
       ]
     },
     "frontend": {
       "views": [
-        "SpeechBubble (CSS overlay following character — current)",
-        "HUD (progress bar, mini-telemetry, victory, dev panel — current)",
-        "DiegeticContentPanel (NEW: in-world 3D text/UI)",
-        "SpatialAnnotationOverlay (NEW: 3D-anchored educational labels)"
-      ],
-      "agentSurfaces": [],
-      "scenarioFlows": [
-        "TeachingBeatFlow (motivate→explain→demonstrate→practice→assess per planet)",
-        "CRAProgression (Concrete→Representational→Abstract within planet)",
-        "VTDimensionJourney (contrast→separation→generalization→fusion→integration across planets)"
-      ],
-      "interaction": [
-        "Enter key → advance beat (current)",
-        "Teaching interaction modes (10 types — current)",
-        "Spatial proximity → content trigger (NEW candidate)",
-        "Gaze/focus → content highlight (NEW candidate)",
-        "Adaptive timing → auto-advance (NEW candidate)"
+        "SpaceshipSurface (NEW: 3D spaceship as teaching grouping container)",
+        "SpacekidCharacter (NEW: 3D child in spacesuit as counting unit)",
+        "PhotonicEnvironment (NEW: PBR environment with HDRI sky, atmosphere, realistic lighting)",
+        "SpeechBubble (PRESERVED: CSS overlay for teaching text)",
+        "HUD (PRESERVED: progress bar, telemetry, victory)"
       ],
       "rendering": [
-        "CSS overlay via Vector3.project (current speech bubble)",
-        "WebGL2 scene with n8ao + postprocessing (current 3D)",
-        "CSS3DRenderer (NEW candidate — Three.js native CSS-in-3D)",
-        "troika-three-text SDF (NEW candidate — WebGL-native text)",
-        "three-mesh-ui (NEW candidate — WebGL UI panels)",
-        "CanvasTexture (NEW candidate — rasterized text on 3D meshes)"
+        "PhotonicRealism PBR materials (NEW: metalness/roughness workflow + envMap + PMREM)",
+        "Character model rendering (NEW: GLTF or procedural character pipeline)",
+        "Character animation rendering (NEW: skeletal/morph/procedural animation)",
+        "WebGL2 scene with n8ao + postprocessing (PRESERVED)",
+        "CSS overlay via Vector3.project (PRESERVED for speech bubble)"
+      ],
+      "interaction": [
+        "Character drag-and-drop (NEW: move spacekids between spaceships)",
+        "Boarding/disembarking animation triggers (NEW)",
+        "Spatial proximity triggers (NEW: approach → content activation)",
+        "Touch gesture support (NEW: mobile/tablet pinch, swipe, tap)",
+        "Enter key → advance beat (PRESERVED)",
+        "Teaching interaction modes — 10 types adapted (MODIFIED)"
       ]
     }
   },
-  "devconPhase": "Phase 2 → Phase 3 transition — Data model (TeachingBeat, SpeechBubbleContent) and basic rendering pipeline exist (Phase 2). Research targets enriched content delivery with potential adaptive/AI-first patterns (Phase 3 aspiration).",
-  "userDirectives": [],
-  "codebaseUpdates": [
-    {
-      "timestamp": "2026-04-12T06:17:00Z",
-      "pr": "#28",
-      "title": "feat: migrate HUD teaching panel to character speech bubble",
-      "impact": "HUD 2089→530 LOC. New speech-bubble.ts 717 LOC. SpeechBubbleContent type added to teaching.ts. Ontology frontend.ts/runtime.ts updated with SpeechBubble view + binding.",
-      "filesChanged": ["src/hud/speech-bubble.ts", "src/hud/hud.ts", "src/game-loop.ts", "src/types/teaching.ts", "ontology/frontend.ts", "ontology/runtime.ts"],
-      "verifiedBy": "bunx tsc + bunx vite build + audit:doc-contracts + audit:spatial-support"
-    }
+  "devconPhase": "Phase 2 → Phase 3 transition — Current entity system (geometric primitives) is Phase 2. PhotonicRealism + character-based entities is a Phase 3 aspiration requiring deep rendering + animation research.",
+  "userDirectives": [
+    "Claude는 RESEARCH 품질에 집중. 직접 코드 생성이 아닌 참조 구현 + 라이브러리 패턴 큐레이션 중심.",
+    "재사용 가능한 photonicRealism 컴포넌트를 여러 수학 개념에 미리 설계해두기를 원함.",
+    "말풍선 내용이 너무 많아 짤림 — 키 설명(keycap+promptText)은 화면 오른쪽 아래 등으로 분리. 교육 콘텐츠를 더 쪼개서 진행하는 프레임워크 개선 필수. Blueprint에 포함."
   ],
-  "recommendations": [
-    {
-      "id": "rec-cd-001",
-      "hypothesisId": "H-A",
-      "verdict": "ACCEPT",
-      "confidence": 0.88,
-      "rationale": "H-A (Enhanced CSS Overlay) wins on: (1) lowest implementation cost (1-2 weeks additive), (2) zero WebGL render loop changes — no regression risk to n8ao/postprocessing pipeline, (3) highest reversibility (CSS-only changes, fully revertible), (4) pedagogical soundness confirmed by Mayer P8 Segmenting + CLT (speech bubble + Enter-advances-beat is correct for elementary), (5) CognitiveLoadManager adds adaptive content density (3 tiers) without architecture change, (6) prefers-reduced-motion WCAG 2.3 compliance built-in, (7) prototype passes 9/9 eval cases including beat sequencing invariant preservation.",
-      "alternativeId": "H-B",
-      "alternativeRationale": "H-B (Hybrid Diegetic + Overlay) is the Phase 3 evolution path. Valid when: (1) CRA Concrete phase needs in-world spatial annotations (SpatialAnnotation entity), (2) Mayer Spatial Contiguity principle demands labels near 3D objects, (3) troika-three-text SDF + n8ao compatibility is browser-validated (gap C-B01-1). Higher cost (6-8 weeks) but closes depth/occlusion gap for teaching-critical scenes. Prototype passes 8/8.",
-      "scenarioIds": ["S-A-01", "S-A-02", "S-A-03", "S-A-04", "S-B-01", "S-B-02", "S-B-03", "S-B-04"],
-      "riskIds": ["NE-02", "NE-03", "C-B01-1", "C-B03-1"],
-      "whatWouldChangeDecision": [
-        "If CRA Concrete phase requires spatial labels NEAR 3D manipulatives (Mayer Spatial Contiguity) → H-B becomes mandatory for motivate/explain/demonstrate phases",
-        "If troika-three-text + n8ao benchmark shows <5% FPS impact on Chromebook → H-B migration cost justified",
-        "If elementary learner testing shows speech bubble text insufficient for abstract concepts → add troika SDF labels as supplementary (H-B hybrid)",
-        "If accessibility audit requires screen reader support for in-world labels → CSS overlay (H-A) remains superior (DOM accessibility)",
-        "If audio narration (Mayer P9, d=0.87) is implemented first → H-A's simplicity is even more valuable as the high-ROI investment"
-      ]
-    }
-  ],
-  "experiments": [
-    {
-      "id": "exp-cd-01",
-      "description": "Browser benchmark: CSS overlay z-order vs n8ao postprocessing canvas stacking context (gap NE-02). Validate that speech bubble DOM layer renders correctly above postprocessed WebGL output.",
-      "status": "deferred-to-implementation",
-      "priority": "p0"
+  "speechBubbleAnalysis": {
+    "currentProblems": [
+      "card width clamp(280px, 36vw, 400px) + overflow:hidden → 긴 내용 짤림",
+      "6개 요소(header, title, body, vocab, criteria, prompt)가 400px 카드에 모두 포함",
+      "body 텍스트(15.5px, line-height 1.62)가 다단으로 길어지면 카드 높이 폭발",
+      "vocabulary callout + success criteria가 body와 함께 있어서 인지 부하 가중",
+      "OCCLUSION: 말풍선이 캐릭터 위(ANCHOR_Y_OFFSET=1.0)에 고정 → 캐릭터가 보는 월드 콘텐츠(teaching surface, resonance-loop, pulse-shard 등)를 가림",
+      "translate(-50%, -100%)로 캐릭터 바로 위에 위치 → practice/demonstrate 페이즈에서 인터랙티브 3D 오브젝트와 겹침",
+      "카메라 각도/줌에 따라 말풍선이 화면 대부분을 차지할 수 있음 (특히 모바일/태블릿)"
+    ],
+    "proposedSolution": {
+      "goalAndPromptRelocation": "keycap + promptText + successCriteria(Goal) → 화면 오른쪽 하단 독립 GoalPromptHUD로 통합 분리. 말풍선에서 완전 제거. Goal(성공기준)과 키 안내가 항상 함께 보이도록.",
+      "contentGranularity": "현재 1 beat = 1 큰 텍스트 블록 → 1 beat를 2-4개 micro-step으로 분할. Enter로 micro-step 진행.",
+      "vocabSeparation": "vocabulary callout → 3D 공간의 spatial annotation 또는 별도 HUD 카드로 분리",
+      "bubbleDesignResearch": {
+        "status": "COMPLETED",
+        "constraint": "현재 mathcrew space semantic + space style과 일관성 유지 필수. 아동 친화 원칙 적용하되 우주 테마 깨지지 않도록.",
+        "spaceStylePreserved": [
+          "어두운 반투명 surface (rgba(8,35,58,0.78)) — 우주 배경에 자연스러운 글래스모피즘 유지",
+          "밝은 ink (#ddf4ff 계열) on dark surface — 우주 공간 가독성",
+          "phase별 홀로그래픽 글로우 (motivate:amber, explain:skyblue, demonstrate:mint, practice:lavender, assess:coral) — 우주선 계기판 느낌 유지",
+          "border-radius: 24px — 현재 값 유지 (8-12세 리서치에서도 16-24px 적합)",
+          "backdrop-filter: blur(24px) saturate(130%) — 우주 씬 위 글래스 효과 유지"
+        ],
+        "childFriendlyEnhancements": [
+          "폰트: Varela Round (infant-friendly, rounded counter, tall x-height) — Google Fonts, ACNH에서도 사용 [NN/G + Cantuni 연구 기반]",
+          "font-size: 18px body (NN/G 14pt 최소 → 18px 적용) + line-height: 1.6 (golden ratio leading)",
+          "font-weight: 600 (readability, not thin)",
+          "Entry animation: scale(0.8)→scale(1) with easeOutBack cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s — 'pop-in' 아이들이 좋아하는 스프링 효과",
+          "Idle animation: subtle scale(1)↔scale(1.005) 2s ease-in-out infinite alternate — '숨쉬는' 느낌 (alive/engaged)",
+          "Typewriter effect: 25-40ms per character — 말하는 느낌, 아이들 읽기 속도에 맞춤",
+          "Continue arrow: CSS triangle ::after, 4px vertical bob 0.6s — 진행 어포던스",
+          "thought-bubble variant (작은 원 체인) — space helmet comms 메타포와 호환 (삼각형 대안)"
+        ],
+        "rejectedFromResearch": [
+          "따뜻한 크림 배경 (#FFFDF0) → space theme과 충돌. 어두운 반투명 유지.",
+          "primary color 강조 → 9-12세 'reject childish' (Gapsy). holographic glow가 더 적합.",
+          "blobby organic shape (ACNH goo filter) → space theme에 부적합. 정돈된 rounded rect 유지."
+        ],
+        "sources": [
+          "[Official] NN/G — Children's UX: Usability Issues (Sherwin/Nielsen 2019)",
+          "[Official] NN/G — Designing for Kids: Cognitive Considerations (Liu 2018)",
+          "[Synthesis] Typography in Digital Products for Kids (Cantuni/Apress 2020)",
+          "[Synthesis] ACNH Wobbly Dialogue Demo (GitHub Gist rayfitz9656)",
+          "[Synthesis] Gapsy Studio — UX Design for Kids (Jan 2026)",
+          "[Synthesis] FreeFrontend — 25 CSS Speech Bubbles (Oct 2025)"
+        ]
+      },
+      "adaptiveCardSize": "내용 길이에 따라 카드 크기 동적 조절 (max-height + scroll 대신 micro-step 분할 우선)",
+      "occlusionSolution": {
+        "phaseBasedPosition": "motivate/explain → 캐릭터 위(현재). practice/demonstrate/assess → 화면 상단 좌측 또는 우측 고정 위치로 자동 이동. 인터랙티브 페이즈에서 월드 콘텐츠 가시성 확보.",
+        "collapseOnInteraction": "인터랙션 모드 활성화 시 말풍선 → 한 줄 미니 바(제목만) 자동 축소. 탭/클릭으로 펼침. 월드 오브젝트 가시성 최대화.",
+        "smartAvoidance": "말풍선 위치를 teaching surface screen-projection과 비교하여 겹침 감지. 겹치면 반대편으로 자동 재배치 (위→아래, 좌→우).",
+        "recommended": "phaseBasedPosition + collapseOnInteraction 조합 — 가장 낮은 구현 복잡도로 occlusion 문제 해결. smartAvoidance는 Phase 3 후보.",
+        "implementation": {
+          "phaseBasedPosition": "speech-bubble.ts update()에서 data.phase 확인 → practice/demonstrate/assess이면 translate(-50%,-100%) 대신 fixed position top-left (left:20px, top:20px). tail 숨김.",
+          "collapseOnInteraction": "SpeechBubbleContent에 collapsed:boolean 추가. interaction-controller.ts에서 mode 활성화 시 collapsed=true. 말풍선 CSS: .speech-bubble--collapsed { height:40px, overflow:hidden, cursor:pointer }. 클릭→toggle."
+        }
+      }
     },
-    {
-      "id": "exp-cd-02",
-      "description": "If H-B adopted: troika-three-text SDF + n8ao EffectComposer pass ordering benchmark. Validate OverrideMaterialManager.workaroundEnabled=true + renderBeforeCompositor pattern (gap C-B01-1).",
-      "status": "deferred-to-implementation",
-      "priority": "p1"
-    },
-    {
-      "id": "exp-cd-03",
-      "description": "Audio narration pilot: Web Speech API Korean TTS quality test with 3-5 teaching beats. Measure learner engagement delta per Mayer P9 Temporal Contiguity.",
-      "status": "proposed",
-      "priority": "p0"
-    }
-  ],
+    "frameworkChanges": [
+      "TeachingBeat.text (단일 문자열) → TeachingBeat.microSteps (string[]) 배열로 확장",
+      "SpeechBubbleContent에 microStepIndex 추가 — Enter가 micro-step을 순차 진행",
+      "모든 micro-step 완료 후 다음 beat로 전진",
+      "promptText/promptKey + successCriteria(Goal) → 별도 GoalPromptHUD 컴포넌트로 통합 분리 (오른쪽 하단)",
+      "말풍선 디자인 리서치: 아동 친화적 스타일(Nintendo/Animal Crossing/Kirby 참조) 기반으로 비주얼 리디자인",
+      "teaching-content.ts의 PLANET_CONTENT beats 텍스트를 microSteps 배열로 리팩터"
+    ],
+    "impactFiles": [
+      "src/types/teaching.ts — TeachingBeat.microSteps: string[] 추가",
+      "src/types/teaching.ts — SpeechBubbleContent.microStepIndex 추가",
+      "src/hud/speech-bubble.ts — prompt bar 제거, card overflow 개선",
+      "src/hud/hud.ts — PromptHUD 컴포넌트 추가 (오른쪽 하단)",
+      "src/systems/teaching-flow.ts — micro-step 진행 로직",
+      "src/game-loop.ts — micro-step index 관리",
+      "src/config/teaching-content.ts — beats text → microSteps[] 변환"
+    ]
+  },
   "evaluatorGateResult": "ACCEPT",
   "evaluatorGateDetails": {
-    "timestamp": "2026-04-12T13:00:00Z",
+    "timestamp": "2026-04-12T22:30:00Z",
     "agent": "evaluator",
-    "evaluationRound": 2,
-    "passed": ["R1", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15"],
-    "failed": [],
-    "notApplicable": ["R2"],
-    "summary": "ACCEPT — 14/15 PASS, 0 FAIL, 1 N/A. Independent adversarial evaluation by evaluator agent. All upstream pipeline artifacts verified: 14 sources (40+ provenance-tagged claims), 21 D/L/A-classified objects, 12 scenarios (11-dim scoring, 2 revision rounds), recommendation with 7-point rationale + 5 reversal conditions. Both prototypes independently verified: bun test 74/74 (H-A) + 30/30 (H-B), bunx tsc --noEmit clean. H-A (Enhanced CSS Overlay) accepted as Phase 2 recommendation. H-B (Hybrid Diegetic) documented as Phase 3 evolution. H-C (Full WebGL) correctly deprioritized (staleness + WCAG insufficient evidence).",
-    "debateTriggered": false,
-    "previousRound": {
-      "verdict": "REJECT",
-      "timestamp": "2026-04-12T11:00:00Z",
-      "reason": "11/15 rules failed — upstream pipeline T2-T6 was incomplete (all state files empty except T1 intake). Correct rejection."
-    },
-    "caveats": [
-      "5 evidence-gap contradictions remain — tracked via next-experiments",
-      "7/12 scenarios have partial evidence sufficiency — validation work continues in implementation",
-      "Propagation paths are partial (designed, not implemented)",
-      "H-B evolution depends on NE-B-01 (troika FPS benchmark) — p0 before H-B work"
+    "round": 1,
+    "sessionEvaluated": "mathcrew-photonic-realism-001",
+    "rulesSummary": "14 PASS, 0 FAIL, 1 N/A (R2). No debate triggered.",
+    "independentVerification": "T7: 33/33 (18ms, 83 assertions), T8: 35/35 (19ms, 74 assertions), tsc: 0 errors",
+    "keyFindings": [
+      "6 hypotheses analyzed: H-1 GLTF+AnimationMixer, H-2 Procedural, H-3 Factory+Registry, H-4 ECS, H-5 DragControls+Proxy, H-6 Gesture+Proximity",
+      "Hybrid recommendation: H-2 procedural start -> H-1 GLTF pivot via H-3 Factory+Registry OCP pattern",
+      "All sources tier-1/2 official docs. Zero stale evidence. 22 D/L/A-classified objects.",
+      "3 critical runtime gaps (g-pr-01 SSS FPS, g-pr-02 clone draw calls, g-pr-03 DragControls jitter) require prototype benchmarks",
+      "FM-T8-001 (high): H-2 procedural engagement unresolvable by research alone — user study required",
+      "Teaching framework migration confirmed METAPHOR-LAYER-ONLY — all core contracts preserved"
     ]
   }
 }
