@@ -1,461 +1,718 @@
-# Kosmos 최종 연구 보고서
+# Kosmos Final Research Report
 
-**세션 ID:** mathcrew-photonic-realism-001
-**생성일:** 2026-04-12
-**평가자 게이트:** ACCEPT (14 PASS, 0 FAIL, 1 N/A)
-**독립 검증:** T7 33/33 (18ms) · T8 35/35 (19ms) · tsc 0 errors
-
----
-
-## 1. 사용자 목표 (User Objective)
-
-mathcrew/src 전체 점검과 함께 두 핵심 엔티티를 **photonicRealism** 형태로 전환한다.
-
-- **공명고리 (TorusGeometry 기반 관측 장비)** → **우주선 (SpaceshipEntity)**
-- **펄스조각 (crystal/orbiter 신호 단위)** → **우주복 입은 어린이 (SpacekidEntity)**
-
-동시에 다음 세 가지 횡단 목표를 달성한다.
-
-| 목표 | 설명 |
-|------|------|
-| 재사용 컴포넌트 | 약수/배수/분수/비율 등 복수 수학 개념에 재사용 가능한 PhotonicRealism 컴포넌트 프레임워크 설계 |
-| Interactive 강화 | 캐릭터 드래그·배치·탑승, 공간 트리거, 제스처 기반 조작으로 상호작용 대폭 강화 |
-| 말풍선 프레임워크 개선 | 내용 짤림·오클루전 문제 해결 — microSteps 분할, PromptHUD 분리, 인터랙션 페이즈 자동 축소 |
-
-**기존 계약 보존 원칙:** VT/CRA/beats, ts-fsrs 5.3.1, 10개 InteractionMode 인터페이스는 변경하지 않는다. 전환 범위는 **은유(metaphor) 레이어만** — 수학 교육 로직은 그대로다.
-
-**현재 기술 스택:** Three.js 0.183.2 (WebGL2), postprocessing 6.36.7, n8ao 1.10.1, Vite 8.0.5, TypeScript 5.9.3, Bun, Playwright 1.59.1
+**Session ID:** kosmos-research-2026-04-15-palantir-mini
+**Generated:** 2026-04-15
+**Evaluator Gate:** ACCEPT (15 rules applied; R11 + R13 triggered on H-B only — pipeline health signal, not defect)
+**Debate Rounds Used:** 0 / 2 (evidence chain coherent; no dispute required)
+**Machine-readable companion:** `/home/palantirkc/kosmos/ontology-state/blueprint.json`
 
 ---
 
-## 2. 연구 질문 (Research Questions)
+## 1. User Objective
 
-총 7개의 연구 질문이 D/L/A 도메인 태그와 함께 분류되었다.
+**Primary objective:** Build `palantir-mini` — a Claude Code plugin (`~/.claude/plugins/palantir-mini/`) plus extension to `~/.claude/schemas/ontology/` — that implements Palantir Foundry/AIP/Ontology's real operating mechanisms at small scale within Claude Code Native Runtime (API-Free, Claude Max X20, v2.1.108 maximum utilization). The plugin targets cross-project scope: `~/kosmos`, `~/palantir-math`, `~/mathcrew` plus the global `~/.claude/` layer.
 
-| ID | 질문 요약 | 도메인 | 우선순위 |
-|----|----------|--------|---------|
-| q-pr-01 | 교육용 캐릭터 모델 구현 최적 방법 — GLTF vs 절차적 vs 하이브리드. Sketchfab/Mixamo/RPM 에셋 파이프라인 활용 가능성 | DATA | p0 |
-| q-pr-02 | Three.js 맥락에서 photonicRealism 구현 — PBR workflow, PMREM, subsurface scattering, fresnel, atmosphere. r183 호환성 | LOGIC | p0 |
-| q-pr-03 | 교육용 3D 캐릭터 애니메이션 시스템 — AnimationMixer+skeletal vs morph target vs 절차적. 교육 맥락 적합성 trade-off | ACTION | p0 |
-| q-pr-04 | 재사용 가능한 photonicRealism 컴포넌트 아키텍처 — Composition, Factory+Registry, ECS(miniplex) 중 적합한 패턴 | LOGIC | p0 |
-| q-pr-05 | 3D 캐릭터 기반 교육 인터랙션 best practice — 드래그/배치, 공간 트리거, 제스처, 프록시미티 이벤트 | ACTION | p0 |
-| q-pr-06 | 관측소 메타포 → 우주탐험 메타포 마이그레이션 영향 범위 및 전략 | LOGIC | p1 |
-| q-pr-07 | 교육용 디바이스(Chromebook, 태블릿)에서 60fps 유지 성능 최적화 전략 | ACTION | p0 |
+**Full objective statement (from T1 decomposition):** Implement OSDK 2.0 patterns and Palantir's 5 must-include infrastructure patterns (two-tier actions, edit functions returning `Edits[]` without commit, OSDK type codegen, 6-phase validation, submission criteria pre-flight) on an append-only event log foundation, mirroring Anthropic Managed Agents Session/Harness/Sandbox virtualization, within Claude Code Native Runtime.
 
----
+### WHY this exists: 6 root-cause motivations
 
-## 3. 검색 계획 (Retrieval Plan)
+1. **3 projects reinvent the same ontology pattern 3x** — `kosmos`, `palantir-math`, `mathcrew` each independently model ontology concepts but learnings do not propagate across projects. The same abstractions are re-derived from scratch each time.
 
-### 내부 탐색 (Internal Browse)
+2. **Foundry-shaped silos without Foundry's actual mechanisms** — the projects look like Foundry (they use Palantir vocabulary) but lack Foundry's real mechanisms: no shared schema registry, no propagation enforcement, no change audit, no capability tokens, no OSDK regen.
 
-내부 탐색은 `~/.claude/research/palantir/` 라이브러리의 BROWSE.md 레시피를 통해 수행되었다.
+3. **Multi-runtime fragmentation** — ontology knowledge is trapped in Claude memory blobs. When Codex or Gemini pick up the same codebase, they reinvent because there is no declarative, filesystem-accessible contract.
 
-- **DevCon 5 원칙** (`platform/devcon.md` §DC5-04, §DC5-05, §DC5-06): DDD/DRY/OCP/PECS 4원칙 및 3단계 제품 여정 (Golden Tables → Operational → AI-First)
-- **FDE Eval Loop** (`platform/fde.md`): scaffold escalation logic, 4-tier nudge system
+4. **`~/.claude/research/palantir/` is read-only evidence, not executable contract** — 61 files of high-quality Palantir research exist in the internal library, but code across the 3 projects does not follow the patterns. The research is decorative, not operative.
 
-### 외부 탐색 (External Research)
+5. **BackwardProp loop broken** — `kosmos` generates blueprints; `palantir-math` and `mathcrew` generate runtime evidence. Neither feeds back to the other. Each session starts from zero.
 
-| 소스 ID | 제목 | Tier | 도메인 |
-|---------|------|------|--------|
-| src-pr-gltf | Three.js GLTFLoader + DRACOLoader (r183) | 1 [Official] | DATA |
-| src-pr-pbr | Three.js MeshPhysicalMaterial (r183) | 1 [Official] | DATA |
-| src-pr-anim | Three.js AnimationMixer + Skeletal (r183) | 1 [Official] | LOGIC |
-| src-pr-pmrem | Three.js PMREMGenerator + Env Maps (r183) | 1 [Official] | DATA |
-| src-pr-instanced | Three.js InstancedMesh (r183) | 1 [Official] | ACTION |
-| src-pr-drag | Three.js DragControls (r183) | 1 [Official] | ACTION |
-| src-pr-assets | Sketchfab/Mixamo/ReadyPlayerMe/PolyHaven | 1 [Official] | DATA |
-| src-pr-crossref | API 호환성 교차 분석 | 2 [Synthesis] | LOGIC |
-| src-pr-miniplex | miniplex v2.0.0 ECS (npm) | 2 [Official] | LOGIC |
-| src-pr-gesture | Pointer Events — MDN Gesture Detection | 1 [Official] | ACTION |
-| src-int-dc5 | DevCon 5 설계 원칙 | 1 [Synthesis from Official] | LOGIC |
+6. **`palantir-math` `data.ts` (141KB / 2,190 LOC) is approaching OSDK 1.x failure mode** — a single-file ontology declaration at this size is exactly the pattern Palantir replaced with OSDK 2.0 separated client/generated architecture. If not migrated before it grows further, the pain compounds.
 
-총 9개 소스, 32개 이상의 개별 클레임이 수집되었으며 모든 소스의 freshnessStatus는 "current"다.
+**Pre-pipeline synthesis input:** `~/.claude/research/claude-code/palantir-mini-blueprint.md` — the v0 architecture document created after multi-project survey, v2.1.108 feature inventory, OSDK 2.0 patterns research, Anthropic Managed Agents deep-dive, and Palantir library deep-dive. This document served as the primary input to the 7-agent pipeline.
 
 ---
 
-## 4. 내부 발견 사항 (Internal Findings)
+## 2. Research Questions (D/L/A Tags)
 
-### DevCon 5 원칙 적용 [Synthesis] [Official]
+Seven research questions were decomposed from the user objective at T1. All carry explicit D/L/A domain tags and priorities.
 
-**3단계 제품 여정**은 photonicRealism 전환에 그대로 적용된다:
+| ID | Text (abbreviated) | Domains | Priority |
+|----|-------------------|---------|----------|
+| **RQ-01** | Append-only event log foundation: minimum viable schema and atomic-append mechanism for cross-project ontology state under API-Free constraint? | LEARN, DATA | P0 |
+| **RQ-02** | Two-tier action architecture (declarative tier-1 + function-backed tier-2) with read-only edit-function agents enforcing 'returns Edits[] without commit' via disallowedTools? | ACTION, LOGIC | P0 |
+| **RQ-03** | OSDK 2.0 type codegen pattern (branded RID, separated client/generated, lazy loading) applied to ontology declarations across kosmos/palantir-math/mathcrew? | DATA, LOGIC | P0 |
+| **RQ-04** | MCP bridge as Harness API: which MCP tools to expose for Session/Harness/Sandbox virtualization within Native Runtime? | ACTION, LEARN | P1 |
+| **RQ-05** | 6-phase (or 3-phase minimum) validation pipeline using v2.1.108 hooks with managed-settings.d/ fragments per project? | LOGIC, SECURITY | P1 |
+| **RQ-06** | Submission criteria pre-flight gates as foundation for progressive autonomy? | ACTION, SECURITY | P1 |
+| **RQ-07** | Migration sequencing from existing palantir-math (most mature) to mathcrew to kosmos with backward compatibility? | DATA, ACTION, LEARN | P2 |
 
-- **Phase 1 — Golden Tables:** SpacekidConfig + SpaceshipConfig Struct 정의, PhotonicMaterialPreset 명명 (DATA)
-- **Phase 2 — Operational Decision-Making:** AnimationStateMachine + CharacterSpawn + DragDispatch 운영 시스템 구축 (LOGIC + ACTION)
-- **Phase 3 — AI-First:** 에이전트가 호출 가능한 typed EntitySpec으로 캐릭터 spawn/configure (Agent Composability)
-
-**4대 설계 원칙 적용:**
-
-| 원칙 | 적용 패턴 |
-|------|----------|
-| DDD | SpacekidEntity/SpaceshipEntity 명칭이 사용자 도메인 어휘('우주복 입은 어린이', '우주선')와 1:1 매핑 |
-| DRY | 단일 PMREMGenerator 초기화. 단일 AnimationStateMachine이 모든 캐릭터 인스턴스를 구동. 단일 PhotonicComponentFactory |
-| OCP | 새 수학 개념 → 새 엔티티 타입은 `registry.set()` 한 줄. 기존 Factory 코드 미변경 |
-| PECS | SpacekidConfig (producer DATA) → CharacterRenderSystem (consumer LOGIC). ComponentSpec → ComponentFactory |
-
-### FDE Eval Loop
-
-4단계 scaffold 구조가 ContentDeliveryResolver와 연동된다: (1) Nudge (미묘한 3D 시각 단서), (2) Visual hint (강조된 조작물), (3) Worked example (말풍선), (4) Direct instruction. 1-2단계는 공간/3D 단서가 필요하며 현재 구현되어 있지 않다. FSRS retrievability(R)가 0.4 미만일 때 scaffold 강화 모드 트리거가 필요하다 (현재 설계만 존재, 미구현).
+**DevCon 5 3-phase journey mapping:**
+- Phase I (Golden Tables): RQ-01 (events.jsonl as durable Golden Table) + RQ-03 (OSDK codegen as typed interface)
+- Phase II (Operational Decision-Making): RQ-02 (two-tier actions) + RQ-05 (validation pipeline) + RQ-06 (submission criteria)
+- Phase III (AI-First): RQ-04 (MCP bridge for agent composability) + RQ-07 (migration + cross-project propagation)
 
 ---
 
-## 5. 외부 발견 사항 (External Findings)
+## 3. Retrieval Plan
 
-### GLTFLoader (r183) [Official] — 신뢰도 0.98
+The researcher (T2 + T3) followed the BROWSE.md protocol with the routes specified at T1.
 
-- `GLTFLoader.loadAsync(url)` 반환: `Promise<GLTF>` (scene: Group, animations: AnimationClip[], asset, parser)
-- r183 버그 수정: "empty groups with multiple scene references" 해결
-- DRACOLoader WASM 디코더로 geometry 80-90% 압축 가능. 소형 모델(<100KB)에서는 CPU 디코드 비용이 네트워크 절약을 상쇄 가능
-- import path: `three/addons/loaders/GLTFLoader.js`
+### Internal routes (T2)
 
-### MeshPhysicalMaterial (r183) [Official] — 신뢰도 0.98
+| Route | Purpose | Markers Retrieved |
+|-------|---------|-------------------|
+| `~/.claude/research/palantir/action/mutations.md` | Two-tier action architecture, submission criteria, OSDK $validateOnly/$returnEdits | §ACTION.MU-09..19, §ACTION.MU-24 |
+| `~/.claude/research/palantir/logic/functions.md` | Edit functions v2 returning Edits[], createEditBatch pattern | §LOGIC.FN-04, §LOGIC.FN-09, L496 |
+| `~/.claude/research/palantir/validation/README.md` | 6-phase validation timeline, StaleObject pattern | §VAL.R-02..R-08 |
+| `~/.claude/research/palantir/typescript/type-safety-as-grounding.md` | TypeScript + OSDK as hallucination-proof pipeline | §TS.TSG-03..TSG-06 |
+| `~/.claude/research/palantir/cross-cutting/decision-lineage.md` | 5D Decision Lineage schema (WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT) | §DL-02, §DL-09 |
+| `~/.claude/research/claude-code/palantir-mini-blueprint.md` | v0 architecture synthesis (pre-pipeline input) | Architecture + OMC + Gap fills |
+| `~/.claude/research/claude-code/managed-agents.md` | Anthropic Managed Agents Brain/Session/Hands | §1-19 |
+| `~/.claude/research/claude-code/features.md` | v2.1.108 baseline + delta features | Delta section |
 
-전체 PBR feature set:
+### External routes (T3)
 
-| 속성 | 교육용 적용 |
-|------|-----------|
-| clearcoat (0-1) | 우주선 선체 광택 |
-| iridescence + IOR 1.0-2.333 | 바이저 무지개빛 효과 |
-| transmission + IOR | 바이저 유리 투과 |
-| metalness/roughness | 우주선 금속 표면 |
-| sheen | 우주복 패브릭 질감 |
+| Source | URL | Tier | Key Findings |
+|--------|-----|------|-------------|
+| Claude Code Hooks Reference | `code.claude.com/docs/en/hooks` | Tier-1 official | `hookSpecificOutput.permissionDecision` (top-level `decision` DEPRECATED); PreCompact `decision:block` confirmed; TaskCreated/TaskCompleted schemas verified |
+| Claude Code Plugins Reference | `code.claude.com/docs/en/plugins-reference` | Tier-1 official | Plugin agents CANNOT define hooks/mcpServers/permissionMode; hooks at `hooks/hooks.json`; `${CLAUDE_PLUGIN_DATA}` survives updates; monitors manifest |
+| Palantir OSDK TypeScript v2 | `palantir.com/docs/foundry/functions/typescript-v2-ontology-edits` | Tier-1 official | Edits discriminated union: `Edits.Object<T>`, `Edits.Interface<T>`, `Edits.Link<Src,'linkName'>`; `createEditBatch<OntologyEdit>(client)` |
+| proper-lockfile npm | `npmjs.com/package/proper-lockfile` | Tier-3 | mkdir-based atomic locking, NFS-safe, 9.27M weekly downloads, last published 2020 |
 
-각 feature 활성화 시 shader 복잡도 증가. transmission이 가장 비용이 높음. 교육 디바이스에서는 엔티티 타입별로 필요한 feature만 활성화할 것.
-
-표준 photonicRealism 프리셋:
-- spaceship-hull: `metalness=0.85, roughness=0.15, clearcoat=1.0, clearcoatRoughness=0.1`
-- visor-glass: `transmission=0.95, ior=1.5, roughness=0.05, clearcoat=1.0, iridescence=0.3`
-- spacesuit-fabric: MeshSSSNodeMaterial (SSS, 선택적 적용 — g-pr-01 벤치마크 선행 필요)
-
-### AnimationMixer (r183) [Official] — 신뢰도 0.98
-
-- 애니메이션 인스턴스당 별도의 AnimationMixer 필요
-- `crossFadeTo(targetAction, 0.5, true)`: 두 액션 모두 재생 중이어야 smooth blend
-- `clock.getDelta()`는 공유 Clock 하나로 모든 mixer에 통일
-- 핵심 제약: SkeletonUtils.retarget()은 신뢰성 문제(뼈대 비율 차이 시 발/손 방향 오류). Mixamo 애니메이션을 Blender에서 GLB에 bake 후 포함 — 런타임 retargeting 완전 회피
-
-### PMREMGenerator [Official] — 신뢰도 0.98
-
-- 초기화 시 1회 호출: `scene.environment = pmremGenerator.fromEquirectangular(texture).texture`
-- 씬의 모든 MeshStandard/PhysicalMaterial에 IBL 자동 적용
-- 권장 설정: `toneMapping=ACESFilmicToneMapping, toneMappingExposure=1.8`
-- Poly Haven (polyhaven.com/hdris): CC0 라이선스 HDRI 무료 제공. 1K-2K면 교육 앱에 충분 (1-8MB)
-
-### InstancedMesh 제약 [Official] — 신뢰도 0.98
-
-CRITICAL: InstancedMesh는 SkinnedMesh/skeletal animation과 호환되지 않는다. 커뮤니티 workaround(bone texture atlas, PR #22667)는 Three.js core에 미통합. 따라서:
-- SpacekidEntity (애니메이션): 캐릭터당 별도 SkinnedMesh + AnimationMixer
-- SpaceshipEntity (정적): InstancedMesh 사용 가능
-
-### DragControls [Official] — 신뢰도 0.98
-
-- `new DragControls(objects[], camera, domElement)` — events: hoveron/hoveroff/dragstart/drag/dragend
-- OrbitControls은 dragstart/dragend에서 enabled=false/true 필수
-- GLTF 애니메이션 모델 직접 연결 불가 → proxy BoxGeometry 패턴 필수
-
-### 무료 에셋 소스
-
-| 소스 | 라이선스 | 활용 방안 |
-|------|---------|----------|
-| Kenney Space Kit (kenney.nl) | CC0 | SpaceshipEntity 기반 — 150개 GLTF/GLB 우주선/행성 모델 |
-| Kenney Animated Characters 3 | CC0 | SpacekidEntity 후보 — 4 스킨, 3 애니메이션 (AnimationMixer 호환 검증 필요) |
-| Mixamo (Adobe) | Royalty-free | 2400+ 모션캡처 애니메이션. FBX → Blender → GLB 변환 필요 |
-| Poly Haven | CC0 | HDRI + 3D 모델 + 텍스처. 귀속 표시 불필요 |
-| Sketchfab | CC 필터 | 800K+ 모델. 라이선스 개별 확인 필요 |
-
-### miniplex v2.0.0 [Official] — 신뢰도 0.95
-
-- `World<Entity>`: `world.add()`, `world.remove()`, `world.with(...components)` → typed Query
-- `onEntityAdded/onEntityRemoved`: Three.js 리소스 할당/해제 lifecycle 훅
-- 중요: `world.remove()`는 Three.js geometry/material 자동 dispose를 하지 않음 — onEntityRemoved 구독에서 수동 처리 필수
-- 번들 크기: ~2KB gzipped. <50 엔티티 규모에서 Factory+Registry와 성능 차이 없음
-
-### Gesture/Pointer Events [Official] — 신뢰도 0.98
-
-- `setPointerCapture(pointerId)` on pointerdown — 포인터가 캔버스 밖으로 나가도 pointermove 이벤트 유지
-- Flick velocity threshold: ~600 px/sec (drag vs flick 구분)
-- OS edge gesture 충돌 위험: iOS 15+ swipe-up (Dock 활성), Android 내비게이션 제스처가 canvas touch와 충돌. 완화: `touch-action:none` on `renderer.domElement`
+**Browse protocol compliance:** DC5 markers used for root-level grep; no broad wildcard scanning on research library; provenance tagged throughout.
 
 ---
 
-## 6. 온톨로지 매핑 (Ontology Mapping)
+## 4. Internal Findings
 
-세션 mathcrew-photonic-realism-001에서 총 43개 객체가 D/L/A/LEARN 도메인으로 분류되었다.
+All findings from `~/.claude/research/palantir/` are tier-1 official docs with high reliability. Five must-include infrastructure patterns confirmed.
 
-### 도메인 요약
+### Pattern 1: Two-Tier Action Architecture
 
-| 도메인 | 객체 수 | 핵심 객체 |
-|--------|---------|----------|
-| DATA | 14 | SpaceshipEntityDef, SpacekidEntityDef, PhotonicMaterialPreset, PhotonicComponentDefinition, CharacterAnimationClip, TeachingStoryFrame, CharacterAssetPipeline, SpeechBubbleContent, TeachingBeat, ContentDeliveryConfig, SpatialAnnotation, AudioNarrationSegment, TroikaText, MetaphorMapping |
-| LOGIC | 12 | PhotonicRealismPipeline, PhotonicComponentFactory, CharacterAnimationSystem, SpatialInteractionResolver, AnimationStateMachine, LODSelector, PBRLightingModel, ContentDeliveryResolver, CognitiveLoadGuard, ScaffoldEscalationLogic, MayerPrincipleChecker, PostprocessingCompatibility |
-| ACTION | 11 | CharacterDragPlacement, BoardingAnimation, SpatialProximityTrigger, GestureInteraction, PhotonicFeedbackEffect, InteractionModeDispatch, EnterAdvancesBeat, SpeechBubbleFollow, TroikaTextSync, SpatialSignalling, AudioNarrationTrigger |
-| LEARN | 6 | InteractionTelemetry, PhotonicComponentUsageMetrics, ContentEngagement, FSRSScheduling, MiniHudTelemetry, ResearchGapRegistry |
-| SECURITY | 0 | 해당 없음 — photonicRealism 파이프라인에 RBAC/접근제어 필요 없음 |
+[Official Palantir §ACTION.MU-09..11]
 
-### 핵심 DATA 객체 상세
+Palantir enforces a strict mutual exclusion between Tier-1 and Tier-2 actions. An ActionType is one or the other — never both.
 
-**SpaceshipEntityDef** (obj-pr-01): 공명고리 대체. 절차적 기하학 (CylinderGeometry 동체 + BoxGeometry 날개 + CylinderGeometry 엔진 포드). `metalness=0.85, roughness=0.15, clearcoat=1.0`. Polyhaven CC0 HDRI. 증거: clm-pr-01, clm-pr-02, clm-pr-17 [Official].
+- **Tier-1 Declarative Action**: Pure CRUD rules. Declarative spec compiled into a fast-path commit handler. Zero custom code.
+- **Tier-2 Function-Backed Action**: Wraps an `EditFunction` (LOGIC domain) with an atomic commit. The function computes `Edits[]` without executing; the action executes.
 
-**SpacekidEntityDef** (obj-pr-02): 펄스조각 대체. GLTF 캐릭터. Kenney CC0 기반 → Blender spacesuit 스킨 → Mixamo 애니메이션 bake → GLB. SkeletonUtils.clone()으로 다중 인스턴스 생성. SkeletonUtils.retarget() 사용 금지 (신뢰성 문제, 설계 수준에서 회피).
+[clm-rq02-01]: "Palantir Two-Tier Action Architecture: Tier 1 declarative CRUD + Tier 2 function-backed, mutually exclusive."
 
-**PhotonicMaterialPreset** (obj-pr-03): 명명된 PBR 재질 프리셋. spaceship-hull, visor-glass, spacesuit-fabric, engine-glow.
+### Pattern 2: Edit Functions Return Edits[] Without Commit
 
-**CharacterAnimationClip** (obj-pr-05): 클립 카탈로그 — idle (looping, blendDuration 0.3s), walk (looping, 0.2s), wave (non-looping, 0.3s), pickup (non-looping, 0.2s), board-spaceship (non-looping, 0.4s). 모두 GLB에 bake 포함.
+[Official Palantir §LOGIC.FN-04, §LOGIC.FN-09]
 
-### 핵심 LOGIC 객체 상세
+> From `logic/functions.md §LOGIC.FN-04`: "Edit functions v2: must return `Edits[]` (not void), `createEditBatch<OntologyEdit>(client)` pattern, `batch.getEdits()` — authoring helper does NOT commit edits."
 
-**PhotonicRealismPipeline** (obj-pr-08): IBL (PMREMGenerator) → 재질 배정 (PhotonicMaterialPreset) → SSS 선택 적용 (spacesuit-fabric만, g-pr-01 벤치마크 선행 필요) → n8ao SSAO (halfRes=true) → EffectComposer. 설정 반환, 씬 직접 변이 없음 (LOGIC).
+[clm-rq02-02]: "Edit Functions v2 return `Edits[]` without commit; commit only happens when wrapped as function-backed Action."
+[clm-rq02-03]: "Authoring helper executes edit functions without committing edits — explicit test-without-side-effects guarantee."
+[clm-ext-18]: "Within function execution, reading a property after `batch.update` does NOT reflect the uncommitted change."
 
-**PhotonicComponentFactory** (obj-pr-09): OCP 구현체. `create(componentId)` → `registry.get(type)` → createFn 호출. 절차적/GLTF 경로 통합 dispatch. 새 엔티티 타입은 `registry.set()` 한 줄.
+The OSDK v2 Edits discriminated union has 3 variants [clm-rq03-04]: `Edits.Object<T>`, `Edits.Interface<T>`, `Edits.Link<Src,'linkName'>`. The `createEditBatch<OntologyEdit>(client)` returns a batch with `update/create/delete/link/unlink/getEdits` methods [clm-ext-14].
 
-**CharacterAnimationSystem** (obj-pr-10): AnimationMixer lifecycle 관리. `playClip(entity, clipId, blendDuration)`, `stopClip`, `update(delta)`. 1 mixer per SkeletonUtils.clone() instance.
+### Pattern 3: OSDK Type Codegen from Ontology
 
-### ForwardProp / BackwardProp 상태
+[Official Palantir §TS.TSG-03..TSG-06]
 
-- **ForwardProp:** SpacekidConfig (DATA) → CharacterRenderSystem (LOGIC) → CharacterSpawn (ACTION) → Three.js scene. 전체 **partial** (구현 전 단계). 추천 경로 핵심 체인 손상 없음.
-- **BackwardProp:** InteractionTelemetry (LEARN) → 캐릭터 interaction 패턴 → 에셋 clip 우선순위 정제. 전체 **partial** (텔레메트리 emit 지점 미구현).
-- **broken 경로:** CSS3DObject forwardPropPath — postprocessing 파이프라인과 아키텍처적 불가. 설계에서 제외.
+> From `typescript/type-safety-as-grounding.md`: "TypeScript + OSDK codegen creates mechanically hallucination-proof pipeline. 5 schema categories: ObjectType, Property, LinkType, ActionType, Function."
 
----
+[clm-rq03-01]: "OSDK generates TypeScript types from Ontology metadata — only Ontology-defined concepts compile."
+[clm-rq03-02]: "Compile-time validation catches incompatible type changes after OSDK regen."
+[clm-rq03-03]: "palantir-math data.ts is 141,618 bytes / 2,190 LOC — exceeds OSDK 1.x single-file threshold." [Official, provenance=official, confidence=1.0]
 
-## 7. 경쟁 옵션 (Competing Options)
+### Pattern 4: 6-Phase Validation
 
-6개 가설이 3가지 축으로 대비되었다.
+[Official Palantir §VAL.R-02..R-08]
 
-### 축 1: 렌더링 스택 (q-pr-01/02)
+[clm-rq05-01]: "Palantir 6-phase validation: Design/Compile/Deploy/Merge/Runtime/Post-Write, each catching distinct error classes."
 
-| 항목 | H-1: GLTF+AnimationMixer+IBL | H-2: 절차적 Geometry+IBL |
-|------|------------------------------|--------------------------|
-| DATA | SpacekidConfig (GLTF path, skeleton topology) | ProceduralCharacterSpec (body radius, helmetColor) |
-| LOGIC | AnimationStateMachine, IBL derivation, LODSelector | PhotonicMaterialDeriver, ProceduralRigAnimator |
-| ACTION | CharacterSpawn (SkeletonUtils.clone), AnimationTransition | GeometryAssembly, SceneAdd |
-| 장점 | 높은 표현력, 자연스러운 skeletal animation, 교육 몰입도 | 외부 에셋 의존 없음, 빠른 프로토타입 (1-2일), 높은 에이전트 구성성 |
-| 단점 | Blender+Mixamo 파이프라인 필요 (2-3주), 에셋 pipeline 복잡도 | 절차적 캐릭터 교육 몰입도 불확실 (FM-pedagogical-h2, UNRESOLVABLE) |
-| 지원 증거 | clm-pr-01, clm-pr-09, clm-pr-10 [Official] 0.98 | clm-pr-35 [Official] 0.90 |
-| 모순 | SkeletonUtils.retarget() 신뢰성 → GLB bake로 해결 | 절차적 캐릭터 교육 몰입도 → 사용자 연구 필요 (미해결) |
+The StaleObject pattern (`§VAL.R-07`) is real and proven in Foundry — but is designed for in-place mutation against an ontology server, not a stateless harness model. This distinction becomes the empirical battleground between H-A and H-B in the simulation phase.
 
-### 축 2: 컴포넌트 프레임워크 (q-pr-04)
+### Pattern 5: Submission Criteria as Pre-Flight
 
-| 항목 | H-3: Factory+Registry | H-4: miniplex ECS |
-|------|----------------------|-------------------|
-| DATA | ComponentSpec, ComponentRegistry (Map<>) | Entity (plain JS object with typed fields) |
-| LOGIC | ComponentFactory dispatch, ComponentQueryResolver | miniplex World (query engine, archetype tracking) |
-| ACTION | ComponentMount, ComponentUnmount, ComponentUpdate | world.add(), world.remove(), component mutation |
-| 장점 | 외부 의존성 없음, OCP 완벽 구현, <50 엔티티에서 충분 | TypeScript-native, reactive lifecycle, 더 깔끔한 D/L/A 분리 |
-| 단점 | 에이전트 composability 낮음 | ~2KB 외부 의존성, 수동 Three.js 리소스 disposal 필수 |
-| 판단 | H-3 우선 — <50 엔티티에서 miniplex 대비 marginal benefit 없음 | miniplex 마이그레이션 경로는 깔끔함 (Map<> → World) |
+[Official Palantir §ACTION.MU-14..17]
 
-### 축 3: 인터랙션 패러다임 (q-pr-05)
+[clm-rq02-04]: "Submission Criteria are independent from edit permissions; ALL must pass for action submission."
+[clm-rq02-05]: "Submission criteria support 9 constraint types: Range/ArraySize/StringLength/StringRegexMatch/OneOf/ObjectQueryResult/ObjectPropertyValue/GroupMember/Unevaluable."
+[clm-rq04-02]: "OSDK 2.0 supports `$validateOnly:true` — evaluates submission criteria without applying edits."
+[clm-rq04-03]: "OSDK 2.0 supports `$returnEdits:true` — executes and returns applied edits for post-commit audit."
 
-| 항목 | H-5: DragControls+Proxy | H-6: Gesture+Spatial Proximity |
-|------|------------------------|--------------------------------|
-| DATA | DragState, SnapGridConfig | GestureState, PlacementZone |
-| LOGIC | SnapPositionDeriver, ProximityEvaluator | GestureClassifier, PlacementZoneEvaluator |
-| ACTION | DragStart/Move/End, ProximityEventDispatch | GestureEventDispatch, ZonePlacement |
-| 장점 | Three.js 공식 내장, proxy 패턴으로 GLTF+AnimationMixer 충돌 해결, 이산 grid snap 수학 게임에 적합 | 태블릿에서 더 자연스러운 조작감, 개방형 탐색 시나리오 지원 |
-| 단점 | GLTF 애니메이션 모델에 proxy mesh 필요 | Three.js 내장 없음 (커스텀 구현), OS edge gesture 충돌 위험, 이산 grid snap 거부 |
-| 판단 | H-5 우선 — 구조화된 수학 게임 grid 배치에 적합 | H-6은 H-5 검증 후 개방형 탐색 모드 확장으로 고려 |
+### 5-Dimensional Decision Lineage
+
+[Official Palantir §DL-02]
+
+> "5-dimensional Decision Lineage schema: WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT, per Chief Architect Akshay Krishnaswamy blog.palantir.com Jan 2024"
+
+[clm-rq01-01]: "Decision Lineage captures 5 dimensions (WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT) per decision artifact." This becomes the `EventEnvelopeBase` schema — every event carries all 5 dimensions.
 
 ---
 
-## 8. 시뮬레이션 결과 (Simulation Results)
+## 5. External Findings
 
-6개 가설 x 4개 시나리오 = 24개 시나리오, 11개 평가 차원으로 점수화 (2 revision round 완료, STOPPING_CRITERIA_MET=true, unresolved contradiction=0).
+### (a) Anthropic Managed Agents — Session/Harness/Sandbox Virtualization
 
-### 11개 평가 차원 점수 요약 (1-5, 높을수록 유리)
+[Official, tier-1, src-int-managed-agents]
 
-| 차원 | H-1 Base | H-2 Base | H-3 Base | H-4 Base | H-5 Base | H-6 Base |
-|------|----------|----------|----------|----------|----------|----------|
-| evidenceFit | 4 | 3 | 4 | 3 | 4 | 3 |
-| implementationDifficulty | 3 | 4 | 4 | 3 | 4 | 2 |
-| riskSeverity | 4 | 3 | 4 | 4 | 4 | 3 |
-| reversibility | 4 | 5 | 5 | 4 | 4 | 3 |
-| timeToValue | 3 | 5 | 4 | 3 | 4 | 2 |
-| governanceCompliance | 5 | 5 | 5 | 5 | 5 | 5 |
-| ecosystemMaturity | 5 | 5 | 5 | 4 | 5 | 3 |
-| dlaFit | 5 | 4 | 5 | 5 | 5 | 4 |
-| forwardPropHealth | 4 | 4 | 4 | 4 | 4 | 3 |
-| agentComposability | 3 | 4 | 4 | 4 | 3 | 3 |
-| prototypeValidation | 3 | 3 | 3 | 3 | 3 | 3 |
+[clm-rq01-02]: "Anthropic Managed Agents Session = append-only event log; Harness = stateless orchestrator; Sandbox = stateless executor."
+[clm-rq01-03]: "Session event log is durable, immutable and persists across disconnects."
 
-prototypeValidation이 전체 3인 이유: 모든 프로토타입이 research-complete (런타임 벤치마크 미수행).
+The virtualization principle from the Anthropic engineering article (mirrored in `~/.claude/research/claude-code/managed-agents.md §1-19`):
 
-### 핵심 시나리오 판단
+> "We virtualized the components of an agent: a session (the append-only log of everything that happened), a harness (the loop that calls Claude and routes Claude's tool calls to the relevant infrastructure), and a sandbox (an execution environment where Claude can run code and edit files). This allows the implementation of each to be swapped without disturbing the others."
 
-**H-1 Best (S-H1-BEST):** Kenney Space Kit CC0 캐릭터가 Mixamo 호환이면 IBL 설정 1-2일. evidenceSufficiency=partial — 프로토타입 검증 필요.
+**palantir-mini mapping:**
 
-**H-1 Worst (S-H1-WORST):** Kenney 캐릭터 리그가 Mixamo와 호환되지 않으면 Blender 커스텀 리깅 1-2개월 지연. SkeletonUtils.clone() r183 regression 위험 (CON-H1-WORST-01: unresolvable — 런타임 테스트 필요).
+| Abstraction | Property | palantir-mini equivalent |
+|---|---|---|
+| Session | Durable append-only event log | `events.jsonl` per project + `${CLAUDE_PLUGIN_DATA}/vault/` |
+| Harness | Stateless orchestrator (cattle) | Claude Code session + plugin hooks |
+| Sandbox | Stateless executor (cattle) | Worktree + project filesystem |
+| Events (SSE) | Bidirectional protocol | SendMessage between Agent Teams + hooks |
+| Vault | Credentials never in generated code | `managed-settings.d/` env vars + `${CLAUDE_PLUGIN_DATA}` |
 
-**H-2 Base (S-H2-BASE):** SpaceshipEntity는 절차적 접근이 정답 (기존 mathcrew 패턴 연장). SpacekidEntity 절차적 접근의 교육 몰입도 미해결 (pedagogical contradiction: unresolvable). reversibility=5 — H-1 GLTF 전환은 `registry.set()` 한 줄.
+### (b) Palantir OSDK v2 Edits Discriminated Union
 
-**H-1 Adversarial (S-H1-ADVERSARIAL):** RPM → Blender → Mixamo → gltfjsx 파이프라인 scope creep. Kenney CC0 shortcut(직접 GLB 다운로드)으로 대부분 완화 가능.
+[Official, tier-1, src-ext-osdk-v2-edits]
 
----
+[clm-rq03-04]: "`Edits.Object<T>`, `Edits.Interface<T>`, `Edits.Link<Src,'linkName'>`"
+[clm-ext-14]: "`createEditBatch<OntologyEdit>(client)` returns batch with `update/create/delete/link/unlink/getEdits` methods."
+[clm-ext-19]: "Edit functions MUST be wrapped as function-backed Actions to have edits applied."
 
-## 9. 시나리오 매트릭스 (Scenario Matrix)
+```typescript
+// OSDK v2 Edits union (from palantir/docs/foundry/functions/typescript-v2-ontology-edits)
+type OntologyEdit =
+  | Edits.Object<MyObjectType>
+  | Edits.Interface<MyInterfaceType>
+  | Edits.Link<MyObjectType, 'linkPropertyKey'>;
 
-24개 시나리오 완료 요약.
+// createEditBatch pattern
+const batch = createEditBatch<OntologyEdit>(client);
+batch.update(myObject, { field: newValue });
+batch.link(objectA, 'linkName', objectB);
+return batch.getEdits(); // returns Edits[], does NOT commit
+```
 
-| 가설 | Base | Best | Worst | Adversarial | 모순 상태 |
-|------|------|------|-------|-------------|----------|
-| H-1 GLTF+AnimationMixer | GLTF pipeline + IBL + AnimationMixer 통합 | Kenney CC0 + Polyhaven HDRI 1일 설정 | GLTF 파이프라인 차단 (Blender 필요) | 에셋 파이프라인 scope creep | CON-H1-BASE-01 resolved (GLB bake 회피) |
-| H-2 절차적 Geometry | 절차적 + IBL + ProceduralRigAnimator | 절차적 photonicRealism 빠른 경로 | 교육 몰입도 미달 | 절차적 캐릭터 표현력 한계 | CON-H2-BASE-01 unresolvable (user study) |
-| H-3 Factory+Registry | OCP 컴포넌트 레지스트리 | 신규 컴포넌트 0 코드 변경 추가 | 엔티티 수 >50 전환 필요 | Map<> 추적 복잡도 | 없음 |
-| H-4 miniplex ECS | World<Entity> + typed query | miniplex onEntityAdded reactive 설정 | world.remove() manual disposal 누락 | 외부 의존성 번들 | 없음 |
-| H-5 DragControls+Proxy | proxy BoxGeometry + snap grid | 프록시 패턴 + touch 지원 1주 | crossFadeTo() 중 jitter | proxy 크기 캐릭터 bounding box 불일치 | 없음 |
-| H-6 Gesture+Spatial | GestureClassifier + PlacementZone | 자연스러운 tablet 제스처 UX | OS edge gesture 충돌 | 600px/sec 임계값 디바이스 캘리브레이션 | clm-pr-31 contradicts H-6 grid rejection |
+### (c) Claude Code v2.1.108 Hook and Plugin Mechanics
 
----
+[Official, tier-1, src-ext-cc-hooks + src-ext-cc-plugins-ref]
 
-## 10. 권장 경로 (Recommended Path)
+**Critical correction surfaced (Correction 2, HIGH severity):**
 
-### 주요 권장: H-1 + H-3 + H-5
+[clm-ext-01]: "PreToolUse hooks return decision via `hookSpecificOutput.permissionDecision` (NOT top-level); top-level `decision` field DEPRECATED. Supports `allow/deny/ask/defer` with precedence `deny > defer > ask > allow`."
 
-| 레이어 | 선택 | 근거 |
-|--------|------|------|
-| 렌더링 (Rendering) | H-1: GLTF+AnimationMixer+IBL | 최고 표현력, 교육 몰입도, r183 공식 지원. SpacekidEntity 자연스러운 skeletal animation |
-| 컴포넌트 (Component) | H-3: Factory+Registry | <50 엔티티에서 외부 의존성 없이 OCP 달성. miniplex 마이그레이션 경로 보존 |
-| 인터랙션 (Interaction) | H-5: DragControls+Proxy | Three.js 공식 내장. 이산 grid snap으로 수학 조작물 정밀 배치. OS 충돌 위험 최소 |
+```json
+// CORRECT v2.1.108 PreToolUse output format
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "allow|deny|ask|defer",
+    "permissionDecisionReason": "shown to Claude for deny",
+    "additionalContext": "injected into Claude context — used for lineage injection"
+  }
+}
+```
 
-### 하이브리드 경로: H-2 -> H-1 피벗
+**Critical restriction surfaced (Correction 1, HIGH severity):**
 
-즉시 실행: H-2 절차적 SpacekidEntity 먼저 구현 (1주). 이유: 빠른 프로토타입, Mixamo 파이프라인 병렬 준비.
+[clm-ext-08]: "Plugin-shipped agents CANNOT define `hooks`, `mcpServers`, or `permissionMode` (security restriction). Hooks must be at plugin-level `hooks/hooks.json`."
 
-피벗 조건: g-pr-02 비공식 사용자 테스트 (target 학생 3-5명)에서 절차적 캐릭터가 교육 몰입도 기준 미달 시 → `registry.set('spacekid', createGLTFSpacekid)` 단 한 줄로 GLTF 캐릭터로 전환.
+Additional v2.1.108 features confirmed available:
 
-SpaceshipEntity: H-2 절차적 접근이 맞는 선택 — 기존 mathcrew CylinderGeometry+TorusGeometry 패턴 연장. 애니메이션 불필요.
+| Feature | Hook/Mechanism | Version Introduced |
+|---------|---------------|-------------------|
+| Block compaction on invariant failure | PreCompact `decision:block` | v2.1.105 |
+| Phase gate on task completion | TaskCompleted hook exit 2 | v2.1.33 |
+| Task creation validation | TaskCreated hook | v2.1.84 |
+| Background drift detection | Plugin monitors manifest | v2.1.105 |
+| Cross-project worktree reuse | EnterWorktree path | v2.1.105 |
+| Tool input rewriting | PreToolUse `updatedInput` | v2.1.85 |
+| Async hook execution | Hook `async:true` / `asyncRewake` | v2.1.85 |
+| Per-Edit failure context injection | PostToolUseFailure `additionalContext` | — |
 
-### 마이그레이션 파일 계획
+[clm-ext-07]: "Plugin manifest monitors field auto-arms Monitor streams at session start or skill invoke."
+[clm-ext-09]: "`${CLAUDE_PLUGIN_DATA}` persists across plugin updates; `${CLAUDE_PLUGIN_ROOT}` does NOT."
 
-수정 (MODIFY):
-- `src/scene/entities/create-pulse-shard.ts` → `create-spacekid-entity.ts` (GLTFLoader + SkeletonUtils.clone + AnimationMixer + proxy BoxGeometry)
-- `src/scene/entities/create-resonance-loop.ts` → `create-spaceship-entity.ts` (절차적 geometry 또는 GLTFLoader)
-- `src/rendering/materials.ts` → photonicMaterialPresets EXTEND (기존 holographic/glow 보존)
-- `src/systems/interaction-controller.ts` → DragControls 통합 ADD (registerMode() 패턴 보존)
-- `src/config/teaching-story-framework.ts` → METAPHOR LAYER ONLY (VT/CRA/beats 미변경)
+### (d) oh-my-claudecode (OMC) Best Practices
 
-신규 (NEW):
-- `src/rendering/photonic-pipeline.ts` — PMREMGenerator + RGBELoader + ACESFilmicToneMapping
-- `src/scene/systems/animation-system.ts` — 모든 AnimationMixer의 per-frame update
-- `src/scene/systems/drag-system.ts` — DragControls + OrbitControls 연동 + snap grid
-- `src/scene/factories/component-factory.ts` — Factory+Registry (H-3) 구현
+[Synthesis, tier-3-vendor-blogs with independent convergence, src-int-palantir-mini-blueprint]
 
-예상 마이그레이션 기간:
+OMC (`github.com/Yeachan-Heo/oh-my-claudecode`, 28.9k stars) and its sister project `clawhip` (760 stars, "event routing to prevent context pollution") provide independent convergence on the append-only event log architecture. Five patterns adopted, five rejected:
 
-| 작업 | 기간 |
-|------|------|
-| IBL + renderer 설정 | 0.5주 |
-| SpaceshipEntity (Kenney Space Kit) | 0.5주 |
-| SpacekidEntity (GLTF + AnimationMixer + proxy) | 2-3주 (에셋 파이프라인 포함) |
-| DragControls 통합 | 1주 |
-| Teaching framework 은유 마이그레이션 | 1-2주 |
-| 합계 | 5-8주 |
+**Adopted from OMC:**
+1. MCP bridge as Harness API (`bridge/mcp-server.ts` exposing 5 tools)
+2. Thin bootstrapper (`bun run scripts/run.ts <handler>.ts`) for all hooks
+3. Read-only enforcement via `disallowedTools` = "edit functions return Edits[] without commit" implementation
+4. Plugin manifest + marketplace.json pair for cross-project distribution
+5. Namespaced skill invocation (`/palantir-mini:init`, `/palantir-mini:verify`)
 
-### 말풍선 프레임워크 개선 (Speech Bubble Redesign)
+**Rejected from OMC:** untyped `.mjs` hook scripts; monolithic `hooks.json`; multiple shadow state dirs; missing v2.1.108 features. palantir-mini will be the first plugin to use the v2.1.108 ontology-guarded compaction pattern.
 
-현재 문제:
-1. `clamp(280px, 36vw, 400px)` + overflow:hidden → 긴 내용 짤림
-2. 6개 요소 (header, title, body, vocab, criteria, prompt)가 단일 400px 카드에 밀집
-3. practice/demonstrate/assess 페이즈에서 말풍선이 교육 오브젝트와 겹침 (오클루전)
+**Three-source convergence** [clm-rq01-04, Synthesis, confidence=0.92]:
 
-권장 해결책: phaseBasedPosition + collapseOnInteraction 조합 — 가장 낮은 구현 복잡도로 오클루전 해결.
-
-microSteps 분할:
-- `TeachingBeat.text` (단일 문자열) → `TeachingBeat.microSteps: string[]` 배열
-- 1 beat = 2-4개 micro-step. Enter로 순차 진행. 모든 micro-step 완료 후 다음 beat 전진
-- `SpeechBubbleContent.microStepIndex` 추가
-
-PromptHUD 분리:
-- keycap + promptText → 화면 오른쪽 하단 독립 PromptHUD 컴포넌트로 분리
-- 말풍선 카드에서 완전 제거 → 카드 높이 압축
-
-오클루전 해결:
-- phaseBasedPosition: motivate/explain 페이즈 → 캐릭터 위 (현재 위치). practice/demonstrate/assess 페이즈 → 화면 상단 좌측 고정 (left:20px, top:20px). tail 숨김. 인터랙티브 페이즈에서 월드 콘텐츠 가시성 확보.
-- collapseOnInteraction: InteractionMode 활성화 시 말풍선 → 한 줄 미니 바 (제목만)로 자동 축소 (height:40px). 탭/클릭으로 펼침.
-- smartAvoidance (교육 표면 screen-projection과 겹침 자동 감지) → Phase 3 후보.
-
-구현 파일 (7개):
-
-| 파일 | 변경 내용 |
-|------|----------|
-| `src/types/teaching.ts` | `TeachingBeat.microSteps: string[]` + `SpeechBubbleContent.microStepIndex` 추가 |
-| `src/hud/speech-bubble.ts` | prompt bar 제거, phase 기반 위치 로직, collapsed 상태 추가 |
-| `src/hud/hud.ts` | PromptHUD 컴포넌트 추가 (오른쪽 하단) |
-| `src/systems/teaching-flow.ts` | micro-step 진행 로직 |
-| `src/game-loop.ts` | microStepIndex 관리 |
-| `src/config/teaching-content.ts` | beats text → microSteps[] 변환 |
-| `src/systems/interaction-controller.ts` | mode 활성화 시 collapsed=true 트리거 |
+| Concept | Anthropic Managed Agents | Palantir Foundry | OMC clawhip |
+|---------|--------------------------|-----------------|-------------|
+| State foundation | Session = append-only log | Decision Lineage 5-dim | "event routing" |
+| Stateless layer | Harness | Edit Function (compute only) | MCP bridge |
+| Compute/execute split | Harness vs Sandbox | Functions vs Actions | Read-only vs writer agents |
 
 ---
 
-## 11. 위험 및 불확실성 (Risks/Unknowns)
+## 6. Ontology Mapping
 
-### 미결 핵심 갭
+T4 (ontologist) produced 28 primitives across all 5 domains. This is the first kosmos session where SECURITY and LEARN are first-class domains, not N/A placeholders.
 
-| 갭 ID | 심각도 | 설명 | 영향 객체 |
-|-------|--------|------|----------|
-| g-pr-01 | HIGH | MeshSSSNodeMaterial FPS 비용 — Chromebook Intel Iris Xe에서 n8ao SSAO 활성 시 spacesuit-fabric SSS 적용 FPS delta 미측정 | PerformanceBudgetPolicy (obj-pr-13) |
-| g-pr-02 | HIGH | SkeletonUtils.clone() x5 동시 draw call 예산 — Chromebook 60fps 타겟에서 renderer.info.render.calls 미측정. ~10-25 인스턴스 가능 예상 [Synthesis 0.90], 미검증 | SpacekidEntityDef (obj-pr-02) |
-| g-pr-03 | MEDIUM | DragControls proxy + SkinnedMesh AnimationMixer 동시 실행 — crossFadeTo() 중 jitter 위험. proxy 패턴 메커니즘 확인됨 (ref 0.95), 실제 jitter 미테스트 | CharacterDragPlacement (ACTION) |
+**Ontologist key insight (world-model.json):** "palantir-mini cleanly maps Anthropic Managed Agents virtualization (Session = append-only log / Harness = stateless MCP bridge / Sandbox = worktree) onto Palantir 5-domain ontology with no fudge. The EventEnvelope discriminated union (10 variants) IS the LEARN-domain Golden Table, and every DATA/LOGIC/ACTION mutation flows through it as events. SECURITY rides on Native Runtime mechanics instead of new runtime code."
 
-### 추가 위험
+### D/L/A/S/L Domain Summary (28 primitives)
 
-FM-pedagogical-h2 (HIGH, UNRESOLVABLE): 절차적 geometry SpacekidEntity의 한국 초등학생 교육 몰입도는 연구만으로 결정 불가. 기술 구현은 유효하나 참여도 충분성은 사용자 연구 또는 이해관계자 결정이 필요하다. 완화: H-3 Factory+Registry로 H-1 GLTF 전환이 `registry.set()` 한 줄.
+| Domain | Count | Primitives |
+|--------|-------|-----------|
+| **DATA** | 5 | EventEnvelope (Struct, 10-variant discriminated union), ObjectType, PropertyType (24 branded), SnapshotManifest, CommitSha (branded) |
+| **LOGIC** | 8 | EditFunction (returns Edits[]), InterfaceType, LinkType/OBLT, DerivedProperty, Reducer, LinkConstraint, SubmissionCriteria (computational), ValidationPhaseEvaluator |
+| **ACTION** | 5 | Tier-1 Declarative Action, Tier-2 Function-Backed Action, AtomicCommit, ActionExecutorAgent, CodegenRun |
+| **SECURITY** | 3 | Layer-1 RBAC Policy, SubmissionCriteria (gate semantics), CapabilityToken (vault pattern) |
+| **LEARN** | 5 | AppendOnlyEventLog (events.jsonl), DecisionLineage5Dim, EvidenceSufficiency, LineageReplay, RefinementProposal |
 
-H-6 제스처 OS 충돌 위험: iOS 15+ swipe-up과 Android 내비게이션 제스처가 canvas touch와 충돌. DragControls (H-5)가 더 낮은 리스크. H-6은 H-5 검증 후 개방형 탐색 모드에서 선택적 도입.
+**DevCon 5 principles applied:** DDD / DRY / OCP / PECS — all four applied with per-primitive documentation. `overallForwardPropStatus = healthy`, `overallBackwardPropStatus = healthy`.
 
-Mixamo 파이프라인 복잡도: FBX → Blender → GLB 변환 필요. Mixamo에 Adobe 계정 필요. Blender 버전 고정 요구. 완화: Kenney Animated Characters 3 (CC0 GLTF)를 먼저 검증 — AnimationMixer 호환 확인 시 Mixamo 파이프라인 불필요.
+### Notable ontological decisions
 
-말풍선 마이그레이션 범위: `teaching-content.ts`의 모든 beat text를 microSteps[] 배열로 변환 필요. 기존 beats 수와 평균 분할 비율 파악 후 일정 산정 권장.
+**Transition-zone calls (LOGIC not DATA):** InterfaceType and LinkType appear in the T1 decomposition under DATA scope. The ontologist reclassified both to LOGIC per the Transition Zone rule (SH-01: they enable reasoning/traversal across objects, not entity identity). DerivedProperty and Reducer also live in LOGIC. These calls were accepted by the simulator without re-debate.
 
-SkeletonUtils.retarget() 신뢰성: 세션 내 설계 수준에서 해결 — GLB에 Mixamo 애니메이션 bake 후 포함으로 retarget() 런타임 호출 완전 회피. 프로토타입 최종 검증 필요.
+**SubmissionCriteria dual modeling (intentional):** SubmissionCriteria appears in BOTH LOGIC (prim-logic-07, computational evaluator) and SECURITY (prim-sec-02, gate semantics). This is intentional per DC5 DDD: the computation lives once (LOGIC, testable/replayable without commit), and the gate semantics lives once (SECURITY, policy-reviewable without digging through function bodies). Not a duplication defect — a domain-slice decision.
+
+**EventEnvelope 10-variant schema:**
+
+```typescript
+// EventEnvelopeBase — all 5 Decision Lineage dimensions
+interface EventEnvelopeBase {
+  eventId: EventId;         // branded string
+  when: ISO8601;            // WHEN dimension
+  atopWhich: CommitSha;     // ATOP_WHICH dimension (git HEAD SHA)
+  throughWhich: {           // THROUGH_WHICH dimension
+    sessionId: SessionId;
+    toolName: string;
+    cwd: string;
+  };
+  byWhom: {                 // BY_WHOM dimension
+    identity: string;
+    agentName?: string;
+    teamName?: string;
+  };
+  withWhat: {               // WITH_WHAT dimension
+    reasoning?: string;
+    hypothesis?: string;
+  };
+  sequence: number;         // monotonic counter = optimistic version vector
+}
+
+type EventEnvelope =
+  | { type: 'edit_proposed';              base: EventEnvelopeBase; functionName: string; params: unknown; hypotheticalEdits: OntologyEdit[] }
+  | { type: 'edit_committed';             base: EventEnvelopeBase; actionTypeRid: string; appliedEdits: OntologyEdit[]; submissionCriteriaPassed: string[] }
+  | { type: 'submission_criteria_failed'; base: EventEnvelopeBase; actionTypeRid: string; failedConstraints: ConstraintResult[] }
+  | { type: 'validation_phase_completed'; base: EventEnvelopeBase; phase: 'design'|'compile'|'deploy'|'merge'|'runtime'|'post_write'; passed: boolean; errorClass?: string }
+  | { type: 'codegen_started';            base: EventEnvelopeBase; targetProject: string; ontologyVersion: string }
+  | { type: 'codegen_completed';          base: EventEnvelopeBase; targetProject: string; generatedFiles: string[]; durationMs: number }
+  | { type: 'phase_completed';            base: EventEnvelopeBase; phaseTag: string; taskId: string; validations: string[] }
+  | { type: 'drift_detected';             base: EventEnvelopeBase; driftType: string; affectedObjectType: string }
+  | { type: 'session_started';            base: EventEnvelopeBase; model: string; effort: string }
+  | { type: 'session_ended';              base: EventEnvelopeBase; reason: string; eventCount: number };
+```
+
+[Composed from: §DL-02 (5D base), OSDK v2 Edits union, §ACTION.MU-14..18 (constraint types), §VAL.R-02..R-08 (6 phases) — blueprint.md Gap fill 1]
+
+### ForwardProp and BackwardProp paths (healthy)
+
+**ForwardProp (6 steps):**
+`~/.claude/schemas/ontology/` (declarations) → `bun codegen` → `lib/event-log/types.ts` + `per-project src/generated/` → `plugin runtime emit_event` → `<project>/.palantir-mini/session/events.jsonl`
+
+**BackwardProp (to ontology update):**
+`events.jsonl` → `replay_lineage MCP tool` → 5-dim lineage graph → `drift_detected` events → `ontology refinement proposal` → ontologist review → `schemas/ontology/lineage/` update
+
+Steps 4+5 of BackwardProp (refinement proposals persistence) have minor persistence gaps — deferred to post-v0 Phase III.
 
 ---
 
-## 12. 다음 실험 (Next Experiments)
+## 7. Competing Options
 
-| 실험 ID | 갭 | 방법 | 통과 기준 | 실패 시 조치 |
-|---------|-----|------|----------|-------------|
-| NE-g-pr-01 | g-pr-01 | stats.js FPS 벤치마크 — 1 SpacekidEntity MeshSSSNodeMaterial (head mesh) vs 기준 MeshPhysicalMaterial. n8ao SSAO 활성. 5초 FPS 측정 | >50fps on Chromebook-class GPU (Intel Iris Xe / UHD 620) | MeshPhysicalMaterial roughness/specular 근사치로 대체. SSS를 성능 티어 감지 후 opt-in feature flag로 전환 |
-| NE-g-pr-02 | g-pr-02 | SkeletonUtils.clone() x5 spawn + 모든 AnimationMixer 실행. renderer.info.render.calls 측정. Chromebook GPU 5초 FPS 측정 | <100 draw calls per frame. >50fps 지속 | 최대 동시 SpacekidEntity 인스턴스 감소. 정적 mesh 파트 geometry 병합. 3개 초과 인스턴스 LOD 적용 |
-| NE-g-pr-03 | g-pr-03 | 애니메이션 SpacekidEntity GLTF 로드. idle Action 실행. DragControls drag 시작. drag 중 crossFadeTo(walkAction, 0.3, true) 트리거. 0.3초 blend window 동안 root Group position jitter 관찰 | 0.3초 crossFade 중 position jitter 없음 | GLB에 root motion bake 여부 확인. 있으면 Blender in-place bake. 없으면 modelGroup.position.copy()를 mixer.update() 이후 postRender 단계로 이동 |
-| NE-microSteps | 말풍선 | microSteps UX 테스트 — 기존 1 beat 단일 텍스트 vs 2-4 microStep 분할. target 학생 3-5명 관찰 | 말풍선 짤림 0건. beat 이해도 동등 이상 | microStep 분할 기준 재조정 |
-| NE-kenney-anim | asset | Kenney Animated Characters 3 GLB 다운로드 → r183 GLTFLoader 로드 → gltf.animations[] 비어있지 않음 확인 → mixer.clipAction().play() 테스트 | gltf.animations[] non-empty. idle/walk 재생 시각 확인 | Mixamo FBX → Blender → GLB 파이프라인으로 fallback |
+Three hypotheses were generated at T5 and scored at T6 across 12 scenarios.
+
+### H-A: Append-Only Event Log Foundation (WINNER)
+
+**Domain:** LEARN (central role)
+**Statement:** Append-only `events.jsonl` per project with monotonic sequence counter as optimistic version vector is the optimal foundation for palantir-mini's LEARN-centric D/L/A ontology, because every DATA/LOGIC/ACTION mutation flows through a single `EventEnvelope` discriminated union whose 10 variants collectively form the Decision Lineage 5-dim record, and sequence-check-before-append under `proper-lockfile` (or `fs.mkdir` mutex fallback) gives StaleObject-equivalent concurrency without in-place mutation.
+
+**Architecture implications:**
+- Every mutation in all 5 domains emits an `EventEnvelope` to `events.jsonl`
+- State is derived by folding events via a Reducer (the `foldToSnapshot()` LOGIC primitive)
+- No in-place mutation — rollback = append a compensating event
+- The LEARN domain IS the substrate, not a side channel
+- Three independent references converge on this pattern [clm-rq01-04]
+
+**Pre-prototype confidence:** 0.85
+
+### H-B: Snapshot + StaleObject Optimistic Concurrency (FORMAL COMPETITOR, DEFEATED)
+
+**Domain:** DATA (primary, LEARN demoted to optional)
+**Statement:** Versioned per-project `state.json` with a per-read version tag where writers re-read on conflict is simpler, faster, and survives every v2.1.108 corner case without requiring a filesystem lockfile.
+
+**Architecture implications:**
+- `state.json` IS truth; `events.jsonl` becomes optional audit side channel
+- Writers check version before commit, retry on mismatch (StaleObject pattern)
+- LEARN domain is secondary — `LineageReplay` cannot reconstruct history without full event log
+- GAIN: Read performance is O(1) vs H-A's O(events) replay (mitigated by H-A's snapshot cache)
+- LOSS: BackwardProp path structurally crippled — no history to replay
+- LOSS: Decision Lineage 5-dim cannot be captured with per-mutation fidelity
+
+**Pre-prototype confidence:** 0.45. Empirically defeated at T8 with 24.2% update loss rate.
+
+### H-C: 3-Phase Validation Pipeline (CO-WINNER, ORTHOGONAL)
+
+**Domain:** LOGIC (ValidationPhaseEvaluator primitive)
+**Statement:** A 3-phase validation pipeline (Design+Compile fused, Runtime, Post-Write) is the right v0 minimum for palantir-mini, because CC v2.1.108 hooks map cleanly to exactly 3 hook-event classes, the remaining 3 Palantir phases (Deploy/Merge-time) presume a Foundry-like branching workflow that Native Runtime does not mirror, and deferring full 6-phase coverage avoids over-engineering hooks that carry no actionable signal.
+
+**Architecture implications:**
+- 3 hook entries in `hooks/hooks.json`: SessionStart+PostToolUse (Design+Compile), MCP `commit_edits` pre-flight (Runtime), PostToolUse(Edit) drift check (Post-Write)
+- Deploy/Merge phases delegated to git pre-commit/pre-push hooks outside palantir-mini
+- ~150 LOC handler code for 3 phases (vs ~300 LOC for full 6-phase)
+- H-C is ORTHOGONAL to H-A vs H-B — runs on top of the event-log substrate, not instead of it
+- Mitigation for adversarial hook burnout: `async:true` field available in v2.1.108
+
+**Pre-prototype confidence:** 0.70. Co-accepted with H-A.
 
 ---
 
-## 13. 결정 변경 조건 (What Would Change the Decision)
+## 8. Simulation Results (11 Dimensions)
 
-다음 조건이 충족되면 현재 H-1+H-3+H-5 추천 경로를 재검토해야 한다.
+The simulator completed 2 revision rounds on all 12 scenarios. After T7+T8 prototype validation, the `prototypeValidation` dimension was updated from the initial score of 3.
 
-| 조건 | 영향 | 변경 방향 |
-|------|------|----------|
-| 절차적 캐릭터(H-2)의 교육 몰입도가 GLTF(H-1)와 동등함이 사용자 연구로 확인되면 | SpacekidEntity GLTF 파이프라인 불필요 | H-2 절차적 접근으로 확정. Blender+Mixamo 파이프라인 전면 제거. 에셋 파이프라인 리스크 0 |
-| miniplex ECS 엔티티 수가 50개를 초과하는 수학 개념이 출현하면 | Factory+Registry(H-3)가 쿼리 복잡도에서 불리해짐 | H-4 miniplex ECS로 전환. `registry.set()` → `world.add(entity)`. 외부 의존성 ~2KB 추가 수용 |
-| H-6 제스처 UX가 H-5 DragControls 대비 InteractionMode 완료율에서 유의미하게 우월하면 | 학습 효과 증거 기반 제스처 전환 타당성 확보 | H-6 GestureClassifier + PlacementZone으로 전환. OS edge gesture 충돌 완화 추가 구현 필요 |
-| 말풍선 microStep 분할이 beat 이해도를 개선하지 못하면 | microSteps 분할 근거 약화 | microStep 없이 max-height + scroll 방식으로 전환. PromptHUD 분리와 phaseBasedPosition은 독립적으로 유지 |
-| MeshSSSNodeMaterial이 Chromebook에서 10fps 이상 하락을 유발하면 (NE-g-pr-01 실패) | spacesuit-fabric SSS 적용 불가 | SSS 제거. MeshPhysicalMaterial roughness/specular 근사치로 대체. SSS를 고성능 디바이스 전용 opt-in feature flag로 전환 |
-| SkeletonUtils.clone() x5가 100 draw call 예산 초과 또는 <50fps를 기록하면 (NE-g-pr-02 실패) | H-1 GLTF 스택의 Chromebook 실현가능성 문제 | 최대 SpacekidEntity 인스턴스 수 감소 (3으로 제한). GPU geometry merge 적용. 또는 H-2 절차적 접근으로 SpacekidEntity 전환 (Group.clone() 사용) |
+### H-A Scenario Scores (after prototype validation)
+
+| Dimension | Base | Best | Worst | Adversarial | Notes |
+|-----------|------|------|-------|-------------|-------|
+| Evidence Fit | 5 | 4 | 3 | 3 | 3-source convergence on base; A1 inference on others |
+| Implementation Difficulty | 4 | 3 | 2 | 3 | Proven patterns; worst case adds schema-bump tooling |
+| Risk Severity | 4 | 5 | 2 | 1 | Adversarial race is critical if unmitigated |
+| Reversibility | 4 | 4 | 4 | 3 | JSONL portable; adversarial: duplicate sequences require reconciliation |
+| Time-to-Value | 4 | 3 | 2 | 3 | 1-2 weeks base; months if schema bumps |
+| Governance Compliance | 4 | 4 | 3 | 2 | Adversarial: audit trail integrity at stake |
+| Ecosystem Maturity | 4 | 4 | 3 | 3 | proper-lockfile aging on worst/adversarial |
+| D/L/A Fit | 5 | 5 | 4 | 4 | All 5 domains; adversarial does not blur classifications |
+| ForwardProp Health | 5 | 5 | 4 | 3 | Chain can fail silently if writes lost (adversarial) |
+| Agent Composability | 5 | 5 | 4 | 3 | 5 MCP tools compose cleanly |
+| Prototype Validation | **5** | **5** | **5** | **5** | T7: 2000/2000 events, 0 lost, 0 torn writes, 0 duplicates |
+
+**H-A prototype validation score updated from 3 → 5 after T7 empirical results.**
+
+### H-B Scenario Scores (after prototype validation)
+
+| Dimension | Base | Best | Worst | Adversarial |
+|-----------|------|------|-------|-------------|
+| Evidence Fit | 3 | 2 | 3 | 4 |
+| Implementation Difficulty | 5 | 5 | 3 | 2 |
+| Risk Severity | 3 | 4 | 2 | 1 |
+| Reversibility | 3 | 3 | 2 | 2 |
+| Time-to-Value | 5 | 5 | 2 | 2 |
+| Governance Compliance | 3 | 3 | 2 | 1 |
+| Ecosystem Maturity | 5 | 5 | 4 | 3 |
+| D/L/A Fit | 3 | 3 | 2 | 2 |
+| ForwardProp Health | 3 | 3 | 2 | 2 |
+| Agent Composability | 3 | 3 | 2 | 2 |
+| Prototype Validation | **1** | **1** | **1** | **1** |
+
+**H-B prototype validation score updated from 3 → 1 after T8 empirical results (484 lost updates / 2000 = 24.2% loss rate).**
+
+### H-C Scenario Scores
+
+| Dimension | Base | Best | Worst | Adversarial |
+|-----------|------|------|-------|-------------|
+| Evidence Fit | 4 | 3 | 3 | 4 |
+| Implementation Difficulty | 5 | 5 | 3 | 3 |
+| Risk Severity | 4 | 4 | 3 | 3 |
+| Reversibility | 5 | 5 | 4 | 4 |
+| Time-to-Value | 5 | 5 | 3 | 4 |
+| Governance Compliance | 4 | 4 | 3 | 4 |
+| Ecosystem Maturity | 5 | 5 | 4 | 4 |
+| D/L/A Fit | 5 | 5 | 4 | 4 |
+| ForwardProp Health | 4 | 4 | 4 | 4 |
+| Agent Composability | 4 | 4 | 4 | 3 |
+| Prototype Validation | 3 | 3 | 3 | 3 |
+
+H-C prototype validation dimension was not updated (H-C is a validation architecture question, not a concurrency question; its empirical validation is deferred to v0 integration).
+
+### Prototype Validation Results Summary
+
+**H-A (prototype-a, T7):**
+- 5 original tests + 5 eval suite tests = 10 tests, 10 pass, 2,287 `expect()` calls
+- Adversarial 2-writer race: `{ concurrentWriters:2, eventsPerWriter:1000, totalExpected:2000, totalActual:2000, duplicateSequences:0, tornWrites:0, lostEvents:0, verdict:"pass" }`
+- Reproducible across 2 independent runs
+- `tsc --noEmit`: 0 errors
+- Zero failure modes
+
+**H-B (prototype-b, T8):**
+- 5 original tests + 5 eval suite tests = 10 tests, 10 pass (tests verify the weakness), 51 `expect()` calls
+- Adversarial 2-writer race: `{ lostUpdates:484 (run1) / 353 (run2) / 56 (run3), staleErrors:111/209/45, verdict:"h-b-weakness-confirmed" }`
+- TOCTOU variance confirms structural weakness (not load-dependent)
+- `tsc --noEmit`: 0 errors
+- 4 classified failure modes (2 critical: LEARN + ACTION; 2 high: LOGIC + DATA)
 
 ---
 
-## 평가자 게이트 요약 (Evaluator Gate Summary)
+## 9. Scenario Matrix
 
-| 규칙 | 결과 | 설명 |
-|------|------|------|
-| R1 (저급 의존성 금지) | PASS | 전체 소스 tier-1 (7개) + tier-2 (1개). 핵심 클레임 신뢰도 0.90-0.98 |
-| R2 (미해결 모순) | N/A | 1개 설계 수준 해결, 3개 본질적 미해결 (H-1 vs H-2 tradeoff). 추천을 차단하지 않음 |
-| R3 (시나리오 연결) | PASS | 24 시나리오 (6H x 4유형). STOPPING_CRITERIA_MET=true. 11개 차원 전체 점수화 |
-| R4 (위험 연결) | PASS | 5개 failure mode (HIGH 1, MEDIUM 3, LOW 1). 4개 NextExperiment. 3개 critical gap 구체적 조치 포함 |
-| R5 (증거 신선도) | PASS | 8개 소스 전체 freshnessStatus=current. Three.js r183 문서가 프로젝트 버전 0.183.2와 일치 |
-| R6 (출처 구분) | PASS | 모든 클레임 [Official]/[Synthesis]/[Inference] 태그 명기. Inference 클레임 <0.90 정직하게 표시 |
-| R7 (승리 근거) | PASS | 하이브리드 추천 (H-2->H-1 via H-3 registry) 다점 근거: time-to-value, OCP pivot, 공유 파이프라인, 구체적 트리거 조건 |
-| R8 (대안) | PASS | 6개 가설 분석. H-4 ECS 명시적 근거로 비우선화. alternatives >= 5 |
-| R9 (증거 충분성) | PASS | H-1/H-5 base 충분. H-2/H-3 base partial 정직한 단서 포함 |
-| R10 (역전 조건) | PASS | 섹션 13: 6개 명시적 역전 조건. 피벗 트리거: engagement study 결과 → registry.set() 전환 |
-| R11 (D/L/A 분류) | PASS | 22개 photonicRealism 객체: DATA(7) LOGIC(6) ACTION(6) LEARN(3). 모든 semanticHeuristic 포함 |
-| R12 (DevCon 5 원칙) | PASS | 43개 객체 전체 DDD/DRY/OCP/PECS. 6개 가설 점수화. DevCon Phase 2->3 문서화 |
-| R13 (ForwardProp/BackwardProp) | PASS | 22개 객체 전체 propagation path 보유. 전체 partial (구현 전). 추천 경로 핵심 체인 손상 없음 |
-| R14 (프로토타입 빌드) | PASS | proto-pr-T7-001 + proto-pr-T8-001 research-complete. 17개 결합 research finding. 공식 문서 기반 reference implementation |
-| R15 (eval 통과율) | PASS | T7: 33/33 (1.0). T8: 35/35 (1.0). 합계 68/68. 5개 failure mode + 완화 조치 |
+Full 12-scenario matrix (base/best/worst/adversarial × H-A/H-B/H-C). DevCon5 alignment score included.
 
-최종 판정: ACCEPT. Debate 없음. Pass rate delta=0%. D/L/A 오분류 없음. H-4 비우선화 근거 확인.
+| Scenario | Hypothesis | Type | Evidence Sufficiency | Contradiction Status | DevCon5 Score | Prototype Validation |
+|----------|-----------|------|---------------------|---------------------|---------------|---------------------|
+| S-HA-BASE | H-A | base | sufficient | none | 5 | 5 (T7: 0/2000 lost) |
+| S-HA-BEST | H-A | best | partial (A1 inference, A2 persistence gap) | none | 5 | 5 |
+| S-HA-WORST | H-A | worst | partial | evidence-gap-driven → T7 resolved | 4 | 5 (fallback works) |
+| S-HA-ADV | H-A | adversarial | partial | evidence-gap-driven → T7 resolved | 4 | 5 (0 torn writes) |
+| S-HB-BASE | H-B | base | partial | **unresolvable** (LEARN centrality violation) | 3 | 1 |
+| S-HB-BEST | H-B | best | insufficient | resolved (A2 caveat) | 3 | 1 |
+| S-HB-WORST | H-B | worst | partial | resolved (git-as-audit lossy) | 2 | 1 |
+| S-HB-ADV | H-B | adversarial | sufficient | none | 2 | 1 |
+| S-HC-BASE | H-C | base | sufficient | none | 5 | 3 (deferred) |
+| S-HC-BEST | H-C | best | partial (A2 speculative) | none | 5 | 3 |
+| S-HC-WORST | H-C | worst | partial | resolved (soft risk) | 4 | 3 |
+| S-HC-ADV | H-C | adversarial | partial (A2 no benchmark) | none | 4 | 3 |
+
+**Key observations:**
+- S-HB-BASE has `contradictionStatus: "unresolvable"` — the LEARN centrality conflict is architectural, not empirical. H-B either accepts LEARN demotion (breaking ontologist model) or adopts `events.jsonl` as primary (collapsing to H-A).
+- All H-A evidence-gap-driven contradictions (S-HA-WORST, S-HA-ADV) were resolved by T7 prototype — gaps filled empirically.
+- H-C scenarios have no unresolvable contradictions; the 3-phase vs 6-phase question is a spectrum, not a fork.
+
+---
+
+## 10. Recommended Path
+
+**Evaluator gate: ACCEPT**
+**Winner: H-A (Append-Only Event Log Foundation)**
+**Co-winner: H-C (3-Phase Validation Pipeline, orthogonal)**
+**Formal competitor: H-B (defeated — 484/2000 lost updates, 24.2% loss rate)**
+**Debate rounds: 0 / 2**
+
+### Win rationale (3 independent evaluation axes)
+
+1. **Architectural convergence** — three independent references (Anthropic Managed Agents "Session = append-only log" [clm-rq01-02], Palantir Decision Lineage 5-dim [clm-rq01-01], OMC clawhip "event routing to prevent context pollution" [clm-rq01-04]) all converge on the append-only log pattern without coordination. This is the strongest available evidence without API access.
+
+2. **Empirical superiority** — H-A prototype passes 2-writer adversarial race at 2×1000 events with 0 duplicate sequences, 0 torn writes, 0 lost events (reproducible across 2 runs). H-B loses 484/2000 updates (24.2%) with TOCTOU variance across 3 runs confirming the weakness is structural, not load-dependent [eval-results.json comparisonSummary].
+
+3. **Ontology fit** — H-A populates all 5 domains first-class per world-model's 28 primitives (DATA/LOGIC/ACTION/SECURITY/LEARN, `overallForwardPropStatus = healthy`, `overallBackwardPropStatus = healthy`). H-B cannot reliably populate LEARN (R11 trigger: AppendOnlyEventLog prim-learn-01 impossible from lossy substrate) and has structurally broken BackwardProp (R13 trigger: no history to replay from state.json substrate).
+
+### v0 Implementation Steps
+
+**Step (a): Create plugin structure**
+```
+~/.claude/plugins/palantir-mini/
+├── .claude-plugin/
+│   ├── plugin.json          # name, version, hooks ref, mcpServers, skills, agents
+│   └── marketplace.json     # for /plugin marketplace add
+```
+Both files required for cross-project distribution per OMC marketplace pattern [blueprint.md Gap fill, clm-ext-08].
+
+**Step (b): Ship hooks at plugin-level `hooks/hooks.json` (NOT agent frontmatter)**
+
+[Correction 1 — clm-ext-08]: Plugin agents CANNOT define hooks. All hooks live at `hooks/hooks.json`. Hook handlers use matchers to target specific events and agents.
+
+Critical hook registrations:
+- `PreToolUse(Edit|Write ontology/*)` → append `edit_proposed` event, inject 5-event lineage summary via `hookSpecificOutput.additionalContext`
+- `PostToolUse(Edit)` → append `edit_committed` event + trigger `CodegenRun`
+- `PreCompact` → check ontology invariants; `decision:block` if failing (v2.1.105)
+- `TaskCompleted` → emit `phase_completed` event; `exit 2` if phase gate fails
+- `SubagentStop(ontology-verifier)` → validate verifier output before agent shutdown
+
+All `PreToolUse` hooks must use [Correction 2 — clm-ext-01]:
+```json
+{ "hookSpecificOutput": { "hookEventName": "PreToolUse", "permissionDecision": "allow|deny" } }
+```
+
+**Step (c): MCP bridge exposing 5 tools**
+
+```typescript
+// bridge/mcp-server.ts — 5 tool registrations
+// mirrors Harness API in Session/Harness/Sandbox virtualization
+const tools = [
+  { name: "get_ontology",          // read derived snapshot
+    inputs: "{ domain, project, atSequence? }" },
+  { name: "emit_event",            // append to events.jsonl
+    inputs: "{ project, envelope: EventEnvelope }",
+    outputs: "{ eventId, sequence }" },
+  { name: "apply_edit_function",   // execute tier-2 function returning Edits[]
+    inputs: "{ project, functionName, params }",
+    outputs: "{ edits: OntologyEdit[], provenance: 5D lineage }",
+    mirrors: "§LOGIC.FN-04 authoring helper" },
+  { name: "commit_edits",          // atomic commit (action wrapper)
+    inputs: "{ project, actionTypeRid, edits, submissionCriteria, validateOnly? }",
+    outputs: "{ result: VALID|INVALID, committed, appliedEdits?, perCriterionResult }",
+    mirrors: "$validateOnly / $returnEdits OSDK 2.0" },
+  { name: "replay_lineage",        // BackwardProp via replay
+    inputs: "{ project, filter: { fromSequence?, toSequence?, eventTypes?, byWhom?, affectedObjectType? } }",
+    outputs: "{ events, derivedState, lineageGraph }",
+    mirrors: "Palantir Decision Lineage 5-dim + BackwardProp" }
+];
+```
+
+Tools appear in Claude Code as `mcp__palantir-mini__get_ontology`, etc. [clm-rq04-01].
+
+**Step (d): `~/.claude/schemas/ontology/` extension**
+
+New directories under the existing schemas directory:
+```
+~/.claude/schemas/ontology/
+├── primitives/        # object-type.ts, link-type.ts, action-type.ts, property-type.ts, interface-type.ts
+├── functions/         # function-signature.ts, derived-property.ts, reducer.ts
+├── policies/          # submission-criteria.ts, rbac.ts, propagation.ts
+├── lineage/           # decision-lineage.ts, event-types.ts (10-variant EventEnvelope union)
+├── generators/        # osdk-2.0-config.ts, lazy-loader.ts
+├── types.ts           # KEEP — extend with branded RIDs
+├── semantics.ts       # KEEP
+└── validation/        # KEEP + extend with phase-evaluator tests
+```
+
+**Step (e): Per-project session directory**
+```
+<project>/.palantir-mini/session/
+├── events.jsonl       # THE source of truth (append-only)
+├── snapshots/         # derived cache (not truth)
+│   ├── ontology.json
+│   └── manifest.json  # SnapshotManifest: version, atSequence, generatedAt
+├── handoffs/          # phase-gate records
+└── locks/             # events.lock (advisory)
+```
+
+**Step (f): Migration sequence (starting from palantir-math)**
+
+Following [blueprint.md Gap fill 5]:
+1. Extract `schema.ts` (2.5KB) first — validate typegen primitives, minimal blast radius
+2. Extract `security.ts` (4KB) — exercises policy codegen
+3. Refactor `data.ts` (141KB) by ObjectType into `primitives/` — requires OSDK codegen ready
+4. Migrate `capabilities.ts` (57KB) to `~/.claude/schemas/ontology/policies/rbac.ts` — cross-project shared
+5. Migrate `changeContracts.ts` (66KB) to `lib/actions/tier1-declarative.ts` + `tier2-function.ts`
+6. Wire `events.jsonl` emission via `plugin hooks/hooks.json` (NOT agent frontmatter — Correction 1)
+7. Parallel old-path support via compat shim (re-export from generated files) during transition
+
+After palantir-math: mathcrew, then kosmos. Each project follows the same 7-step sequence.
+
+---
+
+## 11. Risks and Unknowns
+
+### risk-01: Bun compatibility for proper-lockfile (MEDIUM)
+
+[clm-ext-24, inference, confidence=0.75] proper-lockfile uses standard Node `fs` APIs (graceful-fs); compatibility under Bun is inferred, not empirically proven. H-A prototype-a proved `fs.mkdir` fallback path works (0 lost events / 2000) but did not test proper-lockfile itself under Bun.
+
+**Mitigation:** T7 already proved `fs.mkdir`-only path works. Use that as the production path in v1 and defer proper-lockfile to optional optimization.
+
+### risk-02: Cross-project shared schemas write coordination (MEDIUM)
+
+3 projects share `~/.claude/schemas/ontology/`. Claude Code is declared sole writer (constraint boundary). The gap-03 architectural resolution (git branches coordinate parallel sessions; per-project `events.jsonl` lockfile handles per-project atomic writes) works for v0 — but the assumption that Codex/Gemini remain readers-only must hold at deployment time.
+
+**Mitigation:** gap-03 resolved architecturally — no new mechanism needed for v0. If Codex/Gemini become writers, reintroduce multi-writer coordination.
+
+### risk-03: proper-lockfile last published 2020 (LOW)
+
+5 years old; maintainer activity low. Still 9.27M weekly downloads [contra-01, resolved].
+
+**Mitigation:** `fs.mkdir` zero-dep fallback is already the empirically proven path. Consider making fallback the only path in v1.
+
+### risk-04: BackwardProp persistence gap — Phase III closure (LOW)
+
+world-model `backwardProp.gaps` steps 4+5: refinement proposals persistence not yet implemented. Phase III (AI-First) requires this loop to close.
+
+**Mitigation:** Deferred to post-v0. Phase I + Phase II are self-contained and do not require Phase III closure.
+
+### Deferred open questions (from source-map gapsForOntologist)
+
+These are NOT blocking for v0 but require resolution before Phase III:
+
+1. **K-LLM consensus mechanism** — when multiple agents propose conflicting ontology changes, which one wins? Deferred per blueprint.md open questions section.
+2. **Workflow Lineage vs Decision Lineage composition** — the `ATOP_WHICH` dimension captures git SHA but does not fully capture Palantir's Workflow Lineage concept (which spans multiple decisions). Product composition unclear.
+3. **Bun empirical compatibility for proper-lockfile** — flagged as `flag-03 MEDIUM` in scenarios.json. `fs.mkdir` fallback mitigates but does not close the question.
+4. **Edit function rollback semantics** — in an append-only model, rollback = append a compensating event (never delete). The compensating event schema for partial rollbacks is not yet formalized.
+
+---
+
+## 12. Next Experiments
+
+Phase I and Phase II of the v0 roadmap are defined. After v0 stabilizes, Phase III experiments:
+
+### (a) AIP Logic Functions integration
+
+Palantir AIP Logic Functions (`§LOGIC.FN-09`) exposes computation as a service — functions callable via OSDK without embedding logic in client code. palantir-mini's `apply_edit_function` MCP tool is the native runtime equivalent. Next experiment: validate that the `apply_edit_function` → `Edits[]` → `commit_edits` round-trip is functionally equivalent to AIP Logic Function invocation via OSDK `$returnEdits:true`.
+
+### (b) Workshop frontend ontology bridge
+
+The `code-editor` surface in the frontend ontology (decision-log frontendOntology) includes generated descenders (`src/generated/`) and branded RID types. Next experiment: validate that palantir-math's TypeScript surfaces (its current `data.ts` consumers) continue to compile after migration to generated descenders, with zero breaking changes to existing consumers.
+
+### (c) Multi-runtime adapter for Codex/Gemini read-only consumption
+
+The constraint boundary declares Codex/Gemini as readers of `~/.claude/schemas/ontology/` and `events.jsonl` via filesystem. Next experiment: verify that a Codex session can load the TypeScript declarations, parse them via `tsc --noEmit`, and read `events.jsonl` without conflict. Establish read-only consumption contract before Codex/Gemini gain any write path.
+
+### (d) BackwardProp loop completion — refinement proposals as first-class EventEnvelope variants
+
+Steps 4+5 of the BackwardProp path (world-model `backwardProp.gaps`) require `refinement_proposed` and `refinement_applied` event variants. These would make the full loop — `drift_detected → replay_lineage → refinement proposal → ontologist review → schemas/ontology/ update → new forward propagation cycle` — observable and auditable via `replay_lineage`. This closes the Phase III AI-First loop from decision-log `devCon5Application.phase3_AIFirst`.
+
+### (e) Validate H-C 3-phase pipeline empirically
+
+H-C prototype validation dimension remains at 3 (deferred). After v0 ships with H-A substrate, validate that the 3-phase hook pipeline (Design+Compile / Runtime / Post-Write) actually catches distinct error classes encountered during palantir-math migration. If a real error class escapes all 3 phases, the H-C worst case (S-HC-WORST) materializes and the 6-phase retrofit question reopens.
+
+---
+
+## 13. What Would Change the Decision
+
+Five concrete reversal conditions identified by the evaluator (T10). H-A is the decision; these conditions would force revision.
+
+### Reversal 1: `fs.mkdir` fallback insufficient under 10+ concurrent writers AND proper-lockfile broken under Bun
+
+If a v1 integration test shows:
+- `fs.mkdir` fallback is insufficient under 10+ concurrent writers (current empirical test is 2 writers), AND
+- `proper-lockfile` is empirically broken under Bun (not just inferred)
+
+Then: revisit H-A's atomic append mechanism. Consider application-level retry-on-conflict (sequence conflict detection + exponential backoff at application layer, above filesystem) or an alternative lockfile strategy. Do NOT revert to H-B — the LEARN centrality violation is structural and independent of locking mechanism.
+
+### Reversal 2: H-C 3-phase validation fails integration due to PostToolUse hook latency burnout
+
+If v1 integration shows that `PostToolUse` hook latency under high-refactor sessions (e.g., migrating `data.ts` 141KB) burns the token budget faster than validation value, and the `async:true` mitigation is insufficient:
+- Retreat to 2-phase validation (Design+Compile only at SessionStart; Runtime at `commit_edits` pre-flight)
+- OR move all validation to `async:true` mode with `asyncRewake` (v2.1.108 supported)
+- The H-C adversarial scenario (S-HC-ADV) predicted this exactly; `async:true` was the proposed mitigation at Round 2.
+
+### Reversal 3: New MCP server pattern emerges making snapshot-based architecture viable for LEARN
+
+If a new MCP server pattern emerges that makes snapshot-based architecture viable for the LEARN domain — specifically, **CRDT-based merging with cross-version history** — then H-B or a H-A+snapshot hybrid becomes worth re-evaluating. The current H-B defeat is structural against the TOCTOU window and the absence of lineage; a CRDT-based substrate would address both.
+
+### Reversal 4: palantir-math migration reveals EventEnvelope variant gaps requiring breaking schema bumps before v0 stabilizes
+
+If migrating `palantir-math`'s `data.ts` (141KB) reveals patterns not covered by the initial 10 `EventEnvelope` variants, and schema bumps are required mid-v0 stabilization (before the migration is complete), then `events.jsonl` migration tooling is needed and the H-A worst case (S-HA-WORST) materializes. In this case, revisit gap-04 and consider versioned `events.jsonl` with explicit schema version in each envelope.
+
+### Reversal 5: Cross-project write coordination proves insufficient (Codex/Gemini become writers)
+
+If the deployment constraint that Codex/Gemini are readers-only does not hold — if either runtime gains a write path to `~/.claude/schemas/ontology/` or project `events.jsonl` files — then the gap-03 architectural resolution (git branches + per-project lockfiles) is insufficient. A multi-writer coordination mechanism (e.g., distributed lock, git merge hooks, or CRDT) must be introduced before H-A's AtomicCommit guarantees can hold cross-runtime.
+
+---
+
+## Appendix: Source Provenance Summary
+
+| Source ID | Title | Provenance | Tier | Domain | Status |
+|-----------|-------|-----------|------|--------|--------|
+| src-int-decision-lineage | Palantir Decision Lineage (5D schema) | Official | Tier-1 | LEARN | Aging (2024-01) |
+| src-int-action-mutations | Palantir Action Mutations — Two-Tier + Submission Criteria | Official | Tier-1 | ACTION | Current |
+| src-int-logic-functions | Palantir Logic Functions — Edit Functions v2 | Official | Tier-1 | LOGIC | Current |
+| src-int-validation-readme | Palantir 6-Phase Validation Timeline | Official | Tier-1 | LOGIC | Current |
+| src-int-ts-grounding | Palantir TypeScript as Grounding | Official | Tier-1 | DATA | Current |
+| src-int-managed-agents | Anthropic Managed Agents — Brain/Session/Hands | Official | Tier-1 | LEARN | Current |
+| src-int-palantir-mini-blueprint | palantir-mini v0 Blueprint (pipeline synthesis input) | Synthesis | Tier-1 | Cross-cutting | Current |
+| src-ext-cc-hooks | Claude Code Hooks Reference (v2.1.108) | Official | Tier-1 | LOGIC | Current |
+| src-ext-cc-plugins-ref | Claude Code Plugins Reference (v2.1.108) | Official | Tier-1 | Cross-cutting | Current |
+| src-ext-osdk-v2-edits | Palantir OSDK TypeScript v2 Ontology Edits | Official | Tier-1 | LOGIC | Current |
+| src-ext-proper-lockfile | proper-lockfile npm package | Official | Tier-3 | ACTION | Aging (2020) |
+
+**Claim distribution:** 30 claims total — 28 official provenance, 1 synthesis, 1 inference. The single inference claim (`clm-ext-24`, confidence=0.75: Bun compatibility for proper-lockfile) is the only non-official claim that touches a critical path. It has been explicitly flagged throughout the pipeline and mitigated by the empirically proven `fs.mkdir` fallback.
+
+**Contradiction resolution:** 6 contradictions identified; 5 resolved; 1 (`contra-06` StaleObject in append-only) was empirically resolved by T7 adversarial race (0 lost events, sequence counter works as version vector).
+
+---
+
+*Machine-readable companion: `/home/palantirkc/kosmos/ontology-state/blueprint.json` (TechBlueprint JSON per schemas/types.ts)*
+*Previous session reports archived in git history: `mathcrew-photonic-realism-001`, `mathcrew-content-delivery-001`, `jsxgraph-sequencer-001`*

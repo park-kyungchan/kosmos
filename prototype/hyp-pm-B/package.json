@@ -1,0 +1,11 @@
+{
+  "name": "hyp-pm-b-snapshot",
+  "version": "1.0.0",
+  "description": "H-B Prototype: Snapshot-based + StaleObject optimistic concurrency PoC",
+  "scripts": {
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

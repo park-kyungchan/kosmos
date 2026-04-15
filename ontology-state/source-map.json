@@ -1,197 +1,325 @@
 {
-  "version": "0.9.0",
-  "lastUpdated": "2026-04-12T21:30:00Z",
-  "sessionId": "mathcrew-photonic-realism-001",
-  "previousSessions": ["mathcrew-content-delivery-001"],
+  "version": "1.0.0",
+  "lastUpdated": "2026-04-15T15:45:00Z",
+  "sessionId": "kosmos-research-2026-04-15-palantir-mini",
+  "previousSessions": ["mathcrew-photonic-realism-001", "mathcrew-content-delivery-001", "jsxgraph-sequencer-001"],
+  "completedTasks": ["T2", "T3"],
+  "authors": ["researcher (findings)", "lead (persistence — researcher has disallowedTools: Write)"],
+
   "sources": [
     {
-      "id": "src-pr-gltf",
-      "title": "Three.js GLTFLoader + DRACOLoader — Official Documentation (r183)",
-      "url": "https://threejs.org/docs/pages/GLTFLoader.html",
-      "tier": 1,
-      "domain": "DATA",
-      "provenance": "[Official]",
-      "freshnessDate": "2026-03-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "GLB/GLTF 캐릭터 모델 로딩. r183에서 'empty groups with multiple scene references' 수정. GLTF result: scene, animations[], cameras[], asset, parser. DRACOLoader로 80-90% geometry 압축 가능. import path: three/addons/loaders/GLTFLoader.js",
-      "claims": [
-        { "id": "clm-pr-01", "text": "GLTFLoader.loadAsync(url) returns Promise<GLTF> with scene (Group), animations (AnimationClip[]), cameras, asset metadata. r183 fully compatible.", "confidence": 0.98, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-02", "text": "DRACOLoader WASM decoder (gstatic.com CDN) compresses geometry 80-90%. CPU decode cost offsets network savings for small models (<100KB).", "confidence": 0.95, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-03", "text": "GLTF scene.traverse + isMesh pattern for castShadow/receiveShadow setup. Standard integration pattern for all GLTF models.", "confidence": 0.98, "domain": "DATA", "provenance": "[Official]", "isAtomic": true }
-      ]
+      "id": "src-int-decision-lineage",
+      "title": "Palantir Decision Lineage (5D schema)",
+      "filePath": "~/.claude/research/palantir/cross-cutting/decision-lineage.md",
+      "retrievedAt": "2026-04-15T15:30:00Z",
+      "provenance": "official",
+      "tier": "tier-1-official-docs",
+      "domain": "learn",
+      "summary": "5-dimensional Decision Lineage schema: WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT, per Chief Architect Akshay Krishnaswamy blog.palantir.com Jan 2024",
+      "markers": ["§DL-02", "§DL-09"],
+      "reliability": "high",
+      "freshnessDate": "2024-01-01",
+      "freshnessStatus": "aging"
     },
     {
-      "id": "src-pr-pbr",
-      "title": "Three.js MeshPhysicalMaterial — Complete PBR Property Reference (r183)",
-      "url": "https://threejs.org/docs/pages/MeshPhysicalMaterial.html",
-      "tier": 1,
-      "domain": "DATA",
-      "provenance": "[Official]",
-      "freshnessDate": "2026-03-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "전체 PBR feature set: metalness, roughness, clearcoat, iridescence, sheen, transmission, ior, anisotropy, dispersion. r183에서 clearcoat support for rectangular area lights 추가. 'Higher performance cost per pixel than other materials.'",
-      "claims": [
-        { "id": "clm-pr-04", "text": "MeshPhysicalMaterial supports clearcoat (0-1), iridescence (thin-film, IOR 1.0-2.333, thickness 100-400nm), sheen (fabric), transmission (physical transparency with IOR-based refraction), anisotropy, dispersion. All disabled by default.", "confidence": 0.98, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-05", "text": "Each enabled MeshPhysicalMaterial feature adds shader complexity. transmission is most expensive. For education devices: enable only needed features per entity type.", "confidence": 0.95, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-06", "text": "Spacesuit visor: clearcoat(1.0) + iridescence(0.3) + envMap. Spaceship hull: metalness(0.8) + roughness(0.3) + clearcoat(0.5). These combinations are GPU-feasible per-entity.", "confidence": 0.80, "domain": "LOGIC", "provenance": "[Inference]", "isAtomic": true }
-      ]
+      "id": "src-int-action-mutations",
+      "title": "Palantir Action Mutations — Two-Tier Architecture + Submission Criteria",
+      "filePath": "~/.claude/research/palantir/action/mutations.md",
+      "retrievedAt": "2026-04-15T15:30:00Z",
+      "provenance": "official",
+      "tier": "tier-1-official-docs",
+      "domain": "action",
+      "summary": "Two-tier action architecture (declarative + function-backed, mutually exclusive), submission criteria (9 constraint types), validate action API, OSDK 2.0 $validateOnly/$returnEdits options",
+      "markers": ["§ACTION.MU-09", "§ACTION.MU-10", "§ACTION.MU-11", "§ACTION.MU-14", "§ACTION.MU-15", "§ACTION.MU-16", "§ACTION.MU-17", "§ACTION.MU-18", "§ACTION.MU-19", "§ACTION.MU-24"],
+      "reliability": "high",
+      "freshnessDate": "2026-03-19",
+      "freshnessStatus": "current"
     },
     {
-      "id": "src-pr-anim",
-      "title": "Three.js AnimationMixer + Skeletal Animation System (r183)",
-      "url": "https://threejs.org/docs/#api/en/animation/AnimationMixer",
-      "tier": 1,
-      "domain": "LOGIC",
-      "provenance": "[Official]",
-      "freshnessDate": "2026-03-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "AnimationClip (data) + AnimationMixer (controller) + AnimationAction (per-clip control). GLTF animations loaded via gltf.animations[]. crossFadeTo/crossFadeFrom for smooth transitions. mixer.update(delta) must be called every frame. r183: BezierInterpolant + DEVTOOLS access.",
-      "claims": [
-        { "id": "clm-pr-07", "text": "AnimationMixer: one per animated model. clipAction(clip).play() starts animation. crossFadeTo(action, 0.5, true) blends smoothly. Weight 0-1 controls influence.", "confidence": 0.98, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-08", "text": "For 10-50 animated characters, each requires separate AnimationMixer instance. Clock.getDelta() should be shared (not per-mixer). CPU-bound per-mixer update.", "confidence": 0.90, "domain": "ACTION", "provenance": "[Synthesis]", "isAtomic": true },
-        { "id": "clm-pr-09", "text": "GLTF animation clips: idle, walk, board, celebrate, error — all can be embedded in single GLB file. AnimationClip.findByName(clips, 'idle') for named lookup.", "confidence": 0.95, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true }
-      ]
+      "id": "src-int-logic-functions",
+      "title": "Palantir Logic Functions — Edit Functions v2",
+      "filePath": "~/.claude/research/palantir/logic/functions.md",
+      "retrievedAt": "2026-04-15T15:30:00Z",
+      "provenance": "official",
+      "tier": "tier-1-official-docs",
+      "domain": "logic",
+      "summary": "Edit functions v2: must return Edits[] (not void), createEditBatch<OntologyEdit>(client) pattern, batch.getEdits() — authoring helper does NOT commit edits",
+      "markers": ["§LOGIC.FN-04", "§LOGIC.FN-09", "L496"],
+      "reliability": "high",
+      "freshnessDate": "2026-03-19",
+      "freshnessStatus": "current"
     },
     {
-      "id": "src-pr-pmrem",
-      "title": "Three.js PMREMGenerator + Environment Maps — PBR Lighting Setup (r183)",
-      "url": "https://threejs.org/docs/pages/PMREMGenerator.html",
-      "tier": 1,
-      "domain": "DATA",
-      "provenance": "[Official]",
-      "freshnessDate": "2026-03-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "PMREMGenerator converts equirectangular HDR/EXR to pre-filtered mipmap for roughness-based PBR sampling. scene.environment auto-applies to all MeshStandard/PhysicalMaterial. ACESFilmicToneMapping recommended. r183: PMREM cache fix.",
-      "claims": [
-        { "id": "clm-pr-10", "text": "Complete PBR env setup: renderer.outputColorSpace=SRGBColorSpace, toneMapping=ACESFilmicToneMapping, toneMappingExposure=1.8. RGBELoader for .hdr, EXRLoader for .exr.", "confidence": 0.98, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-11", "text": "scene.environment = pmremGenerator.fromEquirectangular(texture).texture — automatically applies PBR lighting to ALL MeshStandard/PhysicalMaterial in scene. One-time GPU operation.", "confidence": 0.98, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-12", "text": "Poly Haven (polyhaven.com/hdris): CC0 license, hundreds of free HDRIs, 1K-8K resolution. 1K-2K sufficient for education apps (1-8MB).", "confidence": 0.95, "domain": "DATA", "provenance": "[Official]", "isAtomic": true }
-      ]
+      "id": "src-int-validation-readme",
+      "title": "Palantir 6-Phase Validation Timeline",
+      "filePath": "~/.claude/research/palantir/validation/README.md",
+      "retrievedAt": "2026-04-15T15:30:00Z",
+      "provenance": "official",
+      "tier": "tier-1-official-docs",
+      "domain": "logic",
+      "summary": "6-phase validation: Design, Compile, Deploy, Merge, Runtime, Post-Write. Each catches distinct error classes.",
+      "markers": ["§VAL.R-02", "§VAL.R-03", "§VAL.R-04", "§VAL.R-05", "§VAL.R-06", "§VAL.R-07", "§VAL.R-08"],
+      "reliability": "high",
+      "freshnessDate": "2026-03-19",
+      "freshnessStatus": "current"
     },
     {
-      "id": "src-pr-instanced",
-      "title": "Three.js InstancedMesh — Batch Rendering (r183)",
-      "url": "https://threejs.org/docs/pages/InstancedMesh.html",
-      "tier": 1,
-      "domain": "ACTION",
-      "provenance": "[Official]",
-      "freshnessDate": "2026-03-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "InstancedMesh renders multiple instances with single draw call. setMatrixAt/setColorAt per instance. CRITICAL: InstancedMesh does NOT support SkinnedMesh/skeletal animation. For animated characters, use separate SkinnedMesh + AnimationMixer per character.",
-      "claims": [
-        { "id": "clm-pr-13", "text": "CRITICAL: InstancedMesh does NOT natively support SkinnedMesh/skeletal animation. No official API for instanced skeletal animation. Community workaround (bone texture atlas, PR #22667) not merged into core.", "confidence": 0.98, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-14", "text": "For 10-50 animated spacekid characters: use separate SkinnedMesh instances from GLTFLoader, each with own AnimationMixer. InstancedMesh only for static/identical objects (environmental props).", "confidence": 0.95, "domain": "ACTION", "provenance": "[Synthesis]", "isAtomic": true },
-        { "id": "clm-pr-15", "text": "InstancedMesh performance: 10 instances — minimal benefit. 50+ — noticeable. 100+ — significant. Per-instance frustum culling NOT natively supported.", "confidence": 0.90, "domain": "ACTION", "provenance": "[Synthesis]", "isAtomic": true }
-      ]
+      "id": "src-int-ts-grounding",
+      "title": "Palantir TypeScript as Grounding",
+      "filePath": "~/.claude/research/palantir/typescript/type-safety-as-grounding.md",
+      "retrievedAt": "2026-04-15T15:30:00Z",
+      "provenance": "official",
+      "tier": "tier-1-official-docs",
+      "domain": "data",
+      "summary": "TypeScript + OSDK codegen creates mechanically hallucination-proof pipeline. 5 schema categories: ObjectType, Property, LinkType, ActionType, Function.",
+      "markers": ["§TS.TSG-03", "§TS.TSG-04", "§TS.TSG-05", "§TS.TSG-06"],
+      "reliability": "high",
+      "freshnessDate": "2026-03-19",
+      "freshnessStatus": "current"
     },
     {
-      "id": "src-pr-drag",
-      "title": "Three.js DragControls — Drag-and-Drop Interaction (r183)",
-      "url": "https://threejs.org/docs/pages/DragControls.html",
-      "tier": 1,
-      "domain": "ACTION",
-      "provenance": "[Official]",
-      "freshnessDate": "2026-03-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "DragControls: drag objects in 3D. Constructor(objects[], camera, domElement). Events: hoveron/hoveroff/dragstart/drag/dragend. Touch support via touches property. Must disable OrbitControls during drag.",
-      "claims": [
-        { "id": "clm-pr-16", "text": "DragControls events (dragstart/drag/dragend) provide event.object — the dragged Object3D. Integrates with GLTF-loaded models via recursive:true (default).", "confidence": 0.98, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-17", "text": "OrbitControls must be disabled during drag (orbitControls.enabled=false on dragstart, true on dragend). DragControls supports touch via touches:{ONE:PAN} property.", "confidence": 0.95, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-18", "text": "Custom raycasting for advanced hit testing: raycaster.setFromCamera(pointer, camera) + raycaster.intersectObjects(objects, true). Pointer events unify mouse+touch.", "confidence": 0.95, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true }
-      ]
-    },
-    {
-      "id": "src-pr-assets",
-      "title": "Free 3D Model Sources for Education — Sketchfab/Mixamo/ReadyPlayerMe/PolyHaven",
-      "url": "https://sketchfab.com",
-      "tier": 1,
-      "domain": "DATA",
-      "provenance": "[Official]",
+      "id": "src-int-managed-agents",
+      "title": "Anthropic Managed Agents — Brain/Session/Hands",
+      "filePath": "~/.claude/research/claude-code/managed-agents.md",
+      "retrievedAt": "2026-04-15T15:30:00Z",
+      "provenance": "official",
+      "tier": "tier-1-official-docs",
+      "domain": "learn",
+      "summary": "Session = append-only event log (durable, immutable, server-side); Harness = stateless orchestrator (cattle); Sandbox = stateless executor (cattle)",
+      "markers": ["§1-19"],
+      "reliability": "high",
       "freshnessDate": "2026-04-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "Sketchfab: 800K+ free models, CC licenses, auto GLB conversion. Mixamo: 2400+ free mo-cap animations, royalty-free, FBX→GLB conversion needed. Ready Player Me: GLB API, quality presets, morph targets. Poly Haven: CC0 HDRIs + models. KenShape: pixel→3D voxel tool ($3.99), GLTF export.",
-      "claims": [
-        { "id": "clm-pr-19", "text": "Sketchfab: 800K+ free downloadable models, auto GLTF conversion, CC license filtering. Spaceship category: sketchfab.com/tags/spaceship. Character category: sketchfab.com/tags/character.", "confidence": 0.95, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-20", "text": "Mixamo: free royalty-free 2400+ mo-cap animations. Upload custom humanoid → auto-rig + apply animations. FBX output only → Blender/Mixamo2GLTF for GLB conversion.", "confidence": 0.90, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-21", "text": "Ready Player Me API: https://models.readyplayer.me/{id}.glb?quality=medium&meshLod=1. Quality presets (low/medium/high), configurable morph targets, Draco compression option.", "confidence": 0.90, "domain": "DATA", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-22", "text": "Poly Haven: CC0 HDRIs (1K-8K), CC0 3D models, CC0 textures. Best source for environment maps in education apps — no attribution required.", "confidence": 0.95, "domain": "DATA", "provenance": "[Official]", "isAtomic": true }
-      ]
+      "freshnessStatus": "current"
     },
     {
-      "id": "src-pr-crossref",
-      "title": "Cross-Reference Analysis — API Compatibility Matrix",
-      "url": "internal-analysis",
-      "tier": 2,
-      "domain": "LOGIC",
-      "provenance": "[Synthesis]",
-      "freshnessDate": "2026-04-12",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "Critical cross-references: (1) InstancedMesh + SkinnedMesh INCOMPATIBLE — animated characters must use separate SkinnedMesh. (2) GLTFLoader → AnimationMixer tightly coupled via gltf.animations[]. (3) PMREMGenerator → scene.environment auto-applies to MeshPhysicalMaterial. (4) DragControls works with GLTF models (recursive:true). (5) All 7 APIs fully compatible with r183.",
-      "claims": [
-        { "id": "clm-pr-23", "text": "CRITICAL CONSTRAINT: InstancedMesh + SkinnedMesh are INCOMPATIBLE. For 10-50 animated spacekid characters: separate SkinnedMesh per character + shared geometry + individual AnimationMixer. Budget: ~25 characters at 60fps on mid-range GPU.", "confidence": 0.90, "domain": "LOGIC", "provenance": "[Synthesis]", "isAtomic": true },
-        { "id": "clm-pr-24", "text": "GLTFLoader.load() → gltf.scene (visual) + gltf.animations[] (clips) → AnimationMixer.clipAction(clip) — tightly coupled pipeline. Animation data MUST be embedded in GLB file.", "confidence": 0.95, "domain": "LOGIC", "provenance": "[Synthesis]", "isAtomic": true },
-        { "id": "clm-pr-25", "text": "Renderer config shared across Topics 2+4: outputColorSpace=SRGBColorSpace (r183 default), toneMapping=ACESFilmicToneMapping, toneMappingExposure=1.8. One-time global setup.", "confidence": 0.98, "domain": "LOGIC", "provenance": "[Synthesis]", "isAtomic": true },
-        { "id": "clm-pr-26", "text": "Existing mathcrew n8ao + postprocessing pipeline: MeshPhysicalMaterial is compatible with n8ao SSAO. No OverrideMaterialManager workaround needed (unlike troika-three-text). GLTF models participate in postprocessing naturally.", "confidence": 0.85, "domain": "LOGIC", "provenance": "[Inference]", "isAtomic": true }
-      ]
+      "id": "src-int-palantir-mini-blueprint",
+      "title": "palantir-mini v0 Blueprint (this session synthesis)",
+      "filePath": "~/.claude/research/claude-code/palantir-mini-blueprint.md",
+      "retrievedAt": "2026-04-15T15:30:00Z",
+      "provenance": "synthesis",
+      "tier": "tier-1-official-docs",
+      "domain": "cross-cutting",
+      "summary": "v0 architecture synthesizing Managed Agents virtualization + Palantir 5 patterns + OMC best practices. Being refined this pipeline.",
+      "markers": ["OMC reference section", "Architecture section", "Per-project migration"],
+      "reliability": "high",
+      "freshnessDate": "2026-04-15",
+      "freshnessStatus": "current"
     },
     {
-      "id": "src-pr-miniplex",
-      "title": "miniplex v2.0.0 — Developer-Friendly ECS for TypeScript Games",
-      "url": "https://www.npmjs.com/package/miniplex",
-      "tier": 2,
-      "domain": "LOGIC",
-      "provenance": "[Official]",
-      "freshnessDate": "2023-01-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "miniplex ECS: World<Entity> manages typed entities. world.with(...components) returns archetypal query (iterable). world.add(entity), world.remove(entity). No built-in scheduling. onEntityAdded/onEntityRemoved events for lifecycle hooks. Entities are plain JS objects — direct property mutation OK for component values, use addComponent/removeComponent to add/remove components. ~2KB gzipped, MIT license, 2587 weekly downloads.",
-      "claims": [
-        { "id": "clm-pr-27", "text": "miniplex v2.0.0 API: World<Entity> — world.add(entity), world.remove(entity), world.with(...components) → typed Query<Entity>. For...of iteration over queries. No built-in scheduling.", "confidence": 0.98, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-28", "text": "miniplex onEntityAdded/onEntityRemoved: reactive lifecycle hooks per query. Critical for Three.js: subscribe to onEntityRemoved to call geometry.dispose() + material.dispose() — miniplex.world.remove() does NOT auto-dispose Three.js resources.", "confidence": 0.95, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-29", "text": "miniplex bundle size: ~2KB gzipped (bundlephobia). Adds external dependency vs Factory+Registry zero-dep Map<>. Migration path: replace Map<ComponentType, CreateFn> with World<Entity> — query replaces registry lookup, system functions replace createFn dispatch.", "confidence": 0.90, "domain": "DATA", "provenance": "[Official]", "isAtomic": true }
-      ]
+      "id": "src-ext-cc-hooks",
+      "title": "Claude Code Hooks Reference (v2.1.108)",
+      "url": "https://code.claude.com/docs/en/hooks",
+      "retrievedAt": "2026-04-15T15:30:00Z",
+      "provenance": "official",
+      "tier": "tier-1-official-docs",
+      "domain": "logic",
+      "summary": "Official v2.1.108 hook input/output schemas. PreToolUse uses hookSpecificOutput.permissionDecision (top-level 'decision' DEPRECATED). TaskCreated/TaskCompleted schemas verified. PreCompact block mechanism confirmed.",
+      "markers": ["PreToolUse section", "PreCompact section", "TaskCreated section", "Exit code 2 table"],
+      "reliability": "high",
+      "freshnessDate": "2026-04-15",
+      "freshnessStatus": "current"
     },
     {
-      "id": "src-pr-gesture",
-      "title": "Pointer Events — Gesture Detection for 3D Games (MDN + Three.js forum)",
-      "url": "https://developer.mozilla.org/en-US/docs/Games/Techniques/Control_mechanisms/Mobile_touch",
-      "tier": 1,
-      "domain": "ACTION",
-      "provenance": "[Official]",
-      "freshnessDate": "2025-01-01",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "PointerEvents API: setPointerCapture(pointerId) + releasePointerCapture on pointerdown/pointerup for reliable cross-device gesture tracking. Velocity calculation: delta position / elapsed time (px/sec). Flick threshold ~600 px/sec. For continuous gestures: capture pointer. OS edge conflict: iOS swipe-up (home) + Android nav gestures conflict with canvas touch events — requires CSS touch-action:none.",
-      "claims": [
-        { "id": "clm-pr-30", "text": "PointerEvents best practice for gestures: setPointerCapture(e.pointerId) on pointerdown + releasePointerCapture on pointerup — ensures pointerMove events fire even when pointer leaves canvas. Applies to both mouse and touch.", "confidence": 0.98, "domain": "ACTION", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-pr-31", "text": "Flick gesture velocity classification: delta_position / delta_time (px/sec). Threshold ~600 px/sec distinguishes drag from flick in game context. ZingTouch library provides configurable minVelocity parameter for swipe recognition.", "confidence": 0.75, "domain": "LOGIC", "provenance": "[Synthesis]", "isAtomic": true },
-        { "id": "clm-pr-32", "text": "OS edge gesture conflicts: iOS 15+ swipe-up triggers Dock/App Switcher; Android navigation gestures interfere with canvas touch. Mitigation: touch-action:none on renderer.domElement + viewport meta touch-action:none. High risk for H-6 at screen edges.", "confidence": 0.85, "domain": "ACTION", "provenance": "[Synthesis]", "isAtomic": true }
-      ]
+      "id": "src-ext-cc-plugins-ref",
+      "title": "Claude Code Plugins Reference (v2.1.108)",
+      "url": "https://code.claude.com/docs/en/plugins-reference",
+      "retrievedAt": "2026-04-15T15:30:00Z",
+      "provenance": "official",
+      "tier": "tier-1-official-docs",
+      "domain": "cross-cutting",
+      "summary": "Plugin manifest fields, default file locations (.claude-plugin/plugin.json, skills/, agents/, hooks/hooks.json, .mcp.json, monitors/monitors.json, bin/), ${CLAUDE_PLUGIN_ROOT} vs ${CLAUDE_PLUGIN_DATA}, plugin agent security restrictions (agents cannot define hooks/mcpServers/permissionMode)",
+      "markers": ["monitors field", "File locations reference", "plugin agent restrictions", "path traversal warning"],
+      "reliability": "high",
+      "freshnessDate": "2026-04-15",
+      "freshnessStatus": "current"
     },
     {
-      "id": "src-int-dc5",
-      "title": "DevCon 5 — Ontology Design Principles (§DC5-04, §DC5-05, §DC5-06)",
-      "url": "~/.claude/research/palantir/platform/devcon.md",
-      "tier": 1,
-      "domain": "LOGIC",
-      "provenance": "[Synthesis] from [Official] DevCon 5 session",
-      "freshnessDate": "2026-03-22",
-      "retrievedDate": "2026-04-12",
-      "freshnessStatus": "current",
-      "summary": "3-stage product journey (Golden Tables → Operational Decision-Making → AI-First). Four ontology design principles: DDD, DRY, Open-Closed, PECS. Primitives: Interfaces, Structs, Reducers, Derived properties, Object-backed link types.",
-      "claims": [
-        { "id": "clm-int-01", "text": "The 3-stage product journey applies to photonicRealism: (1) Golden Tables — entity definitions + material presets, (2) Operational — interaction systems + animation controllers, (3) AI-First — adaptive content delivery.", "confidence": 0.90, "domain": "LOGIC", "provenance": "[Synthesis]", "isAtomic": true },
-        { "id": "clm-int-02", "text": "OCP (Open-Closed): PhotonicComponentFactory must be open for extension (new math concepts → new entity types) without modifying core factory code.", "confidence": 0.95, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true },
-        { "id": "clm-int-03", "text": "DDD: Entity names (SpaceshipEntity, SpacekidEntity) must match domain vocabulary. Teaching surface names must map 1:1 to ontology terms.", "confidence": 0.95, "domain": "LOGIC", "provenance": "[Official]", "isAtomic": true }
-      ]
+      "id": "src-ext-osdk-v2-edits",
+      "title": "Palantir OSDK TypeScript v2 Ontology Edits",
+      "url": "https://www.palantir.com/docs/foundry/functions/typescript-v2-ontology-edits",
+      "retrievedAt": "2026-04-15T15:30:00Z",
+      "provenance": "official",
+      "tier": "tier-1-official-docs",
+      "domain": "logic",
+      "summary": "OSDK v2 Edits discriminated union: Edits.Object<T>, Edits.Interface<T>, Edits.Link<Src,'linkName'>. createEditBatch<OntologyEdit>(client) + batch.update/create/delete/link/unlink/getEdits.",
+      "markers": ["Edits type union", "createEditBatch signature", "batch methods", "authoring helper caveat"],
+      "reliability": "high",
+      "freshnessDate": "2026-04-15",
+      "freshnessStatus": "current"
+    },
+    {
+      "id": "src-ext-proper-lockfile",
+      "title": "proper-lockfile npm package (atomic file lock)",
+      "url": "https://www.npmjs.com/package/proper-lockfile",
+      "retrievedAt": "2026-04-15T15:30:00Z",
+      "provenance": "official",
+      "tier": "tier-3-vendor-blogs",
+      "domain": "action",
+      "summary": "mkdir-based atomic file lock. NFS-safe, unlike O_EXCL. 9.27M weekly downloads. Last published 2020.",
+      "markers": ["mkdir strategy", "API surface", "graceful exit"],
+      "reliability": "high",
+      "freshnessDate": "2020-06-01",
+      "freshnessStatus": "aging"
     }
-  ]
+  ],
+
+  "claims": [
+    {"id":"clm-rq01-01","text":"Decision Lineage captures 5 dimensions (WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT) per decision artifact","isAtomic":true,"sourceId":"src-int-decision-lineage","provenance":"official","confidence":0.98,"domain":"learn","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq01-02","text":"Anthropic Managed Agents Session = append-only event log; Harness = stateless orchestrator; Sandbox = stateless executor","isAtomic":true,"sourceId":"src-int-managed-agents","provenance":"official","confidence":0.98,"domain":"learn","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq01-03","text":"Session event log is durable, immutable and persists across disconnects","isAtomic":true,"sourceId":"src-int-managed-agents","provenance":"official","confidence":0.98,"domain":"learn","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq01-04","text":"Three independent references (Anthropic MA, Palantir DL, OMC clawhip) converge on append-only log architecture","isAtomic":true,"sourceId":"src-int-palantir-mini-blueprint","provenance":"synthesis","confidence":0.92,"domain":"learn","contradictedBy":[],"supportedBy":["clm-rq01-01","clm-rq01-02"],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq02-01","text":"Palantir Two-Tier Action Architecture: Tier 1 declarative CRUD + Tier 2 function-backed, mutually exclusive","isAtomic":true,"sourceId":"src-int-action-mutations","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq02-02","text":"Edit Functions v2 return Edits[] without commit; commit only happens when wrapped as function-backed Action","isAtomic":true,"sourceId":"src-int-logic-functions","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq02-03","text":"Authoring helper executes edit functions without committing edits — explicit test-without-side-effects guarantee","isAtomic":true,"sourceId":"src-int-logic-functions","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq02-04","text":"Submission Criteria are independent from edit permissions; ALL must pass for action submission","isAtomic":true,"sourceId":"src-int-action-mutations","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq02-05","text":"Submission criteria support 9 constraint types: Range/ArraySize/StringLength/StringRegexMatch/OneOf/ObjectQueryResult/ObjectPropertyValue/GroupMember/Unevaluable","isAtomic":true,"sourceId":"src-int-action-mutations","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq02-06","text":"CC agent frontmatter supports disallowedTools as deny-list, enforced at tool invocation time","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.95,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq03-01","text":"OSDK generates TypeScript types from Ontology metadata — only Ontology-defined concepts compile","isAtomic":true,"sourceId":"src-int-ts-grounding","provenance":"official","confidence":0.98,"domain":"data","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq03-02","text":"Compile-time validation catches incompatible type changes after OSDK regen","isAtomic":true,"sourceId":"src-int-validation-readme","provenance":"official","confidence":0.98,"domain":"data","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq03-03","text":"palantir-math data.ts is 141618 bytes / 2190 LOC — exceeds OSDK 1.x single-file threshold","isAtomic":true,"sourceId":"src-int-palantir-mini-blueprint","provenance":"official","confidence":1.0,"domain":"data","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq03-04","text":"OSDK v2 Edits discriminated union has 3 variants: Edits.Object<T>, Edits.Interface<T>, Edits.Link<Src,'linkName'>","isAtomic":true,"sourceId":"src-ext-osdk-v2-edits","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq04-01","text":"Plugin MCP servers auto-start when plugin is enabled; tools appear as mcp__<server>__<tool>","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq04-02","text":"Palantir OSDK 2.0 supports $validateOnly:true — evaluates submission criteria without applying edits","isAtomic":true,"sourceId":"src-int-action-mutations","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq04-03","text":"Palantir OSDK 2.0 supports $returnEdits:true — executes and returns applied edits for post-commit audit","isAtomic":true,"sourceId":"src-int-action-mutations","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq05-01","text":"Palantir 6-phase validation: Design/Compile/Deploy/Merge/Runtime/Post-Write, each catching distinct error classes","isAtomic":true,"sourceId":"src-int-validation-readme","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq05-02","text":"CC v2.1.105 PreCompact supports decision:block — blocks compaction when ontology invariants fail","isAtomic":true,"sourceId":"src-ext-cc-hooks","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-rq05-03","text":"CC v2.1.84 TaskCreated hook supports exit 2 rollback + stderr feedback","isAtomic":true,"sourceId":"src-ext-cc-hooks","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-ext-01","text":"PreToolUse hooks return decision via hookSpecificOutput.permissionDecision (NOT top-level); top-level 'decision' field DEPRECATED; supports allow/deny/ask/defer with precedence deny>defer>ask>allow","isAtomic":true,"sourceId":"src-ext-cc-hooks","provenance":"official","confidence":0.98,"domain":"cross-cutting","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-ext-07","text":"Plugin manifest monitors field auto-arms Monitor streams at session start or skill invoke","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"cross-cutting","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-ext-08","text":"Plugin-shipped agents CANNOT define hooks, mcpServers, or permissionMode (security restriction). Hooks must be at plugin-level hooks/hooks.json","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"security","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-ext-09","text":"${CLAUDE_PLUGIN_DATA} persists across plugin updates; ${CLAUDE_PLUGIN_ROOT} does NOT","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"security","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-ext-10","text":"Default plugin hook location is hooks/hooks.json at plugin root; same schema as user-defined hooks","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"cross-cutting","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-ext-12","text":"Default monitors location is monitors/monitors.json when path not specified","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"cross-cutting","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-ext-14","text":"createEditBatch<OntologyEdit>(client) returns batch with update/create/delete/link/unlink/getEdits methods","isAtomic":true,"sourceId":"src-ext-osdk-v2-edits","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-ext-18","text":"Within function execution, reading a property after batch.update does NOT reflect the uncommitted change","isAtomic":true,"sourceId":"src-ext-osdk-v2-edits","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-ext-19","text":"Edit functions MUST be wrapped as function-backed Actions to have edits applied","isAtomic":true,"sourceId":"src-ext-osdk-v2-edits","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-ext-20","text":"proper-lockfile uses mkdir-based atomic locking — works on NFS and all filesystems","isAtomic":true,"sourceId":"src-ext-proper-lockfile","provenance":"official","confidence":0.95,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
+    {"id":"clm-ext-24","text":"proper-lockfile should work under Bun because it uses standard Node fs APIs (graceful-fs)","isAtomic":false,"sourceId":"src-ext-proper-lockfile","provenance":"inference","confidence":0.75,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"aging"}
+  ],
+
+  "contradictions": [
+    {
+      "id": "contra-01",
+      "severity": "low",
+      "description": "proper-lockfile last published 2020 (5 years old, aging) vs current need for production-proven library",
+      "affectedClaims": ["clm-ext-20", "clm-ext-24"],
+      "resolution": "Accept but flag for BackwardProp review. 9.27M weekly downloads confirms production use. Alternative: zero-dep mkdir fallback.",
+      "status": "resolved"
+    },
+    {
+      "id": "contra-02",
+      "severity": "medium",
+      "description": "Plugin-shipped agents CANNOT define hooks, mcpServers, or permissionMode (per plugins-reference), but palantir-mini-blueprint.md architecture initially implied agents use hooks field",
+      "affectedClaims": ["clm-ext-08"],
+      "resolution": "Define hooks at plugin level (hooks/hooks.json) with matchers targeting agent context (e.g., SubagentStop matcher 'ontology-verifier'), not agent-level frontmatter. Blueprint updated with Correction 1.",
+      "status": "resolved"
+    },
+    {
+      "id": "contra-03",
+      "severity": "high",
+      "description": "PreToolUse top-level 'decision' field is DEPRECATED in v2.1.108. Deprecated values 'approve'->'allow', 'block'->'deny'. Must use hookSpecificOutput.permissionDecision.",
+      "affectedClaims": ["clm-ext-01"],
+      "resolution": "All palantir-mini hook code must use new format. Other events (PostToolUse, Stop) continue using top-level decision. Per-event format awareness required. Blueprint updated with Correction 2.",
+      "status": "resolved"
+    },
+    {
+      "id": "contra-04",
+      "severity": "medium",
+      "description": "Foundry edit functions don't apply outside of an Action vs Native Runtime has no Palantir backend. How does palantir-mini commit_edits MCP tool synthesize Action wrapper?",
+      "affectedClaims": ["clm-ext-19", "clm-rq02-02"],
+      "resolution": "palantir-mini action-executor.md agent + lib/actions/commit.ts atomic writer IS the Action equivalent. The submission_criteria + atomic_commit pattern is adapter-inferred. Flag for ontologist.",
+      "status": "resolved"
+    },
+    {
+      "id": "contra-05",
+      "severity": "low",
+      "description": "CC Agent Teams 'no nested teams' vs ontology-verifier as a custom subagent spawned from within Agent Teams pipeline",
+      "affectedClaims": [],
+      "resolution": "ontology-verifier is a custom subagent, not a nested team. Agent Teams limitation applies to TeamCreate nesting only.",
+      "status": "resolved"
+    },
+    {
+      "id": "contra-06",
+      "severity": "medium",
+      "description": "StaleObject optimistic concurrency (in-place mutation) vs append-only event log (no in-place mutation). How to reject concurrent edits?",
+      "affectedClaims": [],
+      "resolution": "Use sequence number in EventEnvelope as optimistic version. Writers check headSequence before append. Flag for prototyper validation.",
+      "status": "detected"
+    }
+  ],
+
+  "gapsFilledConcrete": {
+    "eventEnvelopeSchema": {
+      "description": "TypeScript discriminated union with 10 event type variants (full code in palantir-mini-blueprint.md Gap fill 1)",
+      "baseFields": ["eventId (branded)", "when (ISO8601)", "atopWhich (git SHA)", "throughWhich (sessionId + toolName + cwd)", "byWhom (identity + agentName + teamName)", "withWhat (reasoning + hypothesis)", "sequence (monotonic counter — serves as optimistic version)"],
+      "eventTypes": [
+        "edit_proposed {functionName, params, hypotheticalEdits[]}",
+        "edit_committed {actionTypeRid, appliedEdits[], submissionCriteriaPassed[]}",
+        "submission_criteria_failed {actionTypeRid, failedConstraints[]}",
+        "validation_phase_completed {phase: design|compile|deploy|merge|runtime|post_write, passed, errorClass?}",
+        "codegen_started {targetProject, ontologyVersion}",
+        "codegen_completed {targetProject, generatedFiles[], durationMs}",
+        "phase_completed {phaseTag, taskId, validations[]}",
+        "drift_detected {driftType, affectedObjectType}",
+        "session_started {model, effort}",
+        "session_ended {reason, eventCount}"
+      ],
+      "provenance": "Composed from: decision-lineage.md §DL-02 (5D base), typescript-v2-ontology-edits (Edits union), mutations.md §ACTION.MU-14..18 (submission criteria constraint types), validation/README.md §VAL.R-02..R-08 (6 phases)"
+    },
+    "mcpToolSchemas": [
+      {"name": "get_ontology", "inputs": "{domain: data|logic|action|security|learn, project, atSequence?}", "mirrors": "Palantir ontology query"},
+      {"name": "emit_event", "inputs": "{project, envelope: EventEnvelope}", "outputs": "{eventId, sequence}"},
+      {"name": "apply_edit_function", "inputs": "{project, functionName, params}", "outputs": "{edits: OntologyEdit[], provenance: 5D lineage}", "mirrors": "Palantir authoring helper (functions.md L496)"},
+      {"name": "commit_edits", "inputs": "{project, actionTypeRid, edits, submissionCriteria, validateOnly?}", "outputs": "{result: VALID|INVALID, committed, appliedEdits?, perCriterionResult}", "mirrors": "OSDK 2.0 $validateOnly / $returnEdits"},
+      {"name": "replay_lineage", "inputs": "{project, filter: {fromSequence?, toSequence?, eventTypes?, byWhom?, affectedObjectType?}}", "outputs": "{events, derivedState, lineageGraph}", "mirrors": "Palantir Decision Lineage + BackwardProp"}
+    ],
+    "hookHandlerBodies": {
+      "preEditOntology": "PreToolUse(Edit|Write|MultiEdit) + ontology/*.ts path filter → proper-lockfile on events.jsonl → append 'edit_proposed' event → release → hookSpecificOutput.additionalContext with recent 5-event lineage summary. Uses v2.1.108 hookSpecificOutput format.",
+      "preCompactState": "PreCompact → checkOntologyInvariants(cwd) → if fails, output JSON {decision:'block', reason: '...'}. Caveat: blocking auto-compact surfaces underlying context error; safer as advisory for manual trigger.",
+      "taskCompletedGate": "TaskCompleted → extract phaseTag from [TAG] prefix regex → runPhaseGates(phaseTag, cwd) → if fails, exit 2 with stderr → else emit 'phase_completed' event. Works with kosmos-registry.json."
+    },
+    "atomicAppendMechanism": {
+      "primary": "proper-lockfile (npm, 9.27M dl/week, mkdir-based NFS-safe atomic locking). API: lockfile.lock(path, {stale: 10000, retries: 5}) → release function.",
+      "fallback": "Zero-dep: fs.mkdir(lockDir, {recursive: false}) throws EEXIST atomically. Retry with exponential backoff (50ms base, 2^attempt). Graceful cleanup via try/finally rmdir.",
+      "caveat": "Bun compatibility inferred from standard fs API usage, must be empirically verified in prototype phase (hypothesis A PoC)"
+    },
+    "migrationSequence": [
+      "Step 1: Extract schema.ts (2.5KB) first — validate typegen primitives work, minimal blast radius",
+      "Step 2: Extract security.ts (4KB) — minimal risk, exercises policy codegen",
+      "Step 3: Refactor data.ts (141KB) by ObjectType into primitives/ — requires OSDK codegen ready",
+      "Step 4: Migrate capabilities.ts (57KB) to ~/.claude/schemas/ontology/policies/rbac.ts — cross-project shared",
+      "Step 5: Migrate changeContracts.ts (66KB) to lib/actions/tier1-declarative.ts + tier2-function.ts",
+      "Step 6: Wire events.jsonl emission via plugin hooks/hooks.json (NOT agent frontmatter — per Correction 1)",
+      "Step 7: Parallel old-path support via compat shim (re-export from generated files) during transition"
+    ]
+  },
+
+  "gapsForOntologist": [
+    "StaleObject optimistic concurrency in append-only log model — how to reject concurrent edits without in-place target (hint: sequence number as version vector)",
+    "K-LLM consensus implementation — deferred per palantir-mini-blueprint.md open questions",
+    "Workflow Lineage vs Decision Lineage product composition — ATOP_WHICH dimension not fully captured beyond git SHA",
+    "Edit function rollback semantics — in append-only, rollback = append compensating event (never delete)",
+    "Bun compatibility for proper-lockfile — inferred, needs empirical test in prototype phase",
+    "Multi-writer cross-project coordination — 3 projects sharing ~/.claude/schemas/ontology/ needs coordination"
+  ],
+
+  "v2108FeatureAvailability": {
+    "blockCompactionOnInvariantFailure": "PreCompact decision:block (v2.1.105)",
+    "phaseGateOnTaskCompletion": "TaskCompleted hook (v2.1.33)",
+    "taskCreationValidation": "TaskCreated hook (v2.1.84)",
+    "backgroundDriftDetection": "Plugin monitors manifest (v2.1.105)",
+    "crossProjectWorktreeReuse": "EnterWorktree path (v2.1.105)",
+    "toolInputRewriting": "PreToolUse updatedInput (v2.1.85)",
+    "conditionalHookExecution": "Hook if field (v2.1.85)",
+    "asyncHookExecution": "Hook async:true / asyncRewake",
+    "recentFailureContextInjection": "PostToolUseFailure additionalContext",
+    "status": "All required v2.1.108 features exist — blueprint is feature-complete"
+  },
+
+  "nextStep": "ontologist spawned for T4. Primary inputs: this source-map.json + palantir-mini-blueprint.md + decision-log.json. Must address 6 gapsForOntologist.",
+
+  "phaseGates": {
+    "T2": {"completed": true, "completedAt": "2026-04-15T15:45:00Z", "outputArtifacts": ["ontology-state/source-map.json"]},
+    "T3": {"completed": true, "completedAt": "2026-04-15T15:45:00Z", "outputArtifacts": ["ontology-state/source-map.json"]}
+  }
 }
