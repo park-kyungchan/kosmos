@@ -1,604 +1,576 @@
 {
-  "id": "blueprint-mathcrew-photonic-realism-001",
-  "sessionId": "mathcrew-photonic-realism-001",
-  "createdAt": "2026-04-12T23:00:00Z",
-  "updatedAt": "2026-04-12T23:00:00Z",
-  "createdBy": "reporter",
+  "schemaVersion": "1.0.0",
+  "generatedBy": "reporter-blueprint",
+  "id": "blueprint-palantir-mini-2026-04-15",
+  "createdAt": "2026-04-15T18:45:00Z",
+  "updatedAt": "2026-04-15T18:45:00Z",
+  "createdBy": "reporter-blueprint",
 
   "projectScope": {
-    "objective": "mathcrew/src 전체 점검 + 교육용 컴포넌트 추가/개선. 공명고리→우주선, 펄스조각→우주복 입은 어린이로 photonicRealism 형태 전환 + interactive 대폭 강화 + 재사용 가능한 PhotonicRealism 컴포넌트 프레임워크 설계. speechBubble 레이아웃/교육 콘텐츠 구조 개선 포함.",
+    "objective": "Build palantir-mini Claude Code plugin (v2.1.108) + ~/.claude/schemas/ontology extension implementing OSDK 2.0 patterns and Palantir 5 must-include infra patterns (two-tier actions, edit functions returning Edits[] without commit, OSDK type codegen, 6-phase validation, submission criteria pre-flight) on append-only event log foundation, mirroring Anthropic Managed Agents Session/Harness/Sandbox virtualization, within Claude Code Native Runtime (API-Free, Claude Max X20, max v2.1.108 utilization). Cross-project: kosmos / palantir-math / mathcrew. Promote ~/.claude/research/palantir/ from declarative evidence to executable contract.",
     "backendDomains": [
-      "DATA: SpaceshipEntityDef, SpacekidEntityDef, PhotonicMaterialPreset, PhotonicComponentDefinition, CharacterAnimationClip, TeachingStoryFrame, TeachingWorldTerms, MetaphorMapping, PlanetTeachingContent (PRESERVED), TeachingBeat (EXTENDED: microSteps[]), SpeechBubbleContent (EXTENDED: microStepIndex), CharacterAssetPipeline",
-      "LOGIC: PhotonicRealismPipeline, PhotonicComponentFactory, CharacterAnimationSystem, SpatialInteractionResolver, TeachingFrameworkMigration, PerformanceBudgetPolicy, ContentDeliveryResolver (PRESERVED), ScaffoldEscalationLogic (PRESERVED), MayerPrincipleChecker (PRESERVED), CognitiveLoadGuard (PRESERVED)",
-      "ACTION: CharacterDragPlacement, BoardingAnimation, SpatialProximityTrigger, GestureInteractionAdapter, PhotonicFeedbackEffect, AdaptiveDPRController, EnterAdvancesBeat (PRESERVED + micro-step extension), InteractionModeDispatch (MODIFIED)",
-      "SECURITY: none — no RBAC/access-control concerns for photonicRealism pipeline",
-      "LEARN: InteractionTelemetry, PhotonicComponentUsageMetrics, ContentEngagement (PRESERVED), FSRSScheduling (PRESERVED)"
+      "DATA — EventEnvelope (10-variant discriminated union), ObjectType, PropertyType (24 branded), SnapshotManifest, CommitSha (branded)",
+      "LOGIC — EditFunction (returns OntologyEdit[] without commit), InterfaceType, LinkType / Object-Backed LinkType, DerivedProperty, Reducer, LinkConstraint, SubmissionCriteria (computational), ValidationPhaseEvaluator (6-phase; v0 implements 3)",
+      "ACTION — Tier-1 Declarative Action, Tier-2 Function-Backed Action, AtomicCommit (fs.mkdir mutex), ActionExecutorAgent (Write/Edit allowlist), CodegenRun (descender regen)",
+      "SECURITY — Layer-1 RBAC Policy (managed-settings.d/ fragments), SubmissionCriteria (gate semantics), CapabilityToken (${CLAUDE_PLUGIN_DATA}/vault/)",
+      "LEARN — AppendOnlyEventLog (events.jsonl per project), DecisionLineage5Dim (WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT), EvidenceSufficiency, LineageReplay (MCP tool replay_lineage), DriftSignal (drift_detected event variant)"
     ],
     "frontendSurfaces": [
-      "SpaceshipSurface (NEW: 3D spaceship as teaching grouping container — replaces resonanceLoop)",
-      "SpacekidCharacter (NEW: GLTF character child-in-spacesuit as counting unit — replaces pulseShard)",
-      "PhotonicEnvironment (NEW: HDRI sky, PMREMGenerator IBL, ACESFilmicToneMapping)",
-      "PromptHUD (NEW: keycap+promptText relocated to bottom-right fixed HUD — replaces prompt bar in speech bubble)",
-      "SpeechBubble (MODIFIED: phaseBasedPosition + collapseOnInteraction — occlusion solution applied)",
-      "HUD (PRESERVED: progress bar, mastery, victory)",
-      "WebGL2 + n8ao + postprocessing pipeline (PRESERVED)",
-      "10 InteractionMode types (PRESERVED + extended for character entities)"
+      "Claude Code CLI session surface — Hooks (24 events incl. PreCompact decision:block, TaskCreated, TaskCompleted, PostToolUseFailure), Skills (namespaced /palantir-mini:*), Custom Subagents (.md frontmatter with tools allowlist + maxTurns + disallowedTools), Plugin Manifest (.claude-plugin/{plugin,marketplace}.json), MCP Bridge (bridge/mcp-server.ts as Harness API), managed-settings.d/ fragments per project",
+      "Code editor TypeScript surface — Generated descenders (src/generated/ per project), Branded RID types (ObjectTypeRid, LinkTypeRid, ActionTypeRid, etc.), Exhaustive visitor unions on EventEnvelope type tag"
     ]
   },
 
   "designPrinciples": {
     "ddd": [
-      "SpaceshipEntity / SpacekidEntity vocabulary matches user-specified domain story (우주선, 우주복 입은 어린이) — observable naming consistency from ontology through contracts to runtime",
-      "PhotonicComponentDefinition uses component/registry/factory vocabulary from ECS domain, not raw geometry params",
-      "TeachingBeat.microSteps uses 'micro-step' (교육 설계 vocabulary) not 'sub-text' or 'chunk'",
-      "DragState.dragTarget: EntityRef — uses domain reference (EntityRef), not raw Three.js mesh reference",
-      "PromptHUD / SpeechBubble naming matches HUD design vocabulary distinct from 3D scene objects",
-      "Boarding, Proximity, Discovery — narrative vocabulary maps 1:1 to ontology ACTION types"
+      "All 28 primitive names match Palantir / Anthropic Managed Agents / OSDK 2.0 domain vocabulary exactly: 'EditFunction', 'SubmissionCriteria', 'EventEnvelope', 'DecisionLineage', 'ObjectTypeRid', 'Tier-1/Tier-2 Action' — zero translation required across all 3 projects (kosmos/palantir-math/mathcrew)",
+      "EventEnvelope 10-variant discriminated union uses Anthropic MA + Palantir Decision Lineage 5-dim field names verbatim: when, atopWhich, throughWhich, byWhom, withWhat",
+      "Semantic heuristics SH-01/SH-02/SH-03/SH-04/SH-05 formalize domain classification: SH-02 (delete LOGIC+ACTION, still describes reality? -> DATA), SH-03 (returns Edits[]? -> LOGIC), SH-04 (governs WHO / under WHAT CONDITIONS? -> SECURITY), SH-05 (captures WHAT HAPPENED + WHY + LEARNED? -> LEARN)",
+      "Transition-zone classification rigidly applied: InterfaceType/LinkType/DerivedProperty/Reducer are LOGIC (not DATA) per ontologist authority; SubmissionCriteria is dual-modeled as LOGIC (computation) + SECURITY (gate) — both are intentional"
     ],
     "dry": [
-      "Single PMREMGenerator call at scene init — auto-applies IBL to ALL MeshStandard/PhysicalMaterial; no per-entity lighting setup",
-      "Single PhotonicComponentFactory dispatches all entity type creation — no scattered per-entity factory functions",
-      "Single CharacterAnimationSystem drives all AnimationMixer instances from one shared clock.getDelta()",
-      "Single PerformanceBudgetPolicy read by PhotonicRealismPipeline AND AdaptiveDPRController — no duplicated device caps",
-      "photonic-pipeline.ts shared between H-1 (GLTF) and H-2 (procedural) paths — IBL setup not per-stack",
-      "TeachingBeat.microSteps[] consolidates beat content into one canonical location — eliminated per-phase text duplication"
+      "Single ontology declaration in ~/.claude/schemas/ontology/ feeds codegen for all 3 projects — no per-project duplication of ObjectType/PropertyType/ActionType declarations",
+      "Single EventEnvelope discriminated union hosts all 10 event types without per-type envelope boilerplate; EventEnvelopeBase captures 5-dim lineage once, inherited by all variants",
+      "Single AtomicCommit primitive serves Tier-1 fast path (declarative CRUD) and Tier-2 slow path (function-backed) without per-type commit code",
+      "One replay_lineage MCP handler serves all backward propagation queries across all 3 projects; single foldToSnapshot Reducer derives current state from events.jsonl without per-mutation snapshot logic",
+      "palantir-math data.ts (141KB) anti-pattern explicitly cited as DRY violation to be refactored via OSDK 2.0 codegen + primitives/ split"
     ],
     "ocp": [
-      "PhotonicComponentFactory Interface: new entity types registered via PhotonicComponentDefinition.register() — zero changes to factory core code",
-      "CharacterAnimationSystem.clipTransitionTable: new animation transitions added as data entries — system code unchanged",
-      "SpatialInteractionResolver.resolutionRules[]: new trigger conditions added as array entries — resolver Interface unchanged",
-      "PerformanceBudgetPolicy: new device profiles added as policy entries — consuming code (PhotonicRealismPipeline, AdaptiveDPRController) unchanged",
-      "SpeechBubble phaseBasedPosition: new phases mapped to positions via config — switch logic encapsulated",
-      "PhotonicFeedbackEffect.fxCatalog: new FX types added to catalog — dispatch logic closed to modification"
+      "Discriminated union pattern enables Open/Closed extension: new EventEnvelope variants add a new case, never modify existing variants — type exhaustiveness enforced at compile time via tsc",
+      "New ObjectTypes/LinkTypes/ActionTypes added as new declarations in schemas/ontology/primitives/ without modifying existing generator templates",
+      "New validation phase evaluators added to prim-logic-08 (3-phase -> 6-phase post-v0) without modifying the 3 existing v0 phase implementations",
+      "Codegen templates extended per new primitive category via new template file, never modified — OCP applied to the code generator itself"
     ],
     "pecs": [
-      "SpacekidEntityDef (producer DATA) extends PhotonicComponentDefinition interface; PhotonicComponentFactory (consumer LOGIC) reads without concrete class binding",
-      "PhotonicMaterialPreset (producer DATA) extends material config interface; PhotonicRealismPipeline (consumer LOGIC) instantiates materials",
-      "CharacterAnimationClip[] (producer DATA) extends clip catalog; CharacterAnimationSystem (consumer LOGIC) plays clips via AnimationMixer",
-      "TeachingBeat.microSteps[] (producer DATA) extends teaching content; SpeechBubble renderer (consumer) reads step-by-step",
-      "DragState (producer DATA) extends interaction interface; DragDispatch (consumer ACTION) reads target reference generically",
-      "FSRSRetrievabilitySignal (producer LEARN) extends feedback interface; ScaffoldEscalationLogic (consumer LOGIC) reduces to tier"
+      "Producer Extends, Consumer Super applied at every generic boundary: EditFunction<Params, Edits extends OntologyEdit[]> where Edits is producer-extends; Action<F extends EditFunction<any,any>> where F extends",
+      "Reducer<In, Out>: In is consumer-super (accepts any event supertype), Out is producer-extends (produces typed snapshot subtype) — snapshot derivation from events.jsonl is the canonical PECS example",
+      "Replay<Filter, Event>: Filter is consumer-super (broad query accepts any filter subtype), Event is producer-extends (specific event subtype returned)",
+      "Exhaustive visitor on EventEnvelope type tag replaces switch-default anti-pattern; consumer code visits via supertype visitor, not per-variant switch blocks"
     ]
   },
 
   "primitives": [
-    "Struct — SpaceshipEntityDef, SpacekidEntityDef, PhotonicMaterialPreset, PhotonicComponentDefinition, CharacterAnimationClip, TeachingStoryFrame, CharacterAssetPipeline, InteractionTelemetry, PhotonicComponentUsageMetrics",
-    "Interface — PhotonicRealismPipeline, PhotonicComponentFactory, CharacterAnimationSystem, SpatialInteractionResolver",
-    "DerivedProperty — TeachingFrameworkMigration, PerformanceBudgetPolicy, WorldToScreenProjection, PostprocessingCompatibility",
-    "Reducer — ScaffoldEscalationLogic",
-    "ActionType — CharacterDragPlacement, BoardingAnimation, SpatialProximityTrigger, GestureInteractionAdapter, PhotonicFeedbackEffect, AdaptiveDPRController, EnterAdvancesBeat, SpeechBubbleFollow",
-    "Object-backed link — PhotonicComponentDefinition to PhotonicMaterialPreset (materialPresetIds[]), SpacekidEntityDef to CharacterAnimationClip (animationCatalog)"
+    "EventEnvelope (DATA — discriminated union, 10 variants, base carries Decision Lineage 5-dim)",
+    "ObjectType (DATA — named entity with branded ObjectTypeRid)",
+    "PropertyType 24 branded (DATA — value objects with nominal type safety)",
+    "SnapshotManifest (DATA — cache metadata: version, atSequence, generatedAt, sourceEventCount)",
+    "CommitSha branded (DATA — branded string & {__brand: 'CommitSha'} for atopWhich dimension)",
+    "EditFunction (LOGIC — returns OntologyEdit[] without commit; disallowedTools enforces no side effects)",
+    "InterfaceType (LOGIC — shared behavioral contract; transition-zone reclassified from DATA)",
+    "LinkType / Object-Backed LinkType (LOGIC — relationship with/without properties; transition-zone reclassified from DATA)",
+    "DerivedProperty (LOGIC — computed, not stored; lazy-evaluated getter from codegen)",
+    "Reducer (LOGIC — fold over event collection; powers snapshot derivation Reducer<EventEnvelope, OntologySnapshot>)",
+    "LinkConstraint (LOGIC — cardinality / type / temporal constraint computation; returns Constraint[] not Edits[])",
+    "SubmissionCriteria computational (LOGIC — pre-flight evaluator; 9 constraint types: Range/ArraySize/StringLength/StringRegexMatch/OneOf/ObjectQueryResult/ObjectPropertyValue/GroupMember/Unevaluable)",
+    "ValidationPhaseEvaluator (LOGIC — 6-phase Palantir pipeline; v0 implements 3: Design+Compile / Runtime / Post-Write; each returns Pass | Fail<ErrorClass>)",
+    "Tier-1 Declarative Action (ACTION — pure CRUD rule compiled to commit_edits fast path; mutually exclusive with Tier-2)",
+    "Tier-2 Function-Backed Action (ACTION — wraps EditFunction with AtomicCommit; mutually exclusive with Tier-1)",
+    "AtomicCommit (ACTION — writes edits + appends edit_committed event in single mutex; primary: proper-lockfile; fallback: zero-dep fs.mkdirSync empirically proven)",
+    "ActionExecutorAgent (ACTION — plugin subagent with Write/Edit/Bash allowlist; sole agent permitted to commit)",
+    "CodegenRun (ACTION — descender regen triggered by PostToolUse(Edit schemas/ontology/*); appends codegen_started + codegen_completed events)",
+    "Layer-1 RBAC Policy (SECURITY — managed-settings.d/50-palantir-mini.json per project; governs tools/paths/MCP allowlists; Layer-1 only in v0)",
+    "SubmissionCriteria gate semantics (SECURITY — dual model of LOGIC prim; gate that USES evaluation to permit or deny commit; policy review targets this)",
+    "CapabilityToken / Vault (SECURITY — ${CLAUDE_PLUGIN_DATA}/vault/ survives plugin updates; codegen emits token references, not secret values)",
+    "AppendOnlyEventLog events.jsonl (LEARN — per-project immutable NDJSON truth source; IS the Anthropic Managed Agents Session primitive scoped per-project)",
+    "DecisionLineage5Dim (LEARN — WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT captured on every EventEnvelopeBase; root-cause analysis foundation)",
+    "EvidenceSufficiency (LEARN — meta-evaluation: sufficient | partial | insufficient; drives evaluator R9 gate)",
+    "LineageReplay (LEARN — MCP replay_lineage handler; deterministic replay of events.jsonl filtered by 5-dim query; foundation for BackwardProp)",
+    "DriftSignal (LEARN — drift_detected EventEnvelope variant: schema_mismatch | stale_codegen | orphan_reference; plugin monitor detects and emits)"
   ],
 
   "ontologyMapping": {
     "data": [
       {
-        "id": "obj-cd-01", "name": "SpeechBubbleContent",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "Teaching data model: title, body, phase, vocabularyIntro, successCriteria, microStepIndex (NEW), totalMicroSteps (NEW). EXTENDED: promptText/promptKey removed to PromptHUD.",
-        "provenance": "synthesis", "evidenceIds": ["clm-ext-14", "clm-int-06"], "relatedObjectIds": ["obj-cd-02"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-data-01",
+        "name": "EventEnvelope",
+        "ontologyType": "value-type",
+        "domain": "data",
+        "description": "The append-only Session log record. 10 variants via type discriminator. Immutable once appended. Every write to ontology state MUST flow through an EventEnvelope. Base carries Decision Lineage 5-dim: when, atopWhich, throughWhich, byWhom, withWhat.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq01-01", "clm-rq01-02", "clm-rq01-03"],
+        "relatedObjectIds": ["prim-learn-01", "prim-learn-02"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-02", "name": "TeachingBeat",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "EXTENDED: TeachingBeat.microSteps: string[] — beat text split into 2-4 micro-steps for Enter-paced progression. CRA micro-phase, interactionMode, successCriteria preserved.",
-        "provenance": "official", "evidenceIds": ["clm-ext-21", "clm-ext-32"], "relatedObjectIds": ["obj-cd-01"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-data-02",
+        "name": "ObjectType",
+        "ontologyType": "object-type",
+        "domain": "data",
+        "description": "Palantir ObjectType declaration with branded ObjectTypeRid. Each ObjectType holds stored-fact properties only (no derived). Compiled from ~/.claude/schemas/ontology/primitives/object-type.ts to src/generated/objects/*.ts per project.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq03-01"],
+        "relatedObjectIds": ["prim-logic-02", "prim-logic-03"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-03", "name": "TroikaText",
-        "ontologyType": "object-type", "domain": "data",
-        "description": "troika-three-text SDF text mesh v0.52.4. WebGL-native, compatible with n8ao + postprocessing pipeline via OverrideMaterialManager workaround.",
-        "provenance": "official", "evidenceIds": ["clm-ext-01", "clm-ext-02"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-data-03",
+        "name": "PropertyType (24 branded)",
+        "ontologyType": "property",
+        "domain": "data",
+        "description": "24 branded primitive property types from ~/.claude/schemas/ontology/types.ts extended with RID branding for OSDK 2.0 compliance. Value objects — no identity.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq03-01"],
+        "relatedObjectIds": ["prim-data-02"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-04", "name": "CSS3DObject",
-        "ontologyType": "object-type", "domain": "data",
-        "description": "EXCLUDED: CSS3DRenderer cannot receive WebGL postprocessing (architectural impossibility confirmed). mathcrew uses n8ao + postprocessing 6.36.7 — incompatible.",
-        "provenance": "official", "evidenceIds": ["clm-ext-11", "clm-ext-12", "clm-ext-38"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-data-04",
+        "name": "SnapshotManifest",
+        "ontologyType": "value-type",
+        "domain": "data",
+        "description": "Derived snapshot metadata: version, atSequence (replay cut-point), generatedAt, sourceEventCount. Snapshots are cache, not truth — events.jsonl is truth.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq01-03"],
+        "relatedObjectIds": ["prim-learn-01", "prim-logic-05"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-05", "name": "ContentDeliveryConfig",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "Configuration mapping (craMicroPhase, beatPhase) to rendering approach selection.",
-        "provenance": "synthesis", "evidenceIds": ["clm-int-03", "clm-ext-27"], "relatedObjectIds": ["obj-cd-08"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-cd-06", "name": "SpatialAnnotation",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "3D-anchored educational annotation rendered via troika-three-text. UIType: Spatial. Anchor to math object worldPosition.",
-        "provenance": "synthesis", "evidenceIds": ["clm-ext-29", "clm-ext-04"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-cd-07", "name": "AudioNarrationSegment",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "Korean audio narration segment per teaching beat. url, beatIndex, language. Implements Mayer TemporalContiguity.",
-        "provenance": "official", "evidenceIds": ["clm-ext-25", "clm-ext-22"], "relatedObjectIds": ["obj-cd-02"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-01", "name": "SpaceshipEntityDef",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "Replaces resonanceLoop. Procedural geometry spaceship: fuselage (CylinderGeometry), wings (BoxGeometry), engine pods. MeshPhysicalMaterial: metalness=0.85, roughness=0.15, clearcoat=1.0. PMREMGenerator IBL from Polyhaven CC0.",
-        "provenance": "official", "evidenceIds": ["clm-pr-01", "clm-pr-02", "clm-pr-17"], "relatedObjectIds": ["obj-pr-03", "obj-pr-09"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-02", "name": "SpacekidEntityDef",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "Replaces pulseShard. GLTF character child-in-spacesuit. Kenney CC0 base + Blender spacesuit + Mixamo animations baked in GLB + gltfjsx -S -T -t. AnimationMixer for clips. SkeletonUtils.clone() for multi-instance.",
-        "provenance": "official", "evidenceIds": ["clm-pr-05", "clm-pr-06", "clm-pr-07", "clm-pr-11"], "relatedObjectIds": ["obj-pr-05", "obj-pr-10"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-03", "name": "PhotonicMaterialPreset",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "Named PBR material presets: spaceship-hull (metalness=0.85, clearcoat=1.0), visor-glass (transmission=0.95, ior=1.5), spacesuit-fabric (MeshSSSNodeMaterial, thickness=0.5), engine-glow (emissiveIntensity=2.0).",
-        "provenance": "official", "evidenceIds": ["clm-pr-04", "clm-pr-17", "clm-pr-18"], "relatedObjectIds": ["obj-pr-08"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-04", "name": "PhotonicComponentDefinition",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "Registry entry: componentId, entityType, geometryFn or assetUrl, materialPresetIds[], interactionModes[], lodLevels[], tags[]. Factory reads registry (OCP).",
-        "provenance": "synthesis", "evidenceIds": ["clm-pr-22", "clm-pr-23"], "relatedObjectIds": ["obj-pr-09"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-05", "name": "CharacterAnimationClip",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "Named animation clip catalog: idle (loop), walk (loop), wave (once), pickup (once), board-spaceship (once). All baked into GLB via Blender/Mixamo export. No runtime SkeletonUtils.retarget().",
-        "provenance": "official", "evidenceIds": ["clm-pr-05", "clm-pr-06", "clm-pr-12", "clm-pr-14"], "relatedObjectIds": ["obj-pr-10"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-06", "name": "TeachingStoryFrame",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "MODIFIED: extends TeachingBeat with narrative context — storyBeatId, narrativeRole, spatialTriggerIds[], characterPlacementConstraint. Math contract (TeachingBeat) PRESERVED. Metaphor only: observatory to space station.",
-        "provenance": "synthesis", "evidenceIds": ["clm-pr-34", "clm-pr-35"], "relatedObjectIds": ["obj-cd-02"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-07", "name": "CharacterAssetPipeline",
-        "ontologyType": "value-type", "domain": "data",
-        "description": "Offline pipeline: Kenney CC0 base + Blender spacesuit skin + Mixamo bake + gltfjsx -S -T -t to mathcrew/public/characters/spacekid.glb. Step-by-step definition.",
-        "provenance": "official", "evidenceIds": ["clm-pr-11", "clm-pr-13", "clm-pr-15", "clm-pr-21"], "relatedObjectIds": ["obj-pr-02"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-data-05",
+        "name": "CommitSha (branded)",
+        "ontologyType": "value-type",
+        "domain": "data",
+        "description": "Branded string & { readonly __brand: 'CommitSha' } for atopWhich lineage dimension. Nominal type prevents mixing with SessionId / EventId at compile time.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq01-01"],
+        "relatedObjectIds": ["prim-data-01", "prim-learn-02"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       }
     ],
     "logic": [
       {
-        "id": "obj-cd-08", "name": "ContentDeliveryResolver",
-        "ontologyType": "interface", "domain": "logic",
-        "description": "PRESERVED. Selects rendering approach per CRA phase: Concrete=SpatialAnnotation, Representational=hybrid troika+SpeechBubble, Abstract=SpeechBubble primary.",
-        "provenance": "synthesis", "evidenceIds": ["clm-int-03", "clm-int-06"], "relatedObjectIds": ["obj-cd-05"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-logic-01",
+        "name": "EditFunction",
+        "ontologyType": "function",
+        "domain": "logic",
+        "description": "Tier-2 function that takes params and returns Edits[] WITHOUT committing. Mechanically enforced via disallowedTools: [Write, Edit] on the edit-function agent .md frontmatter. Return type: OntologyEdit[] (Edits.Object | Edits.Link | Edits.Interface). Authoring helper does NOT commit edits per §LOGIC.FN-04.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq02-02", "clm-rq02-03", "clm-ext-14"],
+        "relatedObjectIds": ["prim-action-02"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-09", "name": "WorldToScreenProjection",
-        "ontologyType": "function", "domain": "logic",
-        "description": "PRESERVED. Vector3.project to CSS transform for speech bubble positioning. Per-frame DOM mutation. Phase-based position override added for occlusion solution.",
-        "provenance": "official", "evidenceIds": ["clm-ext-14"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-logic-02",
+        "name": "InterfaceType",
+        "ontologyType": "interface",
+        "domain": "logic",
+        "description": "Shared behavioral contract across 2+ ObjectTypes. Transition-zone reclassification: enables polymorphic reasoning, not entity identity. LOGIC not DATA per ontologist SH-01.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq03-01"],
+        "relatedObjectIds": ["prim-data-02"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-10", "name": "CognitiveLoadGuard",
-        "ontologyType": "interface", "domain": "logic",
-        "description": "PRESERVED. CLT rules: elementary needs high guidance, no redundancy, coherence, segmenting (learner-paced beats with microSteps).",
-        "provenance": "official", "evidenceIds": ["clm-ext-22", "clm-ext-23"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-logic-03",
+        "name": "LinkType / Object-Backed LinkType",
+        "ontologyType": "link-type",
+        "domain": "logic",
+        "description": "Relationship between ObjectTypes. Plain LinkType when the relationship carries no properties; Object-Backed LinkType when it does. Transition-zone reclassification: enables reasoning/traversal, not stored fact.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq03-01"],
+        "relatedObjectIds": ["prim-data-02"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-11", "name": "MayerPrincipleChecker",
-        "ontologyType": "property", "domain": "logic",
-        "description": "PRESERVED. Validates 5 CTML principles: SpatialContiguity, TemporalContiguity, Signalling, Coherence, Segmenting.",
-        "provenance": "official", "evidenceIds": ["clm-ext-20", "clm-ext-21", "clm-ext-24", "clm-ext-25"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-logic-04",
+        "name": "DerivedProperty",
+        "ontologyType": "property",
+        "domain": "logic",
+        "description": "Property computed from other properties. Not stored. Lives in schemas/ontology/functions/derived-property.ts. SH-01: if you delete the computation, raw data remains but derived value vanishes.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq03-01"],
+        "relatedObjectIds": ["prim-data-02"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-12", "name": "ScaffoldEscalationLogic",
-        "ontologyType": "property", "domain": "logic",
-        "description": "PRESERVED. 4-tier scaffold reducer: Nudge to Visual hint to Worked example to Direct instruction. Aggregates FSRSRetrievabilitySignal[].",
-        "provenance": "synthesis", "evidenceIds": ["clm-int-04", "clm-int-05"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-logic-05",
+        "name": "Reducer",
+        "ontologyType": "function",
+        "domain": "logic",
+        "description": "Aggregation or fold over a collection of objects. Critical for snapshot derivation from events.jsonl: Reducer<EventEnvelope, OntologySnapshot> folds the log into current state. Powers LEARN -> DATA derivation per DC5-06.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq01-03"],
+        "relatedObjectIds": ["prim-learn-01", "prim-data-04"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-13", "name": "PostprocessingCompatibility",
-        "ontologyType": "property", "domain": "logic",
-        "description": "PRESERVED. Compatibility matrix: CSS3DRenderer EXCLUDED (architectural impossibility), TroikaText compatible via OverrideMaterialManager, MeshPhysicalMaterial compatible with n8ao natively.",
-        "provenance": "official", "evidenceIds": ["clm-ext-03", "clm-ext-12", "clm-ext-38"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-logic-06",
+        "name": "LinkConstraint",
+        "ontologyType": "function",
+        "domain": "logic",
+        "description": "Computed constraint on a LinkType (cardinality, type-of-both-ends, temporal ordering). Returns Constraint[] or boolean, no side effects.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq02-04"],
+        "relatedObjectIds": ["prim-logic-03"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-pr-08", "name": "PhotonicRealismPipeline",
-        "ontologyType": "interface", "domain": "logic",
-        "description": "5-stage setup: (1) PMREMGenerator IBL, (2) PhotonicMaterialPreset assignment, (3) MeshSSSNodeMaterial selective (pending g-pr-01 benchmark), (4) n8ao halfRes=true SSAO, (5) EffectComposer compose.",
-        "provenance": "official", "evidenceIds": ["clm-pr-01", "clm-pr-03", "clm-pr-17", "clm-pr-26"], "relatedObjectIds": ["obj-pr-03", "obj-pr-13"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-logic-07",
+        "name": "SubmissionCriteria (computational)",
+        "ontologyType": "function",
+        "domain": "logic",
+        "description": "Pre-flight business-logic evaluator. Returns Pass | Fail with 9 constraint classes (Range/ArraySize/StringLength/StringRegexMatch/OneOf/ObjectQueryResult/ObjectPropertyValue/GroupMember/Unevaluable). Mirrors OSDK 2.0 $validateOnly. Dual-modeled with prim-sec-02 (gate semantics).",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq02-04", "clm-rq02-05", "clm-rq04-02"],
+        "relatedObjectIds": ["prim-sec-02", "prim-action-03"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-pr-09", "name": "PhotonicComponentFactory",
-        "ontologyType": "interface", "domain": "logic",
-        "description": "OCP Factory: create(componentId, position) routes to procedural or GLTF path via PhotonicComponentDefinition registry. dispose() for Three.js resource cleanup.",
-        "provenance": "synthesis", "evidenceIds": ["clm-pr-22", "clm-pr-23", "clm-int-02"], "relatedObjectIds": ["obj-pr-04"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-10", "name": "CharacterAnimationSystem",
-        "ontologyType": "interface", "domain": "logic",
-        "description": "AnimationMixer lifecycle: playClip(entity, clipId, blendDuration), stopClip, update(delta). One mixer per SkeletonUtils.clone() instance. Clip transitions: drag-start=walk, drag-end=idle, proximity-trigger=wave, boarding=board-spaceship.",
-        "provenance": "official", "evidenceIds": ["clm-pr-05", "clm-pr-06", "clm-pr-07"], "relatedObjectIds": ["obj-pr-05"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-11", "name": "SpatialInteractionResolver",
-        "ontologyType": "interface", "domain": "logic",
-        "description": "Classifies spatial events: Vector3.distanceTo() returns BoardingTrigger or MathZoneTrigger or ScaleGesture or RotateGesture. Returns InteractionEvent (no side effects). Per-frame resolution.",
-        "provenance": "official", "evidenceIds": ["clm-pr-31", "clm-pr-32", "clm-pr-33"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-12", "name": "TeachingFrameworkMigration",
-        "ontologyType": "property", "domain": "logic",
-        "description": "Derived migration scope: PRESERVE (TeachingBeat, VT/CRA, 10 InteractionModes, ts-fsrs), REPLACE (resonanceLoop to SpaceshipEntityDef, pulseShard to SpacekidEntityDef, observatory to space station), EXTEND (CharacterDragPlacement, SpatialProximityTrigger, BoardingAnimation).",
-        "provenance": "official", "evidenceIds": ["clm-pr-34", "clm-pr-35", "clm-pr-36"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-13", "name": "PerformanceBudgetPolicy",
-        "ontologyType": "property", "domain": "logic",
-        "description": "Target: Chromebook Intel Iris Xe, 60fps, <100 draw calls, <16.7ms. Rules: n8ao halfRes=true mandatory; DPR cap desktop=1.0/mobile=1.5; SSS selective (pending g-pr-01); LOD 3 levels max; InstancedMesh for static-only geometry.",
-        "provenance": "synthesis", "evidenceIds": ["clm-pr-26", "clm-pr-27", "clm-pr-28"], "relatedObjectIds": ["obj-pr-08", "obj-pr-19"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-logic-08",
+        "name": "ValidationPhaseEvaluator",
+        "ontologyType": "function",
+        "domain": "logic",
+        "description": "6-phase validation pipeline evaluator (Design/Compile/Deploy/Merge/Runtime/Post-Write per §VAL.R-03..R-08). v0 implements minimum 3: Design+Compile / Runtime / Post-Write. Phase-to-hook: Design+Compile -> PostToolUse(Edit schemas/ontology/*) bun tsc; Runtime -> commit_edits pre-flight; Post-Write -> PostToolUse(Edit) drift check.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq05-01", "clm-rq05-02", "clm-rq05-03"],
+        "relatedObjectIds": ["prim-sec-02", "prim-learn-05"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       }
     ],
     "action": [
       {
-        "id": "obj-cd-14", "name": "EnterAdvancesBeat",
-        "ontologyType": "action-type", "domain": "action",
-        "description": "EXTENDED: Enter key advances through TeachingBeat.microSteps[]. All micro-steps complete then advance to next beat. Implements Mayer Segmenting.",
-        "provenance": "official", "evidenceIds": ["clm-ext-21", "clm-ext-26"], "relatedObjectIds": ["obj-cd-02"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-action-01",
+        "name": "Tier-1 Declarative Action",
+        "ontologyType": "action-type",
+        "domain": "action",
+        "description": "Pure CRUD rule. Declarative spec: given ObjectTypeX and field Y, on operation Z, apply rule R. No custom code path. Compiled into commit_edits handler fast path. Mutually exclusive with Tier-2 per §ACTION.MU-09..11.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq02-01"],
+        "relatedObjectIds": ["prim-action-03"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-15", "name": "SpeechBubbleFollow",
-        "ontologyType": "action-type", "domain": "action",
-        "description": "MODIFIED: phaseBasedPosition — motivate/explain: above character (current); practice/demonstrate/assess: top-left fixed (left:20px, top:20px). collapseOnInteraction: 40px mini-bar when InteractionMode active. Per-frame CSS DOM update.",
-        "provenance": "official", "evidenceIds": ["clm-ext-14", "clm-ext-15"], "relatedObjectIds": ["obj-cd-09"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-action-02",
+        "name": "Tier-2 Function-Backed Action",
+        "ontologyType": "action-type",
+        "domain": "action",
+        "description": "Action type that wraps an EditFunction (LOGIC) with an atomic commit. EditFunction computes Edits[] without committing; Tier-2 Action takes those Edits[] and commits them atomically with submission criteria pre-flight. Mutually exclusive with Tier-1.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq02-01", "clm-rq02-02", "clm-ext-19"],
+        "relatedObjectIds": ["prim-logic-01", "prim-action-03"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-16", "name": "AudioNarrationTrigger",
-        "ontologyType": "action-type", "domain": "action",
-        "description": "NEW: Beat advance triggers synchronized Korean narration. Redundancy principle: audio replaces duplicate text display. TemporalContiguity: simultaneous with text.",
-        "provenance": "official", "evidenceIds": ["clm-ext-25", "clm-ext-22"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-action-03",
+        "name": "AtomicCommit",
+        "ontologyType": "action-type",
+        "domain": "action",
+        "description": "The actual mutation: writes edits to ontology state AND appends edit_committed event to events.jsonl in a single atomic operation. Primary: proper-lockfile (mkdir-based NFS-safe). Fallback: zero-dep fs.mkdirSync empirically proven at 2x1000 events with 0 lost events (T7 prototype, 2 independent runs).",
+        "provenance": "official",
+        "evidenceIds": ["clm-ext-20", "clm-ext-24"],
+        "relatedObjectIds": ["prim-learn-01"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-17", "name": "TroikaTextSync",
-        "ontologyType": "action-type", "domain": "action",
-        "description": "NEW: Async SDF text update via .sync(callback). Web worker generates SDF atlas. preloadFont() for Korean+math chars at scene init.",
-        "provenance": "official", "evidenceIds": ["clm-ext-05", "clm-ext-06"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-action-04",
+        "name": "ActionExecutorAgent",
+        "ontologyType": "action-type",
+        "domain": "action",
+        "description": "Plugin subagent with Write/Edit/Bash allowlist. The ONLY palantir-mini agent permitted to commit. All other agents have disallowedTools covering Write/Edit. Per OMC architect.md pattern + Correction 1 (plugin agents cannot define hooks — hooks live at plugin-level hooks/hooks.json).",
+        "provenance": "official",
+        "evidenceIds": ["clm-ext-08", "clm-rq02-06"],
+        "relatedObjectIds": ["prim-action-03"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-18", "name": "SpatialSignalling",
-        "ontologyType": "action-type", "domain": "action",
-        "description": "3D visual highlights (emissive glow, particle trails, scale pulses) anchored to referenced math objects. Implements Mayer Signalling Principle.",
-        "provenance": "official", "evidenceIds": ["clm-ext-24", "clm-ext-25"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-14", "name": "CharacterDragPlacement",
-        "ontologyType": "action-type", "domain": "action",
-        "description": "H-5 DragControls proxy pattern: invisible BoxMesh proxy + DragControls + characterGroup.position.copy(proxy.position) per frame. Grid snap: Math.round(pos/CELL_SIZE)*CELL_SIZE. drag:start=walk anim, drag:end=idle anim. SpatialInteractionResolver.resolve() on drag:end. touch-action:none on canvas.",
-        "provenance": "official", "evidenceIds": ["clm-pr-16", "clm-pr-17", "clm-pr-31"], "relatedObjectIds": ["obj-pr-10", "obj-pr-11"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-15", "name": "BoardingAnimation",
-        "ontologyType": "action-type", "domain": "action",
-        "description": "Narrative sequence: BoardingTrigger fires + walk toward spaceship (tween position) + board-spaceship clip + TeachingBeat advance. Requires GLTF spacekid with board-spaceship animation clip (H-1 only).",
-        "provenance": "official", "evidenceIds": ["clm-pr-05", "clm-pr-35"], "relatedObjectIds": ["obj-pr-10"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-16", "name": "SpatialProximityTrigger",
-        "ontologyType": "action-type", "domain": "action",
-        "description": "Per-frame: Vector3.distanceTo(character, zone.center) < zone.radius fires MathZoneTrigger event + wave animation clip + ContentDeliveryResolver beat dispatch. Hysteresis: reset at 1.2x radius.",
-        "provenance": "official", "evidenceIds": ["clm-pr-33", "clm-pr-35"], "relatedObjectIds": ["obj-pr-11"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-17", "name": "GestureInteractionAdapter",
-        "ontologyType": "action-type", "domain": "action",
-        "description": "Tablet gestures: pinch-to-scale, two-finger rotate, long-press. PointerEvents API with setPointerCapture. Edge safety: reject starts within 20px top/left/right, 48px bottom (GEST.OS-02). touch-action:none (PE.TA-01).",
-        "provenance": "official", "evidenceIds": ["clm-pr-31", "clm-pr-32"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-18", "name": "PhotonicFeedbackEffect",
-        "ontologyType": "action-type", "domain": "action",
-        "description": "Photonic-style feedback: correct=engine-glow-pulse (emissiveIntensity 0 to 2.0 to 0.5, 0.6s), incorrect=shield-flicker (red flash, 3x 0.3s), discovery=particle-burst (50 particles). GSAP tween or manual lerp.",
-        "provenance": "official", "evidenceIds": ["clm-pr-01", "clm-pr-29"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
-      },
-      {
-        "id": "obj-pr-19", "name": "AdaptiveDPRController",
-        "ontologyType": "action-type", "domain": "action",
-        "description": "60-frame FPS window: <55fps triggers DPR-0.1 (min 0.75); >60fps for 120 frames triggers DPR+0.1 (max desktop=1.0, mobile=1.5). disableSSS_below=50fps. renderer.setPixelRatio(dpr) on change.",
-        "provenance": "synthesis", "evidenceIds": ["clm-pr-26", "clm-pr-27", "clm-pr-28"], "relatedObjectIds": ["obj-pr-13"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-action-05",
+        "name": "CodegenRun",
+        "ontologyType": "action-type",
+        "domain": "action",
+        "description": "Descender regeneration action triggered by PostToolUse(Edit schemas/ontology/*) hook. Reads ontology declarations, writes src/generated/* per project, appends codegen_started + codegen_completed events to events.jsonl.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq03-01", "clm-rq03-02"],
+        "relatedObjectIds": ["prim-data-02", "prim-learn-01"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       }
     ],
-    "security": [],
+    "security": [
+      {
+        "id": "prim-sec-01",
+        "name": "Layer-1 RBAC Policy",
+        "ontologyType": "object-type",
+        "domain": "security",
+        "description": "Per-project managed-settings.d/50-palantir-mini.json fragment declares permission allowlists (tools, paths, MCP servers). Layer 1 only in v0. Markings/ObjectSecurity/PermissionsCascade explicitly deferred to future phase.",
+        "provenance": "official",
+        "evidenceIds": ["clm-ext-08", "clm-ext-09"],
+        "relatedObjectIds": ["prim-action-04"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
+      },
+      {
+        "id": "prim-sec-02",
+        "name": "SubmissionCriteria (gate semantics)",
+        "ontologyType": "object-type",
+        "domain": "security",
+        "description": "Pre-flight gate that blocks commits unless business-logic conditions pass. SECURITY dual of prim-logic-07. LOGIC evaluates pass/fail; SECURITY is the gate that USES the evaluation to permit or deny the commit. Intentional dual modeling per DC5 DDD.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq02-04", "clm-rq02-05", "clm-rq04-02"],
+        "relatedObjectIds": ["prim-logic-07", "prim-action-03"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
+      },
+      {
+        "id": "prim-sec-03",
+        "name": "CapabilityToken / Vault",
+        "ontologyType": "object-type",
+        "domain": "security",
+        "description": "Secrets live in ${CLAUDE_PLUGIN_DATA}/vault/ — survives plugin updates — referenced by capability token, never embedded in generated code. Mirrors Anthropic Managed Agents Vault proxy pattern.",
+        "provenance": "official",
+        "evidenceIds": ["clm-ext-09"],
+        "relatedObjectIds": [],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
+      }
+    ],
     "learn": [
       {
-        "id": "obj-cd-19", "name": "ContentEngagement",
-        "ontologyType": "property", "domain": "learn",
-        "description": "PRESERVED. Tracks per-beat: sessionId, beatIndex, approachUsed, craPhase, vtDimension, dwellTimeMs, interactionDepth, fsrsR, scaffoldTierUsed, masteryGainedAfterBeat.",
-        "provenance": "synthesis", "evidenceIds": ["clm-int-04", "clm-int-05"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-learn-01",
+        "name": "AppendOnlyEventLog (events.jsonl)",
+        "ontologyType": "object-type",
+        "domain": "learn",
+        "description": "Per-project <project>/.palantir-mini/session/events.jsonl. Append-only. Immutable lines. Each line is a serialized EventEnvelope. IS the Anthropic Managed Agents Session primitive scoped per-project. Three-source convergence: Anthropic MA, Palantir Decision Lineage 5-dim, OMC clawhip event routing.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq01-02", "clm-rq01-03", "clm-rq01-04"],
+        "relatedObjectIds": ["prim-data-01", "prim-action-03"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-20", "name": "FSRSScheduling",
-        "ontologyType": "property", "domain": "learn",
-        "description": "PRESERVED. ts-fsrs 5.3.1. R-to-content-intensity mapping: low-R concepts trigger reinforcement delivery mode in ContentDeliveryResolver. FSRS-7 upgrade path preserved.",
-        "provenance": "official", "evidenceIds": ["clm-ext-37"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-learn-02",
+        "name": "DecisionLineage5Dim",
+        "ontologyType": "value-type",
+        "domain": "learn",
+        "description": "Palantir Decision Lineage 5 dimensions: WHEN, ATOP_WHICH, THROUGH_WHICH, BY_WHOM, WITH_WHAT. Captured on every EventEnvelope via EventEnvelopeBase. Enables root-cause analysis of ontology changes.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq01-01"],
+        "relatedObjectIds": ["prim-data-01", "prim-learn-04"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-cd-21", "name": "ResearchGapRegistry",
-        "ontologyType": "value-type", "domain": "learn",
-        "description": "3 open gaps from prior session: g-01 (troika+n8ao FPS), g-02 (troika r183 compat), g-03 (FSRS adaptive pacing). Plus 3 photonic-realism gaps: g-pr-01 (SSS FPS), g-pr-02 (clone draw calls), g-pr-03 (DragControls jitter).",
-        "provenance": "synthesis", "evidenceIds": ["clm-ext-07", "clm-ext-19"], "relatedObjectIds": [],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-learn-03",
+        "name": "EvidenceSufficiency",
+        "ontologyType": "value-type",
+        "domain": "learn",
+        "description": "Meta-evaluation: sufficient | partial | insufficient. Used by evaluator R9 gate. Drives researcher re-spawn for insufficient evidence gaps.",
+        "provenance": "official",
+        "evidenceIds": [],
+        "relatedObjectIds": [],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-pr-20", "name": "InteractionTelemetry",
-        "ontologyType": "value-type", "domain": "learn",
-        "description": "Photonic-specific interaction events: drag-placed, proximity-trigger, boarding-completed, gesture-applied, fx-played, clip-played. Extends ContentEngagement with position3D, entityId, componentId, teachingOutcome.",
-        "provenance": "synthesis", "evidenceIds": ["clm-pr-34", "clm-pr-36"], "relatedObjectIds": ["obj-cd-19"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-learn-04",
+        "name": "LineageReplay",
+        "ontologyType": "function",
+        "domain": "learn",
+        "description": "Deterministic replay of events.jsonl filtered by 5-dim lineage. Given a filter (e.g. all events byWhom.agentName=ontologist in the last 24h), returns ordered event stream. Foundation for BackwardProp. Mirrors replay_lineage MCP tool.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq04-03"],
+        "relatedObjectIds": ["prim-learn-01", "prim-learn-02"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       },
       {
-        "id": "obj-pr-21", "name": "PhotonicComponentUsageMetrics",
-        "ontologyType": "value-type", "domain": "learn",
-        "description": "Aggregated per PhotonicComponentDefinition: totalInteractions, interactionsByMode, averageTeachingOutcomeScore, fpsImpactProfile (sssActive, avgDPR, avgFPS), clipUsageFrequency.",
-        "provenance": "synthesis", "evidenceIds": ["clm-pr-34"], "relatedObjectIds": ["obj-pr-20"],
-        "createdAt": "2026-04-12T23:00:00Z", "updatedAt": "2026-04-12T23:00:00Z", "createdBy": "reporter"
+        "id": "prim-learn-05",
+        "name": "DriftSignal",
+        "ontologyType": "value-type",
+        "domain": "learn",
+        "description": "drift_detected EventEnvelope variant: schema_mismatch | stale_codegen | orphan_reference. Surfaces when runtime usage diverges from ontology declarations. Plugin drift-watch monitor detects and emits.",
+        "provenance": "official",
+        "evidenceIds": ["clm-rq05-01"],
+        "relatedObjectIds": ["prim-learn-01", "prim-data-01"],
+        "createdAt": "2026-04-15T16:00:00Z",
+        "updatedAt": "2026-04-15T16:00:00Z",
+        "createdBy": "ontologist"
       }
     ]
   },
 
   "recommendedStack": {
-    "name": "Three.js PhotonicRealism Stack — H-1+H-3+H-5 (Hybrid: H-2 procedural start then H-1 GLTF pivot via H-3 OCP)",
+    "name": "TypeScript + Bun + Claude Code v2.1.108 Native Runtime + Append-Only Event Log (H-A + H-C)",
     "technologies": [
       {
-        "id": "tech-threejs-r183",
-        "name": "Three.js r183 (0.183.2)",
-        "category": "3D rendering engine",
-        "version": "0.183.2",
-        "url": "https://threejs.org",
-        "license": "MIT",
-        "maturity": "mature",
-        "evidenceIds": ["clm-pr-01", "clm-pr-04", "clm-pr-09", "clm-pr-10"],
-        "strengths": [
-          "All required APIs stable: GLTFLoader, AnimationMixer, MeshPhysicalMaterial, PMREMGenerator, DragControls (tier-1 official docs)",
-          "r183 fixes: empty groups with multiple scene references (GLTF), PMREM cache, BezierInterpolant DEVTOOLS",
-          "MeshPhysicalMaterial compatible with n8ao SSAO natively — no OverrideMaterialManager needed"
-        ],
-        "weaknesses": [
-          "MeshSSSNodeMaterial FPS cost on Chromebook Intel Iris Xe unverified (g-pr-01 OPEN)",
-          "SkeletonUtils.clone() x5 draw call budget on Chromebook unverified (g-pr-02 OPEN)",
-          "DragControls proxy + AnimationMixer crossFadeTo concurrent jitter risk (g-pr-03 PARTIALLY_ADDRESSED)"
-        ],
-        "constraintIds": ["clm-pr-13"],
-        "createdAt": "2026-04-12T23:00:00Z",
-        "updatedAt": "2026-04-12T23:00:00Z",
-        "createdBy": "reporter"
-      },
-      {
-        "id": "tech-gltfloader",
-        "name": "GLTFLoader + DRACOLoader",
-        "category": "asset loader",
-        "version": "r183 (three/addons/loaders/GLTFLoader.js)",
-        "url": "https://threejs.org/docs/pages/GLTFLoader.html",
-        "license": "MIT",
-        "maturity": "mature",
-        "evidenceIds": ["clm-pr-01", "clm-pr-02", "clm-pr-03"],
-        "strengths": [
-          "loadAsync(url) returns Promise<GLTF> with scene (Group) + animations (AnimationClip[])",
-          "DRACOLoader: 80-90% geometry compression — use only if GLB > 500KB",
-          "r183 GLTF fix: empty groups with multiple scene references resolved"
-        ],
-        "weaknesses": ["Kenney Animated Characters 3 r183 AnimationMixer compat unverified (asset gap)"],
-        "constraintIds": [],
-        "createdAt": "2026-04-12T23:00:00Z",
-        "updatedAt": "2026-04-12T23:00:00Z",
-        "createdBy": "reporter"
-      },
-      {
-        "id": "tech-animationmixer",
-        "name": "AnimationMixer + SkeletonUtils",
-        "category": "animation system",
-        "version": "r183 (three/addons/utils/SkeletonUtils.js)",
-        "url": "https://threejs.org/docs/#api/en/animation/AnimationMixer",
-        "license": "MIT",
-        "maturity": "mature",
-        "evidenceIds": ["clm-pr-07", "clm-pr-08", "clm-pr-09"],
-        "strengths": [
-          "crossFadeTo(action, durationSeconds, warp) for smooth clip blending",
-          "SkeletonUtils.clone() provides independent bone hierarchy per SpacekidEntity instance",
-          "One mixer per clone, shared clock.getDelta() — efficient multi-instance update"
-        ],
-        "weaknesses": ["AVOID SkeletonUtils.retarget() — inverted feet/backward hands with different-proportion skeletons (use pre-baked GLB clips)"],
-        "constraintIds": ["clm-pr-14"],
-        "createdAt": "2026-04-12T23:00:00Z",
-        "updatedAt": "2026-04-12T23:00:00Z",
-        "createdBy": "reporter"
-      },
-      {
-        "id": "tech-meshphysicalmaterial",
-        "name": "MeshPhysicalMaterial + MeshSSSNodeMaterial",
-        "category": "PBR material",
-        "version": "r183",
-        "url": "https://threejs.org/docs/pages/MeshPhysicalMaterial.html",
-        "license": "MIT",
-        "maturity": "mature",
-        "evidenceIds": ["clm-pr-04", "clm-pr-05", "clm-pr-06"],
-        "strengths": [
-          "clearcoat(1.0) + iridescence(0.3) + envMap: visor glass photonicRealism achievable",
-          "metalness=0.85 + roughness=0.15 + clearcoat=0.5: spaceship hull photonicRealism",
-          "Feature-flagged: enable only needed features per entity type"
-        ],
-        "weaknesses": [
-          "transmission is most expensive feature — selective use only for visor",
-          "MeshSSSNodeMaterial WebGPU-tier — Chromebook FPS cost unverified (g-pr-01)"
-        ],
-        "constraintIds": [],
-        "createdAt": "2026-04-12T23:00:00Z",
-        "updatedAt": "2026-04-12T23:00:00Z",
-        "createdBy": "reporter"
-      },
-      {
-        "id": "tech-pmremgenerator",
-        "name": "PMREMGenerator + RGBELoader",
-        "category": "IBL lighting",
-        "version": "r183",
-        "url": "https://threejs.org/docs/pages/PMREMGenerator.html",
-        "license": "MIT",
-        "maturity": "mature",
-        "evidenceIds": ["clm-pr-10", "clm-pr-11", "clm-pr-12"],
-        "strengths": [
-          "scene.environment = pmremGenerator.fromEquirectangular(texture).texture — one-time GPU op at scene init",
-          "Auto-applies PBR lighting to ALL MeshStandard/PhysicalMaterial in scene",
-          "ACESFilmicToneMapping + toneMappingExposure=1.8 is standard photonicRealism renderer config",
-          "Poly Haven CC0 HDRIs 1K-8K — 1K-2K sufficient for education (1-8MB)"
-        ],
-        "weaknesses": ["r152+ default: outputColorSpace=SRGBColorSpace — do NOT set explicitly to avoid double-correction"],
-        "constraintIds": [],
-        "createdAt": "2026-04-12T23:00:00Z",
-        "updatedAt": "2026-04-12T23:00:00Z",
-        "createdBy": "reporter"
-      },
-      {
-        "id": "tech-dragcontrols",
-        "name": "DragControls (Three.js addons) + Proxy Pattern",
-        "category": "interaction",
-        "version": "r183 (three/addons/controls/DragControls.js)",
-        "url": "https://threejs.org/docs/pages/DragControls.html",
-        "license": "MIT",
-        "maturity": "mature",
-        "evidenceIds": ["clm-pr-16", "clm-pr-17", "clm-pr-18"],
-        "strengths": [
-          "GLTF animated models require invisible BoxGeometry proxy — DragControls attached to proxy array (g-pr-04 RESOLVED via rf-T7-05)",
-          "OrbitControls disable/enable on dragstart/dragend prevents camera conflict",
-          "Grid snap formula: Math.round(pos.x / CELL_SIZE) * CELL_SIZE confirmed",
-          "dragend fires InteractionMode state transition — clean integration with registerMode() pattern"
-        ],
-        "weaknesses": ["crossFadeTo concurrent with active drag — jitter risk (g-pr-03 PARTIALLY_ADDRESSED)"],
-        "constraintIds": [],
-        "createdAt": "2026-04-12T23:00:00Z",
-        "updatedAt": "2026-04-12T23:00:00Z",
-        "createdBy": "reporter"
-      },
-      {
-        "id": "tech-n8ao",
-        "name": "n8ao 1.10.1 + postprocessing 6.36.7",
-        "category": "post-processing",
-        "version": "1.10.1 + 6.36.7",
-        "url": "https://www.npmjs.com/package/n8ao",
+        "id": "tech-ts-bun",
+        "name": "TypeScript 5.x + Bun 1.3.x",
+        "category": "language + runtime",
+        "version": "TypeScript 5.x / Bun 1.3.10",
+        "url": "https://bun.sh",
         "license": "MIT",
         "maturity": "stable",
-        "evidenceIds": ["clm-pr-26"],
+        "evidenceIds": ["clm-rq03-01", "clm-rq03-02"],
         "strengths": [
-          "halfRes=true: SSAO cost halved — Chromebook 60fps escape valve",
-          "MeshPhysicalMaterial compatible with n8ao SSAO natively",
-          "Existing mathcrew pipeline preserved — GLTF models participate naturally"
+          "TypeScript compile-time validation catches ontology schema regressions after codegen (§VAL.R-03)",
+          "Bun native test runner empirically confirmed: H-A prototype 10/10 clean at 2287 expect() calls in 5.64s",
+          "Bun speed enables practical PreCompact decision:block hook (fast tsc --noEmit)",
+          "Branded RID types prevent cross-domain confusion at zero runtime cost"
         ],
-        "weaknesses": ["halfRes reduces SSAO quality — acceptable trade for Chromebook 60fps target"],
+        "weaknesses": [
+          "proper-lockfile Bun compatibility is inferred (tier-3 claim, confidence 0.75); empirically resolved by fs.mkdirSync fallback in T7"
+        ],
         "constraintIds": [],
-        "createdAt": "2026-04-12T23:00:00Z",
-        "updatedAt": "2026-04-12T23:00:00Z",
-        "createdBy": "reporter"
+        "createdAt": "2026-04-15T15:30:00Z",
+        "updatedAt": "2026-04-15T15:30:00Z",
+        "createdBy": "researcher"
+      },
+      {
+        "id": "tech-cc-native-runtime",
+        "name": "Claude Code v2.1.108 Native Runtime",
+        "category": "agent orchestration platform",
+        "version": "v2.1.108",
+        "url": "https://code.claude.com/docs/en/hooks",
+        "license": null,
+        "maturity": "stable",
+        "evidenceIds": ["clm-rq05-02", "clm-rq05-03", "clm-ext-01", "clm-ext-07", "clm-ext-08"],
+        "strengths": [
+          "24 hook events including PreCompact decision:block (v2.1.105), TaskCreated/TaskCompleted (v2.1.84), PostToolUseFailure — all required hooks exist",
+          "Agent Teams + custom subagents with disallowedTools enforce LOGIC/ACTION separation mechanically",
+          "Plugin manifest monitors field auto-arms drift-watch at session start",
+          "hookSpecificOutput.permissionDecision (not deprecated top-level 'decision') verified for PreToolUse per Correction 2",
+          "${CLAUDE_PLUGIN_DATA} persists across plugin updates; vault pattern safe",
+          "managed-settings.d/ fragments enable per-project RBAC without modifying global settings"
+        ],
+        "weaknesses": [
+          "Plugin-shipped agents cannot define hooks, mcpServers, or permissionMode — hooks must be at plugin-level (Correction 1)",
+          "API-Free constraint: no Managed Agents API, no --bare flag, no Bedrock/Vertex"
+        ],
+        "constraintIds": [],
+        "createdAt": "2026-04-15T15:30:00Z",
+        "updatedAt": "2026-04-15T15:30:00Z",
+        "createdBy": "researcher"
+      },
+      {
+        "id": "tech-event-log",
+        "name": "Append-Only Event Log (events.jsonl + fs.mkdirSync mutex)",
+        "category": "state persistence mechanism",
+        "version": null,
+        "url": null,
+        "license": null,
+        "maturity": "stable",
+        "evidenceIds": ["clm-rq01-02", "clm-rq01-03", "clm-ext-20"],
+        "strengths": [
+          "Empirically proven: 2x1000 events, 0 lost events, 0 torn writes, 0 duplicate sequences (T7 H-A prototype, 2 independent runs)",
+          "fs.mkdirSync mutex is zero-dependency; EEXIST is atomic on all filesystems including NFS",
+          "Three-source convergence (Anthropic MA, Palantir DL, OMC clawhip) — strongest external validation under API-Free constraint",
+          "Enables Decision Lineage 5-dim capture on every mutation as first-class record",
+          "BackwardProp path (replay_lineage -> lineage graph -> drift -> refinement) is structurally sound"
+        ],
+        "weaknesses": [
+          "O(n) replay cost for snapshot derivation — mitigated by SnapshotManifest cache at atSequence cut-points",
+          "proper-lockfile (backup mechanism) last published 2020; production path uses zero-dep fs.mkdirSync"
+        ],
+        "constraintIds": [],
+        "createdAt": "2026-04-15T17:00:00Z",
+        "updatedAt": "2026-04-15T17:00:00Z",
+        "createdBy": "prototyper"
+      },
+      {
+        "id": "tech-osdk-codegen",
+        "name": "OSDK 2.0-pattern Type Codegen",
+        "category": "code generation",
+        "version": "2.0",
+        "url": "https://www.palantir.com/docs/foundry/functions/typescript-v2-ontology-edits",
+        "license": "Apache-2.0",
+        "maturity": "stable",
+        "evidenceIds": ["clm-rq03-04", "clm-ext-14", "clm-ext-18", "clm-ext-19"],
+        "strengths": [
+          "Edits discriminated union (Edits.Object<T>, Edits.Interface<T>, Edits.Link<Src,'linkName'>) enables exhaustive compile-time coverage",
+          "createEditBatch<OntologyEdit>(client) pattern: batch.getEdits() — reading property after update does NOT reflect uncommitted change (safe for preview semantics)",
+          "palantir-math data.ts (141KB, 2190 LOC) refactored via primitives/ split to fix OSDK 1.x single-file threshold anti-pattern"
+        ],
+        "weaknesses": [
+          "Foundry edit functions require wrapping as function-backed Actions to commit — commit_edits MCP fills this role in palantir-mini"
+        ],
+        "constraintIds": [],
+        "createdAt": "2026-04-15T15:30:00Z",
+        "updatedAt": "2026-04-15T15:30:00Z",
+        "createdBy": "researcher"
       }
     ],
-    "rationale": "H-1 (GLTF+AnimationMixer+IBL) wins for SpacekidEntity rendering: tier-1 official APIs with 5+ year stability, clean D/L/A surface, teaching framework migration is metaphor-layer-only (zero VT/CRA/beats contract change). H-3 (Factory+Registry) wins for component architecture: OCP extension via Map<ComponentType, CreateFn> with zero external dependencies — miniplex adds ~2KB overhead for marginal benefit at <50 entity scale. H-5 (DragControls+Proxy) wins for interaction: official Three.js built-in with proxy pattern resolving GLTF+AnimationMixer incompatibility (g-pr-04 RESOLVED via rf-T7-05); grid snap formula confirmed; clean registerMode() integration. SpaceshipEntity uses procedural geometry (H-2 approach) as it extends existing mathcrew pattern with no animation rig. HYBRID path: build H-2 procedural SpacekidEntity first (1 week fast path) then user engagement validation then H-3 registry.set() pivot to H-1 GLTF if engagement insufficient. All sources tier-1/2 official docs. Evaluator gate: 14/14 PASS.",
+    "rationale": "H-A (Append-Only Event Log) wins across 3 independent evaluation axes: (1) ARCHITECTURAL CONVERGENCE — three independent references (Anthropic Managed Agents 'Session=append-only log', Palantir Decision Lineage 5-dim §DL-02, OMC clawhip event routing) converge on the append-only log pattern; (2) EMPIRICAL SUPERIORITY — H-A prototype: 0 lost events / 2000 (0 torn writes, 0 duplicate sequences, 2 independent runs) vs H-B: 484/2000 lost updates (24.2%, TOCTOU structural confirmed across 3 runs, 56-484 range); (3) ONTOLOGY FIT — H-A populates all 5 domains first-class (28 primitives, overallForwardPropStatus=healthy, overallBackwardPropStatus=healthy) while H-B cannot reliably populate LEARN (R11 triggered) and has structurally broken BackwardProp (R13 triggered). H-C (3-phase validation pipeline) accepted as co-winner — orthogonal to H-A, runs ON TOP of event-log substrate.",
     "alternatives": [
       {
-        "name": "H-2 Procedural + H-4 miniplex + H-6 Gesture — Full Alternative Stack",
-        "whyNot": "H-2 procedural SpacekidEntity: engagement with Korean elementary school students unresolvable by research alone (FM-T8-001, high severity, UNRESOLVABLE — requires user study). H-4 miniplex: adds ~2KB external dependency for marginal benefit at <50 entity scale vs H-3 TypeScript Map zero-dependency. H-6 gesture: requires bespoke GestureClassifier (no Three.js built-in) + OS edge gesture conflicts (iOS swipe-up dock, Android nav gestures) are high risk for structured grid-based math game. H-6 rejects discrete grid snap — changes math manipulative semantics. Viable as Phase 3 upgrade path for open-ended exploration modes, not for initial PhotonicRealism migration."
+        "name": "H-B: Snapshot + StaleObject optimistic concurrency",
+        "whyNot": "Empirical defeat: 484/2000 lost updates (24.2%) under 2-writer adversarial race across 3 independent runs. TOCTOU window is structural not load-dependent. Destroys Decision Lineage 5-dim — prim-learn-01 BackwardProp structurally impossible from H-B substrate. Triggered R11 (LEARN D/L/A Fit broken) and R13 (BackwardProp broken) on evaluator gate. Preserved as formal competitor of record."
       },
       {
-        "name": "React Three Fiber + @react-three/drei",
-        "whyNot": "mathcrew is TypeScript + Vite + Bun with no React runtime. Adding RTF would require full renderer refactor — architecturally out of scope. Three.js addons provide equivalent functionality natively."
-      },
-      {
-        "name": "miniplex ECS (H-4) as component system",
-        "whyNot": "H-3 Factory+Registry preferred at current scale (<50 entities). miniplex v2.0.0 last published 3 years ago (2587 weekly downloads). Migration path from H-3 to miniplex is clean — treat H-4 as future upgrade when entity count exceeds 50."
+        "name": "Full 6-phase Palantir validation pipeline",
+        "whyNot": "Deploy/Merge phases presume Foundry-like branching workflow absent in Claude Code Native Runtime. Git already handles merge-time validation via normal branch workflows. v0 correct endpoint is 3-phase (Design+Compile / Runtime / Post-Write) per H-C — extensible to 6-phase post-v0 via OCP."
       }
     ],
-    "confidence": 0.85
+    "confidence": 0.92
   },
 
   "forwardProp": {
-    "description": "PhotonicRealism ontology to contracts to runtime propagation chain",
+    "description": "ForwardProp: ontology declarations -> palantir-mini codegen -> per-project generated code -> project runtime -> events.jsonl append -> derived snapshot. 6 steps, all healthy per world-model T4 audit (overallForwardPropStatus=healthy).",
     "steps": [
-      "DATA layer: SpaceshipEntityDef + SpacekidEntityDef + PhotonicMaterialPreset (entity configs) to PhotonicComponentDefinition (registry entries)",
-      "DATA to LOGIC: PhotonicComponentDefinition to PhotonicComponentFactory.create() to Three.js Group instantiation with MeshPhysicalMaterial",
-      "DATA to LOGIC: PhotonicMaterialPreset to PhotonicRealismPipeline to PMREMGenerator.fromEquirectangular() to scene.environment IBL auto-applied",
-      "DATA to LOGIC: CharacterAnimationClip catalog to CharacterAnimationSystem.playClip() to AnimationMixer.clipAction().fadeIn().play()",
-      "DATA to LOGIC: SnapGridConfig + DragState to SpatialInteractionResolver.resolve() to InteractionEvent classification",
-      "LOGIC to ACTION: CharacterAnimationSystem to CharacterDragPlacement (drag:start/end) to AnimationMixer clip transitions",
-      "LOGIC to ACTION: SpatialInteractionResolver to BoardingAnimation or SpatialProximityTrigger or GestureInteractionAdapter dispatch",
-      "LOGIC to ACTION: PerformanceBudgetPolicy to AdaptiveDPRController to renderer.setPixelRatio() dynamic adjustment",
-      "ACTION to Teaching Framework: dragend/proximity/boarding to InteractionMode state transitions via registerMode() pattern to EnterAdvancesBeat to TeachingBeat.microSteps progression",
-      "Teaching Framework to HUD: SpeechBubbleContent.microStepIndex to SpeechBubbleFollow (phaseBasedPosition + collapseOnInteraction) to PromptHUD bottom-right fixed",
-      "HUD to WebGL2 render: EffectComposer (RenderPass to n8ao AOPass to OutputPass) to screen output"
+      "Step 1 (ontology declarations): ~/.claude/schemas/ontology/{primitives,functions,policies,lineage,generators}/ — TypeScript with branded RIDs; DDD: matches Palantir OSDK 2.0 vocabulary; DRY: single schema shared across 3 projects",
+      "Step 2 (palantir-mini codegen): ~/.claude/plugins/palantir-mini/lib/codegen/descender-gen.ts + client-generated-split.ts — OCP: adding primitives adds generator templates, never modifies existing generators",
+      "Step 3 (per-project generated code): <project>/src/generated/{objects,links,actions,functions,events}.d.ts — OSDK 2.0 client/generated split; generated code never hand-edited",
+      "Step 4 (project runtime): <project>/ TypeScript importing src/generated/ — PECS: consumers use supertypes, producers extend; edit functions / action executors / UI surfaces are strongly typed",
+      "Step 5 (events.jsonl append): <project>/.palantir-mini/session/events.jsonl — DRY: single append path for all state changes via AtomicCommit + fs.mkdirSync mutex",
+      "Step 6 (derived snapshot): <project>/.palantir-mini/session/snapshots/{ontology,lineage,manifest}.json — cached fold of events.jsonl via Reducer primitive; snapshot is cache, events.jsonl is truth"
     ],
-    "healthStatus": "partial",
-    "gaps": [
-      "PhotonicComponentFactory not yet implemented in mathcrew/src/",
-      "Polyhaven CC0 HDRI not yet downloaded to mathcrew/public/hdri/",
-      "SpacekidEntity GLB not yet created (requires Blender + Mixamo workflow execution)",
-      "DragControls proxy pattern not yet in interaction-controller.ts",
-      "touch-action:none not yet applied to canvas",
-      "TeachingBeat.microSteps field not yet in src/types/teaching.ts",
-      "SpeechBubble phaseBasedPosition + collapseOnInteraction not yet implemented",
-      "PromptHUD component not yet in src/hud/hud.ts"
-    ]
+    "healthStatus": "healthy",
+    "gaps": []
   },
 
   "backwardProp": {
-    "description": "Runtime events to lineage to evaluation to refinement to ontology updates",
+    "description": "BackwardProp: runtime events -> replay_lineage MCP -> 5-dim lineage graph -> refinement proposal -> ontologist review -> ontology update. 6 steps; steps 4+5 have minor persistence gaps deferred to post-v0. overallBackwardPropStatus=healthy.",
     "steps": [
-      "ACTION runtime events to InteractionTelemetry (LEARN): drag-placed, proximity-trigger, boarding-completed, gesture-applied, fx-played, clip-played captured per frame in game-loop.ts",
-      "InteractionTelemetry to PhotonicComponentUsageMetrics (LEARN): aggregated interaction frequency + teaching outcome scores per componentId",
-      "PhotonicComponentUsageMetrics to evaluator R9 evidence sufficiency gate to blueprint confidence updates",
-      "PhotonicComponentUsageMetrics.fpsImpactProfile to AdaptiveDPRController.dprHistory to PerformanceBudgetPolicy device class refinement",
-      "AdaptiveDPRController.fpsHistory below 50fps threshold to SSS disable signal to PhotonicRealismPipeline.stage3_sss conditional toggle",
-      "ContentEngagement.masteryGainedAfterBeat to FSRSReviewLog cross-reference to R trajectory trend to TeachingBeat sequence refinement",
-      "ContentEngagement.scaffoldTierUsed to ScaffoldEscalationLogic tier threshold calibration to ContentDeliveryResolver rule update",
-      "InteractionTelemetry.clipPlayedId frequency to CharacterAnimationClip catalog priority ordering to CharacterAssetPipeline next GLB export",
-      "ResearchGapRegistry: g-pr-01 (SSS FPS benchmark) resolved to PerformanceBudgetPolicy SSS rule update; g-pr-02 (clone draw calls) resolved to SpacekidEntityDef LOD levels update; g-pr-03 (DragControls jitter) resolved to CharacterDragPlacement proxy sync strategy update",
-      "LEARN to ontology updates: gap resolution findings to world-model.json refresh to forward prop chain health upgrades from partial to healthy"
+      "Step 1 (runtime events): <project>/.palantir-mini/session/events.jsonl — append-only capturing all 5 Decision Lineage dimensions per envelope; DDD: WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT",
+      "Step 2 (replay_lineage MCP tool): ~/.claude/plugins/palantir-mini/bridge/handlers/replay-lineage.ts — MCP handler reads events.jsonl filtered by 5-dim query; DRY: single replay primitive serves all backward queries",
+      "Step 3 (decision lineage graph): in-memory materialization from replay output — 5-dim graph (DDD: matches Palantir Decision Lineage vocabulary)",
+      "Step 4 (refinement proposal): ontologist agent inbox via SendMessage + decision-log append — non-durable in v0; post-v0: add refinement_proposed EventEnvelope variant; PECS: proposal consumers use supertype",
+      "Step 5 (ontologist review): ontologist agent accepts|rejects|revises; decision logged in decision-log.json — human-in-the-loop governance; post-v0: add review_decision event variant",
+      "Step 6 (ontology declaration update): ~/.claude/schemas/ontology/ git commit — triggers full ForwardProp cycle; closed loop: BackwardProp terminates at start of ForwardProp"
     ],
-    "healthStatus": "partial",
+    "healthStatus": "healthy",
     "gaps": [
-      "InteractionTelemetry emit not yet in game-loop.ts",
-      "position3D serialization pattern not defined",
-      "PhotonicComponentUsageMetrics aggregation pipeline not implemented",
-      "ContentEngagement emit points not in game-loop.ts",
-      "FSRSReviewLog cross-reference with ContentEngagement not implemented",
-      "AdaptiveDPRController FPS rolling window not in game-loop.ts",
-      "Automated CTML violation detection not in eval suite",
-      "Gap-resolution to ontology update cycle not automated"
+      "Step 4 (refinement proposal persistence): non-durable in v0 (SendMessage + decision-log append only). Post-v0: add refinement_proposed variant to EventEnvelope union.",
+      "Step 5 (ontologist review decision): should itself be a LEARN-domain event. Post-v0: add review_decision variant to EventEnvelope union."
     ]
   },
 
@@ -606,204 +578,169 @@
     {
       "phase": 1,
       "name": "Golden Tables",
-      "description": "Define all entity DATA structures, material preset catalog, component registry, and teaching framework type extensions. Establish type contracts before any rendering code. Also includes speechBubble type changes.",
+      "description": "Establish events.jsonl per project as the durable Golden Table. Publish ~/.claude/schemas/ontology/ as stable typed interface (the OSDK). palantir-math migrates first (most mature, highest urgency with 141KB data.ts anti-pattern).",
       "deliverables": [
-        "src/types/entities.ts — SpaceshipEntityDef, SpacekidEntityDef (Struct types)",
-        "src/types/photonic.ts — PhotonicMaterialPreset, PhotonicComponentDefinition, CharacterAnimationClip (Struct types)",
-        "src/types/teaching.ts — TeachingBeat.microSteps: string[] addition, SpeechBubbleContent.microStepIndex: number addition",
-        "src/rendering/photonic-materials.ts — 4 standard PhotonicMaterialPreset instances: spaceship-hull, visor-glass, spacesuit-fabric, engine-glow",
-        "src/config/component-registry.ts — initial PhotonicComponentDefinition entries for spaceship, spacekid, environment entity types",
-        "mathcrew/public/hdri/ — Poly Haven CC0 HDRI 1K (e.g. kloofendal_48d_partly_cloudy_1k.hdr)",
-        "Kenney Space Kit GLB assets downloaded to mathcrew/public/models/spaceship/"
+        "~/.claude/schemas/ontology/ initial publication: event-types.ts + primitives/ + functions/ + policies/ + generators/",
+        "Plugin scaffold: .claude-plugin/{plugin.json,marketplace.json} + hooks/hooks.json + bridge/mcp-server.ts + agents/*.md",
+        "EventEnvelope discriminated union (10 variants + EventEnvelopeBase with 5-dim lineage) in schemas/ontology/lineage/event-types.ts",
+        "palantir-mini codegen/descender-gen.ts initial implementation targeting palantir-math data.ts refactor",
+        "palantir-math migration Steps 1-3 (schema.ts 2.5KB, security.ts 4KB, data.ts 141KB split into primitives/)",
+        "AppendOnlyEventLog library: lib/event-log/{append.ts,read.ts,replay.ts} with fs.mkdirSync mutex (zero-dep)",
+        "Bun test suite for event-log (H-A prototype as seed: 10 cases, 2287 expect() calls verified clean)",
+        "Per-project managed-settings.d/50-palantir-mini.json Layer-1 RBAC fragments"
       ],
       "dependencies": [
-        "src/types/ existing TypeScript type system",
-        "Polyhaven.com HDRI download (CC0, no auth required)",
-        "Kenney.nl Space Kit download (CC0, no auth required)"
+        "schemas/ontology/ initial publication must precede codegen implementation",
+        "codegen must produce valid tsc-clean output for palantir-math before Step 3 migration",
+        "fs.mkdirSync fallback (not proper-lockfile) as primary atomic-append mechanism per T7 empirical verdict"
       ]
     },
     {
       "phase": 2,
       "name": "Operational Decision-Making",
-      "description": "Implement PhotonicRealism rendering pipeline, entity factory, animation system, drag interaction, teaching framework metaphor migration, and speechBubble redesign. All LOGIC and ACTION systems operational. 5-8 weeks total.",
+      "description": "Enable two-tier actions + submission criteria + 3-phase validation pipeline. Edit functions return Edits[] without commit. Action executor wraps with atomic commit. MCP bridge exposes 5 tools. palantir-math migration Steps 4-7. kosmos and mathcrew migration.",
       "deliverables": [
-        "src/rendering/photonic-pipeline.ts — PMREMGenerator + RGBELoader IBL setup, ACESFilmicToneMapping, n8ao halfRes integration (0.5 week)",
-        "src/scene/entities/create-spaceship-entity.ts — Kenney Space Kit GLTFLoader or procedural geometry, PhotonicMaterialPreset applied (0.5 week)",
-        "src/scene/entities/create-spacekid-entity.ts — Phase 2A: procedural geometry SpacekidEntity (1 week fast path); Phase 2B: GLTF + AnimationMixer + SkeletonUtils.clone() + DragControls proxy (2-3 weeks after engagement validation)",
-        "src/scene/systems/animation-system.ts — AnimationMixer per-frame update, playClip/crossFadeTo, clipTransitionTable",
-        "src/scene/systems/drag-system.ts — DragControls proxy setup, OrbitControls integration, grid snap formula, touch-action:none",
-        "src/scene/systems/spatial-interaction-resolver.ts — Vector3.distanceTo proximity rules, InteractionEvent dispatch",
-        "interaction-controller.ts — ADD DragControls integration, dragend triggers registerMode() InteractionMode transition (ADD not REPLACE)",
-        "src/scene/entities/create-resonance-loop.ts REPLACED by create-spaceship-entity.ts",
-        "src/scene/entities/create-pulse-shard.ts REPLACED by create-spacekid-entity.ts",
-        "teaching-story-framework.ts — METAPHOR LAYER ONLY rename (resonance-loop to spaceship, pulse-shard to spacekid)",
-        "src/hud/speech-bubble.ts — prompt bar removal, phaseBasedPosition logic, collapseOnInteraction CSS class",
-        "src/hud/hud.ts — PromptHUD component (keycap + promptText, position: fixed; bottom:20px; right:20px)",
-        "src/systems/teaching-flow.ts — micro-step progression logic (Enter increments microStepIndex before beat advance)",
-        "src/game-loop.ts — micro-step index management + collapseOnInteraction trigger on mode activation",
-        "src/config/teaching-content.ts — PLANET_CONTENT beats text to microSteps[] refactor (all 5 planets)",
-        "Phase 2A total: 5-6 weeks (procedural spacekid). Phase 2B delta: +2 weeks (GLTF spacekid after engagement validation passes)"
+        "5 MCP tools in bridge/mcp-server.ts: get_ontology / emit_event / apply_edit_function / commit_edits / replay_lineage",
+        "lib/actions/{commit.ts,tier1-declarative.ts,tier2-function.ts} with SubmissionCriteria pre-flight evaluator",
+        "agents/action-executor.md (Write/Edit/Bash allowlist), agents/edit-function.md (disallowedTools: Write/Edit/Bash)",
+        "hooks/hooks.json: 3-phase validation (Design+Compile PostToolUse / Runtime commit_edits / Post-Write drift check), hookSpecificOutput.permissionDecision format",
+        "monitors/monitors.json: drift-watch monitor for schema_mismatch | stale_codegen | orphan_reference",
+        "palantir-math migration Steps 4-7: capabilities.ts (57KB) -> rbac.ts, changeContracts.ts (66KB) -> tier1+tier2, events.jsonl wire-up, compat shim",
+        "kosmos migration: ontology-state/*.json backed by events.jsonl; decision-log events emitted on pipeline phase completion",
+        "mathcrew migration: event emission for content delivery and photonic realism sessions"
       ],
       "dependencies": [
-        "Phase 1 type contracts established",
-        "Polyhaven HDRI downloaded to public/hdri/",
-        "Phase 2A: procedural geometry only — no external GLTF asset pipeline needed",
-        "Phase 2B: Kenney Animated Characters 3 verified OR Mixamo FBX to Blender to GLB pipeline executed",
-        "Engagement validation: informal test with 3-5 Korean elementary students comparing procedural vs GLTF character preference",
-        "g-pr-01 benchmark: stats.js FPS on Chromebook with MeshSSSNodeMaterial — must pass >50fps before spacesuit-fabric preset enabled"
+        "Phase 1 Golden Tables must be stable before Phase 2 action layer",
+        "palantir-math Step 3 (data.ts refactor) must complete before Step 5 (capabilities migration)",
+        "hooks/hooks.json must use hookSpecificOutput.permissionDecision for PreToolUse (Correction 2 from source-map)"
       ]
     },
     {
       "phase": 3,
       "name": "AI-First",
-      "description": "Enable adaptive content delivery driven by InteractionTelemetry + FSRS backward propagation. Automated gap resolution and policy refinement from runtime data.",
+      "description": "MCP bridge exposes operations for Claude/Codex/Gemini. ontology-verifier agent proactively detects drift. replay_lineage surfaces real refinement signals. BackwardProp loop fully closes with refinement_proposed + review_decision event variants.",
       "deliverables": [
-        "InteractionTelemetry emit in game-loop.ts — spatial events captured",
-        "PhotonicComponentUsageMetrics aggregation pipeline — evaluator R9 evidence sufficiency upgrade",
-        "AdaptiveDPRController in game-loop.ts — FPS rolling window + SSS conditional toggle",
-        "ContentEngagement emit points — masteryGainedAfterBeat cross-referenced to FSRSReviewLog",
-        "ScaffoldEscalationLogic integration — ContentDeliveryResolver reads R signal for scaffold tier selection",
-        "SpatialAnnotation on math manipulables — CTML SpatialContiguity violation resolved for CRA Concrete phase",
-        "AudioNarrationTrigger — Korean TTS synchronized with microStep beat text",
-        "H-6 Gesture+Spatial as enhancement — open-ended exploration mode (post-H-5 validation only)",
-        "Automated CTML violation detection in eval suite"
+        "ontology-verifier custom subagent: reads events.jsonl + schemas/ontology/, emits drift_detected events",
+        "Cross-project BackwardProp: kosmos can call replay_lineage against palantir-math events.jsonl",
+        "refinement_proposed EventEnvelope variant (closes BackwardProp step-4 gap)",
+        "review_decision EventEnvelope variant (closes BackwardProp step-5 gap)",
+        "CapabilityToken vault population: ${CLAUDE_PLUGIN_DATA}/vault/*.json for any MCP bridge credentials",
+        "Historical session lineage: prior sessions (jsxgraph-sequencer, mathcrew-content-delivery, mathcrew-photonic-realism) loaded as replay-only events.jsonl",
+        "Progressive autonomy gates: AIP Automate-style staged review using submission_criteria_passed + decision lineage as autonomy evidence"
       ],
       "dependencies": [
-        "Phase 2 fully operational",
-        "g-pr-01, g-pr-02, g-pr-03 runtime benchmarks completed",
-        "InteractionTelemetry schema defined in src/types/",
-        "FSRS backward propagation cross-reference designed",
-        "Teaching content microSteps[] fully authored for all 5 planets"
+        "Phase 2 MCP bridge must be stable + tested before Phase 3 cross-project use",
+        "BackwardProp steps 4+5 gap fills require Phase 1+2 events.jsonl to have accumulated sufficient signal",
+        "ontology-verifier subagent must not define hooks (enforced by CC plugin restrictions)"
       ]
     }
   ],
 
   "evaluatorGate": "ACCEPT",
-  "evaluatorReason": "14 PASS, 0 FAIL, 1 N/A (R2). Session mathcrew-photonic-realism-001. Round 1. No debate triggered. Independent verification: bun test T7 33/33 (18ms, 83 assertions) + T8 35/35 (19ms, 74 assertions). bunx tsc --noEmit: 0 errors. All sources tier-1 (7) or tier-2 (1). Zero stale evidence. 43 ontology objects with DDD/DRY/OCP/PECS. 6 hypotheses (H-1 to H-6), 24 scenarios (4 per hypothesis), 11-dim scoring, 2 revision rounds. Winning combination: H-1 (GLTF+AnimationMixer+IBL) + H-3 (Factory+Registry) + H-5 (DragControls+Proxy). Alternative upgrade path: H-2+H-4+H-6. Hybrid recommendation: H-2 procedural start then H-1 GLTF pivot via H-3 Factory+Registry OCP. 3 critical runtime gaps remain open (g-pr-01 SSS FPS, g-pr-02 clone draw calls, g-pr-03 DragControls jitter) — do not block recommendation but require prototype benchmarks before production enablement. Teaching framework migration confirmed METAPHOR-LAYER-ONLY. All propagation paths partial (designed but not yet implemented — expected at this research stage).",
-
-  "speechBubbleRedesign": {
-    "sessionContext": "User directive: '말풍선 내용이 너무 많아 짤림 — 키 설명(keycap+promptText)은 화면 오른쪽 아래 등으로 분리. 교육 콘텐츠를 더 쪼개서 진행하는 프레임워크 개선 필수. Blueprint에 포함.'",
-    "currentProblems": [
-      "card width clamp(280px, 36vw, 400px) + overflow:hidden — 긴 내용 짤림",
-      "6개 요소(header, title, body, vocab, criteria, prompt)가 400px 카드에 모두 포함",
-      "body 텍스트(15.5px, line-height 1.62)가 다단으로 길어지면 카드 높이 폭발",
-      "vocabulary callout + success criteria가 body와 함께 있어서 인지 부하 가중",
-      "OCCLUSION: 말풍선이 캐릭터 위(ANCHOR_Y_OFFSET=1.0)에 고정 — 캐릭터가 보는 3D 오브젝트(spaceship, spacekid) 가림",
-      "translate(-50%, -100%)로 캐릭터 바로 위 고정 — practice/demonstrate 페이즈에서 인터랙티브 3D 오브젝트와 겹침",
-      "카메라 각도/줌에 따라 말풍선이 화면 대부분을 차지할 수 있음 (특히 모바일/태블릿)"
-    ],
-    "proposedSolution": {
-      "promptBarRelocation": {
-        "description": "keycap + promptText를 화면 오른쪽 하단 독립 HUD 요소(PromptHUD)로 분리. 말풍선에서 제거.",
-        "newComponent": "PromptHUD — CSS: position:fixed; bottom:20px; right:20px; z-index:100. 말풍선 카드에서 prompt-bar HTML 요소 제거."
-      },
-      "contentGranularity": {
-        "description": "1 beat = 1 큰 텍스트 블록에서 1 beat = 2-4 micro-step으로 분할. Enter가 microStepIndex를 순차 진행. 마지막 micro-step 완료 후 다음 beat로 전진.",
-        "dataChange": "TeachingBeat.microSteps: string[] (기존 text: string 대체). SpeechBubbleContent.microStepIndex: number 추가."
-      },
-      "vocabSeparation": "vocabulary callout를 3D 공간의 SpatialAnnotation (troika-three-text) 또는 별도 HUD 카드로 분리. Phase 2/3 구현 대상.",
-      "criteriaSeparation": "success criteria를 HUD 상단 또는 progress bar 근처로 이동. Phase 2 구현 대상.",
-      "occlusionSolution": {
-        "recommended": "phaseBasedPosition + collapseOnInteraction 조합 — 가장 낮은 구현 복잡도로 occlusion 문제 해결. smartAvoidance는 Phase 3 후보.",
-        "phaseBasedPosition": {
-          "description": "motivate/explain: 캐릭터 위(현재 translate(-50%,-100%) 유지). practice/demonstrate/assess: 화면 상단 좌측 고정 위치 (left:20px, top:20px). tail 숨김.",
-          "implementation": "speech-bubble.ts update()에서 data.phase 확인 후 practice/demonstrate/assess이면 fixed position top-left 적용."
-        },
-        "collapseOnInteraction": {
-          "description": "InteractionMode 활성화 시 말풍선이 40px 높이 미니 바(제목만)로 자동 축소. 탭/클릭으로 펼침.",
-          "implementation": "SpeechBubbleContent에 collapsed:boolean 추가. interaction-controller.ts mode 활성화 시 collapsed=true emit. CSS: .speech-bubble--collapsed { height:40px; overflow:hidden; cursor:pointer; }. 클릭 시 toggle."
-        },
-        "smartAvoidance": "Phase 3 후보: 말풍선 위치와 teaching surface screen-projection 비교하여 겹침 감지 후 반대편 자동 재배치."
-      }
-    },
-    "frameworkChanges": [
-      "TeachingBeat.text (단일 문자열)를 TeachingBeat.microSteps (string[]) 배열로 확장",
-      "SpeechBubbleContent에 microStepIndex: number 추가 — Enter가 micro-step 순차 진행",
-      "모든 micro-step 완료 후 다음 beat로 전진 (기존 beat 전진 로직 위에 micro-step 레이어 추가)",
-      "promptText/promptKey를 별도 PromptHUD 컴포넌트로 분리 (화면 오른쪽 하단 fixed position)",
-      "teaching-content.ts의 PLANET_CONTENT beats 텍스트를 microSteps[] 배열로 리팩터 (Phase 1 deliverable)"
-    ],
-    "impactFiles": [
-      "src/types/teaching.ts — TeachingBeat.microSteps: string[] 추가",
-      "src/types/teaching.ts — SpeechBubbleContent.microStepIndex: number 추가",
-      "src/hud/speech-bubble.ts — prompt bar 제거, card overflow 개선, phaseBasedPosition 로직, collapseOnInteraction CSS class",
-      "src/hud/hud.ts — PromptHUD 컴포넌트 추가 (오른쪽 하단 fixed HUD)",
-      "src/systems/teaching-flow.ts — micro-step 진행 로직 (Enter가 microStepIndex 증가 후 마지막 step에서 nextBeat)",
-      "src/game-loop.ts — micro-step index 관리 + collapseOnInteraction trigger on mode activation",
-      "src/config/teaching-content.ts — beats text를 microSteps[] 변환 (전체 PLANET_CONTENT 리팩터)"
-    ]
-  },
-
-  "photonicRealismComponentFramework": {
-    "description": "Reusable PhotonicRealism component framework — math-concept agnostic. Any new math concept (분수, 비율, 기하 등) adds entity types via registry without changing factory core.",
-    "registryPattern": {
-      "extensionPoint": "registry.set('new-math-entity', createNewMathEntity); // Zero factory code changes (OCP principle)",
-      "factoryDispatch": "ComponentFactory(type, spec, scene): reads registry.get(type), throws for unknown types, dispatches to createFn",
-      "typeContract": "type ComponentType = 'spacekid' | 'spaceship' | 'environment' | ...; type CreateFn = (spec: ComponentSpec, scene: THREE.Scene) => ComponentInstance;"
-    },
-    "materialPresetCatalog": {
-      "spaceship-hull": "MeshPhysicalMaterial: metalness=0.85, roughness=0.15, clearcoat=1.0, clearcoatRoughness=0.1, envMapIntensity=1.5",
-      "visor-glass": "MeshPhysicalMaterial: transmission=0.95, ior=1.5, roughness=0.05, thickness=0.01",
-      "spacesuit-fabric": "MeshSSSNodeMaterial: color=#E8D5B7, thickness=0.5, scatterDistance=0.3, roughness=0.8 (g-pr-01 benchmark required before production)",
-      "engine-glow": "MeshPhysicalMaterial: emissive=#FF6B35, emissiveIntensity=2.0, metalness=0.3, roughness=0.7"
-    },
-    "animationSystemReuse": "CharacterAnimationSystem is entity-type agnostic: playClip(entity, clipId, blendDuration) works for any SkinnedMesh entity. New math entities with animations: register in component registry + bake clips in GLB.",
-    "interactionSystemReuse": "SpatialInteractionResolver is entity-type agnostic: new proximity triggers added via TeachingStoryFrame.spatialTriggerIds[]. New drag-enabled entities: register proxy mesh via DragControls.",
-    "feedbackFXReuse": "PhotonicFeedbackEffect.fxCatalog is entity-agnostic: correct/incorrect/discovery FX applicable to any entity type. New FX: add catalog entry + emissiveIntensity tween.",
-    "mathConceptMigrationPath": "New math concept (e.g. 분수): (1) Define FractionBarEntityDef (DATA Struct), (2) Create PhotonicMaterialPreset, (3) Register createFractionBarEntity in ComponentFactory registry, (4) Define spatialTriggerIds in TeachingStoryFrame, (5) Author TeachingBeat.microSteps[] content. Zero changes to PhotonicRealismPipeline, CharacterAnimationSystem, SpatialInteractionResolver, or PhotonicFeedbackEffect."
-  },
-
-  "openGaps": [
-    {
-      "id": "g-pr-01",
-      "severity": "high",
-      "description": "MeshSSSNodeMaterial FPS cost on Chromebook Intel Iris Xe — benchmark required before enabling spacesuit-fabric preset in production",
-      "status": "OPEN",
-      "affectedDecision": "PhotonicMaterialPreset spacesuit-fabric enablement and PerformanceBudgetPolicy SSS rule",
-      "nextExperiment": "stats.js FPS benchmark: render 1 SpacekidEntity with MeshSSSNodeMaterial on head mesh + n8ao SSAO active. Measure 5s on Chromebook-class GPU (Intel UHD 620 or Iris Xe). Target: >50fps. Fail action: substitute MeshPhysicalMaterial roughness/specular approximation + feature flag behind performance tier detection.",
-      "blocksProduction": true
-    },
-    {
-      "id": "g-pr-02",
-      "severity": "high",
-      "description": "SkeletonUtils.clone() x5 simultaneous draw call budget on Chromebook 60fps target — unverified",
-      "status": "OPEN",
-      "affectedDecision": "SpacekidEntityDef max simultaneous instance count and PerformanceBudgetPolicy <100 draw calls rule",
-      "nextExperiment": "Load SpacekidEntity GLTF, SkeletonUtils.clone() x5, AnimationMixer per clone, idle animation on all. Read renderer.info.render.calls after one frame. Measure FPS over 5s. Target: <100 draw calls + >50fps. Fail action: max 3 simultaneous instances + LOD (Three.js LOD class) for instances at distance.",
-      "blocksProduction": true
-    },
-    {
-      "id": "g-pr-03",
-      "severity": "medium",
-      "description": "DragControls proxy position.copy() + AnimationMixer crossFadeTo concurrent — visual root position jitter risk during 0.3s blend transition",
-      "status": "PARTIALLY_ADDRESSED",
-      "affectedDecision": "CharacterDragPlacement proxy sync strategy — per-frame vs postRender step",
-      "nextExperiment": "Load animated SpacekidEntity. Start idle, initiate DragControls drag, trigger crossFadeTo(walkAction, 0.3, true) during drag. Observe root Group position for jitter over 0.3s window. Check if GLB has root motion keyframes. Fail action: move modelGroup.position.copy() to postRender step after mixer.update(), or bake-in-place in Blender.",
-      "blocksProduction": false
-    }
-  ],
+  "evaluatorReason": "All 15 rejection criteria applied (R1-R15). 0 rules triggered on winning hypothesis H-A + co-winner H-C. 2 rules triggered on losing hypothesis H-B: R11 (LEARN D/L/A Fit — 24.2% empirical update loss makes LEARN domain unreliable on H-B substrate) and R13 (BackwardProp structurally broken — no event history to replay after snapshot overwrite). These R11/R13 triggers are pipeline health signals confirming the evaluator gate correctly discriminates real architectural quality — they strengthen H-A's win, not weaken the pipeline. H-A: passRate=1.0 (10/10), 0 failureModes, adversarialRaceResult 0/2000 lost events (2 independent runs). H-B: passRate=1.0 (10/10), 4 failureModes (2 critical: LEARN+ACTION; 2 high: LOGIC+DATA). winRationale is specific and non-generic (3 enumerated axes). 0 debate rounds used (out of max 2) — evidence chain is coherent. whatWouldChangeDecision has 5 concrete reversal conditions. ACCEPT.",
 
   "scenarioIds": [
-    "S-H1-BASE", "S-H1-BEST", "S-H1-WORST", "S-H1-ADV",
-    "S-H2-BASE", "S-H2-BEST", "S-H2-WORST", "S-H2-ADV",
-    "S-H3-BASE", "S-H3-BEST", "S-H3-WORST", "S-H3-ADV",
-    "S-H4-BASE", "S-H4-BEST", "S-H4-WORST", "S-H4-ADV",
-    "S-H5-BASE", "S-H5-BEST", "S-H5-WORST", "S-H5-ADV",
-    "S-H6-BASE", "S-H6-BEST", "S-H6-WORST", "S-H6-ADV"
+    "S-HA-BASE",
+    "S-HA-BEST",
+    "S-HA-WORST",
+    "S-HA-ADV",
+    "S-HB-BASE",
+    "S-HB-BEST",
+    "S-HB-WORST",
+    "S-HB-ADV",
+    "S-HC-BASE",
+    "S-HC-BEST",
+    "S-HC-WORST",
+    "S-HC-ADV"
   ],
 
   "riskIds": [
-    "FM-g-pr-01", "FM-g-pr-02", "FM-g-pr-03",
-    "FM-asset-kenney", "FM-snap-grid",
-    "FM-pedagogical-h2", "FM-boarding-anim"
+    "risk-01",
+    "risk-02",
+    "risk-03",
+    "risk-04"
   ],
 
   "sourceIds": [
-    "src-pr-gltf", "src-pr-pbr", "src-pr-anim",
-    "src-pr-pmrem", "src-pr-instanced", "src-pr-drag",
-    "src-pr-assets", "src-pr-crossref", "src-pr-miniplex",
-    "src-pr-gesture", "src-int-dc5"
+    "src-int-decision-lineage",
+    "src-int-action-mutations",
+    "src-int-logic-functions",
+    "src-int-validation-readme",
+    "src-int-ts-grounding",
+    "src-int-managed-agents",
+    "src-int-palantir-mini-blueprint",
+    "src-ext-cc-hooks",
+    "src-ext-cc-plugins-ref",
+    "src-ext-osdk-v2-edits",
+    "src-ext-proper-lockfile"
   ],
 
-  "confidence": 0.85
+  "confidence": 0.92,
+
+  "prototypeResults": {
+    "H-A": {
+      "hypothesisId": "H-A",
+      "label": "Append-Only Event Log Foundation",
+      "buildStatus": "success",
+      "linesOfCode": 484,
+      "passCount": 10,
+      "failCount": 0,
+      "passRate": 1.0,
+      "adversarialRaceResult": {
+        "concurrentWriters": 2,
+        "eventsPerWriter": 1000,
+        "totalExpected": 2000,
+        "totalActual": 2000,
+        "duplicateSequences": 0,
+        "tornWrites": 0,
+        "lostEvents": 0,
+        "verdict": "pass"
+      },
+      "failureModes": [],
+      "keyFinding": "Zero-dep fs.mkdirSync mutex proven sufficient for concurrent append safety. EventEnvelope discriminated union provides compile-time exhaustiveness. foldToSnapshot() Reducer confirms O(n) LEARN-domain BackwardProp pattern."
+    },
+    "H-B": {
+      "hypothesisId": "H-B",
+      "label": "Snapshot-based + StaleObject optimistic concurrency",
+      "buildStatus": "success",
+      "linesOfCode": 316,
+      "passCount": 10,
+      "failCount": 0,
+      "passRate": 1.0,
+      "adversarialRaceResult": {
+        "concurrentWriters": 2,
+        "updatesPerWriter": 1000,
+        "totalExpected": 2000,
+        "staleObjectErrors": 111,
+        "finalCounterActual": 1516,
+        "lostUpdates": 484,
+        "lostUpdatesRate": 0.242,
+        "verdict": "h-b-weakness-confirmed"
+      },
+      "failureModes": [
+        { "domain": "learn", "description": "24.2% empirical update loss (484/2000). AppendOnlyEventLog cannot be populated from a lossy substrate. BackwardProp structurally impossible.", "severity": "critical" },
+        { "domain": "action", "description": "TOCTOU window between read-check-write is non-atomic. Two writers can both pass version check simultaneously, producing silent lost updates.", "severity": "critical" },
+        { "domain": "logic", "description": "StaleObjectError detection bypassed in true OS-level concurrency when two writers enter the TOCTOU window simultaneously. Coverage incomplete.", "severity": "high" },
+        { "domain": "data", "description": "No lineage record across versions. Each write overwrites prior state; prior states irrecoverable from disk after overwrite.", "severity": "high" }
+      ],
+      "keyFinding": "TOCTOU weakness is structural not load-dependent: 56-484 lost updates across 3 independent runs. H-B preserved as formal competitor of record."
+    }
+  },
+
+  "winRationale": "H-A (Append-Only Event Log Foundation) is the decisive winner across 3 independent evaluation axes: (1) ARCHITECTURAL CONVERGENCE — three independent references (Anthropic Managed Agents 'Session = append-only log of everything that happened', Palantir Decision Lineage 5-dim §DL-02/§DL-09, OMC clawhip 'event routing to prevent context pollution') all converge on the append-only log pattern — strongest evidence class under API-Free constraint; (2) EMPIRICAL SUPERIORITY — H-A prototype passes 2-writer adversarial race at 2x1000 events with 0 duplicate sequences, 0 torn writes, 0 lost events (reproducible across 2 independent runs) versus H-B losing 484/2000 updates (24.2%, confirmed structural TOCTOU across 3 runs, 56-484 range); (3) ONTOLOGY FIT — H-A populates all 5 domains first-class per world-model's 28 primitives (DATA/LOGIC/ACTION/SECURITY/LEARN all healthy) while H-B cannot reliably populate LEARN (R11 triggered) and has structurally broken BackwardProp (R13 triggered). H-C (3-phase validation pipeline) accepted as co-winner: it is orthogonal to H-A vs H-B and runs ON TOP of the event-log substrate. ACCEPT.",
+
+  "alternatives": [
+    {
+      "optionId": "H-B",
+      "whyNot": "Snapshot + StaleObject optimistic concurrency: empirically defeated at 484/2000 lost updates (24.2% loss rate) in 2-writer adversarial race. TOCTOU window is structural (56-484 range across 3 independent runs). Destroys Decision Lineage 5-dim — BackwardProp from H-B substrate is structurally impossible. Triggered evaluator R11 (LEARN D/L/A Fit broken) and R13 (BackwardProp path broken). Works for single-writer sequential systems but palantir-mini LEARN centrality is non-negotiable."
+    }
+  ],
+
+  "whatWouldChangeDecision": [
+    "If a v1 integration test shows fs.mkdirSync fallback is insufficient under 10+ concurrent writers AND proper-lockfile is empirically broken under Bun, revisit H-A's atomic append mechanism (application-level retry-on-conflict or alternative lockfile strategy).",
+    "If H-C (3-phase validation pipeline) fails integration in v1 due to PostToolUse hook latency burnout, reconsider validation monitoring scope (retreat to 2-phase or move to async:true).",
+    "If a new MCP server pattern emerges that makes snapshot-based architecture viable for LEARN (e.g., CRDT-based merging with cross-version history), reconsider H-B or H-A+snapshot hybrid.",
+    "If palantir-math migration reveals EventEnvelope variant gaps that require breaking schema bumps before v0 stabilizes, revisit gap-04 and consider versioned events.jsonl.",
+    "If cross-project write coordination (gap-03) proves insufficient because Codex/Gemini become writers not readers, reintroduce multi-writer coordination mechanism."
+  ]
 }

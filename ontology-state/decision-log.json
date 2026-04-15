@@ -1,324 +1,504 @@
 {
-  "version": "0.8.0",
-  "lastUpdated": "2026-04-12T18:00:00Z",
-  "sessionId": "mathcrew-photonic-realism-001",
-  "previousBenchmarks": ["jsxgraph-sequencer-001", "mathcrew-content-delivery-001"],
+  "version": "1.0.0-palantir-mini",
+  "lastUpdated": "2026-04-15T15:00:00Z",
+  "sessionId": "kosmos-research-2026-04-15-palantir-mini",
+  "previousBenchmarks": [
+    "jsxgraph-sequencer-001",
+    "mathcrew-content-delivery-001",
+    "mathcrew-photonic-realism-001"
+  ],
+  "leadAgent": "team-lead",
   "entries": [
     {
       "type": "decomposition",
-      "timestamp": "2026-04-12T18:00:00Z",
+      "timestamp": "2026-04-15T15:00:00Z",
       "agent": "lead",
-      "objective": "mathcrew/src 전체 점검 + 교육용 컴포넌트 추가/개선. 공명고리→우주선, 펄스조각→우주복 입은 어린이 등 photonicRealism 형태로 코드 생성하면서 interactive 훨씬 강화. 재사용 가능한 photonicRealism 컴포넌트 프레임워크까지 설계.",
-      "rationale": "현재 mathcrew는 추상적 관측소 메타포(공명고리=원형토러스, 펄스조각=크리스탈/오비터)로 약수/배수를 가르침. 사용자는 이를 캐릭터 기반 photonicRealism(우주선, 우주복어린이)으로 전환하여 몰입감+인터랙티브성을 대폭 강화하고, 여러 수학 개념에 재사용 가능한 컴포넌트 프레임워크를 만들려 함.",
-      "currentCodebaseFindings": {
-        "techStack": {
-          "renderer": "Three.js 0.183.2 (WebGL2)",
-          "postprocessing": "postprocessing 6.36.7 + n8ao 1.10.1",
-          "spacedRepetition": "ts-fsrs 5.3.1",
-          "build": "Vite 8.0.5 + TypeScript 5.9.3 + Bun",
-          "testing": "Playwright 1.59.1"
-        },
-        "currentEntityArchitecture": {
-          "resonanceLoop": {
-            "file": "src/scene/entities/create-resonance-loop.ts (217 LOC)",
-            "shape": "CylinderGeometry deck + TorusGeometry loops + CylinderGeometry masts + dish receivers + orbital arcs",
-            "materials": "MeshStandardMaterial + MeshPhysicalMaterial + ShaderMaterial (grid-floor, glow, holographic)",
-            "role": "Equal-grouping teaching surface — holds groups of pulse shards",
-            "metaphor": "관측 장비 (observatory instrument)"
-          },
-          "pulseShard": {
-            "file": "src/scene/entities/create-pulse-shard.ts (247 LOC)",
-            "shape": "CylinderGeometry crystal OR IcosahedronGeometry orbiter + fins + orbital rings",
-            "materials": "holographic ShaderMaterial + glow MeshBasicMaterial",
-            "variants": "crystal (hexagonal prism) | orbiter (icosahedron satellite)",
-            "role": "Manipulable counting unit — represents dividend number",
-            "metaphor": "신호 단위 (signal unit)"
-          },
-          "player": {
-            "file": "src/scene/entities/create-player.ts + player/*.ts",
-            "shape": "Geometric primitive avatar: torso, helmet, instrument-pack, arms, legs",
-            "role": "Student avatar — observatory cadet",
-            "metaphor": "공명 탐사 파일럿 (resonance exploration pilot)"
-          }
-        },
-        "currentRenderingPipeline": {
-          "materials": "Centralized in src/rendering/materials.ts — PBR (standard/physical) + custom shaders (holographic, grid-floor, glow, energy-beam, warp-ring, atmosphere, sky, starfield)",
-          "postprocessing": "n8ao SSAO + EffectComposer pipeline",
-          "shaders": "8 custom shader pairs (vert+frag) for holographic, grid-floor, energy-beam, warp-ring, atmosphere, sky, starfield, holographic-board"
-        },
-        "interactionModes": {
-          "count": 10,
-          "list": ["pickup-drop", "resonance-trial-sequencer", "predict-verify", "select-scan", "observe", "divisor-judge", "observe-discovery", "array-builder", "venn-diagram", "observe-factor-table"],
-          "architecture": "registerMode() pattern in interaction-controller.ts, each mode implements InteractionMode interface"
-        },
-        "teachingFramework": {
-          "beats": "5-phase (motivate/explain/demonstrate/practice/assess)",
-          "craMicroPhases": "C/R/A (Concrete/Representational/Abstract)",
-          "vtDimensions": "5 VT axes across 5 planets (contrast→integration)",
-          "surfaces": "8 teaching surface types (signal-console, resonance-loop, etc.)",
-          "storyworlds": "5 storyworld regions",
-          "storyFrame": "공명 관측소 (Resonance Observatory)",
-          "metaphorMap": "observatory/resonance language → math concepts"
-        },
-        "identifiedTransformationScope": [
-          "ENTITY VISUAL TRANSFORMATION: 공명고리(TorusGeometry) → 우주선(GLTF/procedural spaceship). 펄스조각(Crystal/Orbiter) → 우주복 어린이(character model)",
-          "MATERIAL SYSTEM: holographic/glow abstractions → photonicRealism (PBR + environment maps + subsurface scattering + fresnel)",
-          "METAPHOR FRAMEWORK: 관측소 메타포 → 우주탐험/캐릭터 메타포. teaching-story-framework.ts 전면 재설계",
-          "INTERACTION UPGRADE: number-input sequencer → character-based spatial interaction (drag characters into spaceships, etc.)",
-          "COMPONENT FRAMEWORK: entity factory → reusable PhotonicRealism component registry with math-concept agnostic primitives",
-          "ANIMATION SYSTEM: static geometry + per-frame shader params → character animation (skeletal, morph targets, or procedural)",
-          "RENDERING PIPELINE: existing n8ao+postprocessing compatible photonicRealism materials"
-        ]
-      }
-    },
-    {
-      "type": "routing",
-      "timestamp": "2026-04-12T18:00:01Z",
-      "agent": "lead",
-      "decisions": {
-        "RQ1": "external+context7 — Three.js GLTF character models + procedural character generation for educational 3D",
-        "RQ2": "external+scrapling — photonicRealism rendering patterns in Three.js (PBR workflow, PMREM, subsurface scattering, atmosphere)",
-        "RQ3": "external+context7 — Three.js animation systems for character-based entities (skeletal, morph, procedural)",
-        "RQ4": "external+scrapling — reusable 3D component architecture patterns for educational games (composition, factory, ECS)",
-        "RQ5": "external — interactive 3D character manipulation in educational contexts (drag, gesture, spatial triggers)",
-        "RQ6": "internal+external — teaching framework adaptation: observatory metaphor → character-based spacecraft metaphor migration",
-        "RQ7": "external — performance optimization for photonicRealism rendering on education-target devices (Chromebook, tablet)"
-      }
-    }
-  ],
-  "requirements": [
-    { "id": "req-pr-01", "description": "공명고리(TorusGeometry)를 우주선(spaceship) 형태의 photonicRealism 엔티티로 변환 — 약수 그룹핑 교육 기능 유지", "category": "functional", "priority": "p0", "domain": "DATA" },
-    { "id": "req-pr-02", "description": "펄스조각(crystal/orbiter)을 우주복 입은 어린이(child in spacesuit) 캐릭터로 변환 — 조작 가능한 counting unit 기능 유지", "category": "functional", "priority": "p0", "domain": "DATA" },
-    { "id": "req-pr-03", "description": "photonicRealism 렌더링 파이프라인: PBR materials, environment maps, 적절한 lighting으로 사실감 있는 3D 교육 환경 구현", "category": "functional", "priority": "p0", "domain": "LOGIC" },
-    { "id": "req-pr-04", "description": "여러 수학 개념(약수, 배수, 분수, 비율 등)에 재사용 가능한 photonicRealism 컴포넌트 프레임워크 설계", "category": "functional", "priority": "p0", "domain": "LOGIC" },
-    { "id": "req-pr-05", "description": "interactive 대폭 강화: 캐릭터 드래그/배치, 우주선 탑승, 공간 트리거, 제스처 기반 조작 등 3D 캐릭터 인터랙션", "category": "functional", "priority": "p0", "domain": "ACTION" },
-    { "id": "req-pr-06", "description": "기존 teaching framework 호환: VT/CRA/beats 구조, ts-fsrs, 10개 interaction mode 계약 유지하며 확장", "category": "constraint", "priority": "p0", "domain": "LOGIC" },
-    { "id": "req-pr-07", "description": "교육 대상 디바이스(Chromebook, 태블릿)에서 60fps 유지하는 성능 최적화", "category": "non-functional", "priority": "p0", "domain": "ACTION" },
-    { "id": "req-pr-08", "description": "캐릭터 애니메이션 시스템: 우주복 어린이의 자연스러운 움직임(걷기, 탑승, 반응 동작)", "category": "functional", "priority": "p1", "domain": "ACTION" },
-    { "id": "req-pr-09", "description": "teaching-story-framework.ts 전면 재설계: 관측소 메타포 → 우주탐험/캐릭터 메타포", "category": "functional", "priority": "p1", "domain": "DATA" }
-  ],
-  "questions": [
-    {
-      "id": "q-pr-01",
-      "text": "Three.js WebGL2 환경에서 교육용 캐릭터 모델(우주복 어린이)을 어떻게 구현하는 것이 최선인가? GLTF import vs procedural geometry vs hybrid. Sketchfab/Ready Player Me/Mixamo 등 기존 에셋 파이프라인 활용 가능성.",
-      "domain": "DATA",
-      "priority": "p0",
-      "route": "external+context7",
-      "status": "open"
-    },
-    {
-      "id": "q-pr-02",
-      "text": "photonicRealism 렌더링이란 Three.js 맥락에서 구체적으로 무엇인가? PBR workflow(metalness/roughness), Environment Map(PMREM), subsurface scattering, fresnel 효과, atmosphere shader의 최신 구현 패턴과 Three.js r183 호환성.",
-      "domain": "LOGIC",
-      "priority": "p0",
-      "route": "external+scrapling",
-      "status": "open"
-    },
-    {
-      "id": "q-pr-03",
-      "text": "교육용 3D 캐릭터에 적합한 애니메이션 시스템은? Three.js AnimationMixer + skeletal animation(GLTF), morph target animation, 절차적(procedural) 모션 생성. 각각의 trade-off와 교육 맥락 적합성.",
-      "domain": "ACTION",
-      "priority": "p0",
-      "route": "external+context7",
-      "status": "open"
-    },
-    {
-      "id": "q-pr-04",
-      "text": "수학 개념 독립적으로 재사용 가능한 photonicRealism 컴포넌트 아키텍처는 어떻게 설계하는가? Composition pattern, Component Registry, ECS(Entity-Component-System), 또는 React Three Fiber/drei 컴포넌트 패턴 중 무엇이 적합한가?",
-      "domain": "LOGIC",
-      "priority": "p0",
-      "route": "external+scrapling",
-      "status": "open"
-    },
-    {
-      "id": "q-pr-05",
-      "text": "3D 캐릭터 기반 교육 인터랙션의 best practice는? 캐릭터 드래그/배치, 공간 트리거, 제스처 인식, 프록시미티 기반 이벤트, 캐릭터-오브젝트 관계 시스템.",
-      "domain": "ACTION",
-      "priority": "p0",
-      "route": "external",
-      "status": "open"
-    },
-    {
-      "id": "q-pr-06",
-      "text": "기존 teaching framework(VT/CRA/beats, 10 interaction modes, teaching-story-framework.ts)를 관측소 메타포에서 우주탐험/캐릭터 메타포로 마이그레이션할 때 영향 범위와 최적 전략은?",
-      "domain": "LOGIC",
-      "priority": "p1",
-      "route": "internal+external",
-      "status": "open"
-    },
-    {
-      "id": "q-pr-07",
-      "text": "교육용 디바이스(Chromebook, 태블릿)에서 photonicRealism 3D + n8ao SSAO + 캐릭터 모델 다수를 60fps로 렌더링하기 위한 성능 최적화 전략은? LOD, instancing, texture atlas, GPU budget, draw call 최적화.",
-      "domain": "ACTION",
-      "priority": "p0",
-      "route": "external",
-      "status": "open"
-    }
-  ],
-  "projectScope": {
-    "backend": {
-      "data": [
-        "SpaceshipEntity (NEW: 공명고리 대체 — 우주선형 teaching surface, GLTF or procedural)",
-        "SpacekidEntity (NEW: 펄스조각 대체 — 우주복 어린이 캐릭터, manipulable counting unit)",
-        "PhotonicMaterialPreset (NEW: PBR material config per entity type — metalness, roughness, envMap intensity)",
-        "PhotonicComponentDefinition (NEW: math-concept-agnostic component spec — shape, material, animation, interaction)",
-        "CharacterAnimationClip (NEW: GLTF animation clips for spacekid — idle, walk, board, celebrate, error)",
-        "TeachingStoryFrame (MODIFIED: 관측소→우주탐험 메타포 전환)",
-        "TeachingWorldTerms (MODIFIED: 공명고리→우주선, 펄스조각→우주복어린이 등)",
-        "MetaphorMapping (MODIFIED: 우주탐험 메타포 기반 action-to-math 브릿지)",
-        "PlanetTeachingContent (PRESERVED: planetId, conceptId, vtDimension, beats, mathParams)",
-        "TeachingBeat (PRESERVED: phase, craMicroPhase, interactionMode, successCriteria)"
+      "task": "T1",
+      "objective": "Build palantir-mini Claude Code plugin (v2.1.108) + ~/.claude/schemas/ontology extension implementing OSDK 2.0 patterns and Palantir's 5 must-include infra patterns (two-tier actions, edit functions returning Edits[] without commit, OSDK type codegen, 6-phase validation, submission criteria pre-flight) on append-only event log foundation, mirroring Anthropic Managed Agents Session/Harness/Sandbox virtualization, within Claude Code Native Runtime (API-Free, Claude Max X20, max v2.1.108 utilization). Cross-project: kosmos / palantir-math / mathcrew. Promote ~/.claude/research/palantir/ from declarative evidence to executable contract.",
+
+      "userMotivation": [
+        "3 projects (kosmos/palantir-math/mathcrew) reinvent the same ontology pattern 3x but learnings do not propagate",
+        "Foundry-shaped silos without Foundry's actual mechanisms (shared schema registry, propagation enforcement, change audit, capability tokens, OSDK regen)",
+        "Multi-runtime fragmentation: ontology trapped in Claude memory blob, Codex/Gemini reinvent",
+        "~/.claude/research/palantir/ is read-only evidence, not executable contract — code does not follow patterns",
+        "BackwardProp loop broken: kosmos generates blueprints, palantir-math/mathcrew runtime evidence does not feed back",
+        "palantir-math data.ts (141KB) approaching OSDK 1.x failure mode — needs OSDK 2.0 migration before pain compounds"
       ],
-      "logic": [
-        "PhotonicRealismPipeline (NEW: PBR material system + environment map + post-processing integration)",
-        "PhotonicComponentFactory (NEW: componentType→entity instantiation with material presets)",
-        "CharacterAnimationSystem (NEW: AnimationMixer or procedural motion controller)",
-        "SpatialInteractionResolver (NEW: character-to-surface spatial relationships, boarding, placement)",
-        "ContentRenderingPipeline (MODIFIED: game-loop → PhotonicEntity rendering)",
-        "TeachingBeatProgression (PRESERVED: beat sequencing logic unchanged)",
-        "FSRSScheduling (PRESERVED: spaced repetition unchanged)"
-      ],
-      "action": [
-        "CharacterDragPlacement (NEW: drag spacekid characters into spaceships)",
-        "BoardingAnimation (NEW: spacekid enters/exits spaceship animation trigger)",
-        "SpatialProximityTrigger (NEW: proximity-based teaching content activation)",
-        "GestureInteraction (NEW: touch/pointer gesture recognition for character manipulation)",
-        "PhotonicFeedbackEffect (NEW: photonic-style visual feedback for correct/error/hint)",
-        "InteractionModeDispatch (MODIFIED: existing 10 modes adapted for character entities)",
-        "EnterAdvancesBeat (PRESERVED: core beat advancement unchanged)"
-      ],
-      "security": [],
-      "learn": [
-        "InteractionTelemetry (MODIFIED: track character-based interaction patterns)",
-        "PhotonicComponentUsageMetrics (NEW: which components engage learners most)",
-        "MiniHudTelemetry (PRESERVED: mastery, attempts, progress)",
-        "FSRSReviewLog (PRESERVED: spaced repetition history)"
-      ]
-    },
-    "frontend": {
-      "views": [
-        "SpaceshipSurface (NEW: 3D spaceship as teaching grouping container)",
-        "SpacekidCharacter (NEW: 3D child in spacesuit as counting unit)",
-        "PhotonicEnvironment (NEW: PBR environment with HDRI sky, atmosphere, realistic lighting)",
-        "SpeechBubble (PRESERVED: CSS overlay for teaching text)",
-        "HUD (PRESERVED: progress bar, telemetry, victory)"
-      ],
-      "rendering": [
-        "PhotonicRealism PBR materials (NEW: metalness/roughness workflow + envMap + PMREM)",
-        "Character model rendering (NEW: GLTF or procedural character pipeline)",
-        "Character animation rendering (NEW: skeletal/morph/procedural animation)",
-        "WebGL2 scene with n8ao + postprocessing (PRESERVED)",
-        "CSS overlay via Vector3.project (PRESERVED for speech bubble)"
-      ],
-      "interaction": [
-        "Character drag-and-drop (NEW: move spacekids between spaceships)",
-        "Boarding/disembarking animation triggers (NEW)",
-        "Spatial proximity triggers (NEW: approach → content activation)",
-        "Touch gesture support (NEW: mobile/tablet pinch, swipe, tap)",
-        "Enter key → advance beat (PRESERVED)",
-        "Teaching interaction modes — 10 types adapted (MODIFIED)"
-      ]
-    }
-  },
-  "devconPhase": "Phase 2 → Phase 3 transition — Current entity system (geometric primitives) is Phase 2. PhotonicRealism + character-based entities is a Phase 3 aspiration requiring deep rendering + animation research.",
-  "userDirectives": [
-    "Claude는 RESEARCH 품질에 집중. 직접 코드 생성이 아닌 참조 구현 + 라이브러리 패턴 큐레이션 중심.",
-    "재사용 가능한 photonicRealism 컴포넌트를 여러 수학 개념에 미리 설계해두기를 원함.",
-    "말풍선 내용이 너무 많아 짤림 — 키 설명(keycap+promptText)은 화면 오른쪽 아래 등으로 분리. 교육 콘텐츠를 더 쪼개서 진행하는 프레임워크 개선 필수. Blueprint에 포함."
-  ],
-  "speechBubbleAnalysis": {
-    "currentProblems": [
-      "card width clamp(280px, 36vw, 400px) + overflow:hidden → 긴 내용 짤림",
-      "6개 요소(header, title, body, vocab, criteria, prompt)가 400px 카드에 모두 포함",
-      "body 텍스트(15.5px, line-height 1.62)가 다단으로 길어지면 카드 높이 폭발",
-      "vocabulary callout + success criteria가 body와 함께 있어서 인지 부하 가중",
-      "OCCLUSION: 말풍선이 캐릭터 위(ANCHOR_Y_OFFSET=1.0)에 고정 → 캐릭터가 보는 월드 콘텐츠(teaching surface, resonance-loop, pulse-shard 등)를 가림",
-      "translate(-50%, -100%)로 캐릭터 바로 위에 위치 → practice/demonstrate 페이즈에서 인터랙티브 3D 오브젝트와 겹침",
-      "카메라 각도/줌에 따라 말풍선이 화면 대부분을 차지할 수 있음 (특히 모바일/태블릿)"
-    ],
-    "proposedSolution": {
-      "goalAndPromptRelocation": "keycap + promptText + successCriteria(Goal) → 화면 오른쪽 하단 독립 GoalPromptHUD로 통합 분리. 말풍선에서 완전 제거. Goal(성공기준)과 키 안내가 항상 함께 보이도록.",
-      "contentGranularity": "현재 1 beat = 1 큰 텍스트 블록 → 1 beat를 2-4개 micro-step으로 분할. Enter로 micro-step 진행.",
-      "vocabSeparation": "vocabulary callout → 3D 공간의 spatial annotation 또는 별도 HUD 카드로 분리",
-      "bubbleDesignResearch": {
-        "status": "COMPLETED",
-        "constraint": "현재 mathcrew space semantic + space style과 일관성 유지 필수. 아동 친화 원칙 적용하되 우주 테마 깨지지 않도록.",
-        "spaceStylePreserved": [
-          "어두운 반투명 surface (rgba(8,35,58,0.78)) — 우주 배경에 자연스러운 글래스모피즘 유지",
-          "밝은 ink (#ddf4ff 계열) on dark surface — 우주 공간 가독성",
-          "phase별 홀로그래픽 글로우 (motivate:amber, explain:skyblue, demonstrate:mint, practice:lavender, assess:coral) — 우주선 계기판 느낌 유지",
-          "border-radius: 24px — 현재 값 유지 (8-12세 리서치에서도 16-24px 적합)",
-          "backdrop-filter: blur(24px) saturate(130%) — 우주 씬 위 글래스 효과 유지"
-        ],
-        "childFriendlyEnhancements": [
-          "폰트: Varela Round (infant-friendly, rounded counter, tall x-height) — Google Fonts, ACNH에서도 사용 [NN/G + Cantuni 연구 기반]",
-          "font-size: 18px body (NN/G 14pt 최소 → 18px 적용) + line-height: 1.6 (golden ratio leading)",
-          "font-weight: 600 (readability, not thin)",
-          "Entry animation: scale(0.8)→scale(1) with easeOutBack cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s — 'pop-in' 아이들이 좋아하는 스프링 효과",
-          "Idle animation: subtle scale(1)↔scale(1.005) 2s ease-in-out infinite alternate — '숨쉬는' 느낌 (alive/engaged)",
-          "Typewriter effect: 25-40ms per character — 말하는 느낌, 아이들 읽기 속도에 맞춤",
-          "Continue arrow: CSS triangle ::after, 4px vertical bob 0.6s — 진행 어포던스",
-          "thought-bubble variant (작은 원 체인) — space helmet comms 메타포와 호환 (삼각형 대안)"
-        ],
-        "rejectedFromResearch": [
-          "따뜻한 크림 배경 (#FFFDF0) → space theme과 충돌. 어두운 반투명 유지.",
-          "primary color 강조 → 9-12세 'reject childish' (Gapsy). holographic glow가 더 적합.",
-          "blobby organic shape (ACNH goo filter) → space theme에 부적합. 정돈된 rounded rect 유지."
-        ],
-        "sources": [
-          "[Official] NN/G — Children's UX: Usability Issues (Sherwin/Nielsen 2019)",
-          "[Official] NN/G — Designing for Kids: Cognitive Considerations (Liu 2018)",
-          "[Synthesis] Typography in Digital Products for Kids (Cantuni/Apress 2020)",
-          "[Synthesis] ACNH Wobbly Dialogue Demo (GitHub Gist rayfitz9656)",
-          "[Synthesis] Gapsy Studio — UX Design for Kids (Jan 2026)",
-          "[Synthesis] FreeFrontend — 25 CSS Speech Bubbles (Oct 2025)"
-        ]
-      },
-      "adaptiveCardSize": "내용 길이에 따라 카드 크기 동적 조절 (max-height + scroll 대신 micro-step 분할 우선)",
-      "occlusionSolution": {
-        "phaseBasedPosition": "motivate/explain → 캐릭터 위(현재). practice/demonstrate/assess → 화면 상단 좌측 또는 우측 고정 위치로 자동 이동. 인터랙티브 페이즈에서 월드 콘텐츠 가시성 확보.",
-        "collapseOnInteraction": "인터랙션 모드 활성화 시 말풍선 → 한 줄 미니 바(제목만) 자동 축소. 탭/클릭으로 펼침. 월드 오브젝트 가시성 최대화.",
-        "smartAvoidance": "말풍선 위치를 teaching surface screen-projection과 비교하여 겹침 감지. 겹치면 반대편으로 자동 재배치 (위→아래, 좌→우).",
-        "recommended": "phaseBasedPosition + collapseOnInteraction 조합 — 가장 낮은 구현 복잡도로 occlusion 문제 해결. smartAvoidance는 Phase 3 후보.",
-        "implementation": {
-          "phaseBasedPosition": "speech-bubble.ts update()에서 data.phase 확인 → practice/demonstrate/assess이면 translate(-50%,-100%) 대신 fixed position top-left (left:20px, top:20px). tail 숨김.",
-          "collapseOnInteraction": "SpeechBubbleContent에 collapsed:boolean 추가. interaction-controller.ts에서 mode 활성화 시 collapsed=true. 말풍선 CSS: .speech-bubble--collapsed { height:40px, overflow:hidden, cursor:pointer }. 클릭→toggle."
+
+      "constraints": [
+        {
+          "type": "billing",
+          "description": "API-Free: Claude Max X20 subscription only. No ANTHROPIC_API_KEY. No --bare flag, no Managed Agents API, no Bedrock/Vertex.",
+          "severity": "critical",
+          "negotiable": false
+        },
+        {
+          "type": "runtime",
+          "description": "Claude Code v2.1.108 native runtime only. Maximize: Agent Teams, ToolSearch, PreCompact decision:'block', plugin monitors manifest, managed-settings.d/, /recap, EnterWorktree path, TaskCreated/TaskCompleted hooks.",
+          "severity": "high",
+          "negotiable": false
+        },
+        {
+          "type": "scope",
+          "description": "Cross-project: ~/kosmos, ~/palantir-math, ~/mathcrew + global ~/.claude/plugins/palantir-mini/ + ~/.claude/schemas/ontology/ extension.",
+          "severity": "high",
+          "negotiable": false
+        },
+        {
+          "type": "boundary",
+          "description": "Multi-runtime: Claude primary writer, Codex/Gemini consume schemas/ontology/ as readers via filesystem. No Codex/Gemini-specific runtime overlays.",
+          "severity": "medium",
+          "negotiable": true
+        },
+        {
+          "type": "research_quality",
+          "description": "Research over codegen: 13-section TechBlueprint is primary deliverable. v0 PoCs are 50-200 LOC each, validate concept not production.",
+          "severity": "high",
+          "negotiable": false
         }
+      ],
+
+      "projectOntologyScope": {
+        "backendOntology": {
+          "domains": [
+            {
+              "id": "DATA",
+              "name": "Data Domain",
+              "primitives": ["ObjectType", "LinkType", "ActionType", "PropertyType (24 branded)", "InterfaceType"],
+              "evidencePaths": [
+                "~/.claude/research/palantir/data/",
+                "~/.claude/schemas/ontology/types.ts"
+              ]
+            },
+            {
+              "id": "LOGIC",
+              "name": "Logic Domain",
+              "primitives": ["EditFunction (returns Edits[])", "DerivedProperty", "Reducer", "LinkConstraint"],
+              "evidencePaths": [
+                "~/.claude/research/palantir/logic/functions.md §LOGIC.FN-04",
+                "~/.claude/research/palantir/logic/README.md"
+              ]
+            },
+            {
+              "id": "ACTION",
+              "name": "Action Domain",
+              "primitives": ["Tier-1 Declarative Action", "Tier-2 Function-Backed Action", "SubmissionCriteria", "AtomicCommit"],
+              "evidencePaths": [
+                "~/.claude/research/palantir/action/mutations.md §ACTION.MU-09..17",
+                "~/.claude/research/palantir/action/README.md"
+              ]
+            },
+            {
+              "id": "SECURITY",
+              "name": "Security Domain (overlay)",
+              "primitives": ["Layer 1 RBAC", "CapabilityToken (vault pattern)", "PermissionsCascade"],
+              "evidencePaths": [
+                "~/.claude/research/palantir/security/README.md"
+              ]
+            },
+            {
+              "id": "LEARN",
+              "name": "Learn Domain (BackwardProp foundation)",
+              "primitives": ["Append-only Event Log", "Decision Lineage 5-dim", "EvidenceSufficiency", "LineageReplay"],
+              "evidencePaths": [
+                "~/.claude/research/palantir/philosophy/digital-twin.md",
+                "https://www.anthropic.com/engineering/managed-agents",
+                "https://github.com/Yeachan-Heo/clawhip (event routing to prevent context pollution)"
+              ]
+            }
+          ]
+        },
+        "frontendOntology": {
+          "surfaces": [
+            {
+              "id": "claude-code-cli",
+              "name": "Claude Code CLI session surface",
+              "primitives": [
+                "Hooks (24 events incl. v2.1.108 PreCompact decision:'block', TaskCreated, TaskCompleted, PostToolUseFailure)",
+                "Skills (namespaced /palantir-mini:*)",
+                "Custom Subagents (.md frontmatter with tools allowlist + maxTurns + isolation + disallowedTools)",
+                "Plugin Manifest (.claude-plugin/{plugin,marketplace}.json)",
+                "MCP Bridge (palantir-mini bridge/mcp-server.ts as Harness API)",
+                "managed-settings.d/ fragments per project"
+              ]
+            },
+            {
+              "id": "code-editor",
+              "name": "Code editor TypeScript surface",
+              "primitives": [
+                "Generated descenders (src/generated/ per project)",
+                "Branded RID types (ObjectTypeRid, LinkTypeRid, ActionTypeRid, etc.)",
+                "Exhaustive visitor unions (no switch statements)"
+              ]
+            }
+          ]
+        },
+        "crossProjectScope": ["~/kosmos", "~/palantir-math", "~/mathcrew"],
+        "globalScope": ["~/.claude/plugins/palantir-mini/", "~/.claude/schemas/ontology/"],
+        "perProjectSessionDir": "<project>/.palantir-mini/session/{events.jsonl, snapshots/, handoffs/, locks/}",
+        "multiRuntimeBoundary": {
+          "writers": ["Claude Code"],
+          "readers": ["Codex", "Gemini"],
+          "interface": "filesystem (TypeScript declarations + events.jsonl)"
+        }
+      },
+
+      "researchQuestions": [
+        {
+          "id": "RQ-01",
+          "text": "Append-only event log foundation: minimum viable schema and atomic-append mechanism for cross-project ontology state under API-Free constraint?",
+          "domains": ["LEARN", "DATA"],
+          "priority": "p0",
+          "scope": "events.jsonl format, EventEnvelope schema, atomic file lock mechanism, snapshot derivation from log, replay determinism, OMC clawhip pattern adaptation",
+          "successCriteria": "Schema published as TypeScript interface, append/read round-trip test passes, replay deterministic across runs"
+        },
+        {
+          "id": "RQ-02",
+          "text": "Two-tier action architecture (declarative tier-1 + function-backed tier-2) with read-only edit-function agents enforcing 'returns Edits[] without commit' via disallowedTools?",
+          "domains": ["ACTION", "LOGIC"],
+          "priority": "p0",
+          "scope": "Tier-1 declarative rule schema, Tier-2 function signature returning Edits[], SubmissionCriteria type, atomic commit wrapper, agent .md frontmatter pattern (disallowedTools per OMC architect.md)",
+          "successCriteria": "Both tiers compile + execute, edit-function agent .md uses disallowedTools deny-list, action-executor agent .md has Write/Edit allowlist, Edits[] round-trips correctly"
+        },
+        {
+          "id": "RQ-03",
+          "text": "OSDK 2.0 type codegen pattern (branded RID, separated client/generated, lazy loading) applied to ontology declarations across kosmos/palantir-math/mathcrew?",
+          "domains": ["DATA", "LOGIC"],
+          "priority": "p0",
+          "scope": "Branded RID type generator, descender generation entry point, client/generated split enforcement (palantir/osdk-ts pattern), lazy module loading",
+          "successCriteria": "Codegen produces valid TS for at least 1 project (palantir-math first), tsc passes, regen is idempotent, separated layers compile independently"
+        },
+        {
+          "id": "RQ-04",
+          "text": "MCP bridge as Harness API: which MCP tools to expose for Session/Harness/Sandbox virtualization within Native Runtime?",
+          "domains": ["ACTION", "LEARN"],
+          "priority": "p1",
+          "scope": "MCP server file structure (per OMC bridge/mcp-server.cjs), tool schema for get_ontology / emit_event / apply_edit_function / commit_edits / replay_lineage, integration with .mcp.json, SSE event protocol",
+          "successCriteria": "MCP server registers 5 tools, all callable from Claude Code session via mcp__palantir-mini__* tool names, round-trip test passes"
+        },
+        {
+          "id": "RQ-05",
+          "text": "6-phase (or 3-phase minimum) validation pipeline using v2.1.108 hooks (PreCompact decision:'block', PostToolUseFailure, TaskCreated/Completed) with managed-settings.d/ fragments per project?",
+          "domains": ["LOGIC", "SECURITY"],
+          "priority": "p1",
+          "scope": "Phase definitions (Design/Compile/Runtime/Post-Write minimum), hook handler scripts via thin bootstrapper (per OMC), managed-settings.d/ fragment template, error class taxonomy per phase",
+          "successCriteria": "Each phase catches at least 1 distinct error class, hook fires on every Edit(ontology/*), managed-settings.d/ loads cleanly across 3 projects"
+        },
+        {
+          "id": "RQ-06",
+          "text": "Submission criteria pre-flight gates as foundation for progressive autonomy?",
+          "domains": ["ACTION", "SECURITY"],
+          "priority": "p1",
+          "scope": "SubmissionCriteria type, pre-flight evaluator function, gate failure event emission, integration with action-executor agent",
+          "successCriteria": "Failed criteria block action commit + emit event, success criteria allow commit + emit event, both events retrievable from log"
+        },
+        {
+          "id": "RQ-07",
+          "text": "Migration sequencing from existing palantir-math (most mature) to mathcrew to kosmos with backward compatibility?",
+          "domains": ["DATA", "ACTION", "LEARN"],
+          "priority": "p2",
+          "scope": "palantir-math changeContracts.ts (66KB) + capabilities.ts (57KB) + data.ts (141KB) -> palantir-mini equivalents, preserve git history, compat shim during transition",
+          "successCriteria": "palantir-math compiles + runs after migration, no breaking changes to existing consumers, clean rollback path"
+        }
+      ],
+
+      "routingDecisions": [
+        {
+          "task": "T2 (internal browse)",
+          "owner": "researcher",
+          "routes": [
+            "~/.claude/research/BROWSE.md (top router)",
+            "~/.claude/research/palantir/{action,logic,validation,typescript,security,philosophy}/",
+            "~/.claude/research/claude-code/palantir-mini-blueprint.md (THE v0 architecture document)",
+            "~/.claude/research/claude-code/features.md (v2.1.108 baseline + delta)",
+            "~/.claude/research/claude-code/managed-agents.md",
+            "~/.claude/research/claude-code/agent-system-design.md"
+          ],
+          "rationale": "Highest density evidence for the 5 must-include patterns + Native Runtime mechanics. palantir-mini-blueprint.md already synthesizes prior research into the v0 architecture."
+        },
+        {
+          "task": "T3 (external research)",
+          "owner": "researcher",
+          "targets": [
+            {
+              "name": "Anthropic Managed Agents",
+              "urls": [
+                "https://www.anthropic.com/engineering/managed-agents",
+                "https://platform.claude.com/docs/en/api/beta/agents/create",
+                "https://platform.claude.com/docs/en/managed-agents/overview"
+              ],
+              "tier": "tier-1-official-docs"
+            },
+            {
+              "name": "Palantir OSDK 2.0",
+              "urls": [
+                "https://github.com/palantir/osdk-ts",
+                "https://github.com/palantir/conjure-typescript",
+                "https://www.palantir.com/docs/foundry/ontology-sdk/typescript-osdk-migration"
+              ],
+              "tier": "tier-1-official-docs"
+            },
+            {
+              "name": "oh-my-claudecode (best practice reference, already deep-dived)",
+              "urls": [
+                "https://github.com/Yeachan-Heo/oh-my-claudecode",
+                "https://github.com/Yeachan-Heo/clawhip"
+              ],
+              "tier": "tier-3-vendor-blogs",
+              "note": "Already deep-dived this session — see ~/.claude/research/claude-code/palantir-mini-blueprint.md OMC section. T3 should verify, not re-research."
+            },
+            {
+              "name": "Claude Code v2.1.108",
+              "urls": [
+                "https://code.claude.com/docs/en/changelog",
+                "https://code.claude.com/docs/en/agent-teams",
+                "https://code.claude.com/docs/en/hooks",
+                "https://code.claude.com/docs/en/plugins-reference"
+              ],
+              "tier": "tier-1-official-docs"
+            }
+          ],
+          "rationale": "Tier-1 sources (official Anthropic + Palantir + most-starred Korean CC plugin reference)"
+        }
+      ],
+
+      "devCon5Application": {
+        "phase1_GoldenTables": "events.jsonl per project = the durable Golden Table. Snapshots derived from log. ~/.claude/schemas/ontology/ = stable typed interface (the OSDK).",
+        "phase2_OperationalDecisionMaking": "Two-tier actions (declarative + function-backed) + submission criteria + 6-phase validation pipeline. Edit functions return Edits[] without commit. Action wraps with atomic commit.",
+        "phase3_AIFirst": "MCP bridge exposes operations for Claude/Codex/Gemini. ontology-verifier agent proactively detects drift. Decision lineage 5-dim enables AIP Automate staged review (deferred to future phase)."
+      },
+
+      "hypothesisProvisional": {
+        "winnerCandidate": "Hypothesis A: Append-only event log foundation",
+        "rationale": "Independent convergence from three references: (1) Anthropic Managed Agents engineering article ('Session = append-only log of everything that happened'), (2) Palantir Decision Lineage 5-dim (when/atop_which/through_which/by_whom/with_what), (3) OMC clawhip 'event routing to prevent context pollution'. Three independent sources agree.",
+        "competitor": "Hypothesis B: Snapshot-based with StaleObject optimistic concurrency",
+        "competitorEvidence": "Palantir validation/README.md StaleObject pattern is real and proven, but is for in-place mutation, not stateless harness model. Adversarial scenario: two parallel writers create lost updates."
       }
     },
-    "frameworkChanges": [
-      "TeachingBeat.text (단일 문자열) → TeachingBeat.microSteps (string[]) 배열로 확장",
-      "SpeechBubbleContent에 microStepIndex 추가 — Enter가 micro-step을 순차 진행",
-      "모든 micro-step 완료 후 다음 beat로 전진",
-      "promptText/promptKey + successCriteria(Goal) → 별도 GoalPromptHUD 컴포넌트로 통합 분리 (오른쪽 하단)",
-      "말풍선 디자인 리서치: 아동 친화적 스타일(Nintendo/Animal Crossing/Kirby 참조) 기반으로 비주얼 리디자인",
-      "teaching-content.ts의 PLANET_CONTENT beats 텍스트를 microSteps 배열로 리팩터"
-    ],
-    "impactFiles": [
-      "src/types/teaching.ts — TeachingBeat.microSteps: string[] 추가",
-      "src/types/teaching.ts — SpeechBubbleContent.microStepIndex 추가",
-      "src/hud/speech-bubble.ts — prompt bar 제거, card overflow 개선",
-      "src/hud/hud.ts — PromptHUD 컴포넌트 추가 (오른쪽 하단)",
-      "src/systems/teaching-flow.ts — micro-step 진행 로직",
-      "src/game-loop.ts — micro-step index 관리",
-      "src/config/teaching-content.ts — beats text → microSteps[] 변환"
-    ]
-  },
+    {
+      "type": "evaluation",
+      "timestamp": "2026-04-15T18:30:00Z",
+      "agent": "evaluator",
+      "task": "T10",
+      "inputsConsulted": [
+        "ontology-state/decision-log.json (T1 decomposition, 7 RQs, provisional H-A winner)",
+        "ontology-state/source-map.json (T2+T3, 12 sources, 30 claims, 6 contradictions all either resolved or deliberately architectural)",
+        "ontology-state/world-model.json (T4, 28 primitives, 5 domains populated, overallForwardPropStatus=healthy, overallBackwardPropStatus=healthy, DDD/DRY/OCP/PECS all applied)",
+        "ontology-state/scenarios.json (T5+T6, 3 hypotheses, 12 scenarios, 11-dim scoring, 2 revision rounds, provisional H-A + H-C winner)",
+        "ontology-state/eval-results.json (T7+T8+T9, both prototypes buildStatus=success, H-A 10/10 clean, H-B 10/10 formal with 4 classified FailureModes)",
+        "~/.claude/research/claude-code/palantir-mini-blueprint.md (v0 architecture, 3 corrections, 5 gap fills)"
+      ],
+      "rejectionCriteriaApplied": [
+        {
+          "rule": "R1",
+          "name": "Low-tier dependency",
+          "triggered": false,
+          "note": "Critical claims anchor on tier-1 sources: Anthropic Managed Agents (official), Palantir Decision Lineage / mutations / validation / functions (official), Claude Code hooks+plugins-reference (official), Palantir OSDK v2 Edits (official). Only src-ext-proper-lockfile is tier-3-vendor-blogs, and it is not critical (fs.mkdir fallback is the production path and was empirically validated in T7)."
+        },
+        {
+          "rule": "R2",
+          "name": "Unresolved contradictions",
+          "triggered": false,
+          "note": "Scenario contradictionStatus audit: S-HA-BASE=none, S-HA-BEST=none, S-HA-WORST=evidence-gap-driven (T7 fills), S-HA-ADV=evidence-gap-driven (T7 fills and empirically resolved with 0 lost events / 2000), S-HB-BASE=unresolvable (classified as irreconcilable architectural fork — H-B is NOT the winner, so this preserves rather than blocks the decision), all remaining scenarios either none or resolved. source-map.json contradictions 01-05 resolved, contra-06 (StaleObject in append-only) empirically resolved by T7 adversarial race (0 lost events, sequence counter works as version vector per gap-01)."
+        },
+        {
+          "rule": "R3",
+          "name": "Missing scenario link",
+          "triggered": false,
+          "note": "Recommendation winner H-A is backed by 4 scenarios (S-HA-BASE, S-HA-BEST, S-HA-WORST, S-HA-ADV). H-C co-winner backed by 4 scenarios (S-HC-*). scenarioIds count per winning path >= 1 (actually 8)."
+        },
+        {
+          "rule": "R4",
+          "name": "Missing risk link",
+          "triggered": false,
+          "note": "strongestContradictionsFlagged in scenarios.json lists 3 flagged risks (flag-01 S-HA-ADV race, flag-02 H-B LEARN violation, flag-03 Bun compat). criticalRisks surfaced here and propagate to reporter. riskIds >= 1."
+        },
+        {
+          "rule": "R5",
+          "name": "Stale evidence",
+          "triggered": false,
+          "note": "source-map.json: 0 claims with freshnessStatus='stale'. Distribution: most claims are 'current', two are 'aging' (proper-lockfile 2020, Palantir Decision Lineage 2024). 0/30 stale << 50% threshold."
+        },
+        {
+          "rule": "R6",
+          "name": "Blurred provenance",
+          "triggered": false,
+          "note": "All claims tagged with provenance: 'official' (28) / 'synthesis' (1) / 'inference' (1). clm-ext-24 is the single inference claim and explicitly flagged as inferred with confidence=0.75. No mixed tagging."
+        },
+        {
+          "rule": "R7",
+          "name": "Missing win rationale",
+          "triggered": false,
+          "note": "winRationale is specific and non-generic: three independent evaluation axes (architectural convergence + empirical superiority + ontology fit), each backed by enumerated evidence paths."
+        },
+        {
+          "rule": "R8",
+          "name": "No alternatives",
+          "triggered": false,
+          "note": "Alternatives preserved on record: H-B (snapshot+StaleObject) is the formal competitor, scored with 4 scenarios, and kept in the decision log with empirical defeat documentation. alternatives[] >= 1."
+        },
+        {
+          "rule": "R9",
+          "name": "Insufficient evidence",
+          "triggered": false,
+          "note": "Winning scenario S-HA-BASE evidenceSufficiency='sufficient'. S-HA-BEST=partial, S-HA-WORST=partial, S-HA-ADV=partial — but partial is not insufficient per rubric, and T7+T9 empirical results upgraded the partial scenarios by filling the Bun compatibility gap and the 2-writer race gap."
+        },
+        {
+          "rule": "R10",
+          "name": "Missing reversal conditions",
+          "triggered": false,
+          "note": "whatWouldChangeDecision has 3 concrete reversal conditions listed below (Bun+fs.mkdir fallback failure, H-C integration failure, CRDT-based MCP pattern emergence). >= 1."
+        },
+        {
+          "rule": "R11",
+          "name": "D/L/A classification missing",
+          "triggered": true,
+          "hypothesis": "H-B",
+          "severity": "critical",
+          "evidence": "ontology-state/eval-results.json evalSuites[1].failureModes[0]: 24.2% empirical update loss rate (484/2000 in run1, 56-484 across 3 runs). LEARN domain cannot be reliably populated from a lossy substrate — prim-learn-01 AppendOnlyEventLog and prim-learn-04 LineageReplay are structurally impossible on H-B. Also confirmed by scenarios.json S-HB-BASE contradictionStatus='unresolvable' (irreconcilable LEARN centrality violation).",
+          "decisionImpact": "This trigger is NOT a pipeline defect — it is the empirical confirmation of H-B's architectural defeat. Winning hypothesis H-A populates all 5 domains first-class per world-model.json (DATA/LOGIC/ACTION/SECURITY/LEARN, 28 primitives, overallForwardPropStatus=healthy). R11 on H-B strengthens, not weakens, the recommendation."
+        },
+        {
+          "rule": "R12",
+          "name": "DevCon 5 principles not applied",
+          "triggered": false,
+          "note": "world-model.json devCon5PrinciplesApplied=['DDD','DRY','OCP','PECS'] with per-primitive findings documented. H-A devcon5Alignment: DDD PASS / DRY PASS / OCP PASS / PECS PASS (scenarios.json hypothesis H-A). All 28 primitives have per-principle analysis in world-model.json."
+        },
+        {
+          "rule": "R13",
+          "name": "ForwardProp/BackwardProp broken",
+          "triggered": true,
+          "hypothesis": "H-B",
+          "severity": "high",
+          "evidence": "ontology-state/eval-results.json evalSuites[1].failureModes[1]+[3]: TOCTOU window non-atomic in snapshot write path (ACTION critical); no lineage across versions — prior states irrecoverable after overwrite (DATA high). BackwardProp path from H-B substrate to ontology is structurally broken: replay_lineage cannot reconstruct history from a substrate that only holds current snapshot state. Also confirmed by scenarios.json S-HB-BASE architectureImplications 'LOSS: BackwardProp path is crippled'.",
+          "decisionImpact": "Same posture as R11: triggers on H-B, confirms H-A win, not a pipeline defect. H-A's own ForwardProp+BackwardProp paths are healthy per world-model.json (overallForwardPropStatus=healthy, overallBackwardPropStatus=healthy)."
+        },
+        {
+          "rule": "R14",
+          "name": "Prototype build failure",
+          "triggered": false,
+          "note": "Both prototypes buildStatus=success. H-A: 5 pass / 0 fail / 2247 expect() calls / tsc clean. H-B: 5 pass / 0 fail / 26 expect() calls / tsc clean. Neither has buildStatus=fail."
+        },
+        {
+          "rule": "R15",
+          "name": "Eval pass rate below threshold",
+          "triggered": false,
+          "note": "H-A passRate=1.0 (10/10), H-B passRate=1.0 (10/10). Both above 0.5 threshold. H-B has 4 classified failureModes (2 critical LEARN+ACTION, 2 high LOGIC+DATA) which the eval-runner has explicitly documented with affectedCases and severity — satisfies the FailureMode analysis requirement even if passRate had been below threshold. H-A has 0 failureModes."
+        }
+      ],
+      "rejectionCriteriaSummary": {
+        "totalTriggered": 2,
+        "triggeredRules": ["R11 (H-B)", "R13 (H-B)"],
+        "winnerTriggers": 0,
+        "winnerRulesClean": "All 15 rules clean for winning path (H-A + H-C). R11 and R13 triggers on H-B are structural confirmations of H-B's defeat, not pipeline defects.",
+        "rationale": "When R11/R13 trigger on the LOSING hypothesis and the eval-runner has classified failureModes that explain WHY the loss is structural rather than load-dependent, the triggers are evaluator signals of pipeline HEALTH: they confirm that the eval gate is discriminating real architectural quality, not rubber-stamping."
+      },
+      "debateProtocol": {
+        "triggered": false,
+        "triggerChecks": {
+          "passRateDiffGreaterThan20pct": false,
+          "passRateDiffExplanation": "H-A 1.0 and H-B 1.0 formal — 0% diff on raw pass rate. Qualitative divergence is captured via failureModes analysis, not via pass-rate debate.",
+          "dlaMisclassification": false,
+          "dlaExplanation": "No misclassification. The ontologist's transition-zone calls (LinkType/InterfaceType/DerivedProperty/Reducer -> LOGIC) were applied rigorously and accepted by the simulator without re-debate (scenarios.json simulatorAudit.transitionZoneRespected).",
+          "newFailureType": false,
+          "newFailureTypeExplanation": "H-B's failure modes (TOCTOU non-atomic write, lossy substrate, missing lineage) were all predicted by S-HB-ADV and S-HB-WORST scenarios BEFORE the prototype. Empirical results confirmed simulator predictions. No surprise failure mode requiring debate."
+        },
+        "roundsUsed": 0,
+        "maxRoundsAllowed": 2,
+        "note": "Zero rounds used. The evidence chain (scenarios prediction -> prototype confirmation -> eval classification) is coherent and the winner is decisively clear across all 11 evaluation dimensions + empirical race results + architectural convergence. No defense/revision cycle needed."
+      },
+      "gateResult": "ACCEPT",
+      "evaluatorGateResult": "ACCEPT",
+      "winner": "H-A",
+      "coWinner": "H-C",
+      "coWinnerNote": "H-C (3-phase validation pipeline) is ORTHOGONAL to H-A vs H-B — it runs ON TOP of the event-log substrate, not instead of it. scenarios.json provisionalWinner.recommendationToEvaluator: 'H-C (3-phase validation pipeline) runs ON TOP of H-A and is complementary, not competing.' Both accepted.",
+      "formalCompetitor": "H-B (Snapshot + StaleObject) — preserved for record with empirical defeat documentation (484 lost updates / 2000 in run1, 24.2% loss rate, TOCTOU structural, no BackwardProp path)",
+      "winRationale": "H-A (Append-Only Event Log Foundation) is the decisive winner across 3 independent evaluation axes: (1) ARCHITECTURAL CONVERGENCE — three independent references (Anthropic Managed Agents 'Session=append-only log', Palantir Decision Lineage 5-dim, OMC clawhip event routing) all converge on the append-only log pattern; (2) EMPIRICAL SUPERIORITY — H-A prototype passes 2-writer adversarial race at 2x1000 events with 0 duplicate sequences, 0 torn writes, 0 lost events (reproducible across 2 runs) versus H-B losing 484/2000 updates (24.2%) with reproducibility confirming TOCTOU is structural not load-dependent; (3) ONTOLOGY FIT — H-A populates all 5 domains first-class per world-model's 28 primitives (DATA/LOGIC/ACTION/SECURITY/LEARN all overallForwardPropStatus=healthy and overallBackwardPropStatus=healthy) while H-B cannot reliably populate LEARN (R11) and has structurally broken BackwardProp (R13). R11 and R13 triggered for H-B confirm rather than invalidate the pipeline: they are the evaluator signals that H-B lost on architectural grounds, which is the pipeline's job to detect.",
+      "architecturalDecision": "ACCEPT H-A as palantir-mini v0 state foundation. ACCEPT H-C (3-phase validation pipeline: Design+Compile fused / Runtime / Post-Write) as the validation depth that runs on top of H-A. H-B is preserved as the formal competitor of record with full empirical defeat documentation for BackwardProp audit purposes.",
+      "criticalRisks": [
+        {
+          "id": "risk-01",
+          "description": "Bun compatibility for proper-lockfile is tier-3 inference (clm-ext-24, confidence 0.75). H-A prototype-a resolved this empirically by using fs.mkdir fallback path and proved 0 lost events / 2000 — but proper-lockfile itself was not directly tested under Bun in T7. For v1 integration the plugin should either commit to fs.mkdir fallback as primary or empirically verify proper-lockfile under Bun.",
+          "severity": "medium",
+          "mitigation": "T7 already proved fs.mkdir-only path works; use that as the production path in v1 and defer proper-lockfile to optional optimization."
+        },
+        {
+          "id": "risk-02",
+          "description": "Cross-project shared schemas write coordination — 3 projects (kosmos/palantir-math/mathcrew) share ~/.claude/schemas/ontology/. Claude Code is declared sole writer (constraint.boundary) and git handles coordination between parallel Claude sessions — but this assumption must hold at deployment time.",
+          "severity": "medium",
+          "mitigation": "gap-03 resolved this architecturally: git branches coordinate parallel sessions and per-project events.jsonl lockfile handles per-project atomic writes. No new mechanism needed for v0."
+        },
+        {
+          "id": "risk-03",
+          "description": "proper-lockfile last published 2020 (5 years old, aging). Still 9.27M weekly downloads but maintainer activity is low.",
+          "severity": "low",
+          "mitigation": "fs.mkdir zero-dep fallback is already the empirically proven path. Consider making fallback the only path in v1."
+        },
+        {
+          "id": "risk-04",
+          "description": "BackwardProp persistence gap (world-model backwardProp.gaps steps 4+5): refinement proposals persistence not yet implemented. H-A Phase III (AI-First) requires this loop to close for the full DevCon 5 journey.",
+          "severity": "low",
+          "mitigation": "Deferred to post-v0. Phase I+II are self-contained and do not require Phase III closure."
+        }
+      ],
+      "whatWouldChangeDecision": [
+        "If a v1 integration test shows fs.mkdir fallback is insufficient under 10+ concurrent writers AND proper-lockfile is empirically broken under Bun, revisit H-A's atomic append mechanism (application-level retry-on-conflict or alternative lockfile strategy).",
+        "If H-C (3-phase validation pipeline) fails integration in v1 due to PostToolUse hook latency burnout, reconsider validation monitoring scope (retreat to 2-phase or move to async:true).",
+        "If a new MCP server pattern emerges that makes snapshot-based architecture viable for LEARN (e.g., CRDT-based merging with cross-version history), reconsider H-B or H-A+snapshot hybrid.",
+        "If palantir-math migration reveals EventEnvelope variant gaps that require breaking schema bumps before v0 stabilizes, revisit gap-04 and consider versioned events.jsonl.",
+        "If cross-project write coordination (gap-03) proves insufficient because Codex/Gemini become writers not readers, reintroduce multi-writer coordination mechanism."
+      ],
+      "nextSpawnRecommendation": "Spawn reporter-blueprint for T11 (TechBlueprint JSON per schemas/types.ts) AND reporter-report for T12 (13-section markdown report) IN PARALLEL. Both depend only on T10 accepted and both can read all existing ontology-state/*.json without coordination. Expected parallel runtime: ~20-30 min on Claude Max X20.",
+      "pipelineHealthObservations": [
+        "Evidence chain coherence: scenarios predicted H-B TOCTOU weakness (S-HB-ADV) BEFORE T8 prototype, and T8 confirmed empirically at 484 lost updates. This is the eval gate working as designed.",
+        "Transition zone discipline: LinkType/Interface/Derived/Reducer all classified as LOGIC by ontologist, accepted by simulator, and preserved through prototyper and eval-runner. No re-litigation downstream.",
+        "First session to touch all 5 domains first-class: palantir-mini's LEARN+SECURITY domains are real primitives, not N/A placeholders. 28 primitives across 5 domains is the densest ontology in the kosmos session history.",
+        "H-B preservation as formal competitor is working: even though H-B lost, the pipeline kept H-B scored, prototyped, eval'd, and documented. This satisfies R8 (No alternatives) AND provides BackwardProp material for future sessions considering snapshot-based alternatives."
+      ]
+    }
+  ],
   "evaluatorGateResult": "ACCEPT",
-  "evaluatorGateDetails": {
-    "timestamp": "2026-04-12T22:30:00Z",
-    "agent": "evaluator",
-    "round": 1,
-    "sessionEvaluated": "mathcrew-photonic-realism-001",
-    "rulesSummary": "14 PASS, 0 FAIL, 1 N/A (R2). No debate triggered.",
-    "independentVerification": "T7: 33/33 (18ms, 83 assertions), T8: 35/35 (19ms, 74 assertions), tsc: 0 errors",
-    "keyFindings": [
-      "6 hypotheses analyzed: H-1 GLTF+AnimationMixer, H-2 Procedural, H-3 Factory+Registry, H-4 ECS, H-5 DragControls+Proxy, H-6 Gesture+Proximity",
-      "Hybrid recommendation: H-2 procedural start -> H-1 GLTF pivot via H-3 Factory+Registry OCP pattern",
-      "All sources tier-1/2 official docs. Zero stale evidence. 22 D/L/A-classified objects.",
-      "3 critical runtime gaps (g-pr-01 SSS FPS, g-pr-02 clone draw calls, g-pr-03 DragControls jitter) require prototype benchmarks",
-      "FM-T8-001 (high): H-2 procedural engagement unresolvable by research alone — user study required",
-      "Teaching framework migration confirmed METAPHOR-LAYER-ONLY — all core contracts preserved"
-    ]
+  "gateDecision": {
+    "result": "ACCEPT",
+    "timestamp": "2026-04-15T18:30:00Z",
+    "winner": "H-A",
+    "coWinner": "H-C",
+    "formalCompetitor": "H-B",
+    "triggeredRulesOnWinner": [],
+    "triggeredRulesOnLoser": ["R11", "R13"],
+    "debateRoundsUsed": 0,
+    "nextStep": "Spawn reporter-blueprint (T11) + reporter-report (T12) in parallel"
+  },
+  "phaseGates": {
+    "T1": {
+      "completed": true,
+      "completedAt": "2026-04-15T15:00:00Z",
+      "outputArtifacts": ["ontology-state/decision-log.json"],
+      "validations": [
+        "ProjectOntologyScope has 5 BackendOntology domains (DATA/LOGIC/ACTION/SECURITY/LEARN)",
+        "ResearchQuestions count = 7 (>= 5 required)",
+        "All RQs have D/L/A domain tags",
+        "DevCon 5 three-phase journey applied",
+        "Constraints captured (5 categories: billing/runtime/scope/boundary/research_quality)",
+        "Routing decisions for T2 and T3 specified",
+        "Provisional hypothesis identified with 3-source convergence rationale"
+      ]
+    },
+    "T10": {
+      "completed": true,
+      "completedAt": "2026-04-15T18:30:00Z",
+      "outputArtifacts": ["ontology-state/decision-log.json"],
+      "validations": [
+        "All 15 rejection criteria applied (R1-R15)",
+        "2 rules triggered on losing hypothesis H-B (R11, R13) — pipeline health signal, not defect",
+        "0 rules triggered on winning hypothesis H-A",
+        "0 debate rounds used (out of max 2) — evidence chain is coherent",
+        "gateResult=ACCEPT set at top level and inside entry",
+        "winRationale specific and non-generic (3 axes, enumerated evidence)",
+        "whatWouldChangeDecision has 5 concrete reversal conditions (>= 1)",
+        "criticalRisks enumerated with severity and mitigation (>= 1)",
+        "Formal competitor H-B preserved with empirical defeat documentation"
+      ]
+    }
   }
 }
