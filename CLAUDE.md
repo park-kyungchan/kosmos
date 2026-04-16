@@ -25,6 +25,73 @@ The output feeds downstream tools: ontology-design, writing-plans, or direct imp
 
 ---
 
+## Brain v2 — Runtime Capabilities
+
+Kosmos runs on Claude Code v2.1.110+ with the following native capabilities:
+
+### Subagent Frontmatter Fields (v2.1.110)
+
+Agent `.md` files in `.claude/agents/` support these additional fields:
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `memory` | `project` | Loads project-scoped memory into subagent context at spawn |
+| `mcpServers` | `[palantir-mini]` | Grants subagent access to palantir-mini MCP tools |
+| `initialPrompt` | string | One-shot instruction injected at session start |
+
+All 7 research agents declare `memory: project` and `mcpServers: [palantir-mini]`.
+The researcher also declares `context7` in mcpServers for library doc lookups.
+The ontologist declares `initialPrompt` to load world-model.json at spawn.
+The prototyper declares `isolation: worktree` for branch-isolated prototype builds.
+
+### palantir-mini MCP Tools
+
+Every subagent with `mcpServers: [palantir-mini]` has access to:
+
+| Tool | Purpose |
+|------|---------|
+| `mcp__palantir-mini__emit_event` | Emit append-only event to `.palantir-mini/session/events.jsonl` |
+| `mcp__palantir-mini__get_ontology` | Retrieve ontology snapshot for current session |
+| `mcp__palantir-mini__replay_lineage` | Replay event log to reconstruct prior session state |
+| `mcp__palantir-mini__apply_edit_function` | Apply ontology-validated Edit function |
+| `mcp__palantir-mini__commit_edits` | Commit edit batch as an atomic ontology transaction |
+
+### Events Log (Append-Only)
+
+Every ontology-state file edit MUST be preceded by an event emission:
+
+```
+mcp__palantir-mini__emit_event({
+  type: "ontology_edit",
+  agent: "<agent-name>",
+  file: "<path>",
+  summary: "<what changed and why>"
+})
+```
+
+The events log lives at `.palantir-mini/session/events.jsonl`.
+It is append-only and never overwritten. It is the audit trail for all session activity.
+
+### 27 Hook Events (v2.1.110)
+
+The full set of hook events available in v2.1.110:
+
+`SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`,
+`TaskCreated`, `TaskCompleted`, `TeammateIdle`, `SubagentStop`,
+`PostCompact`, `Stop`, `TeamCreated`, `TeamDeleted`, `TeammateJoin`,
+`TeammateLeave`, `TeammateError`, `AgentStart`, `AgentStop`,
+`AgentError`, `AgentMessage`, `PlanApproval`, `ShutdownRequest`,
+`ShutdownResponse`, `MemoryWrite`, `MemoryRead`, `ToolApproval`,
+`ToolDenied`, `CompactStart`
+
+### managed-settings.d/ Pattern
+
+Per-project Layer-1 RBAC fragments live in `.claude/managed-settings.d/`.
+The palantir-mini fragment is at `.claude/managed-settings.d/50-palantir-mini.json`.
+It grants read/write permissions for ontology schemas, events.jsonl, and MCP tools.
+
+---
+
 ## Research Pipeline (10 Stages)
 
 The pipeline can be launched via the `/kosmos-research` skill.
@@ -184,6 +251,8 @@ User Request
 - Do NOT skip prototype phase for architecture hypotheses
 - Do NOT let agents claim tasks outside their allowedTags (enforced by registry)
 - Do NOT let agents write files outside their writablePaths (enforced by hooks)
+- Do NOT edit ontology-state/ files without first emitting an event via `mcp__palantir-mini__emit_event`
+- Do NOT skip events.jsonl emission — it is the mandatory audit trail for all session activity
 
 ---
 
@@ -200,9 +269,12 @@ The `ontology-state/` directory maintains runtime state across sessions:
 | `blueprint.json` | TechBlueprint output | reporter |
 | `eval-results.json` | Prototypes, eval suites, failure modes, debates | prototyper, eval-runner, evaluator |
 
+The `.palantir-mini/session/events.jsonl` append-only event log is written by all agents
+via `mcp__palantir-mini__emit_event` before every ontology-state file edit.
+
 ---
 
-## Enforcement Hooks (11 hooks)
+## Enforcement Hooks (13 hooks)
 
 | Hook | Event | Mode | Enforces |
 |------|-------|------|----------|
@@ -217,6 +289,8 @@ The `ontology-state/` directory maintains runtime state across sessions:
 | `enforce-file-ownership.ts` | PostToolUse (Edit/Write) | **BLOCKING** | Registry-driven file ownership per agent |
 | `validate-task-naming.ts` | TaskCreated | **BLOCKING** | [TAG] prefix enforcement from registry phases |
 | `validate-prototype-stop.ts` | SubagentStop | **BLOCKING** (prototyper) | Prototype results must exist before stop |
+| `event-log-emit.ts` | PostToolUse (Edit/Write) | Advisory | Emits event to events.jsonl for every ontology-state/ edit |
+| `pre-compact-state-guard.ts` | PreCompact | **BLOCKING** | Snapshot events.jsonl + state files before compaction |
 
 ---
 

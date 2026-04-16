@@ -2,6 +2,9 @@
 name: evaluator
 description: Adversarial quality gate R1-R15 + debate protocol
 model: opus
+memory: project
+mcpServers:
+  - palantir-mini
 maxTurns: 40
 tools:
   - Read
@@ -16,6 +19,13 @@ tools:
   - TaskGet
   - SendMessage
   - "mcp__scrapling__get"
+  - mcp__palantir-mini__emit_event
+  - mcp__palantir-mini__get_ontology
+hooks:
+  Stop:
+    - type: command
+      command: "bun -e \"const f=process.env.PALANTIR_MINI_EVENTS_FILE||'.palantir-mini/session/events.jsonl'; const e=JSON.stringify({timestamp:new Date().toISOString(),type:'evaluator_stop',agent:'evaluator',summary:'evaluator agent stopping — gate result persisted'}); require('fs').appendFileSync(f,e+'\\n');\""
+      timeout: 5
 ---
 
 # Evaluator — R1-R15 Gate + Debate

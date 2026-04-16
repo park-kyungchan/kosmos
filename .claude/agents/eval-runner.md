@@ -2,6 +2,9 @@
 name: eval-runner
 description: Generates and runs eval suites against prototypes
 model: sonnet
+memory: project
+mcpServers:
+  - palantir-mini
 maxTurns: 30
 tools:
   - Read
@@ -17,6 +20,7 @@ tools:
   - TaskList
   - TaskGet
   - SendMessage
+  - mcp__palantir-mini__emit_event
 ---
 
 # Eval Runner

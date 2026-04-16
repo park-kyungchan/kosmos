@@ -6,7 +6,7 @@ argument-hint: "research objective or app description (e.g., '실시간 협업 �
 model: opus
 ---
 
-# Kosmos Research v2 — Agent Teams Pipeline
+# Kosmos Research v3 — Agent Teams Pipeline + palantir-mini Event Log
 
 You are launching an Edison Kosmos-inspired autonomous research pipeline.
 Seven specialized agents collaborate through a shared world model — and now
@@ -16,7 +16,20 @@ The user's research objective: **$ARGUMENTS**
 
 ---
 
-## Phase 0: Load Prior State
+## Phase 0: Load Prior State + Recap Events Log
+
+### 0.1 Replay prior session lineage (if events log exists)
+
+If `.palantir-mini/session/events.jsonl` exists, replay it first:
+
+```
+mcp__palantir-mini__replay_lineage({})
+```
+
+This reconstructs what happened in prior sessions and surfaces any incomplete
+ontology edits or uncommitted transactions before starting new work.
+
+### 0.2 Read ontology-state files
 
 Read these files to understand any prior session context:
 
@@ -28,6 +41,16 @@ Read these files to understand any prior session context:
 - `ontology-state/blueprint.json` — prior blueprint (if any)
 
 If prior state exists, note what can be reused vs what needs fresh research.
+
+### 0.3 Emit session-start event
+
+```
+mcp__palantir-mini__emit_event({
+  type: "session_start",
+  agent: "lead",
+  summary: "Kosmos research session started for: $ARGUMENTS"
+})
+```
 
 ---
 
@@ -143,8 +166,17 @@ The Lead executes T1 without delegating:
 3. Decompose into ProjectOntologyScope (backend domains + frontend surfaces)
 4. Create 3-7 ResearchQuestions with D/L/A tags
 5. Classify against DevCon 5 three-phase journey
-6. Write to `ontology-state/decision-log.json`
-7. Mark T1 as completed
+6. Emit event before writing:
+   ```
+   mcp__palantir-mini__emit_event({
+     type: "ontology_edit",
+     agent: "lead",
+     file: "ontology-state/decision-log.json",
+     summary: "T1 decomposition: ProjectOntologyScope written"
+   })
+   ```
+7. Write to `ontology-state/decision-log.json`
+8. Mark T1 as completed
 
 ---
 
@@ -318,3 +350,6 @@ After all 12 tasks are completed:
 - The TaskCompleted hook (`team-phase-gate.ts`) validates state files at each phase
 - Prototypes are disposable — they prove/disprove, then are deleted
 - Every failure mode MUST have a D/L/A domain classification
+- **Every ontology-state/ file edit MUST be preceded by `mcp__palantir-mini__emit_event`**
+- `.palantir-mini/session/events.jsonl` is the append-only audit trail — never overwrite it
+- Use `/palantir-mini:recap` (i.e., `mcp__palantir-mini__replay_lineage`) at session start to restore prior session context

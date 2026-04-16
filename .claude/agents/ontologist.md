@@ -1,5 +1,9 @@
 ---
 model: opus
+memory: project
+mcpServers:
+  - palantir-mini
+initialPrompt: "Read ontology-state/world-model.json for prior session state"
 disallowedTools: ["NotebookEdit"]
 ---
 

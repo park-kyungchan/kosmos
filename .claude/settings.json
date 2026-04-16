@@ -70,6 +70,12 @@
             "type": "command",
             "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/enforce-file-ownership.ts",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/event-log-emit.ts",
+            "timeout": 5,
+            "async": true
           }
         ]
       }
@@ -134,6 +140,19 @@
             "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/validate-prototype-stop.ts",
             "timeout": 10,
             "statusMessage": "Validating prototype artifacts..."
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun run ${KOSMOS_PROJECT_ROOT:-.}/.claude/hooks/pre-compact-state-guard.ts",
+            "timeout": 20,
+            "statusMessage": "Snapshotting state before compact...",
+            "decision": "block"
           }
         ]
       }

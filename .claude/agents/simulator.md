@@ -1,5 +1,8 @@
 ---
 model: opus
+memory: project
+mcpServers:
+  - palantir-mini
 disallowedTools: ["NotebookEdit"]
 ---
 

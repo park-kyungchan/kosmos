@@ -1,5 +1,8 @@
 ---
 model: sonnet
+memory: project
+mcpServers:
+  - palantir-mini
 disallowedTools: ["NotebookEdit"]
 ---
 
