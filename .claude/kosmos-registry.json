@@ -1,6 +1,6 @@
 {
-  "version": "2.0.0",
-  "description": "Kosmos Agent Registry — SSoT for all enforcement hooks. Add agents/phases here, zero hook code changes.",
+  "version": "3.0.0",
+  "description": "Kosmos Agent Registry — SSoT for all enforcement hooks. Add agents/phases here, zero hook code changes. v3: mcpTools + eventTypes per agent, events.jsonl stateFile.",
   "phases": [
     { "tag": "INTAKE",       "order": 1, "dependsOn": [] },
     { "tag": "RESEARCH-INT", "order": 2, "dependsOn": ["INTAKE"] },
@@ -19,44 +19,62 @@
       "allowedTags": ["RESEARCH-INT", "RESEARCH-EXT"],
       "writablePaths": ["ontology-state/source-map.json"],
       "notifyOnComplete": ["ontologist"],
-      "model": "sonnet"
+      "model": "sonnet",
+      "mcpTools": ["mcp__palantir-mini__get_ontology", "mcp__palantir-mini__replay_lineage"],
+      "eventTypes": []
     },
     "ontologist": {
       "allowedTags": ["ONTOLOGY"],
       "writablePaths": ["ontology-state/world-model.json"],
       "notifyOnComplete": ["simulator"],
-      "model": "sonnet"
+      "model": "opus",
+      "mcpTools": ["mcp__palantir-mini__get_ontology", "mcp__palantir-mini__emit_event"],
+      "eventTypes": ["phase_completed"]
     },
     "simulator": {
       "allowedTags": ["HYPOTHESIS", "SIMULATION"],
       "writablePaths": ["ontology-state/scenarios.json"],
       "notifyOnComplete": ["prototyper"],
-      "model": "sonnet"
+      "model": "opus",
+      "mcpTools": ["mcp__palantir-mini__get_ontology"],
+      "eventTypes": []
     },
     "prototyper": {
       "allowedTags": ["PROTOTYPE"],
       "writablePaths": ["prototype/**", "ontology-state/eval-results.json"],
       "notifyOnComplete": ["eval-runner"],
-      "model": "sonnet"
+      "model": "sonnet",
+      "mcpTools": [],
+      "eventTypes": []
     },
     "eval-runner": {
       "allowedTags": ["EVAL-GATE"],
       "writablePaths": ["prototype/tests/**", "ontology-state/eval-results.json"],
       "notifyOnComplete": ["evaluator"],
-      "model": "sonnet"
+      "model": "sonnet",
+      "mcpTools": [],
+      "eventTypes": []
     },
     "evaluator": {
       "allowedTags": ["EVALUATE"],
       "writablePaths": ["ontology-state/decision-log.json", "ontology-state/eval-results.json"],
       "notifyOnComplete": ["reporter"],
       "debateParticipants": ["simulator", "ontologist"],
-      "model": "opus"
+      "model": "opus",
+      "mcpTools": [
+        "mcp__palantir-mini__get_ontology",
+        "mcp__palantir-mini__replay_lineage",
+        "mcp__palantir-mini__emit_event"
+      ],
+      "eventTypes": ["phase_completed"]
     },
     "reporter": {
       "allowedTags": ["BLUEPRINT", "REPORT"],
       "writablePaths": ["ontology-state/blueprint.json", "reports/**"],
       "notifyOnComplete": [],
-      "model": "sonnet"
+      "model": "sonnet",
+      "mcpTools": ["mcp__palantir-mini__emit_event"],
+      "eventTypes": ["phase_completed"]
     }
   },
   "stateFiles": {
@@ -65,6 +83,7 @@
     "world-model":   { "path": "ontology-state/world-model.json",   "requiredAfter": ["ONTOLOGY"] },
     "scenarios":     { "path": "ontology-state/scenarios.json",     "requiredAfter": ["SIMULATION"] },
     "eval-results":  { "path": "ontology-state/eval-results.json",  "requiredAfter": ["PROTOTYPE", "EVAL-GATE"] },
-    "blueprint":     { "path": "ontology-state/blueprint.json",     "requiredAfter": ["BLUEPRINT"] }
+    "blueprint":     { "path": "ontology-state/blueprint.json",     "requiredAfter": ["BLUEPRINT"] },
+    "events-log":    { "path": ".palantir-mini/session/events.jsonl", "requiredAfter": ["INTAKE"], "appendOnly": true }
   }
 }
