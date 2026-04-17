@@ -1,7 +1,7 @@
 ---
 name: evaluator
 description: Adversarial quality gate R1-R15 + debate protocol
-model: opus
+model: sonnet
 memory: project
 mcpServers:
   - palantir-mini

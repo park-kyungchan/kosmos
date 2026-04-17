@@ -1,1148 +1,992 @@
 {
-  "version": "1.0.0-palantir-mini",
-  "lastUpdated": "2026-04-15T16:00:00Z",
-  "sessionId": "kosmos-research-2026-04-15-palantir-mini",
-  "previousSessions": [
-    "jsxgraph-sequencer-001",
-    "mathcrew-content-delivery-001",
-    "mathcrew-photonic-realism-001"
-  ],
-  "ontologistAudit": {
-    "timestamp": "2026-04-15T16:00:00Z",
-    "agent": "ontologist",
-    "task": "T4",
-    "totalPrimitives": 28,
-    "domainsPopulated": ["DATA", "LOGIC", "ACTION", "SECURITY", "LEARN"],
-    "allFiveDomainsPopulated": true,
-    "note": "This is the FIRST kosmos session that touches all 5 domains (SECURITY + LEARN are first-class, not N/A). palantir-mini's entire raison d'etre is to put LEARN on a durable footing (append-only events.jsonl) and give SECURITY a real home (CapabilityToken vault + Layer-1 RBAC + managed-settings.d/ allowlists).",
-    "overallForwardPropStatus": "healthy",
-    "overallBackwardPropStatus": "healthy",
-    "gapsResolvedCount": 4,
-    "gapsDeferredCount": 2,
-    "devCon5PrinciplesApplied": ["DDD", "DRY", "OCP", "PECS"],
-    "confidence": 0.88,
-    "keyInsight": "palantir-mini cleanly maps Anthropic Managed Agents virtualization (Session = append-only log / Harness = stateless MCP bridge / Sandbox = worktree) onto Palantir 5-domain ontology with no fudge. The EventEnvelope discriminated union (10 variants) IS the LEARN-domain Golden Table, and every DATA/LOGIC/ACTION mutation flows through it as events. SECURITY rides on Native Runtime mechanics (disallowedTools, managed-settings.d/, ${CLAUDE_PLUGIN_DATA}) instead of new runtime code.",
-    "heavyLift": "The transition-zone call for LinkType/Interface/DerivedProperty/Reducer -> LOGIC (not DATA) per Ontologist SH-01 + DC5-06 was applied rigorously. Every EditFunction returning Edits[] is LOGIC (SH-03). The commit wrapper that applies Edits[] atomically is ACTION. Submission criteria gates are SECURITY (who may commit under what conditions) AND LOGIC (they compute). Audit classification: SubmissionCriteria is modeled twice — once as LOGIC primitive (pre-flight evaluator function) and once as SECURITY policy (pre-flight access gate). This is intentional: the computation is LOGIC, the gate semantics is SECURITY."
-  },
-
-  "domains": {
-    "data": {
-      "name": "Data Domain (What Exists)",
-      "semanticHeuristic": "SH-02: Delete LOGIC + ACTION. Does it still describe reality? Yes -> DATA.",
-      "primitives": [
-        {
-          "id": "prim-data-01",
-          "name": "EventEnvelope",
-          "dc506Primitive": "Struct (discriminated union)",
-          "domain": "DATA",
-          "description": "The append-only Session log record. 10 variants via type discriminator. Immutable once appended. Every write to ontology state MUST flow through an EventEnvelope.",
-          "semanticHeuristic": "SH-02: EventEnvelope describes WHAT HAPPENED. Delete all edit-function logic, delete all commit actions — the events.jsonl still describes reality as a durable record. Classification: DATA.",
-          "variants": [
-            "edit_proposed",
-            "edit_committed",
-            "submission_criteria_failed",
-            "validation_phase_completed",
-            "codegen_started",
-            "codegen_completed",
-            "phase_completed",
-            "drift_detected",
-            "session_started",
-            "session_ended"
-          ],
-          "decisionLineage5Dimensions": {
-            "when": "EventEnvelopeBase.when (ISO8601)",
-            "atopWhich": "EventEnvelopeBase.atopWhich (git HEAD SHA)",
-            "throughWhich": "EventEnvelopeBase.throughWhich {sessionId, toolName, cwd}",
-            "byWhom": "EventEnvelopeBase.byWhom {identity, agentName?, teamName?}",
-            "withWhat": "EventEnvelopeBase.withWhat {reasoning?, hypothesis?}"
-          },
-          "optimisticConcurrency": "EventEnvelopeBase.sequence (monotonic counter) serves as version vector — see gapsResolved.gap-01",
-          "source": "palantir-mini-blueprint.md Gap fill 1 + task briefing",
-          "evidenceIds": ["clm-t2-eventenvelope", "clm-t3-managedagents-session"],
-          "designPrinciples": {
-            "DDD": "PASS — EventEnvelope, sequence, appliedEdits match Anthropic + Palantir domain vocabulary",
-            "DRY": "PASS — ONE struct hosts all 10 event types via discriminated union; no per-type envelope duplication",
-            "OCP": "PASS — new event types add a new variant to the union without modifying existing variants (Open/Closed by discriminator)",
-            "PECS": "PASS — emit_event (producer) extends the union; replay_lineage (consumer) uses super type via exhaustive visitor on type tag"
-          },
-          "forwardPropPath": {
-            "chain": "~/.claude/schemas/ontology/lineage/event-types.ts (declaration) -> bun codegen -> lib/event-log/types.ts + per-project src/generated/events.d.ts -> plugin runtime emit_event -> <project>/.palantir-mini/session/events.jsonl",
-            "healthStatus": "healthy",
-            "evidenceIds": ["clm-t2-eventenvelope"]
-          },
-          "backwardPropPath": {
-            "chain": "events.jsonl -> replay_lineage MCP tool -> 5-dim lineage graph -> drift detection -> ontology refinement proposal -> ontologist review -> schemas/ontology/lineage/ update",
-            "healthStatus": "healthy",
-            "evidenceIds": ["clm-t3-managedagents-session"]
-          }
-        },
-        {
-          "id": "prim-data-02",
-          "name": "ObjectType",
-          "dc506Primitive": "ObjectType (DC5-06 default)",
-          "domain": "DATA",
-          "description": "Palantir ObjectType declaration with branded ObjectTypeRid. Each ObjectType holds stored-fact properties only (no derived). Compiled from ~/.claude/schemas/ontology/primitives/object-type.ts to src/generated/objects/*.ts per project.",
-          "semanticHeuristic": "SH-02: ObjectType describes what KIND of entity can exist (e.g. Spacekid, BeatRecord). Delete all traversal logic and all mutations — the type declaration still describes reality. Classification: DATA.",
-          "brandedRid": "ObjectTypeRid (OSDK 2.0 pattern)",
-          "source": "decision-log projectOntologyScope.DATA + blueprint.md lines 144-147",
-          "evidenceIds": ["clm-t2-dc5-06", "clm-t3-osdk2"],
-          "designPrinciples": {
-            "DDD": "PASS — 'ObjectType' matches Palantir OSDK vocabulary exactly",
-            "DRY": "PASS — single schema declaration shared by kosmos/palantir-math/mathcrew via codegen",
-            "OCP": "PASS — new ObjectTypes added as new declarations, not mutations of existing",
-            "PECS": "PASS — ontology declarations (producer) extend; generated client (consumer super) reads via structural types"
-          },
-          "forwardPropPath": {
-            "chain": "~/.claude/schemas/ontology/primitives/object-type.ts -> palantir-mini codegen/descender-gen.ts -> <project>/src/generated/objects/*.ts -> runtime TypeScript consumer",
-            "healthStatus": "healthy",
-            "evidenceIds": ["clm-t3-osdk2"]
-          },
-          "backwardPropPath": {
-            "chain": "runtime ObjectType usage -> drift_detected event (schema_mismatch) -> replay_lineage -> ontology refinement",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-data-03",
-          "name": "PropertyType (24 branded)",
-          "dc506Primitive": "Struct (value object)",
-          "domain": "DATA",
-          "description": "24 branded primitive property types from ~/.claude/schemas/ontology/types.ts extended with RID branding for OSDK 2.0 compliance. Value objects — no identity.",
-          "semanticHeuristic": "SH-02: PropertyType describes CONSTRAINED value shapes (string-regex, integer-range, enum, struct). Delete all logic — the shapes still describe reality. Classification: DATA.",
-          "source": "decision-log projectOntologyScope.DATA.primitives + blueprint.md line 144",
-          "evidenceIds": ["clm-t2-ontology-types"],
-          "designPrinciples": {
-            "DDD": "PASS — matches existing palantir-math property vocabulary",
-            "DRY": "PASS — 24 types extracted into single module, imported by all projects",
-            "OCP": "PASS — new property types (e.g. RidArray<T>) added without modifying existing",
-            "PECS": "N/A — value objects, no producer/consumer generics"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/types.ts -> codegen -> branded per-project types -> runtime validation",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "runtime property validation failure -> drift_detected -> type definition refinement",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-data-04",
-          "name": "SnapshotManifest",
-          "dc506Primitive": "Struct",
-          "domain": "DATA",
-          "description": "Derived snapshot metadata: version, atSequence (replay cut-point), generatedAt, sourceEventCount. Snapshots are cache, not truth — events.jsonl is truth.",
-          "semanticHeuristic": "SH-02: Manifest describes what snapshot exists at which event sequence. Stored fact about cache state. Classification: DATA.",
-          "source": "blueprint.md architecture lines 252-258",
-          "evidenceIds": ["clm-t2-snapshot-pattern"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS — single manifest shape across projects",
-            "OCP": "PASS",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "snapshot generator -> manifest.json -> get_ontology MCP tool (atSequence parameter)",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "snapshot drift -> regenerate from events.jsonl -> refreshed manifest",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-data-05",
-          "name": "CommitSha (branded)",
-          "dc506Primitive": "Struct (branded nominal)",
-          "domain": "DATA",
-          "description": "Branded `string & { readonly __brand: 'CommitSha' }` for atopWhich lineage dimension. Nominal type prevents mixing with SessionId / EventId at compile time.",
-          "semanticHeuristic": "SH-02: A CommitSha is a stored fact — git's own DAG is external truth. Classification: DATA.",
-          "source": "blueprint.md Gap fill 1 line 324",
-          "evidenceIds": ["clm-t2-eventenvelope"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS",
-            "OCP": "PASS",
-            "PECS": "N/A"
-          },
-          "forwardPropPath": {
-            "chain": "git HEAD -> emit_event hook -> EventEnvelopeBase.atopWhich",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "events.jsonl -> lineage filter by atopWhich -> trace which commit produced which ontology change",
-            "healthStatus": "healthy"
-          }
-        }
-      ],
-      "claimIds": [
-        "clm-t2-eventenvelope",
-        "clm-t2-ontology-types",
-        "clm-t2-snapshot-pattern",
-        "clm-t2-dc5-06",
-        "clm-t3-osdk2",
-        "clm-t3-managedagents-session"
-      ],
-      "ontologyObjects": [
-        "EventEnvelope",
-        "EventEnvelopeBase",
-        "EventId (branded)",
-        "SessionId (branded)",
-        "CommitSha (branded)",
-        "ObjectType",
-        "ObjectTypeRid (branded)",
-        "PropertyType (24 variants, branded)",
-        "SnapshotManifest"
-      ]
-    },
-
-    "logic": {
-      "name": "Logic Domain (How To Reason)",
-      "semanticHeuristic": "SH-03: Does it return Edits[] or commit? Returns Edits[] -> LOGIC. Describes a relationship/computation without executing -> LOGIC.",
-      "primitives": [
-        {
-          "id": "prim-logic-01",
-          "name": "EditFunction",
-          "dc506Primitive": "Function (DC5-06 LOGIC primitive)",
-          "domain": "LOGIC",
-          "description": "Tier-2 function that takes params and returns `Edits[]` WITHOUT committing. Per Palantir logic/functions.md LOGIC.FN-04: functions compute mutations, actions execute them. Mechanically enforced via disallowedTools: [Write, Edit] on the edit-function agent .md frontmatter (per OMC architect.md pattern).",
-          "semanticHeuristic": "SH-03: returns Edits[] array, no side effects -> LOGIC. SH-01: it COMPUTES what should change, it does not CHANGE anything.",
-          "mechanicalEnforcement": "plugin agents/edit-function.md declares disallowedTools: [Write, Edit, Bash]. Agent cannot physically commit — the runtime blocks it. This is the cleanest implementation of LOGIC/ACTION separation.",
-          "returnType": "OntologyEdit[] (Edits.Object | Edits.Link | Edits.Interface)",
-          "source": "decision-log RQ-02 + blueprint.md lines 187-188",
-          "evidenceIds": ["clm-t2-fn04", "clm-t3-omc-architect", "clm-t2-disallowedtools"],
-          "designPrinciples": {
-            "DDD": "PASS — 'EditFunction' and 'returns Edits[]' match Palantir OSDK 2.0 + authoring helper (functions.md L496) vocabulary",
-            "DRY": "PASS — one function-signature template serves all mutation kinds; no per-kind boilerplate",
-            "OCP": "PASS — new EditFunction types added as new declarations; existing functions never modified",
-            "PECS": "PASS — EditFunction<Params, Edits extends OntologyEdit[]> — Edits param is covariant (producer extends), consumer uses `OntologyEdit[]` supertype"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/functions/function-signature.ts -> codegen -> per-project src/generated/functions/*.ts -> plugin apply_edit_function MCP handler -> returns Edits[] WITHOUT commit",
-            "healthStatus": "healthy",
-            "evidenceIds": ["clm-t2-fn04"]
-          },
-          "backwardPropPath": {
-            "chain": "edit_proposed event (containing hypotheticalEdits) -> events.jsonl -> replay_lineage -> audit which functions proposed which edits -> refine function logic if evaluation degrades",
-            "healthStatus": "healthy",
-            "evidenceIds": ["clm-t2-eventenvelope"]
-          }
-        },
-        {
-          "id": "prim-logic-02",
-          "name": "InterfaceType",
-          "dc506Primitive": "Interface (DC5-06 LOGIC primitive)",
-          "domain": "LOGIC",
-          "description": "Shared behavioral contract across 2+ ObjectTypes. Per ontologist.md Transition Zone: Interface is LOGIC not DATA — it enables polymorphic reasoning, not entity identity.",
-          "semanticHeuristic": "SH-01: Interface REASONS about shared behavior across object types. SH-02 Transition Zone rule: though it looks declarative, it is a reasoning construct -> LOGIC.",
-          "source": "decision-log projectOntologyScope.DATA.primitives (reclassified here per SH-01 transition zone)",
-          "classificationNote": "decision-log.json lists 'InterfaceType' under DATA primitives. This is a known transition-zone collision. Per ontologist.md line 68: 'Interface enables reasoning and graph traversal, not stored facts -> LOGIC.' The ontologist reclassifies to LOGIC. decision-log's DATA listing is tolerated because it only says the primitive 'exists' in that domain scope; the semantic home is LOGIC.",
-          "evidenceIds": ["clm-t2-dc5-06", "clm-t2-transition-zones"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS — one Interface reused across object types instead of duplicating shared fields",
-            "OCP": "PASS — new ObjectType implements existing Interface without changing Interface",
-            "PECS": "PASS — Interface<Props> is structurally covariant for consumers"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/primitives/interface-type.ts -> codegen -> branded InterfaceTypeRid + implementor list -> runtime polymorphic dispatch",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "runtime Interface usage -> drift_detected (if implementor divergence) -> refinement",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-logic-03",
-          "name": "LinkType / Object-Backed Link Type",
-          "dc506Primitive": "Object-Backed Link Type (DC5-06 LOGIC primitive)",
-          "domain": "LOGIC",
-          "description": "Relationship between ObjectTypes. Plain LinkType when the relationship carries no properties; Object-Backed LinkType when it does (e.g. weighted, timestamped, annotated edges).",
-          "semanticHeuristic": "SH-01 + ontologist.md Transition Zone: LinkType enables reasoning/traversal across objects. It is NOT a stored fact about one object. Classification: LOGIC.",
-          "source": "decision-log projectOntologyScope.DATA.primitives (reclassified here per SH-01 transition zone)",
-          "classificationNote": "Same transition-zone rationale as InterfaceType. decision-log lists LinkType under DATA; ontologist relocates to LOGIC per the authoritative transition zone rule.",
-          "evidenceIds": ["clm-t2-dc5-06"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS",
-            "OCP": "PASS — new LinkTypes added without modifying existing",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/primitives/link-type.ts -> codegen -> branded LinkTypeRid + traversal helpers -> runtime graph queries",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "runtime graph traversal -> drift_detected (orphan references) -> LinkType refinement",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-logic-04",
-          "name": "DerivedProperty",
-          "dc506Primitive": "Derived Property (DC5-06 LOGIC primitive)",
-          "domain": "LOGIC",
-          "description": "Property computed from other properties. Not stored. Lives in schemas/ontology/functions/derived-property.ts.",
-          "semanticHeuristic": "SH-01: DerivedProperty REASONS over raw data to produce a value. SH-02: If you delete the computation, the raw data remains but the derived value vanishes — classification: LOGIC.",
-          "source": "decision-log projectOntologyScope.LOGIC.primitives",
-          "evidenceIds": ["clm-t2-dc5-06"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS",
-            "OCP": "PASS",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/functions/derived-property.ts -> codegen -> runtime lazy-evaluated getter",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "runtime eval -> correctness check via replay -> refinement",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-logic-05",
-          "name": "Reducer",
-          "dc506Primitive": "Reducer (DC5-06 LOGIC primitive)",
-          "domain": "LOGIC",
-          "description": "Aggregation or fold over a collection of objects (e.g. total count of ObjectTypes per domain, sum of property values). Critical for snapshot derivation from events.jsonl.",
-          "semanticHeuristic": "SH-01: Reducer REASONS over a collection. No mutation, no side effect. Classification: LOGIC.",
-          "source": "decision-log projectOntologyScope.LOGIC.primitives",
-          "evidenceIds": ["clm-t2-dc5-06"],
-          "specialRole": "Snapshot generation from events.jsonl is itself a reducer: Reducer<EventEnvelope, OntologySnapshot> that folds the log into current state. This is the DC5-06 primitive that powers LEARN -> DATA derivation.",
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS — one reducer contract serves snapshot generation, aggregation queries, and drift detection",
-            "OCP": "PASS — new reducers added without modifying existing",
-            "PECS": "PASS — Reducer<In, Out> is classic PECS territory: In is consumer super, Out is producer extends"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/functions/reducer.ts -> codegen -> runtime snapshot generator + aggregate queries",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "reducer output drift -> drift_detected -> replay_lineage -> refinement",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-logic-06",
-          "name": "LinkConstraint",
-          "dc506Primitive": "Function",
-          "domain": "LOGIC",
-          "description": "Computed constraint on a LinkType (e.g. cardinality, type-of-both-ends, temporal ordering). No side effects — computes a boolean or Constraint[].",
-          "semanticHeuristic": "SH-03: returns Constraint[] or boolean, not edits -> LOGIC.",
-          "source": "decision-log projectOntologyScope.LOGIC.primitives",
-          "evidenceIds": ["clm-t2-fn04"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS",
-            "OCP": "PASS",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/functions/link-constraint.ts -> codegen -> runtime validator",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "constraint violation -> submission_criteria_failed event -> refinement",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-logic-07",
-          "name": "SubmissionCriteria (computational)",
-          "dc506Primitive": "Function",
-          "domain": "LOGIC",
-          "description": "Pre-flight business-logic evaluator. Palantir action/mutations.md ACTION.MU-14..17 + OSDK 2.0 $validateOnly pattern. Returns Pass | Fail with 9 constraint classes (Range, ArraySize, StringLength, StringRegexMatch, OneOf, ObjectQueryResult, ObjectPropertyValue, GroupMember, Unevaluable).",
-          "semanticHeuristic": "SH-03: submission criteria COMPUTE pass/fail, they do not commit. Classification: LOGIC. NOTE: the GATE SEMANTICS is modeled separately in SECURITY domain — see prim-sec-02. Intentional dual modeling.",
-          "source": "decision-log RQ-06 + blueprint.md Gap fill 1 lines 359-365",
-          "evidenceIds": ["clm-t2-submissioncriteria", "clm-t3-osdk2-validateonly"],
-          "designPrinciples": {
-            "DDD": "PASS — matches Palantir vocabulary exactly",
-            "DRY": "PASS — constraint classes reused across action types via composition",
-            "OCP": "PASS — new constraint types added without modifying existing",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/policies/submission-criteria.ts -> codegen -> commit_edits MCP handler pre-flight evaluator",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "submission_criteria_failed event -> events.jsonl -> replay_lineage filter by constraint class -> refinement",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-logic-08",
-          "name": "ValidationPhaseEvaluator",
-          "dc506Primitive": "Function",
-          "domain": "LOGIC",
-          "description": "6-phase validation pipeline evaluator (Design/Compile/Deploy/Merge/Runtime/Post-Write per §VAL.R-03..R-08). v0 implements minimum 3: Design + Compile + Runtime. Each phase function returns Pass | Fail<ErrorClass>.",
-          "semanticHeuristic": "SH-03: phase evaluators COMPUTE pass/fail. They do not commit. Classification: LOGIC.",
-          "source": "decision-log RQ-05 + blueprint.md Gap fill 4 lines 398-406",
-          "evidenceIds": ["clm-t2-6phase", "clm-t2-hookhandlers"],
-          "phaseToHookMapping": {
-            "design": "SessionStart + ConfigChange -> schema validation on load",
-            "compile": "PostToolUse(Edit ontology/*) -> bun run tsc --noEmit",
-            "deploy": "Stop -> bun test on ontology state",
-            "merge": "SessionStart(resume) -> branch compat check",
-            "runtime": "MCP commit_edits -> submission criteria pre-flight",
-            "postWrite": "PostToolUse(Edit) -> bun run pm-verify drift check"
-          },
-          "designPrinciples": {
-            "DDD": "PASS — 'validation phase' matches Palantir VAL vocabulary",
-            "DRY": "PASS — single phase-evaluator interface reused across 6 phases",
-            "OCP": "PASS — add new phase evaluator without modifying existing",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/functions/validation-phase.ts -> codegen -> plugin hooks/hooks.json dispatches to bun run scripts/run.ts <phase>.ts -> validation_phase_completed event",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "validation_phase_completed + errorClass -> events.jsonl -> replay_lineage grouped by errorClass -> phase evaluator refinement",
-            "healthStatus": "healthy"
-          }
-        }
-      ],
-      "claimIds": [
-        "clm-t2-dc5-06",
-        "clm-t2-fn04",
-        "clm-t2-transition-zones",
-        "clm-t2-submissioncriteria",
-        "clm-t2-6phase",
-        "clm-t2-hookhandlers",
-        "clm-t3-omc-architect",
-        "clm-t3-osdk2-validateonly",
-        "clm-t2-disallowedtools"
-      ],
-      "ontologyObjects": [
-        "EditFunction (returning OntologyEdit[])",
-        "InterfaceType",
-        "LinkType (plain)",
-        "Object-Backed LinkType",
-        "DerivedProperty",
-        "Reducer",
-        "LinkConstraint",
-        "SubmissionCriteria (computational)",
-        "ValidationPhaseEvaluator"
-      ]
-    },
-
-    "action": {
-      "name": "Action Domain (What Changes Reality)",
-      "semanticHeuristic": "SH-03: commits edits, produces side effects -> ACTION. SH-01: CHANGES reality when executed.",
-      "primitives": [
-        {
-          "id": "prim-action-01",
-          "name": "Tier-1 Declarative Action",
-          "dc506Primitive": "ActionType (DC5-06 ACTION primitive)",
-          "domain": "ACTION",
-          "description": "Pure CRUD rule. Declarative spec: 'given ObjectTypeX and field Y, on operation Z, apply rule R.' No custom code path. Compiled into commit_edits handler fast path. Per Palantir ACTION.MU-09..11: mutually exclusive with Tier-2.",
-          "semanticHeuristic": "SH-03 + SH-01: Tier-1 Action COMMITS edits — it changes reality. Classification: ACTION.",
-          "mutuallyExclusive": "Tier-1 and Tier-2 are MUTUALLY EXCLUSIVE per Palantir ACTION.MU-09..11. An ActionType is one or the other, never both.",
-          "source": "decision-log RQ-02 + blueprint.md lines 48 + 96",
-          "evidenceIds": ["clm-t2-mu09", "clm-t2-actionmu"],
-          "designPrinciples": {
-            "DDD": "PASS — 'Tier-1 Declarative Action' matches Palantir vocabulary",
-            "DRY": "PASS — one declarative rule schema serves all CRUD kinds",
-            "OCP": "PASS — new rules added via new declarations",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/primitives/action-type.ts (tier-1 union member) -> codegen -> commit_edits MCP fast path -> edit_committed event -> events.jsonl",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "edit_committed event (with actionTypeRid) -> events.jsonl -> replay_lineage -> which actions changed reality, when, by whom -> refinement",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-action-02",
-          "name": "Tier-2 Function-Backed Action",
-          "dc506Primitive": "ActionType wrapping EditFunction",
-          "domain": "ACTION",
-          "description": "Action type that wraps an EditFunction (LOGIC) with an atomic commit. The EditFunction computes Edits[] without committing; the Tier-2 Action takes those Edits[] and commits them atomically (with submission criteria pre-flight).",
-          "semanticHeuristic": "SH-03: COMMITS edits via wrapping the LOGIC-domain function. The wrapping is the mutation. Classification: ACTION.",
-          "source": "decision-log RQ-02 + blueprint.md line 98-99",
-          "evidenceIds": ["clm-t2-mu09", "clm-t2-fn04"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS — one Tier-2 wrapper serves all EditFunction types",
-            "OCP": "PASS — new EditFunctions get new Tier-2 wrappers without modifying existing",
-            "PECS": "PASS — wrapper is `Action<F extends EditFunction<any, any>>` — F is producer-extends"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/primitives/action-type.ts (tier-2) -> codegen -> commit_edits MCP handler slow path -> apply_edit_function (LOGIC) + AtomicCommit (ACTION) -> edit_committed event",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "edit_committed event -> replay_lineage -> which function produced which edits -> both function and wrapper refinement",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-action-03",
-          "name": "AtomicCommit",
-          "dc506Primitive": "ActionType",
-          "domain": "ACTION",
-          "description": "The actual mutation: writes edits to ontology state AND appends edit_committed event to events.jsonl in a single atomic operation. Uses proper-lockfile (or zero-dep fs.mkdir fallback) for mutual exclusion.",
-          "semanticHeuristic": "SH-03 + SH-01: AtomicCommit literally changes reality. Classification: ACTION.",
-          "atomicityMechanism": "Per blueprint.md Gap fill 3 lines 388-394: proper-lockfile primary, fs.mkdir zero-dep fallback. mkdir is atomic on all filesystems — EEXIST on race. Exponential backoff retry loop.",
-          "source": "decision-log RQ-01 + blueprint.md Gap fill 3",
-          "evidenceIds": ["clm-t2-properlockfile", "clm-t2-mkdir-atomic"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS — one commit primitive serves Tier-1 fast path and Tier-2 slow path",
-            "OCP": "PASS",
-            "PECS": "N/A — pure side-effect function"
-          },
-          "forwardPropPath": {
-            "chain": "commit_edits MCP handler -> AtomicCommit -> write ontology state + append events.jsonl with lockfile mutex",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "events.jsonl -> replay_lineage -> verify atomicity invariants (no torn writes, sequence monotonic)",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-action-04",
-          "name": "ActionExecutorAgent (callable)",
-          "dc506Primitive": "ActionType (human-in-the-loop wrapper)",
-          "domain": "ACTION",
-          "description": "Plugin subagent with Write/Edit/Bash allowlist. The ONLY palantir-mini agent permitted to commit. All other agents (edit-function, architect, verifier) have disallowedTools covering Write/Edit. Per OMC architect.md pattern + Correction 1 (plugin agents cannot define hooks).",
-          "semanticHeuristic": "SH-01: this agent exists specifically to CHANGE reality via wrapped action execution. Classification: ACTION.",
-          "nativeRuntimeMechanism": "agents/action-executor.md frontmatter: tools: [Read, Grep, Glob, Bash, Write, Edit]. Other agents: disallowedTools: [Write, Edit]. Runtime physically blocks non-executor agents from committing.",
-          "source": "decision-log RQ-02 successCriteria + blueprint.md Correction 1",
-          "evidenceIds": ["clm-t3-pluginagents-restriction", "clm-t3-omc-architect"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS — one executor agent serves all commit kinds; no per-type executor",
-            "OCP": "PASS — new action types added without modifying executor",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "plugin agents/action-executor.md -> action-executor agent invocation -> calls commit_edits MCP -> AtomicCommit",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "edit_committed event (byWhom.agentName='action-executor') -> replay_lineage -> verify only action-executor committed",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-action-05",
-          "name": "CodegenRun",
-          "dc506Primitive": "ActionType",
-          "domain": "ACTION",
-          "description": "Descender regeneration action: triggered by PostToolUse(Edit schemas/ontology/*) hook. Reads ontology declarations, writes src/generated/* per project, appends codegen_started + codegen_completed events.",
-          "semanticHeuristic": "SH-01: generates files on disk. CHANGES reality. Classification: ACTION.",
-          "source": "decision-log RQ-03 + blueprint.md lines 85-88",
-          "evidenceIds": ["clm-t2-codegen", "clm-t3-osdk2"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS — single codegen entrypoint, not per-primitive",
-            "OCP": "PASS — new primitive types add to codegen via new template, not modification",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/ -> PostToolUse hook -> CodegenRun -> src/generated/* + codegen_completed event",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "codegen_completed event (with generatedFiles list) -> replay_lineage -> stale codegen detection -> regen trigger",
-            "healthStatus": "healthy"
-          }
-        }
-      ],
-      "claimIds": [
-        "clm-t2-mu09",
-        "clm-t2-actionmu",
-        "clm-t2-fn04",
-        "clm-t2-properlockfile",
-        "clm-t2-mkdir-atomic",
-        "clm-t2-codegen",
-        "clm-t3-omc-architect",
-        "clm-t3-osdk2",
-        "clm-t3-pluginagents-restriction"
-      ],
-      "ontologyObjects": [
-        "Tier-1 Declarative Action",
-        "Tier-2 Function-Backed Action",
-        "AtomicCommit",
-        "ActionExecutorAgent",
-        "CodegenRun"
-      ]
-    },
-
-    "security": {
-      "name": "Security Domain (Who Governs Access)",
-      "semanticHeuristic": "SH-04: Does this govern WHO can do something, or UNDER WHAT CONDITIONS an action is permitted? -> SECURITY.",
-      "note": "palantir-mini v0 SECURITY is aggressively scoped. Layer-1 RBAC only — Markings, ObjectSecurity, PermissionsCascade deferred to future phase. v0 SECURITY rides on Native Runtime mechanics (disallowedTools, managed-settings.d/, ${CLAUDE_PLUGIN_DATA}) rather than bespoke runtime code.",
-      "primitives": [
-        {
-          "id": "prim-sec-01",
-          "name": "Layer-1 RBAC Policy",
-          "dc506Primitive": "Permission / Role",
-          "domain": "SECURITY",
-          "description": "Per-project managed-settings.d/50-palantir-mini.json fragment declares permission allowlists (which tools, which paths, which MCP servers). Layer 1 only — no object-level markings, no cascading, no dynamic role escalation. Scoped to cross-project need.",
-          "semanticHeuristic": "SH-04: governs WHICH TOOLS AND PATHS an agent may touch. Classification: SECURITY.",
-          "v0Scope": "Only Layer 1. Markings/ObjectSecurity/PermissionsCascade explicitly deferred per decision-log projectOntologyScope.SECURITY.primitives (listed as 'Layer 1 RBAC, CapabilityToken, PermissionsCascade' — ontologist narrows to Layer-1 RBAC + CapabilityToken for v0, defers PermissionsCascade).",
-          "source": "decision-log SECURITY domain + blueprint.md lines 127-128",
-          "evidenceIds": ["clm-t2-managedsettings", "clm-t3-cc-plugins"],
-          "designPrinciples": {
-            "DDD": "PASS — RBAC matches common security vocabulary",
-            "DRY": "PASS — one fragment schema used across all 3 projects",
-            "OCP": "PASS — new permissions added via new fragment entries",
-            "PECS": "N/A — policy declarations, not generic types"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/policies/rbac.ts -> codegen -> managed-settings.d/50-palantir-mini.json per project -> Claude Code runtime enforces on every tool call",
-            "healthStatus": "healthy",
-            "evidenceIds": ["clm-t3-cc-plugins"]
-          },
-          "backwardPropPath": {
-            "chain": "permission denial in runtime -> hook observation -> policy_denied event (NEW variant — consider adding to EventEnvelope union) -> refinement",
-            "healthStatus": "partial",
-            "gaps": ["policy_denied event variant not yet in 10-variant union; needs addition if Layer-1 RBAC is to participate in LEARN backward propagation"]
-          }
-        },
-        {
-          "id": "prim-sec-02",
-          "name": "SubmissionCriteria (gate semantics)",
-          "dc506Primitive": "Approval Chain",
-          "domain": "SECURITY",
-          "description": "Pre-flight gate that blocks commits unless business-logic conditions pass. This is the SECURITY dual of prim-logic-07 (computational). LOGIC evaluates pass/fail; SECURITY is the gate that USES the evaluation to permit or deny the commit. Intentional dual modeling per DC5 DDD.",
-          "semanticHeuristic": "SH-04: 'under what conditions an action is permitted' -> SECURITY. The evaluator is LOGIC (it computes). The gate is SECURITY (it governs).",
-          "dualModelingRationale": "DC5 DDD: the same real-world concept can have different semantic homes depending on which slice you name. The computation goes in LOGIC so it can be tested/replayed without commit. The gate semantics goes in SECURITY so policy review can target it directly without digging through function bodies. See ontologist.md line 222: 'Do NOT collapse SECURITY and LEARN concepts into D/L/A.'",
-          "source": "decision-log RQ-06 + blueprint.md line 56",
-          "evidenceIds": ["clm-t2-submissioncriteria"],
-          "designPrinciples": {
-            "DDD": "PASS — 'submission criteria' matches Palantir ACTION.MU-14 vocabulary",
-            "DRY": "PARTIAL — intentional duality with prim-logic-07 is duplicate surface area but single truth source (computation lives once)",
-            "OCP": "PASS — new gate types added without modifying existing",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "schemas/ontology/policies/submission-criteria.ts -> codegen -> commit_edits MCP gate -> evaluator invocation (LOGIC) -> pass|fail -> commit | submission_criteria_failed event",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "submission_criteria_failed event -> replay_lineage filter by failedConstraints -> gate refinement",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-sec-03",
-          "name": "CapabilityToken (vault pattern)",
-          "dc506Primitive": "Permission / Role",
-          "domain": "SECURITY",
-          "description": "Secrets (API keys, signing keys, tokens) live in ${CLAUDE_PLUGIN_DATA}/vault/ — which SURVIVES plugin updates — and are referenced by capability token, never embedded in generated code. Mirrors Anthropic Managed Agents 'Vault proxy' pattern.",
-          "semanticHeuristic": "SH-04: governs WHO holds credentials and under what conditions -> SECURITY.",
-          "nativeRuntimeMechanism": "${CLAUDE_PLUGIN_DATA} env var per blueprint.md line 314 — this path survives plugin updates (unlike ${CLAUDE_PLUGIN_ROOT}). Codegen never emits secret values; it emits capability token references that runtime resolves through vault.",
-          "source": "decision-log SECURITY domain + blueprint.md lines 41-42 + 313-316",
-          "evidenceIds": ["clm-t2-vault", "clm-t3-managedagents-vault", "clm-t3-cc-plugins"],
-          "designPrinciples": {
-            "DDD": "PASS — 'capability token' + 'vault' match Anthropic Managed Agents + Palantir SECURITY vocabulary",
-            "DRY": "PASS — single vault per plugin install, referenced by ID",
-            "OCP": "PASS — new capability types added via new vault entries",
-            "PECS": "N/A"
-          },
-          "forwardPropPath": {
-            "chain": "${CLAUDE_PLUGIN_DATA}/vault/*.json -> MCP handler reads capability via token -> never embedded in generated code",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "vault access -> audit log (capability_accessed event — NEW variant needed) -> refinement",
-            "healthStatus": "partial",
-            "gaps": ["capability_accessed event variant not yet in 10-variant union; v0 defers to post-prototype phase"]
-          }
-        }
-      ],
-      "claimIds": [
-        "clm-t2-managedsettings",
-        "clm-t2-submissioncriteria",
-        "clm-t2-vault",
-        "clm-t3-cc-plugins",
-        "clm-t3-managedagents-vault"
-      ],
-      "ontologyObjects": [
-        "Layer-1 RBAC Policy",
-        "SubmissionCriteria (gate semantics)",
-        "CapabilityToken",
-        "Vault"
-      ]
-    },
-
-    "learn": {
-      "name": "Learn Domain (What Feedback Is Recorded)",
-      "semanticHeuristic": "SH-05: Does this capture WHAT HAPPENED, WHY, and WHAT WAS LEARNED from it? -> LEARN.",
-      "centralRole": "LEARN is the foundational domain for palantir-mini. Everything else writes to events.jsonl. BackwardPropagation literally IS the LEARN domain being read and fed back to schemas/ontology/.",
-      "primitives": [
-        {
-          "id": "prim-learn-01",
-          "name": "AppendOnlyEventLog (events.jsonl)",
-          "dc506Primitive": "Audit Record",
-          "domain": "LEARN",
-          "description": "Per-project <project>/.palantir-mini/session/events.jsonl. Append-only. Immutable lines. Each line is a serialized EventEnvelope (prim-data-01). This IS the Anthropic Managed Agents 'Session' primitive, scoped per-project.",
-          "semanticHeuristic": "SH-05: events.jsonl IS the record of what happened, why, and what was learned. Classification: LEARN.",
-          "threeSourceConvergence": "Independent convergence on the append-only event log from 3 references: (1) Anthropic Managed Agents engineering article 'Session = append-only log of everything that happened', (2) Palantir Decision Lineage 5-dim, (3) OMC clawhip 'event routing to prevent context pollution' (760 stars, sister project of 28.9k-star OMC). Strongest external validation available without API.",
-          "source": "decision-log RQ-01 + decision-log hypothesisProvisional + blueprint.md Gap fill 1/3",
-          "evidenceIds": ["clm-t2-eventenvelope", "clm-t3-managedagents-session", "clm-t3-clawhip"],
-          "designPrinciples": {
-            "DDD": "PASS — 'append-only event log' matches Anthropic + Palantir + OMC vocabulary",
-            "DRY": "PASS — single log per project serves as truth for ALL state (ontology, lineage, validation, codegen, phase gates)",
-            "OCP": "PASS — new event variants extend the discriminated union (see EventEnvelope OCP)",
-            "PECS": "PASS — emit_event (producer) extends, replay_lineage (consumer) uses super via exhaustive visitor"
-          },
-          "forwardPropPath": {
-            "chain": "MCP emit_event handler -> proper-lockfile mutex -> append to events.jsonl -> fsync",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "events.jsonl -> replay_lineage MCP handler -> 5-dim lineage graph -> drift_detected if ontology divergence -> ontology refinement proposal -> ontologist review -> schemas/ontology/ update",
-            "healthStatus": "healthy",
-            "evidenceIds": ["clm-t3-managedagents-session"]
-          }
-        },
-        {
-          "id": "prim-learn-02",
-          "name": "DecisionLineage5Dim",
-          "dc506Primitive": "Audit Record",
-          "domain": "LEARN",
-          "description": "Palantir Decision Lineage 5 dimensions: WHEN, ATOP_WHICH, THROUGH_WHICH, BY_WHOM, WITH_WHAT. Captured on every EventEnvelope via EventEnvelopeBase. Enables root-cause analysis of ontology changes.",
-          "semanticHeuristic": "SH-05: captures WHY and BY_WHOM — the lineage IS the learning record. Classification: LEARN.",
-          "source": "decision-log LEARN domain evidence path",
-          "evidenceIds": ["clm-t2-decisionlineage", "clm-t2-eventenvelope"],
-          "designPrinciples": {
-            "DDD": "PASS — all 5 dimension names from Palantir",
-            "DRY": "PASS — captured once in EventEnvelopeBase, inherited by all 10 variants",
-            "OCP": "PASS — new lineage dimensions (e.g. FOR_WHAT, UPON_WHAT) can be added to base without breaking variants",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "hook observes tool call -> captures 5 dims -> populates EventEnvelopeBase -> events.jsonl",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "replay_lineage(filter: {byWhom, atopWhich}) -> filtered event stream -> targeted refinement queries",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-learn-03",
-          "name": "EvidenceSufficiency",
-          "dc506Primitive": "Evaluation",
-          "domain": "LEARN",
-          "description": "Meta-evaluation of whether a claim or scenario has sufficient evidence. Per docs/ontology-mapping-rules.md line 133: sufficient | partial | insufficient. Used by evaluator R9 gate.",
-          "semanticHeuristic": "SH-05: measures the QUALITY of accumulated knowledge. Classification: LEARN.",
-          "source": "decision-log LEARN domain + ontology-mapping-rules.md line 133",
-          "evidenceIds": ["clm-int-evidencesuff"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS",
-            "OCP": "PASS",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "claim/scenario -> evaluator computes EvidenceSufficiency -> gate R9",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "low EvidenceSufficiency -> researcher spawn for more evidence -> re-evaluation",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-learn-04",
-          "name": "LineageReplay",
-          "dc506Primitive": "Function (replays events)",
-          "domain": "LEARN",
-          "description": "Deterministic replay of events.jsonl filtered by 5-dim lineage. Given a filter (e.g. 'all events byWhom.agentName=ontologist in the last 24h'), returns the ordered event stream. Foundation for backward propagation: lineage query -> pattern detection -> refinement.",
-          "semanticHeuristic": "SH-05: LineageReplay EXISTS to surface what was learned from past events. Classification: LEARN. NOTE: it is also a pure computation (no side effects) so it could classify as LOGIC. Ontologist rules: LEARN wins because the PURPOSE is learning, not reasoning.",
-          "classificationTiebreaker": "SH-01 + SH-05: LineageReplay returns event streams (not Edits[]) so it is not ACTION. It computes (not commits) so it is not ACTION. It could be LOGIC (computation) or LEARN (audit surface). Ontologist rule: when a computation's SOLE PURPOSE is to surface audit trails for refinement, LEARN wins. This is consistent with ontologist.md line 36 which reserves LEARN for 'feedback, outcomes, refinement recording'.",
-          "source": "decision-log RQ-04 replay_lineage MCP tool + blueprint.md Gap fill 2 line 386",
-          "evidenceIds": ["clm-t2-replaylineage", "clm-t2-eventenvelope"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS — one replay primitive serves all backward propagation queries",
-            "OCP": "PASS — new filter types added without modifying core replay",
-            "PECS": "PASS — Replay<Filter, Event> is PECS-clean"
-          },
-          "forwardPropPath": {
-            "chain": "MCP replay_lineage handler -> reads events.jsonl -> returns filtered stream to caller (agent or skill)",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "replay output -> pattern detector (future agent) -> drift_detected / refinement proposal -> ontology update",
-            "healthStatus": "healthy"
-          }
-        },
-        {
-          "id": "prim-learn-05",
-          "name": "DriftSignal",
-          "dc506Primitive": "Evaluation",
-          "domain": "LEARN",
-          "description": "drift_detected EventEnvelope variant: schema_mismatch | stale_codegen | orphan_reference. Surfaces when runtime usage diverges from ontology declarations.",
-          "semanticHeuristic": "SH-05: drift IS the learning signal — 'ontology said X, runtime did Y, delta is what needs refinement.' Classification: LEARN.",
-          "source": "blueprint.md Gap fill 1 line 373",
-          "evidenceIds": ["clm-t2-eventenvelope"],
-          "designPrinciples": {
-            "DDD": "PASS",
-            "DRY": "PASS",
-            "OCP": "PASS — new drift types added to the union without modifying existing",
-            "PECS": "PASS"
-          },
-          "forwardPropPath": {
-            "chain": "drift-watch monitor -> detects divergence -> emit drift_detected event -> events.jsonl",
-            "healthStatus": "healthy"
-          },
-          "backwardPropPath": {
-            "chain": "drift_detected -> replay_lineage filter by driftType -> root cause -> ontology refinement",
-            "healthStatus": "healthy"
-          }
-        }
-      ],
-      "claimIds": [
-        "clm-t2-eventenvelope",
-        "clm-t2-decisionlineage",
-        "clm-t2-replaylineage",
-        "clm-t3-managedagents-session",
-        "clm-t3-clawhip",
-        "clm-int-evidencesuff"
-      ],
-      "ontologyObjects": [
-        "AppendOnlyEventLog (events.jsonl)",
-        "DecisionLineage5Dim",
-        "EvidenceSufficiency",
-        "LineageReplay",
-        "DriftSignal"
-      ]
-    }
-  },
-
-  "propagationPaths": {
-    "forwardProp": {
-      "name": "ForwardProp: ontology declaration -> runtime artifact",
-      "steps": [
-        {
-          "step": 1,
-          "layer": "ontology declarations",
-          "location": "~/.claude/schemas/ontology/{primitives,functions,policies,lineage,generators}/",
-          "artifactType": "TypeScript source files with branded RIDs",
-          "devCon5Principle": "DDD — matches Palantir OSDK 2.0 vocabulary; DRY — single schema shared across 3 projects",
-          "evidenceIds": ["clm-t2-ontology-types", "clm-t3-osdk2"]
-        },
-        {
-          "step": 2,
-          "layer": "palantir-mini codegen",
-          "location": "~/.claude/plugins/palantir-mini/lib/codegen/ (descender-gen.ts, client-generated-split.ts)",
-          "artifactType": "generator program that reads step-1 declarations",
-          "devCon5Principle": "OCP — adding primitives adds templates, never modifies existing generators",
-          "evidenceIds": ["clm-t2-codegen"]
-        },
-        {
-          "step": 3,
-          "layer": "per-project generated code",
-          "location": "<project>/src/generated/ (kosmos, palantir-math, mathcrew)",
-          "artifactType": "TypeScript descender files — objects/*.ts, links/*.ts, actions/*.ts, functions/*.ts, events.d.ts",
-          "devCon5Principle": "OSDK 2.0 client/generated split — generated code is never hand-edited; consumers import from client layer",
-          "evidenceIds": ["clm-t3-osdk2"]
-        },
-        {
-          "step": 4,
-          "layer": "project runtime",
-          "location": "<project>/ runtime TypeScript that imports src/generated/",
-          "artifactType": "strongly typed consumers (edit functions, action executors, UI surfaces)",
-          "devCon5Principle": "PECS — consumers use supertypes, producers extend",
-          "evidenceIds": ["clm-t2-fn04"]
-        },
-        {
-          "step": 5,
-          "layer": "events.jsonl append",
-          "location": "<project>/.palantir-mini/session/events.jsonl",
-          "artifactType": "one JSONL line per mutation — edit_committed / submission_criteria_failed / drift_detected / etc.",
-          "devCon5Principle": "DRY — single append path for all state changes",
-          "evidenceIds": ["clm-t2-eventenvelope"]
-        },
-        {
-          "step": 6,
-          "layer": "derived snapshot",
-          "location": "<project>/.palantir-mini/session/snapshots/{ontology,lineage,manifest}.json",
-          "artifactType": "cached fold of events.jsonl via Reducer primitive",
-          "devCon5Principle": "snapshot is cache — events.jsonl is truth",
-          "evidenceIds": ["clm-t2-snapshot-pattern"]
-        }
-      ],
-      "healthStatus": "healthy",
-      "evidenceIds": [
-        "clm-t2-ontology-types",
-        "clm-t2-codegen",
-        "clm-t2-fn04",
-        "clm-t2-eventenvelope",
-        "clm-t2-snapshot-pattern",
-        "clm-t3-osdk2"
-      ],
-      "gaps": []
-    },
-    "backwardProp": {
-      "name": "BackwardProp: runtime events -> ontology refinement",
-      "steps": [
-        {
-          "step": 1,
-          "layer": "runtime events",
-          "location": "<project>/.palantir-mini/session/events.jsonl",
-          "artifactType": "append-only event log capturing all 5 lineage dimensions per envelope",
-          "devCon5Principle": "DDD — Decision Lineage 5-dim matches Palantir naming exactly",
-          "evidenceIds": ["clm-t2-eventenvelope", "clm-t2-decisionlineage"]
-        },
-        {
-          "step": 2,
-          "layer": "replay_lineage MCP tool",
-          "location": "~/.claude/plugins/palantir-mini/bridge/handlers/replay-lineage.ts",
-          "artifactType": "MCP handler that reads events.jsonl filtered by 5-dim query",
-          "devCon5Principle": "DRY — single replay primitive serves all backward queries",
-          "evidenceIds": ["clm-t2-replaylineage"]
-        },
-        {
-          "step": 3,
-          "layer": "decision lineage graph",
-          "location": "in-memory materialization from replay output",
-          "artifactType": "5-dim graph (WHEN, ATOP_WHICH, THROUGH_WHICH, BY_WHOM, WITH_WHAT)",
-          "devCon5Principle": "DDD",
-          "evidenceIds": ["clm-t2-decisionlineage"]
-        },
-        {
-          "step": 4,
-          "layer": "ontology refinement proposal",
-          "location": "ontologist agent inbox (not yet persistent — v0 uses SendMessage + decision-log append)",
-          "artifactType": "natural-language proposal citing specific events + 5-dim filters",
-          "devCon5Principle": "PECS — proposal consumers use supertype; refinements extend",
-          "evidenceIds": ["clm-t3-managedagents-session"]
-        },
-        {
-          "step": 5,
-          "layer": "ontologist review",
-          "location": "ontologist agent",
-          "artifactType": "accept | reject | revise decision logged as entry in decision-log.json",
-          "devCon5Principle": "human-in-the-loop governance",
-          "evidenceIds": []
-        },
-        {
-          "step": 6,
-          "layer": "ontology declaration update",
-          "location": "~/.claude/schemas/ontology/ (back to Step 1 of ForwardProp)",
-          "artifactType": "git commit updating schemas; triggers full ForwardProp cycle",
-          "devCon5Principle": "closed loop — BackwardProp terminates at the start of ForwardProp, completing the cycle",
-          "evidenceIds": []
-        }
-      ],
-      "healthStatus": "healthy",
-      "evidenceIds": [
-        "clm-t2-eventenvelope",
-        "clm-t2-decisionlineage",
-        "clm-t2-replaylineage",
-        "clm-t3-managedagents-session"
-      ],
-      "gaps": [
-        "Step 4 (refinement proposal persistence) is non-durable in v0 — lives only in SendMessage + decision-log append. Pipeline should decide whether proposals merit their own state file or if events.jsonl (with a new refinement_proposed variant) suffices.",
-        "Step 5 (ontologist review decision artifact) should itself be a LEARN-domain event. Consider adding review_decision variant to EventEnvelope union in post-prototype phase."
-      ]
-    }
-  },
-
-  "devCon5PrinciplesSummary": {
-    "DDD": {
-      "applied": true,
-      "findings": "All primitive names match Palantir / Anthropic Managed Agents / OSDK 2.0 domain vocabulary exactly. 'EditFunction', 'SubmissionCriteria', 'EventEnvelope', 'DecisionLineage', 'ObjectTypeRid', 'Tier-1/Tier-2 Action' — zero translation required. The cross-project scope (kosmos/palantir-math/mathcrew) forces shared vocabulary by construction."
-    },
-    "DRY": {
-      "applied": true,
-      "findings": "Single ontology declaration in ~/.claude/schemas/ontology/ feeds codegen for all 3 projects — no duplication. Single EventEnvelope discriminated union hosts 10 event types without per-type envelope boilerplate. Single AtomicCommit primitive serves Tier-1 fast path and Tier-2 slow path. One replay_lineage MCP handler serves all backward propagation queries."
-    },
-    "OCP": {
-      "applied": true,
-      "findings": "Discriminated unions enable Open/Closed extension: new EventEnvelope variants add cases, never modify existing. New ObjectTypes/LinkTypes/ActionTypes added as new declarations. New validation phase evaluators added without modifying existing. Codegen templates extended, never mutated."
-    },
-    "PECS": {
-      "applied": true,
-      "findings": "Producer Extends, Consumer Super applied at every generic boundary: EditFunction<Params, Edits extends OntologyEdit[]> (Edits is producer-extends), Reducer<In, Out> (In is consumer-super), Replay<Filter, Event> (Filter is consumer-super), Action<F extends EditFunction<any,any>> (F is producer-extends). Exhaustive visitor pattern on EventEnvelope type tag replaces switch statements per OSDK 2.0 convention."
-    }
-  },
-
-  "gapsResolved": [
-    {
-      "gapId": "gap-01",
-      "gap": "StaleObject optimistic concurrency in append-only model — does sequence number in EventEnvelope base work as version vector?",
-      "resolution": "YES. EventEnvelopeBase.sequence is a monotonic counter per project events.jsonl. On append, the plugin reads the tail of events.jsonl (under proper-lockfile mutex), verifies sequence = lastSequence + 1, then appends. A concurrent writer that holds a stale lastSequence will fail the check and retry with the current tail. This is functionally equivalent to Palantir StaleObject optimistic concurrency: the 'version' is the last observed sequence; a conflict is a mismatched sequence at append time. Zero-dep fs.mkdir lockfile provides the mutual exclusion, so the check-and-append is atomic.",
-      "evidenceIds": ["clm-t2-eventenvelope", "clm-t2-properlockfile", "clm-t2-mkdir-atomic"],
-      "forwardPropImpact": "codegen must emit the sequence-check wrapper in commit_edits MCP handler; this is a generator obligation, not hand-written runtime",
-      "backwardPropImpact": "sequence gaps in events.jsonl are themselves a drift_detected signal — indicates write failures or external tampering"
-    },
-    {
-      "gapId": "gap-02",
-      "gap": "Edit function rollback via compensating events (append-only means no delete)",
-      "resolution": "Resolved via compensating events. Append-only means you never DELETE a committed event; you APPEND a compensating inverse event. Pattern: if edit_committed event E1 added Spacekid obj-123 with name='Alice', rollback emits a new edit_committed event E2 whose appliedEdits contains Edits.Object.delete(obj-123). The snapshot reducer folds both events and arrives at 'obj-123 does not exist.' This is the same model Palantir OSDK 2.0 uses for Action revert. The sequence counter continues monotonically; no time travel.",
-      "evidenceIds": ["clm-t2-eventenvelope", "clm-t3-osdk2"],
-      "forwardPropImpact": "codegen emits an invert(Edits[]) -> Edits[] helper for every ActionType; this is a reducer-level obligation",
-      "backwardPropImpact": "replay_lineage can trace (E1, E2) pairs via shared metadata in withWhat.reasoning='rollback_of:E1' — enables root-cause analysis of rollback patterns"
-    },
-    {
-      "gapId": "gap-03",
-      "gap": "Multi-writer cross-project coordination for ~/.claude/schemas/ontology/",
-      "resolution": "Per blueprint.md decision-log constraint 'Claude primary writer, Codex/Gemini consume schemas/ontology/ as readers via filesystem,' there is only ONE writer runtime (Claude Code). Codex and Gemini are READ-ONLY consumers via filesystem. This sidesteps multi-writer coordination entirely. If Claude Code runs in parallel sessions against the same schemas/, the per-project events.jsonl lockfile + sequence check (gap-01) handles that layer; the schemas/ directory itself is under normal git, so parallel Claude Code sessions coordinate via git branches like any TypeScript project. NO NEW MECHANISM NEEDED for v0.",
-      "evidenceIds": ["clm-t1-constraint-boundary"],
-      "forwardPropImpact": "no codegen obligation; git handles it",
-      "backwardPropImpact": "n/a"
-    },
-    {
-      "gapId": "gap-04",
-      "gap": "Concrete EventEnvelope TypeScript schema (from source-map.json gapsFilledConcrete)",
-      "resolution": "Fully resolved by blueprint.md Gap fill 1 (lines 321-376). 10-variant discriminated union with EventEnvelopeBase holding 5-dim lineage + sequence counter. All 5 domains touch EventEnvelope: DATA owns the type, LOGIC computes payload via EditFunction, ACTION triggers append via AtomicCommit, SECURITY governs who may emit via agent allowlists, LEARN reads via replay_lineage. One primitive, five-domain touchpoint.",
-      "evidenceIds": ["clm-t2-eventenvelope"],
-      "forwardPropImpact": "primary schema artifact for codegen",
-      "backwardPropImpact": "primary read target for replay"
-    }
-  ],
-
-  "gapsDeferred": [
-    {
-      "gapId": "gap-05",
-      "gap": "Semantic vs Kinetic 2-layer terminology — where do LOGIC functions fit?",
-      "rationale": "Flagged in blueprint.md open questions line 470. Not required for v0 ontology. Ontologist position: in palantir-mini terms, 'semantic' = DATA primitives (ObjectType, PropertyType), 'kinetic' = ACTION primitives (Tier-1/Tier-2/AtomicCommit). LOGIC sits BETWEEN — it is the reasoning layer that connects semantic to kinetic. This is consistent with ontologist.md transition zone rule. Full Palantir terminology harmonization deferred to post-prototype phase.",
-      "deferredTo": "post-v0 phase",
-      "blocksCurrentPipeline": false
-    },
-    {
-      "gapId": "gap-06",
-      "gap": "Workflow Lineage vs Decision Lineage relationship",
-      "rationale": "Flagged in blueprint.md open question line 476. Both are official Palantir products. For v0 palantir-mini ontology we model Decision Lineage 5-dim only (per DecisionLineage5Dim primitive). Workflow Lineage is a Foundry-scale concept not mapped to events.jsonl yet. Simulator should consider if the 11-dim scenario matrix needs a WorkflowLineage dimension.",
-      "deferredTo": "simulator (T5+T6) and post-prototype phase",
-      "blocksCurrentPipeline": false
-    }
-  ],
-
-  "conflicts_detected": [
-    {
-      "conflictId": "conflict-01",
-      "description": "decision-log.json lists InterfaceType and LinkType under BackendOntology.DATA.primitives, but ontologist.md Transition Zone rule (line 68) classifies them as LOGIC.",
-      "resolution": "Reclassified to LOGIC per ontologist authority. decision-log listing is tolerated as 'scope membership' not 'semantic home'. Documented in prim-logic-02 and prim-logic-03 classificationNote fields. No change to decision-log.json required — it documents scope, world-model.json documents semantic classification.",
-      "severity": "LOW (scope vs semantic home distinction)"
-    },
-    {
-      "conflictId": "conflict-02",
-      "description": "SubmissionCriteria is modeled in BOTH LOGIC (prim-logic-07) and SECURITY (prim-sec-02) domains.",
-      "resolution": "Intentional dual modeling per DC5 DDD. The COMPUTATION is LOGIC (evaluates constraint classes, returns pass/fail — no side effects). The GATE SEMANTICS is SECURITY (policy that governs whether a commit is permitted). Both point at the same runtime evaluator; the duality lives at the classification layer. Documented in prim-sec-02.dualModelingRationale.",
-      "severity": "N/A — not a conflict, intentional design"
-    }
-  ],
-
-  "contradictionsFromSourceMap": [
-    {
-      "note": "The task briefing indicates source-map.json contains 6 contradictions including one HIGH severity. The on-disk source-map.json (Apr 12, photonicRealism session) does not contain the palantir-mini research output — those corrections are captured in palantir-mini-blueprint.md 'Research corrections' section (lines 271-306).",
-      "highSeverityContradiction": "Plugin agents CANNOT define hooks/mcpServers/permissionMode (blueprint.md Correction 1, HIGH severity). Resolution: all hooks live at plugin level hooks/hooks.json. Agents declare tool allowlists + disallowedTools only. Hooks use matchers to target specific agents. This is enforced in the ACTION domain via prim-action-04 (ActionExecutorAgent) — all hook logic goes in plugin level, agents only own their tool surface.",
-      "mediumSeverityContradiction_1": "PreToolUse uses hookSpecificOutput, not top-level decision (blueprint.md Correction 2). Resolution: documented in prim-logic-08 ValidationPhaseEvaluator mapping — phase-to-hook mapping must use hookSpecificOutput.permissionDecision for PreToolUse, top-level decision for PostToolUse/Stop/etc.",
-      "mediumSeverityContradiction_2": "Plugin file locations standardized (blueprint.md Correction 3). Resolution: monitors live in monitors/monitors.json (separate file), not in plugin.json. No ontology impact; architecture detail only."
-    }
-  ],
-
-  "referentialIntegrity": {
-    "allPrimitivesHaveEvidenceIds": true,
-    "allPrimitivesHaveForwardPropPath": true,
-    "allPrimitivesHaveBackwardPropPath": true,
-    "allPrimitivesHaveDevCon5PrinciplesCheck": true,
-    "allPrimitivesHaveSemanticHeuristicCited": true,
-    "transitionZoneAudit": "LinkType, InterfaceType, DerivedProperty, Reducer all verified as LOGIC (not DATA) per ontologist.md line 68-73."
-  },
-
-  "phaseGates": {
-    "T1": {
-      "completed": true,
-      "completedAt": "2026-04-15T15:00:00Z",
-      "outputArtifacts": ["ontology-state/decision-log.json"]
-    },
-    "T2": {
-      "completed": true,
-      "completedAt": "2026-04-15T15:30:00Z",
-      "outputArtifacts": [
-        "updated ~/.claude/research/claude-code/palantir-mini-blueprint.md (Research corrections + Gap fills)",
-        "ontology-state/source-map.json (note: stale on-disk content from photonicRealism session — T2 corrections persisted to blueprint.md instead)"
-      ],
-      "note": "T2 output primarily captured in blueprint.md (authoritative) rather than a fresh source-map.json. This was the researcher's persistence choice; ontologist works from both documents."
-    },
-    "T3": {
-      "completed": true,
-      "completedAt": "2026-04-15T15:45:00Z",
-      "outputArtifacts": [
-        "updated palantir-mini-blueprint.md with Anthropic Managed Agents + OSDK 2.0 + OMC evidence",
-        "6 contradictions identified, 1 HIGH severity, 5 gaps filled concretely"
-      ]
-    },
-    "T4": {
-      "completed": true,
-      "completedAt": "2026-04-15T16:00:00Z",
-      "owner": "ontologist",
-      "outputArtifacts": ["ontology-state/world-model.json"],
-      "validations": [
-        "All 5 domains populated (DATA/LOGIC/ACTION/SECURITY/LEARN) — first kosmos session to touch all 5",
-        "28 primitives classified (5 DATA, 8 LOGIC, 5 ACTION, 3 SECURITY, 5 LEARN = 26; plus intentional duals SubmissionCriteria LOGIC+SECURITY = 2 more surface entries = 28)",
-        "Every primitive cites at least one semanticHeuristic (SH-01 through SH-05)",
-        "Every primitive specifies a DC5-06 primitive",
-        "Every primitive has DDD/DRY/OCP/PECS checks applied",
-        "Every primitive has ForwardProp + BackwardProp paths documented",
-        "4 of 6 source-map gapsForOntologist RESOLVED (gap-01 through gap-04)",
-        "2 of 6 source-map gapsForOntologist DEFERRED with rationale (gap-05, gap-06)",
-        "Transition zone audit: LinkType/InterfaceType/DerivedProperty/Reducer verified as LOGIC",
-        "Intentional dual modeling for SubmissionCriteria (LOGIC computational + SECURITY gate) documented",
-        "ForwardProp path: 6 steps, healthStatus=healthy",
-        "BackwardProp path: 6 steps, healthStatus=healthy (2 minor gaps in persistence of refinement proposals)",
-        "Contradictions from source-map / blueprint.md Corrections reflected in classification choices"
-      ]
-    }
-  },
-
-  "nextAgent": {
-    "target": "simulator",
-    "task": "T5 (hypothesis generation) + T6 (simulation loop)",
-    "handoffSummary": "World model is READY. 28 primitives across all 5 domains. 2 primary hypotheses already seeded in decision-log.json: H-A (Append-only event log foundation) vs H-B (Snapshot-based StaleObject optimistic concurrency). Ontologist recommends simulator focus the 11-dim scenario matrix on these 3 cuts: (1) H-A vs H-B across base/best/worst/adversarial — adversarial is the highest-signal scenario because gap-01 resolution relies on sequence-check correctness; (2) 3-phase vs 6-phase validation pipeline trade-off; (3) Layer-1 RBAC adequacy vs v0 SECURITY deferral of Markings/PermissionsCascade. The transition zone reclassifications (LinkType/InterfaceType -> LOGIC) should NOT be re-debated; they are ontologist authority."
-  },
-
-  "objectsArrayNote": "Top-level objects[] array added by Lead (Ontologist wrote primitives under domains[].primitives[] — richer schema; objects[] is a flattened summary conforming to team-phase-gate.ts required fields: id, domain, ontologyType, evidenceIds). Full primitive details (DDD/DRY/OCP/PECS checks, ForwardProp/BackwardProp paths, semantic heuristics) remain in domains.{data,logic,action,security,learn}.primitives[]. This objects[] is the SUMMARY for hook validation — simulator/evaluator should consult domains.*.primitives[] for full data.",
+  "version": "1.0.0-rebuild-2026-04-17",
+  "lastUpdated": "2026-04-17T15:45:00Z",
+  "sessionId": "kosmos-rebuild-research-0dff144d",
+  "devConPhase": "1->2",
 
   "objects": [
-    {"id":"prim-data-01","name":"EventEnvelope","domain":"data","ontologyType":"Struct","evidenceIds":["clm-rq01-01","clm-rq01-02","clm-rq01-03"],"source":"domains.data.primitives[0]"},
-    {"id":"prim-data-02","name":"ObjectType","domain":"data","ontologyType":"ObjectType","evidenceIds":["clm-rq03-01","clm-rq03-02","clm-ext-13"],"source":"domains.data.primitives[1]"},
-    {"id":"prim-data-03","name":"PropertyType","domain":"data","ontologyType":"Struct","evidenceIds":["clm-rq03-01"],"source":"domains.data.primitives[2]"},
-    {"id":"prim-data-04","name":"SnapshotManifest","domain":"data","ontologyType":"Struct","evidenceIds":["clm-rq01-02"],"source":"domains.data.primitives[3]"},
-    {"id":"prim-data-05","name":"CommitSha","domain":"data","ontologyType":"Struct","evidenceIds":["clm-rq01-01"],"source":"domains.data.primitives[4]"},
-    {"id":"prim-logic-01","name":"EditFunction","domain":"logic","ontologyType":"Function","evidenceIds":["clm-rq02-02","clm-rq02-03","clm-ext-14","clm-ext-18","clm-ext-19"],"source":"domains.logic.primitives[0]"},
-    {"id":"prim-logic-02","name":"InterfaceType","domain":"logic","ontologyType":"Interface","evidenceIds":["clm-ext-13"],"source":"domains.logic.primitives[1]"},
-    {"id":"prim-logic-03","name":"LinkType","domain":"logic","ontologyType":"LinkType","evidenceIds":["clm-ext-13"],"source":"domains.logic.primitives[2]"},
-    {"id":"prim-logic-04","name":"DerivedProperty","domain":"logic","ontologyType":"DerivedProperty","evidenceIds":["clm-rq03-01"],"source":"domains.logic.primitives[3]"},
-    {"id":"prim-logic-05","name":"Reducer","domain":"logic","ontologyType":"Reducer","evidenceIds":["clm-rq03-01"],"source":"domains.logic.primitives[4]"},
-    {"id":"prim-logic-06","name":"LinkConstraint","domain":"logic","ontologyType":"Function","evidenceIds":["clm-rq03-01"],"source":"domains.logic.primitives[5]"},
-    {"id":"prim-logic-07","name":"SubmissionCriteriaComputational","domain":"logic","ontologyType":"Function","evidenceIds":["clm-rq02-04","clm-rq02-05"],"source":"domains.logic.primitives[6]","dualModeling":"Also appears as prim-sec-02 in SECURITY — intentional dual (LOGIC=computation, SECURITY=gate)"},
-    {"id":"prim-logic-08","name":"ValidationPhaseEvaluator","domain":"logic","ontologyType":"Function","evidenceIds":["clm-rq05-01","clm-rq05-02"],"source":"domains.logic.primitives[7]"},
-    {"id":"prim-action-01","name":"Tier1DeclarativeAction","domain":"action","ontologyType":"ActionType","evidenceIds":["clm-rq02-01"],"source":"domains.action.primitives[0]"},
-    {"id":"prim-action-02","name":"Tier2FunctionBackedAction","domain":"action","ontologyType":"ActionType","evidenceIds":["clm-rq02-01","clm-rq02-02","clm-ext-19"],"source":"domains.action.primitives[1]"},
-    {"id":"prim-action-03","name":"AtomicCommit","domain":"action","ontologyType":"ActionType","evidenceIds":["clm-ext-20","clm-rq02-04"],"source":"domains.action.primitives[2]"},
-    {"id":"prim-action-04","name":"ActionExecutorAgent","domain":"action","ontologyType":"ActionType","evidenceIds":["clm-ext-08","clm-rq02-06"],"source":"domains.action.primitives[3]","note":"Agent with Write/Edit allowlist; edit-function agents have disallowedTools per Correction 1"},
-    {"id":"prim-action-05","name":"CodegenRun","domain":"action","ontologyType":"ActionType","evidenceIds":["clm-rq03-01","clm-rq03-02"],"source":"domains.action.primitives[4]"},
-    {"id":"prim-sec-01","name":"Layer1RBACPolicy","domain":"security","ontologyType":"Permission","evidenceIds":["clm-ext-08","clm-ext-09"],"source":"domains.security.primitives[0]"},
-    {"id":"prim-sec-02","name":"SubmissionCriteriaGate","domain":"security","ontologyType":"ApprovalChain","evidenceIds":["clm-rq02-04","clm-rq02-05"],"source":"domains.security.primitives[1]","dualModeling":"Also prim-logic-07 — intentional dual (LOGIC=computation, SECURITY=gate)"},
-    {"id":"prim-sec-03","name":"CapabilityTokenVault","domain":"security","ontologyType":"Permission","evidenceIds":["clm-ext-09"],"source":"domains.security.primitives[2]"},
-    {"id":"prim-learn-01","name":"AppendOnlyEventLog","domain":"learn","ontologyType":"AuditRecord","evidenceIds":["clm-rq01-02","clm-rq01-03","clm-ext-20"],"source":"domains.learn.primitives[0]"},
-    {"id":"prim-learn-02","name":"DecisionLineage5Dim","domain":"learn","ontologyType":"AuditRecord","evidenceIds":["clm-rq01-01","clm-rq01-04"],"source":"domains.learn.primitives[1]"},
-    {"id":"prim-learn-03","name":"EvidenceSufficiency","domain":"learn","ontologyType":"Evaluation","evidenceIds":["clm-rq05-01"],"source":"domains.learn.primitives[2]"},
-    {"id":"prim-learn-04","name":"LineageReplay","domain":"learn","ontologyType":"Function","evidenceIds":["clm-rq01-04"],"source":"domains.learn.primitives[3]"},
-    {"id":"prim-learn-05","name":"DriftSignal","domain":"learn","ontologyType":"Evaluation","evidenceIds":["clm-rq05-01","clm-rq05-02"],"source":"domains.learn.primitives[4]"}
+    {
+      "id": "WMO-001",
+      "name": "ObjectType",
+      "domain": "DATA",
+      "ontologyType": "primitive",
+      "primitive": "ObjectType (DC5-06 default)",
+      "semanticHeuristic": "SH-02",
+      "provenance": "Official",
+      "evidenceIds": ["INT-001", "INT-005", "INT-016", "INT-017", "INT-026"],
+      "currency": "v0.2.1 present",
+      "classification": "present",
+      "sh02Result": "Delete LOGIC+ACTION → ObjectType still describes an entity that exists → DATA",
+      "designPrinciples": {
+        "DDD": "Named per business domain (CustomerOrder, TeachingBeat, OntologyPrimitive)",
+        "DRY": "Inherits PropertyType + SharedPropertyType to avoid property definition duplication",
+        "OCP": "Versioned via branded RID so extension never breaks existing consumers",
+        "PECS": "N/A — ObjectType is the base entity, not a generic container"
+      },
+      "forwardPropPath": "schemas/ontology/primitives/object-type.ts → home /ontology/ObjectType re-export → project ontology/*.ts declarations → src/contracts/*.ts → src/runtime/object-store.ts",
+      "backwardPropPath": "runtime object creation → emit_event(object_created) → events.jsonl → replay_lineage → schema drift detection → codegen regeneration"
+    },
+    {
+      "id": "WMO-002",
+      "name": "Struct",
+      "domain": "DATA",
+      "ontologyType": "primitive-missing",
+      "primitive": "Struct (DC5-06)",
+      "semanticHeuristic": "SH-02",
+      "provenance": "Official",
+      "evidenceIds": ["INT-004", "INT-001", "INT-026"],
+      "classification": "missing-for-v1",
+      "justification": "DC5-06 first-class primitive for nested composite fields (address, coordinate, measurement). Currently only interface StructType in types.ts — no primitives/struct.ts with registry + codegen contract.",
+      "breakingChange": false,
+      "sh02Result": "Delete LOGIC+ACTION → a coordinate or address struct still describes reality → DATA",
+      "designPrinciples": {
+        "DDD": "Named per value-object vocabulary (Coordinate, Address, Duration)",
+        "DRY": "Struct prevents duplication of nested field sets across ObjectTypes",
+        "OCP": "New Structs added without modifying existing ObjectTypes",
+        "PECS": "N/A — value object"
+      },
+      "forwardPropPath": "ontology/struct.ts → schemas/ontology/primitives/struct.ts → codegen StructDeclaration → project src/generated/structs/*.ts → runtime value-object constructors",
+      "backwardPropPath": "runtime struct validation → emit_event(struct_validation_failed) → eval drift → primitives/struct.ts refinement"
+    },
+    {
+      "id": "WMO-003",
+      "name": "ValueType",
+      "domain": "DATA",
+      "ontologyType": "primitive-missing",
+      "primitive": "ValueType (DC5-06)",
+      "semanticHeuristic": "SH-02",
+      "provenance": "Official",
+      "evidenceIds": ["INT-004", "INT-001", "INT-026"],
+      "classification": "missing-for-v1",
+      "justification": "DC5-06 primitive for reusable scalar constraints (Currency, ISO-Date, Email, URL). Currently only interface ValueType in types.ts — no primitives/value-type.ts with branded constructor + codegen contract.",
+      "breakingChange": false,
+      "sh02Result": "Delete LOGIC+ACTION → 'USD-currency', 'ISO-8601-date' still describe real-world constraints → DATA",
+      "designPrinciples": {
+        "DDD": "Named per domain constraint vocabulary",
+        "DRY": "Eliminates repeated validation logic across PropertyType declarations",
+        "OCP": "New ValueTypes added additively",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "ontology/value-type.ts → schemas/ontology/primitives/value-type.ts → codegen ValueType branded types → project src/generated/value-types/*.ts → runtime validators",
+      "backwardPropPath": "runtime validation failure → emit_event(value_type_validation_failed) → eval drift → value-type.ts refinement"
+    },
+    {
+      "id": "WMO-004",
+      "name": "SharedPropertyType",
+      "domain": "DATA",
+      "ontologyType": "primitive-missing",
+      "primitive": "SharedPropertyType (DC5-06)",
+      "semanticHeuristic": "SH-02",
+      "provenance": "Official",
+      "evidenceIds": ["INT-001", "INT-026"],
+      "classification": "missing-for-v1",
+      "justification": "Cross-object property reuse (createdAt, updatedAt, ownerId used across 3+ ObjectTypes). Currently defined in types.ts but not in codegen pipeline.",
+      "breakingChange": false,
+      "sh02Result": "Delete LOGIC+ACTION → shared properties (timestamps, owner) still describe facts about entities → DATA",
+      "designPrinciples": {
+        "DDD": "Named per cross-cutting concept (AuditFields, OwnedEntity)",
+        "DRY": "Directly enforces DRY across ObjectType declarations",
+        "OCP": "Added without modifying ObjectType definitions",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "ontology/shared-property.ts → schemas/ontology/primitives/shared-property.ts → codegen re-exports → project src/generated/shared-properties/*.ts",
+      "backwardPropPath": "runtime shared-property usage audit → emit_event(shared_property_referenced) → drift signal when adoption < 2 ObjectTypes"
+    },
+    {
+      "id": "WMO-005",
+      "name": "PropertyType",
+      "domain": "DATA",
+      "ontologyType": "primitive",
+      "primitive": "PropertyType (DC5-06)",
+      "semanticHeuristic": "SH-02",
+      "provenance": "Official",
+      "evidenceIds": ["INT-001", "INT-017", "INT-026"],
+      "classification": "present",
+      "currency": "v0.2.1 — 24 branded names (19 base + 5 extended)",
+      "sh02Result": "Delete LOGIC+ACTION → string/number/date types still describe attribute facts → DATA",
+      "designPrinciples": {
+        "DDD": "Branded names per domain vocabulary",
+        "DRY": "Base 19 + extended 5 prevents redefinition",
+        "OCP": "Extended without changing base",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "schemas/ontology/primitives/property-type.ts → project ontology declarations → codegen property unions → runtime validators",
+      "backwardPropPath": "runtime type mismatch → emit_event(property_type_violation) → eval → schema refinement"
+    },
+    {
+      "id": "WMO-006",
+      "name": "LinkType",
+      "domain": "LOGIC",
+      "ontologyType": "primitive",
+      "primitive": "LinkType / Object-Backed LinkType (DC5-06)",
+      "semanticHeuristic": "SH-01",
+      "provenance": "Official",
+      "evidenceIds": ["INT-002", "INT-005", "INT-016", "INT-026"],
+      "classification": "present",
+      "currency": "v0.2.1 — LinkCardinality 4 (1:1 / M:1 / 1:M / M:N). Object-Backed flavor exists via discriminated union.",
+      "sh01Result": "LinkType describes how to REASON about relationships (traversal, propagation), not a stored fact → LOGIC",
+      "designPrinciples": {
+        "DDD": "Named per relationship verb (ownedBy, teaches, relatedTo)",
+        "DRY": "Cardinality enum reused across link declarations",
+        "OCP": "New link flavors added via discriminated union",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "schemas/ontology/primitives/link-type.ts → project ontology/logic.ts → codegen link traversal helpers → runtime query engine",
+      "backwardPropPath": "runtime traversal failure → emit_event(link_traversal_failed) → eval → link-type.ts refinement"
+    },
+    {
+      "id": "WMO-007",
+      "name": "InterfaceType",
+      "domain": "LOGIC",
+      "ontologyType": "primitive",
+      "primitive": "Interface (DC5-06)",
+      "semanticHeuristic": "SH-01",
+      "provenance": "Official",
+      "evidenceIds": ["INT-002", "INT-004", "INT-016", "INT-026"],
+      "classification": "present",
+      "currency": "v0.2.1 present — missing BrandedRID (only string APIName today)",
+      "sh01Result": "Interface defines a shared contract for polymorphic reasoning, not a stored fact → LOGIC",
+      "designPrinciples": {
+        "DDD": "Named per domain capability (Searchable, Auditable, Owned)",
+        "DRY": "Interface reuse across ObjectTypes eliminates duplicate contract declarations",
+        "OCP": "Core principle — ObjectTypes implement interfaces, extended without modification",
+        "PECS": "Consumer-super applies when interface is used as a parameter type"
+      },
+      "forwardPropPath": "schemas/ontology/primitives/interface-type.ts → project ontology/logic.ts → codegen interface contracts → runtime polymorphic dispatch",
+      "backwardPropPath": "runtime interface contract violation → emit_event(interface_contract_violation) → eval → interface.ts refinement"
+    },
+    {
+      "id": "WMO-008",
+      "name": "DerivedProperty",
+      "domain": "LOGIC",
+      "ontologyType": "primitive",
+      "primitive": "Derived Property (DC5-06)",
+      "semanticHeuristic": "SH-01",
+      "provenance": "Official",
+      "evidenceIds": ["INT-002", "INT-004", "INT-026"],
+      "classification": "present",
+      "currency": "v0.2.1 — onRead | cached modes; Beta per 2026-Q1",
+      "sh01Result": "DerivedProperty COMPUTES over raw data; it does not describe a stored fact → LOGIC",
+      "designPrinciples": {
+        "DDD": "Named per computed concept (totalPrice, fullName, isOverdue)",
+        "DRY": "Prevents re-implementing the same computation across callers",
+        "OCP": "Added without modifying source properties",
+        "PECS": "Producer-extends when derivation output fan-outs"
+      },
+      "forwardPropPath": "schemas/ontology/functions/derived-property.ts → project ontology/logic.ts → codegen derived getters → runtime memoization",
+      "backwardPropPath": "runtime derived-property staleness → emit_event(derived_property_recomputed) → cache drift detection → refinement"
+    },
+    {
+      "id": "WMO-009",
+      "name": "Reducer",
+      "domain": "LOGIC",
+      "ontologyType": "primitive",
+      "primitive": "Reducer<In,Out> (DC5-06)",
+      "semanticHeuristic": "SH-01",
+      "provenance": "Official",
+      "evidenceIds": ["INT-002", "INT-026"],
+      "classification": "present",
+      "currency": "v0.2.1 — PropertyReducerStrategy 6 variants",
+      "sh01Result": "Reducer aggregates collections to derive new facts → LOGIC",
+      "designPrinciples": {
+        "DDD": "Named per aggregation (orderTotalByCustomer, attendanceByBeat)",
+        "DRY": "Common aggregation strategies (6 variants) reused",
+        "OCP": "Strategy-union extended additively",
+        "PECS": "CRITICAL — Reducer<In,Out> MUST use Producer-Extends input variance and Consumer-Super output variance"
+      },
+      "forwardPropPath": "schemas/ontology/functions/reducer.ts → project ontology/logic.ts → codegen reducer pipelines → runtime streaming fold",
+      "backwardPropPath": "runtime reducer divergence → emit_event(reducer_output_drift) → eval → strategy refinement"
+    },
+    {
+      "id": "WMO-010",
+      "name": "EditFunction",
+      "domain": "LOGIC",
+      "ontologyType": "primitive",
+      "primitive": "EditFunction (returns Edits[])",
+      "semanticHeuristic": "SH-03",
+      "provenance": "Official",
+      "evidenceIds": ["INT-003", "INT-019", "INT-026"],
+      "classification": "present",
+      "currency": "v0.2.1 — returns Edits[] without commit; mcp__palantir-mini__apply_edit_function",
+      "sh03Result": "Returns Edits[] (proposed changes, no side effects) → LOGIC (it computes, does not commit)",
+      "designPrinciples": {
+        "DDD": "Named per business transformation (validateOrder, calculateDiscount)",
+        "DRY": "Reusable computation separated from commit",
+        "OCP": "Chain composed without modifying underlying functions",
+        "PECS": "Producer-extends on input, Consumer-super on Edits[] output"
+      },
+      "forwardPropPath": "schemas/ontology/functions/function-signature.ts → project ontology/logic.ts → codegen EditFunction signatures → runtime apply_edit_function (MCP)",
+      "backwardPropPath": "emit_event(edit_function_applied) → events.jsonl → replay for dry-run audit → function refinement"
+    },
+    {
+      "id": "WMO-011",
+      "name": "AIPLogicFunction",
+      "domain": "LOGIC",
+      "ontologyType": "primitive-missing",
+      "primitive": "AIPLogicFunction (LLM-backed)",
+      "semanticHeuristic": "SH-03",
+      "provenance": "Official",
+      "evidenceIds": ["INT-009", "INT-010", "INT-005"],
+      "classification": "missing-for-v1",
+      "justification": "LLM-backed function primitive; distinguishes from deterministic EditFunction. Workflow Lineage §DL-04 lists 'AIP Logic Functions' as separate graph node type. Not represented in schemas/ontology/functions/ today.",
+      "breakingChange": false,
+      "sh03Result": "LLM computation returns proposed Edits[] OR proposed reasoning without commit → LOGIC (non-deterministic variant)",
+      "designPrinciples": {
+        "DDD": "Named per semantic task (classifyIntent, summarizeCase, suggestNextAction)",
+        "DRY": "LLM prompt templates reusable across callers",
+        "OCP": "Model-agnostic (K-LLM consensus per §PHIL.R-02) — swap backends without changing callers",
+        "PECS": "Consumer-super on proposed-output type"
+      },
+      "forwardPropPath": "ontology/aip-logic-function.ts → schemas/ontology/functions/aip-logic-function.ts → codegen K-LLM signature → runtime dispatcher",
+      "backwardPropPath": "emit_event(aip_function_invoked, model, confidence) → evaluator K-LLM coherence check (§VAL.R-20) → refinement"
+    },
+    {
+      "id": "WMO-012",
+      "name": "ActionType",
+      "domain": "ACTION",
+      "ontologyType": "primitive",
+      "primitive": "ActionType (Tier1 | Tier2 discriminated union)",
+      "semanticHeuristic": "SH-03",
+      "provenance": "Official",
+      "evidenceIds": ["INT-003", "INT-005", "INT-016", "INT-026"],
+      "classification": "present",
+      "currency": "v0.2.1 — Tier1Declarative | Tier2FunctionBacked",
+      "sh03Result": "ActionType COMMITS edits (side effects, reality change) → ACTION",
+      "designPrinciples": {
+        "DDD": "Named per business command (submitOrder, publishBeat, registerPrimitive)",
+        "DRY": "Two tiers prevent reinventing simple mutations for every action",
+        "OCP": "Tier union extended; Tier1 and Tier2 mutually exclusive per §ACTION.R-02",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "schemas/ontology/primitives/action-type.ts → project ontology/action.ts → codegen action signatures → runtime commit_edits (MCP)",
+      "backwardPropPath": "emit_event(action_committed) → action log (§ACTION.R-11 queryable ontology object) → lineage → refinement"
+    },
+    {
+      "id": "WMO-013",
+      "name": "AutomationDeclaration",
+      "domain": "ACTION",
+      "ontologyType": "primitive-missing",
+      "primitive": "AutomationDeclaration",
+      "semanticHeuristic": "SH-03",
+      "provenance": "Official",
+      "evidenceIds": ["INT-003"],
+      "classification": "missing-for-v1",
+      "justification": "Research/action/automation.md covers cron/trigger/scheduled automation but no primitive in primitives/automation.ts. Needed to represent scheduled or triggered action invocation as a first-class ontology entity.",
+      "breakingChange": false,
+      "sh03Result": "Describes HOW reality changes via trigger/schedule → ACTION",
+      "designPrinciples": {
+        "DDD": "Named per automation semantic (nightlyRollup, onOrderSubmitted)",
+        "DRY": "Shared cron/trigger vocabulary",
+        "OCP": "New trigger kinds added additively",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "ontology/automation.ts → schemas/ontology/primitives/automation.ts → codegen trigger registrations → runtime scheduler",
+      "backwardPropPath": "emit_event(automation_triggered, scheduleId) → lineage → drift when failure rate exceeds threshold → refinement"
+    },
+    {
+      "id": "WMO-014",
+      "name": "WebhookDeclaration",
+      "domain": "ACTION",
+      "ontologyType": "primitive-missing",
+      "primitive": "WebhookDeclaration",
+      "semanticHeuristic": "SH-03",
+      "provenance": "Official",
+      "evidenceIds": ["INT-003"],
+      "classification": "missing-for-v1",
+      "justification": "Research/action/webhooks.md documents external event ingress. Needed as first-class primitive so ingress is governed + audited.",
+      "breakingChange": false,
+      "sh03Result": "External ingress converts webhook payload → Edits → commit → ACTION",
+      "designPrinciples": {
+        "DDD": "Named per source (stripeWebhook, slackEvent)",
+        "DRY": "Common auth + retry patterns shared",
+        "OCP": "New providers added without changing dispatch core",
+        "PECS": "Payload types covariant"
+      },
+      "forwardPropPath": "ontology/webhook.ts → schemas/ontology/primitives/webhook.ts → codegen route handlers → runtime webhook server",
+      "backwardPropPath": "emit_event(webhook_received, webhook_rejected) → retry audit → refinement"
+    },
+    {
+      "id": "WMO-015",
+      "name": "SubmissionCriteria",
+      "domain": "ACTION",
+      "ontologyType": "primitive",
+      "primitive": "SubmissionCriteria (9 constraint classes)",
+      "semanticHeuristic": "SH-03",
+      "provenance": "Official",
+      "evidenceIds": ["INT-003", "INT-019", "INT-026"],
+      "classification": "present",
+      "currency": "v0.2.1 — 9 constraint classes; pre-flight enforced by commit_edits",
+      "sh03Result": "Pre-commit guard before reality change → ACTION (constraint applied at commit boundary)",
+      "designPrinciples": {
+        "DDD": "Named per constraint class (UniqueConstraint, RangeConstraint)",
+        "DRY": "9 canonical classes prevent ad-hoc check duplication",
+        "OCP": "New constraint classes added additively",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "schemas/ontology/policies/submission-criteria.ts → project ontology/action.ts → codegen pre-flight checks → runtime commit_edits dry-run (validateOnly)",
+      "backwardPropPath": "emit_event(submission_criteria_failed) → reject audit → constraint refinement"
+    },
+    {
+      "id": "WMO-016",
+      "name": "RBACFragment",
+      "domain": "SECURITY",
+      "ontologyType": "primitive",
+      "primitive": "RBACFragment (Layer-1)",
+      "semanticHeuristic": "SH-04",
+      "provenance": "Official",
+      "evidenceIds": ["INT-011", "INT-023", "INT-026"],
+      "classification": "present",
+      "currency": "v0.2.1 — Layer-1 role-only (managed-settings.d fragment); Layer-2/3 deferred",
+      "sh04Result": "Governs WHO may Read/Write/Bash — SECURITY",
+      "designPrinciples": {
+        "DDD": "Named per role bucket (schemas-read, generated-write, mcp-tool-allow)",
+        "DRY": "Fragment-based composition prevents duplicated permission rules across projects",
+        "OCP": "Per-project fragments additive; shared fragment re-used",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "schemas/ontology/policies/rbac.ts → plugin managed-settings.d/50-palantir-mini.json → per-project managed-settings.d/ → runtime permission check",
+      "backwardPropPath": "emit_event(permission_denied) → RBAC audit → fragment refinement"
+    },
+    {
+      "id": "WMO-017",
+      "name": "CapabilityToken",
+      "domain": "SECURITY",
+      "ontologyType": "primitive-missing",
+      "primitive": "CapabilityToken (Layer-2)",
+      "semanticHeuristic": "SH-04",
+      "provenance": "Official",
+      "evidenceIds": ["INT-011"],
+      "classification": "missing-for-v1",
+      "justification": "4-layer security model (§SEC.R-01) requires cell-level + capability-based governance. Layer-1 RBAC alone is insufficient for sensitive actions. Needed for §SOS-01 approval workflows.",
+      "breakingChange": false,
+      "sh04Result": "Governs UNDER WHAT CONDITIONS an action is permitted → SECURITY",
+      "designPrinciples": {
+        "DDD": "Named per sensitive operation (ship-merge, schema-write, ontology-register)",
+        "DRY": "Token issuance logic centralized",
+        "OCP": "New token kinds additive; existing tokens immutable",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "ontology/capability-token.ts → schemas/ontology/policies/capability-token.ts → plugin managed-settings.d Layer-2 → runtime commit_edits token check",
+      "backwardPropPath": "emit_event(capability_token_issued, capability_token_consumed, capability_token_denied) → audit → issuance policy refinement"
+    },
+    {
+      "id": "WMO-018",
+      "name": "MarkingDeclaration",
+      "domain": "SECURITY",
+      "ontologyType": "primitive-missing",
+      "primitive": "MarkingDeclaration (Layer-2/3)",
+      "semanticHeuristic": "SH-04",
+      "provenance": "Official",
+      "evidenceIds": ["INT-011"],
+      "classification": "missing-for-v1",
+      "justification": "Marking-based security (§SEC.R-03) is Palantir standard. Without it, cell-level classification and column masking are impossible.",
+      "breakingChange": false,
+      "sh04Result": "Classifies WHO may see specific data cells under specific markings → SECURITY",
+      "designPrinciples": {
+        "DDD": "Named per classification vocabulary (PII, Confidential, StudentData)",
+        "DRY": "Marking set reused across properties + objects",
+        "OCP": "New markings added without touching existing classifications",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "ontology/marking.ts → schemas/ontology/policies/marking.ts → plugin managed-settings Layer-3 → runtime property-level access check",
+      "backwardPropPath": "emit_event(marking_check_passed, marking_check_denied) → audit → marking policy refinement"
+    },
+    {
+      "id": "WMO-019",
+      "name": "EventTypeRegistry",
+      "domain": "LEARN",
+      "ontologyType": "primitive",
+      "primitive": "EVENT_TYPE_REGISTRY",
+      "semanticHeuristic": "SH-05",
+      "provenance": "Official",
+      "evidenceIds": ["INT-008", "INT-009", "INT-019", "INT-026"],
+      "classification": "present",
+      "currency": "v0.2.1 — 10 variants; v1.0 expands to 16+ (adds ontology_registered, capability_token_issued, schema_locked, scenario_created, pr_body_generated, session_complete)",
+      "sh05Result": "Captures WHAT HAPPENED and WHY per event → LEARN",
+      "designPrinciples": {
+        "DDD": "Named per lifecycle moment (object_created, action_committed, evaluation_recorded)",
+        "DRY": "Canonical variant list prevents ad-hoc event types",
+        "OCP": "New variants additive; old never removed (append-only log discipline)",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "schemas/ontology/lineage/event-types.ts → palantir-mini lib/event-log/types.ts → emit_event MCP tool → events.jsonl",
+      "backwardPropPath": "events.jsonl → snapshot → replay_lineage → variant coverage audit → registry expansion"
+    },
+    {
+      "id": "WMO-020",
+      "name": "DecisionLineage",
+      "domain": "LEARN",
+      "ontologyType": "primitive",
+      "primitive": "DecisionLineage 5-dim",
+      "semanticHeuristic": "SH-05",
+      "provenance": "Official",
+      "evidenceIds": ["INT-008", "INT-009", "INT-026"],
+      "classification": "present",
+      "currency": "v0.2.1 — WHEN / ATOP_WHICH / THROUGH_WHICH / BY_WHOM / WITH_WHAT",
+      "sh05Result": "5-dimensional audit record of every decision → LEARN",
+      "designPrinciples": {
+        "DDD": "Each dim names a first-class lineage concept",
+        "DRY": "Every event carries all 5 dims — no alternate lineage formats",
+        "OCP": "New fields additive within withWhat.reasoning; core 5 immutable",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "schemas/ontology/lineage/decision-lineage.ts → palantir-mini lib/event-log → events.jsonl → replay_lineage MCP tool",
+      "backwardPropPath": "replay_lineage(byWhom, throughWhich, atopWhich filter) → pattern detection → refinement"
+    },
+    {
+      "id": "WMO-021",
+      "name": "ScenarioSandbox",
+      "domain": "LEARN",
+      "ontologyType": "primitive-missing",
+      "primitive": "ScenarioSandbox (DC5-10)",
+      "semanticHeuristic": "SH-05",
+      "provenance": "Official",
+      "evidenceIds": ["INT-004"],
+      "classification": "missing-for-v1",
+      "justification": "DC5-10 Scenarios for what-if planning. Isolates scenario runs so they don't pollute lineage. Not implemented today.",
+      "breakingChange": false,
+      "sh05Result": "Captures outcome of hypothetical runs → LEARN",
+      "designPrinciples": {
+        "DDD": "Named per scenario purpose (priceCutSimulation, trafficSurge)",
+        "DRY": "Shared lineage replay for scenario + production",
+        "OCP": "New scenarios added without touching production lineage",
+        "PECS": "Scenario input/output types covariant"
+      },
+      "forwardPropPath": "ontology/scenario-sandbox.ts → schemas/ontology/lineage/scenario-sandbox.ts → palantir-mini scenario_create MCP tool → isolated events.jsonl segment",
+      "backwardPropPath": "emit_event(scenario_created, scenario_evaluated, scenario_promoted) → evaluator scenario R-gate → refinement"
+    },
+    {
+      "id": "WMO-022",
+      "name": "HomeSharedOntology",
+      "domain": "DATA",
+      "ontologyType": "structural-gap",
+      "primitive": "Module (namespace)",
+      "semanticHeuristic": "SH-02",
+      "provenance": "Inference",
+      "evidenceIds": ["INT-027", "INT-028", "INT-013"],
+      "classification": "missing-for-v1",
+      "justification": "Home repo (~/) has NO ontology/ directory today. palantir-math + mathcrew each declare ontology independently, causing uncoordinated duplication. Adding shared ~/ontology/ layer is the critical ForwardProp repair for v1.0.",
+      "breakingChange": false,
+      "sh02Result": "Shared primitives describe what exists across all projects → DATA (scoped module)",
+      "designPrinciples": {
+        "DDD": "Bounded context boundary between shared core and project-specific",
+        "DRY": "Single definition of shared primitives — THE primary DRY win for v1.0",
+        "OCP": "Home ontology closed to modification; projects extend it",
+        "PECS": "N/A at module level"
+      },
+      "forwardPropPath": "schemas/ontology/ (authoritative types) → ~/ontology/ (shared re-exports + home overrides) → <project>/ontology/ (project-specific extensions) → project src/contracts/ → runtime",
+      "backwardPropPath": "project ontology divergence events → home ontology re-alignment → schemas refinement"
+    },
+    {
+      "id": "WMO-023",
+      "name": "PalantirMathOntology",
+      "domain": "DATA",
+      "ontologyType": "per-project-namespace",
+      "primitive": "Module (14 files)",
+      "semanticHeuristic": "SH-02",
+      "provenance": "Inference",
+      "evidenceIds": ["INT-028"],
+      "classification": "present-independent",
+      "currency": "14 files — action.ts, capabilities/, changeContracts/, data/, frontend.ts, logic.ts, runtime.ts, schema.ts, security.ts + BROWSE/INDEX/BEHAVIOR",
+      "sh02Result": "Math-domain entities (ConceptPrimitive, JSXGraphRenderer) describe domain reality → DATA (project-scoped)",
+      "divergenceJustifications": [
+        "JSXGraph rendering is math-specific",
+        "ConceptPrimitive taxonomy is math-domain",
+        "useTeachingState.ts decision (D-cont-2 deferred)"
+      ],
+      "designPrinciples": {
+        "DDD": "Math bounded context; uses math-domain vocabulary",
+        "DRY": "Extending home ontology (in v1.0) removes current cross-project duplication with mathcrew",
+        "OCP": "Project additively extends shared core",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "~/ontology/ (v1.0 shared core) → palantir-math/ontology/*.ts → palantir-math/src/contracts/ → runtime (JSXGraph renderer, lesson engine)",
+      "backwardPropPath": "palantir-math runtime → events.jsonl (project session) → evaluator → ontology refinement (project or shared)"
+    },
+    {
+      "id": "WMO-024",
+      "name": "MathcrewOntology",
+      "domain": "DATA",
+      "ontologyType": "per-project-namespace",
+      "primitive": "Module (16 files)",
+      "semanticHeuristic": "SH-02",
+      "provenance": "Inference",
+      "evidenceIds": ["INT-028"],
+      "classification": "present-independent",
+      "currency": "16 files — includes theater-kind.ts, event-envelope.ts, frontend-semantic-core.ts, beat-template.ts, concept-primitive.ts, learn.ts",
+      "sh02Result": "Theater + teaching-flow entities describe domain reality → DATA (project-scoped)",
+      "divergenceJustifications": [
+        "BeatTemplate is theater DSL",
+        "TheaterKind taxonomy is UX-specific",
+        "Deferred items from THEATER-REBUILD-2026-04.md"
+      ],
+      "designPrinciples": {
+        "DDD": "Theater + teaching bounded context; richer than palantir-math (has learn.ts + frontend-semantic-core.ts)",
+        "DRY": "Post-v1.0, shared core eliminates current duplication with palantir-math (both declare ConceptPrimitive)",
+        "OCP": "Project extensions layered on home core",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "~/ontology/ (v1.0 shared core) → mathcrew/ontology/*.ts → mathcrew/src/contracts/ → runtime (theater canvas, beat scheduler)",
+      "backwardPropPath": "mathcrew runtime → events.jsonl → evaluator R-gate → ontology refinement"
+    },
+    {
+      "id": "WMO-025",
+      "name": "PalantirMiniPlugin",
+      "domain": "ACTION",
+      "ontologyType": "operational-substrate",
+      "primitive": "Plugin (bridge + lib + hooks + skills)",
+      "semanticHeuristic": "SH-03",
+      "provenance": "Official",
+      "evidenceIds": ["INT-019", "INT-020", "INT-021", "INT-022", "INT-023", "INT-024"],
+      "classification": "present-v0.2-partial",
+      "currency": "v0.2.x — 5 MCP tools, 6 hooks (of 27 available), 4 validation phases (of 6), Layer-1 RBAC",
+      "sh03Result": "Plugin's runtime effect CHANGES reality (commits, regenerates codegen, enforces hooks) → ACTION substrate",
+      "gapsForV1": ["5→10 MCP tools", "6→15 hooks", "4→6 validation phases", "Layer-1→L1+L2+L3 RBAC"],
+      "designPrinciples": {
+        "DDD": "Foundry-analog operational layer; bridge/lib/hooks/skills boundaries preserve domain roles",
+        "DRY": "Single plugin installed across 3 projects (eliminates per-project operational layer duplication)",
+        "OCP": "v1.0 extends v0.2 — new MCP tools + hooks added additively; no breaking MCP signature changes",
+        "PECS": "Subagents as consumers of plugin capabilities — consumer-super on tool signatures"
+      },
+      "forwardPropPath": "schemas/ontology/ → plugin-bundled mcp-server.ts → per-session events.jsonl + codegen outputs → project runtime",
+      "backwardPropPath": "runtime events → events.jsonl → snapshots → replay_lineage → plugin capability refinement"
+    },
+    {
+      "id": "WMO-026",
+      "name": "ClaudeSchemasPackage",
+      "domain": "DATA",
+      "ontologyType": "maven-analog-artifact",
+      "primitive": "Module (4 axes, SemVer-tagged)",
+      "semanticHeuristic": "SH-02",
+      "provenance": "Official",
+      "evidenceIds": ["INT-016", "INT-017", "INT-018", "INT-026", "INT-027"],
+      "classification": "present",
+      "currency": "@palantirKC/claude-schemas@0.2.1 git-tag; axes ontology 1.12.0 / interaction 0.1.2 / meta 0.1.0 / rendering 0.1.0",
+      "sh02Result": "Schema primitive definitions describe what exists → DATA (cross-project canonical source)",
+      "v1Plan": "v1.0 major-bump git-tag; axes consolidated or per-axis version gated; peerDep pin bumped atomically across 3 consumers",
+      "designPrinciples": {
+        "DDD": "Axis boundaries map to domain roles (ontology vs interaction vs rendering)",
+        "DRY": "Maven-analog prevents per-project schema reimplementation",
+        "OCP": "SemVer protects consumers; v1.0 breaking-change allowed by user directive",
+        "PECS": "Reducer<In,Out> contract applies PECS within ontology axis"
+      },
+      "forwardPropPath": "schemas/ontology/primitives + functions + policies + lineage + generators → peerDep resolution → plugin bundle + project imports → runtime",
+      "backwardPropPath": "project-side drift signals → schemas CHANGELOG entry → SemVer bump → coordinated consumer migration"
+    },
+    {
+      "id": "WMO-027",
+      "name": "ShipSkill",
+      "domain": "ACTION",
+      "ontologyType": "skill-rewrite-target",
+      "primitive": "Skill (AIP-analog dispatch)",
+      "semanticHeuristic": "SH-03",
+      "provenance": "Synthesis",
+      "evidenceIds": ["INT-025", "INT-007", "INT-008"],
+      "classification": "legacy-rewrite",
+      "currency": "user-scope /ship 465 LOC — does NOT consume events.jsonl; rewrites required for v1.0",
+      "sh03Result": "Commits PR, pushes, merges — reality change → ACTION",
+      "v1Plan": "Rewrite: read events.jsonl → generate PR body → run pm-verify 4→6 phase gates → enforce schema lock + codegen drift → emit session_complete",
+      "designPrinciples": {
+        "DDD": "Ship = semantic intent 'close out work'; AIPCon 9 Ship OS patterns (§SOS-01..05) apply",
+        "DRY": "Shared across 3 projects once plugin is substrate",
+        "OCP": "New validation gates added via plugin; skill remains thin dispatcher",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "events.jsonl → /ship skill (v1.0) → PR body + pm-verify → git push → merge → emit session_complete",
+      "backwardPropPath": "ship failures → emit_event(ship_rejected) → evaluator → skill refinement"
+    },
+    {
+      "id": "WMO-028",
+      "name": "OrchestrateSkill",
+      "domain": "ACTION",
+      "ontologyType": "skill-rewrite-target",
+      "primitive": "Skill (phase-transition dispatcher)",
+      "semanticHeuristic": "SH-03",
+      "provenance": "Synthesis",
+      "evidenceIds": ["INT-025"],
+      "classification": "legacy-rewrite",
+      "currency": "user-scope /orchestrate 406 LOC — plugin is afterthought, not substrate",
+      "sh03Result": "Each phase transition writes state → ACTION",
+      "v1Plan": "Rewrite: every phase transition via plugin MCP calls (emit_event, get_ontology, apply_edit_function, commit_edits); plugin becomes substrate",
+      "designPrinciples": {
+        "DDD": "Orchestration domain distinct from individual domain work",
+        "DRY": "Single orchestrator across 3 projects via plugin",
+        "OCP": "New phase kinds added via plugin event types; skill stays thin",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "user intent → /orchestrate skill (v1.0) → plugin MCP calls per phase → events.jsonl → validated state",
+      "backwardPropPath": "phase gate failures → emit_event(phase_rejected) → evaluator → orchestrator refinement"
+    },
+    {
+      "id": "WMO-029",
+      "name": "PalantirDispatchSkill",
+      "domain": "ACTION",
+      "ontologyType": "skill-new",
+      "primitive": "Skill (AIP-analog intent classifier)",
+      "semanticHeuristic": "SH-03",
+      "provenance": "Synthesis",
+      "evidenceIds": ["INT-007", "INT-024"],
+      "classification": "missing-for-v1",
+      "justification": "AIP-analog semantic intent dispatcher. Accepts user intent, classifies, routes to correct skill. Mirrors Palantir AIP pattern per RQ-03.",
+      "breakingChange": false,
+      "sh03Result": "Dispatch → downstream skill commits → ACTION",
+      "designPrinciples": {
+        "DDD": "Intent → skill routing; distinct from direct skill invocation",
+        "DRY": "Single dispatch point vs per-user memorization of slash-commands",
+        "OCP": "New intents added via plugin intent registry",
+        "PECS": "Intent types covariant"
+      },
+      "forwardPropPath": "user prompt → /palantir-dispatch → intent classifier → routed skill → emit_event(dispatch_routed, skill, intent)",
+      "backwardPropPath": "dispatch miss-routes → emit_event(dispatch_misrouted) → intent registry refinement"
+    },
+    {
+      "id": "WMO-030",
+      "name": "OntologyRegisterSkill",
+      "domain": "ACTION",
+      "ontologyType": "skill-new",
+      "primitive": "Skill (primitive registration)",
+      "semanticHeuristic": "SH-03",
+      "provenance": "Synthesis",
+      "evidenceIds": ["INT-022", "INT-024"],
+      "classification": "missing-for-v1",
+      "justification": "/ontology-register handles primitive registration + codegen trigger; needed to make ontology declaration first-class vs ad-hoc file edits.",
+      "breakingChange": false,
+      "sh03Result": "Registration → schema write → codegen regeneration → ACTION",
+      "designPrinciples": {
+        "DDD": "Registration as semantic intent distinct from raw file write",
+        "DRY": "Uniform registration pipeline for all primitive kinds",
+        "OCP": "New primitive kinds added via registry extension",
+        "PECS": "N/A"
+      },
+      "forwardPropPath": "user → /ontology-register → validate → write schemas + re-codegen → emit_event(ontology_registered, primitive, schemaVersion)",
+      "backwardPropPath": "registration rejections → emit_event(ontology_register_rejected) → validation refinement"
+    },
+    {
+      "id": "WMO-031",
+      "name": "ForwardPropPipeline",
+      "domain": "LOGIC",
+      "ontologyType": "propagation-path",
+      "primitive": "Authority chain",
+      "semanticHeuristic": "SH-01",
+      "provenance": "Synthesis",
+      "evidenceIds": ["INT-005", "INT-006", "INT-013", "INT-026", "INT-027"],
+      "classification": "present-broken",
+      "currency": "Broken: home repo missing ontology/ layer; palantir-math + mathcrew declare independently",
+      "sh01Result": "Describes HOW to propagate (reason about change) from research → runtime → LOGIC",
+      "healthStatus": "broken",
+      "healthStatusRationale": "No shared home ontology/. Two projects duplicate primitives.",
+      "designPrinciples": {
+        "DDD": "Each layer named by role (research, schemas, home, project, contracts, runtime)",
+        "DRY": "v1.0 home ontology/ adds DRY enforcement layer",
+        "OCP": "Lower layers closed; higher layers extend — strictly enforced once home layer exists",
+        "PECS": "Layer boundaries with producer-extends on types flowing down"
+      },
+      "forwardPropPath": "[research/, schemas/, ~/ontology/ (NEW v1.0), <project>/ontology/, <project>/src/contracts/, <project>/src/runtime, artifacts/]",
+      "backwardPropPath": "[runtime events, lineage snapshots, evaluations, refinement signals, ontology updates]"
+    },
+    {
+      "id": "WMO-032",
+      "name": "BackwardPropPipeline",
+      "domain": "LEARN",
+      "ontologyType": "propagation-path",
+      "primitive": "Feedback loop",
+      "semanticHeuristic": "SH-05",
+      "provenance": "Synthesis",
+      "evidenceIds": ["INT-008", "INT-009", "INT-012", "INT-019", "INT-021"],
+      "classification": "present-partial",
+      "currency": "Partial: events.jsonl + snapshots + replay_lineage working; evaluator → schema update manual",
+      "sh05Result": "Records outcomes and routes learning back to ontology → LEARN",
+      "healthStatus": "partial",
+      "healthStatusRationale": "Forward mechanisms (events, snapshots, replay) operational. Backward automation (evaluator signals → schema refinement) is manual Phase-B planning today.",
+      "designPrinciples": {
+        "DDD": "Each step named by lineage role (runtime event → lineage → evaluation → refinement)",
+        "DRY": "Single events.jsonl powers all backward paths",
+        "OCP": "New evaluator gates (R16+) added without breaking existing R1-R15",
+        "PECS": "Evaluator output types covariant across gate versions"
+      },
+      "forwardPropPath": "[runtime event → emit_event → events.jsonl → snapshot → replay_lineage]",
+      "backwardPropPath": "[evaluator R-gate → drift_detected event → pm-codegen suggestion → /ontology-register → schemas refinement]"
+    }
   ],
 
-  "objectsCount": 26,
-  "objectsByDomain": {"data": 5, "logic": 8, "action": 5, "security": 3, "learn": 5}
+  "dlaMapping": {
+    "D": {
+      "domain": "DATA",
+      "primitivesPresent": ["ObjectType", "PropertyType", "ClaudeSchemasPackage", "PalantirMathOntology (per-project)", "MathcrewOntology (per-project)"],
+      "primitivesMissing": ["Struct", "ValueType", "SharedPropertyType", "HomeSharedOntology"],
+      "count": {"present": 5, "missing": 4}
+    },
+    "L": {
+      "domain": "LOGIC",
+      "primitivesPresent": ["LinkType", "InterfaceType", "DerivedProperty", "Reducer", "EditFunction", "ForwardPropPipeline"],
+      "primitivesMissing": ["AIPLogicFunction"],
+      "count": {"present": 6, "missing": 1}
+    },
+    "A": {
+      "domain": "ACTION",
+      "primitivesPresent": ["ActionType", "SubmissionCriteria", "PalantirMiniPlugin", "ShipSkill (rewrite)", "OrchestrateSkill (rewrite)"],
+      "primitivesMissing": ["AutomationDeclaration", "WebhookDeclaration", "PalantirDispatchSkill", "OntologyRegisterSkill"],
+      "count": {"present": 5, "missing": 4}
+    },
+    "S": {
+      "domain": "SECURITY",
+      "primitivesPresent": ["RBACFragment"],
+      "primitivesMissing": ["CapabilityToken", "MarkingDeclaration"],
+      "count": {"present": 1, "missing": 2}
+    },
+    "LEARN": {
+      "domain": "LEARN",
+      "primitivesPresent": ["EventTypeRegistry", "DecisionLineage", "BackwardPropPipeline"],
+      "primitivesMissing": ["ScenarioSandbox"],
+      "count": {"present": 3, "missing": 1}
+    }
+  },
+
+  "fourPillarMap": {
+    "ontology": {
+      "currentState": "schemas v0.2.1 — 4 axes (ontology 1.12.0 / interaction 0.1.2 / meta 0.1.0 / rendering 0.1.0). Missing Struct + ValueType + SharedPropertyType primitives. No home-repo ontology/ directory. palantir-math + mathcrew declare independently with known duplication.",
+      "v1Target": "schemas v1.0 canonical source with Struct + ValueType + CapabilityToken + MarkingDeclaration + AutomationDeclaration + WebhookDeclaration + ScenarioSandbox + AIPLogicFunction + SharedPropertyType primitives. NEW ~/ontology/ shared layer re-exports and extends. Per-project ontology/ extends shared core with documented divergence justifications.",
+      "gap": "9 missing primitives + home /ontology/ layer absent + legacy types.ts/semantics.ts superseded by primitives/ layer but not retired",
+      "dc5PrincipleApplied": "DDD: bounded contexts (shared core / home / per-project). DRY: home ontology eliminates palantir-math × mathcrew duplication. OCP: per-axis version gates + versioned extension. PECS: Reducer<In,Out> and Edits[] contract apply in-out variance."
+    },
+    "aip": {
+      "currentState": "/ship (465 LOC user-scope) + /orchestrate (406 LOC user-scope) exist but do NOT use palantir-mini as substrate. /ship does not consume events.jsonl. /orchestrate treats plugin as afterthought. No semantic-intent dispatcher.",
+      "v1Target": "Skills dispatch semantic intent: /palantir-dispatch (intent classifier → skill router), /ontology-register (primitive registration + codegen emission), /ship (lineage-driven PR body from events.jsonl + 6-phase pm-verify), /orchestrate (every phase transition via plugin MCP calls). Each skill emits events per event contract.",
+      "gap": "/palantir-dispatch missing entirely; /ontology-register missing entirely; /ship + /orchestrate need rewrite to read events.jsonl and run plugin as substrate; event contract per skill missing",
+      "dc5PrincipleApplied": "DDD: each skill maps to a single AIP-analog intent. DRY: dispatcher centralizes intent→skill routing. OCP: new intents added via plugin intent registry without changing dispatcher core. PECS: intent types covariant; skill inputs contravariant."
+    },
+    "foundry": {
+      "currentState": "palantir-mini v0.2 — 5 MCP tools (get_ontology, emit_event, apply_edit_function, commit_edits, replay_lineage), 6/27 hooks (PreToolUse, PostToolUse, PreCompact, TaskCompleted, Stop, SessionStart), 4/6 validation phases (design, compile, runtime, post-write; Deploy + Merge deferred), Layer-1 RBAC only. package.json declares 0.1.0 but CLAUDE.md references 0.2.0 — version reconciliation needed.",
+      "v1Target": "palantir-mini v1.0 — 10+ MCP tools (add ontology_schema_get, project_register, codegen_trigger, scenario_create, capability_token_check), 15+ hooks (add TaskCreated, TeammateIdle, SubagentStop, PostCompact, ShutdownRequest, TeamCreated/Deleted, TeammateJoin/Leave/Error, AgentStart/Stop/Error/Message, PlanApproval, MemoryWrite/Read, ToolApproval/Denied, CompactStart, UserPromptSubmit), 6/6 validation phases (add Deploy + Merge, fail-fast mode), Layer-1/2/3 RBAC (RBAC + CapabilityToken + Marking), deterministic codegen with SSoT header contract.",
+      "gap": "5 MCP tools missing; 21 hook events uncovered; 2 validation phases deferred; Layer-2/3 RBAC missing; CapabilityToken primitive missing; codegen not auto-invoked on schema change; monitors/ not wired to hooks; version string mismatch; BrandedRID missing for LinkType + InterfaceType",
+      "dc5PrincipleApplied": "DDD: Foundry operational substrate boundary (bridge/lib/hooks/skills) preserves roles. DRY: single plugin across 3 projects. OCP: v1.0 extends v0.2 additively via new MCP tools + hooks; no signature breaks. PECS: MCP tool IO respects producer-extends input / consumer-super output."
+    },
+    "maven": {
+      "currentState": "@palantirKC/claude-schemas@0.2.1 git-tag (git+https://github.com/park-kyungchan/claude-schemas.git#v0.2.1) pinned in all 3 consumers via peerDependencies. rules/08-schema-versioning.md enforces semver gates. CHANGELOG.md documents v0.2.0 and v0.2.1 additions.",
+      "v1Target": "@palantirKC/claude-schemas@1.0.0 SemVer-breaking git-tag (per-axis version gates). Atomic 3-consumer migration coordinated via Wave pattern (staging PR sequence). CHANGELOG.md v1.0 entry enumerating all breaking changes + additive primitives + deprecation notes. pm-verify blocks when peerDep pin incompatible.",
+      "gap": "v1.0 tag not cut; per-axis version gate policy not documented; 3-consumer atomic migration sequence not planned; breaking-change manifest missing",
+      "dc5PrincipleApplied": "DDD: each axis is a bounded context with its own version. DRY: Maven-analog prevents per-project schema reimplementation. OCP: additive primitives additive even in v1.0; true breaks limited to legacy retirement. PECS: generic type boundaries preserved across version transitions."
+    }
+  },
+
+  "forwardProp": {
+    "path": ["research/", "schemas/", "home /ontology/ (NEW v1.0)", "project ontology/", "contracts", "runtime", "artifacts"],
+    "authorityChain": [
+      {
+        "layer": "research",
+        "path": "~/.claude/research/palantir/",
+        "authority": "semantic evidence (markers + provenance tags [Official]/[Synthesis]/[Inference])",
+        "writer": "human + researcher agent"
+      },
+      {
+        "layer": "schemas",
+        "path": "~/.claude/schemas/",
+        "authority": "typed primitive definitions + version discipline",
+        "writer": "claude-schemas maintainer (SemVer gated)"
+      },
+      {
+        "layer": "home ontology (NEW in v1.0)",
+        "path": "~/ontology/",
+        "authority": "shared core primitives for 3 projects — DRY boundary",
+        "writer": "home repo maintainer",
+        "status": "MISSING TODAY — critical ForwardProp repair"
+      },
+      {
+        "layer": "project ontology",
+        "path": "<project>/ontology/",
+        "authority": "project-specific domain schema extensions",
+        "writer": "project maintainer",
+        "extends": "home ontology"
+      },
+      {
+        "layer": "contracts",
+        "path": "<project>/src/contracts/",
+        "authority": "TypeScript interface boundary",
+        "writer": "pm-codegen from ontology/"
+      },
+      {
+        "layer": "runtime",
+        "path": "<project>/src/",
+        "authority": "executed behavior",
+        "writer": "normal dev + ontology-aware skills"
+      }
+    ],
+    "enforcementMechanism": "pm-verify 4→6 phase gates enforce each layer transition; higher layer wins on conflict per rules/01-ontology-first-core.md; managed-settings.d deny rules enforce schema lock; v1.0 adds Layer-2 CapabilityToken for sensitive cross-layer writes",
+    "healthStatus": "broken",
+    "healthStatusRationale": "Home repo (~/) has NO ontology/ layer, breaking the authority chain. palantir-math + mathcrew extend nothing — they define independently, causing duplication (both declare ConceptPrimitive, both define frontend patterns independently). v1.0 adds ~/ontology/ to restore the chain and unify cross-project primitives."
+  },
+
+  "backwardProp": {
+    "path": ["runtime events", "lineage (events.jsonl)", "evaluations", "refinement signals", "ontology updates"],
+    "mechanism": "Append-only events.jsonl via mcp__palantir-mini__emit_event → PreCompact snapshots → replay_lineage for 5-dim filter → evaluator R-gate signals → (v1.0) automatic ontology refinement suggestions via pm-codegen + /ontology-register",
+    "currentReach": "Forward side complete: events emit, snapshots roll, replay works. Feedback side manual: evaluator signals do not yet auto-generate ontology refinement proposals — Phase B automation target.",
+    "healthStatus": "partial",
+    "healthStatusRationale": "events + snapshots + replay working via palantir-mini v0.2. But evaluator → schema update is manual Phase B planning. v1.0 target: drift_detected + evaluation_recorded events auto-trigger pm-codegen suggestions; evaluator R-gate signals emit ontology-refinement events consumable by /ontology-register."
+  },
+
+  "v1PrimitiveSelection": [
+    {
+      "name": "Struct",
+      "category": "D",
+      "rationale": "DC5-06 first-class primitive for nested composite fields. Currently only interface StructType in types.ts — no primitives/struct.ts with registry.",
+      "breaking": false,
+      "migrationNote": "Additive. Existing StructType interface aliased to new primitive during transition."
+    },
+    {
+      "name": "ValueType",
+      "category": "D",
+      "rationale": "DC5-06 first-class primitive for reusable scalar constraints (Currency, ISO-Date, Email). Currently only interface ValueType in types.ts.",
+      "breaking": false,
+      "migrationNote": "Additive. Existing ValueType interface aliased."
+    },
+    {
+      "name": "SharedPropertyType",
+      "category": "D",
+      "rationale": "Cross-object property reuse; needed in codegen pipeline (currently in types.ts but not codegen-integrated).",
+      "breaking": false,
+      "migrationNote": "Additive. Existing types.ts definition promoted to primitives/ layer."
+    },
+    {
+      "name": "CapabilityToken",
+      "category": "S",
+      "rationale": "Layer-2 RBAC needed for sensitive actions (ship-merge, schema-write, ontology-register). RBAC alone insufficient per §SEC.R-01.",
+      "breaking": false,
+      "migrationNote": "Additive. Layer-1 RBAC remains; CapabilityToken layered on top."
+    },
+    {
+      "name": "MarkingDeclaration",
+      "category": "S",
+      "rationale": "Layer-2/3 RBAC overlay per Palantir standard. Enables cell-level classification and column masking.",
+      "breaking": false,
+      "migrationNote": "Additive. Fully opt-in at v1.0 release."
+    },
+    {
+      "name": "AutomationDeclaration",
+      "category": "A",
+      "rationale": "Describes cron/trigger/scheduled action as first-class primitive. Research covered; primitive missing.",
+      "breaking": false,
+      "migrationNote": "Additive."
+    },
+    {
+      "name": "WebhookDeclaration",
+      "category": "A",
+      "rationale": "External event ingress as first-class primitive. Research covered; primitive missing.",
+      "breaking": false,
+      "migrationNote": "Additive."
+    },
+    {
+      "name": "ScenarioSandbox",
+      "category": "LEARN",
+      "rationale": "DC5-10 Scenarios for what-if analysis. Isolates scenario runs so they do not pollute production lineage.",
+      "breaking": false,
+      "migrationNote": "Additive."
+    },
+    {
+      "name": "AIPLogicFunction",
+      "category": "L",
+      "rationale": "LLM-backed function primitive. Workflow Lineage §DL-04 lists it as separate graph node type. Distinguishes from deterministic EditFunction.",
+      "breaking": false,
+      "migrationNote": "Additive."
+    }
+  ],
+
+  "legacyAudit": {
+    "researchLibrary": {
+      "action": {"verdict": "keep", "rationale": "Authoritative through 2026-Q1; referenced in v0.2 lib/actions/; OSDK 2.0 patterns current."},
+      "architecture": {"verdict": "keep-partial", "rationale": "ontology-model.md + orchestration-map.md current; adapter-gap-analysis.md [Inference] dated 2026-03-17 references frontend-dashboard/convex paths from prior iteration — may not match current 3-project scope."},
+      "cross-cutting": {"verdict": "keep", "rationale": "llm-independence principle + cross-cutting patterns + decision-lineage 5-dim still current through AIPCon 9 (March 2026)."},
+      "data": {"verdict": "keep", "rationale": "Includes 2026-Q1 features (AIP Doc Intelligence GA Feb 2026, Core Object Views GA Feb 2026, Derived Properties Beta)."},
+      "decision-lineage": {"verdict": "keep", "rationale": "5-dim Decision Lineage foundational; Workflow Lineage GA Nov 2025, Cross-Ontology visualization Feb 2026."},
+      "entry": {"verdict": "keep", "rationale": "Decomposition + requirements intake patterns cited in T1 decomposition."},
+      "logic": {"verdict": "keep", "rationale": "Impact Propagation Graph thesis authoritative; directly encoded in palantir-mini v0.2 lib/codegen and lib/actions."},
+      "marketplace": {"verdict": "review", "rationale": "Only BROWSE.md + INDEX.md present per source-map; content files may be stubs; verify during legacy sweep before declaring deletable."},
+      "osdk": {"verdict": "keep", "rationale": "OSDK 2.0 patterns referenced in schemas primitives + codegen. Sub-files noted as potentially stub per INDEX.md."},
+      "philosophy": {"verdict": "keep", "rationale": "Digital twin + ontology vision underpin BackwardProp design; AIPCon 9 + Chief Architect quotes current."},
+      "platform": {"verdict": "keep", "rationale": "DevCon 5 §DC5-* foundation — most recent event March 11 2026."},
+      "security": {"verdict": "keep", "rationale": "RBAC L1 documented; L2/L3 patterns directly inform v1.0 CapabilityToken + MarkingDeclaration additions."},
+      "ship-os": {"verdict": "keep", "rationale": "AIPCon 9 Ship OS patterns (§SOS-01..05) — governs v1.0 /ship rewrite."},
+      "typescript": {"verdict": "keep-low-priority", "rationale": "Philosophy-level low depth; 2 files not deeply read per source-map gaps."},
+      "validation": {"verdict": "keep", "rationale": "6-phase validation model authoritative; 2 phases missing in v0.2 plugin explicitly informs v1.0 gap fill."}
+    },
+    "schemasFiles": {
+      "interaction/*": {"verdict": "keep", "rationale": "Currently v0.1.2; v1.0 will bump consistently; low rebuild risk."},
+      "meta/*": {"verdict": "review-possibly-deprecate", "rationale": "Currently v0.1.0; no per-project use found per source-map. May be deprecated or integrated into ontology axis in v1.0."},
+      "ontology/types.ts": {"verdict": "keep-read-only-until-retire", "rationale": "Schema lock per managed-settings.d deny rules. v1.0 new canonical source in primitives/ layer; types.ts sections superseded by primitives/ are candidates for retirement."},
+      "ontology/semantics.ts": {"verdict": "keep-read-only-until-retire", "rationale": "Same as types.ts — schema lock; v1.0 candidate for retirement."},
+      "ontology/primitives/": {"verdict": "keep-extend", "rationale": "Core v0.2 primitives; v1.0 adds Struct + ValueType + CapabilityToken + Marking + Automation + Webhook + ScenarioSandbox + AIPLogicFunction + SharedPropertyType."},
+      "ontology/functions/": {"verdict": "keep-extend", "rationale": "EditFunction + DerivedProperty + Reducer present; v1.0 adds AIPLogicFunction."},
+      "ontology/policies/": {"verdict": "keep-extend", "rationale": "SubmissionCriteria + RBACFragment + ForwardProp/BackwardProp present; v1.0 adds CapabilityToken + MarkingDeclaration."},
+      "ontology/lineage/": {"verdict": "keep-extend", "rationale": "DecisionLineage + EVENT_TYPE_REGISTRY present; v1.0 expands registry from 10 → 16+ variants."},
+      "ontology/generators/": {"verdict": "keep-extend", "rationale": "OSDK-2.0-config + LazyRef present; v1.0 adds codegen header contract + drift detection."},
+      "rendering/*": {"verdict": "keep-possibly-extend", "rationale": "Currently v0.1.0; mathcrew has theater-kind.ts + beat-template.ts — rendering axis may need extension for theater primitives in v1.0."}
+    },
+    "pluginFiles": {
+      "bridge/mcp-server.ts": {"verdict": "rewrite", "rationale": "Expand from 5 to 10+ MCP tools (add ontology_schema_get, project_register, codegen_trigger, scenario_create, capability_token_check). Version reconciliation needed (package.json 0.1.0 vs docs 0.2.0)."},
+      "lib/actions/": {"verdict": "keep-extend", "rationale": "Tier-1/Tier-2 pattern sound; v1.0 adds CapabilityToken pre-flight + Marking access check."},
+      "lib/codegen/": {"verdict": "rewrite", "rationale": "Add deterministic header contract (schema version + ontology hash + generator version + timestamp). Support home-ontology + project-ontology chain. Auto-invoke on schema edit."},
+      "lib/event-log/": {"verdict": "keep-extend", "rationale": "Append-only + 2000 concurrent writer limit proven. Add 6 event type variants."},
+      "lib/validation/pipeline.ts": {"verdict": "rewrite", "rationale": "4/6 phases; add Deploy + Merge phases; fail-fast mode."},
+      "hooks/hooks.json": {"verdict": "rewrite", "rationale": "6/27 events; add TaskCreated, TeammateIdle, SubagentStop, PostCompact, ShutdownRequest, TeamCreated/Deleted, TeammateJoin/Leave/Error, AgentStart/Stop/Error/Message, PlanApproval, MemoryWrite/Read, ToolApproval/Denied, CompactStart, UserPromptSubmit."},
+      "skills/pm-*": {"verdict": "keep-extend", "rationale": "7 skills operational (pm-action, pm-blueprint, pm-codegen, pm-init, pm-recap, pm-replay, pm-verify). v1.0 adds pm-ontology-register, pm-dispatch; expand pm-verify for new gates."},
+      "agents/*": {"verdict": "review", "rationale": "5 agents (action-executor, change-auditor, codegen-runner, ontology-verifier, propagation-tracer) optimized for v0.2; v1.0 may need prompt updates for new primitives. Not deeply read per source-map gaps."},
+      "managed-settings.d/50-palantir-mini.json": {"verdict": "rewrite", "rationale": "Add L2/L3 RBAC rules (CapabilityToken enforcement + Marking checks). Add deny rules for sensitive-action direct writes requiring CapabilityToken."},
+      "monitors/": {"verdict": "rewrite-and-wire", "rationale": "drift-watch.ts + event-log-tail.ts exist but not wired to hook events. v1.0 wires monitors to TeammateIdle + PostCompact hooks."},
+      "scripts/": {"verdict": "keep-review", "rationale": "log.ts + run.ts current; migrate-palantir-math-schema.ts is transitional — review for retirement post-v1.0 migration."}
+    }
+  },
+
+  "perProjectOntologyPlan": {
+    "home": {
+      "v1Path": "~/ontology/",
+      "status": "NEW in v1.0 (currently does not exist — critical ForwardProp repair)",
+      "primitives": [
+        "Shared core re-exports: ObjectType, LinkType, ValueType (NEW), InterfaceType, Struct (NEW), DerivedProperty, Reducer, ActionType, SubmissionCriteria, CapabilityToken (NEW), MarkingDeclaration (NEW), SharedPropertyType (NEW), AutomationDeclaration (NEW), WebhookDeclaration (NEW), ScenarioSandbox (NEW), AIPLogicFunction (NEW), EventTypeRegistry, DecisionLineage"
+      ],
+      "exports": "Shared primitive definitions re-exported from ~/.claude/schemas/ but scoped to ~/ as the 'home shared layer' — the control plane that projects extend. Also home-specific primitives (e.g., CrossProjectTeammate, CoordinatedPRWave) not needed by individual projects.",
+      "divergenceJustifications": []
+    },
+    "palantir-math": {
+      "v1Path": "~/palantir-math/ontology/",
+      "status": "EXISTING (14 files); extend from home ontology in v1.0",
+      "primitives": [
+        "Math-specific: ConceptPrimitive (math variant), JSXGraphRenderer, CoordinateSystem, ParametricCurve, FunctionGraph, AxisScale, TeachingState (pending D-cont-2 decision)"
+      ],
+      "extends": "home ontology shared core",
+      "divergenceJustifications": [
+        "JSXGraph rendering is math-specific",
+        "ConceptPrimitive taxonomy is math-domain (distinct from mathcrew ConceptPrimitive)",
+        "useTeachingState.ts keep/delete/restore decision deferred (D-cont-2)",
+        "F-1 full: jsxGraphRenderer functiongraph + parametric-curve body extraction requires curveHelpers.ts with 7 module-local symbols"
+      ]
+    },
+    "mathcrew": {
+      "v1Path": "~/mathcrew/ontology/",
+      "status": "EXISTING (16 files — richer than palantir-math; includes learn.ts + frontend-semantic-core.ts)",
+      "primitives": [
+        "Theater-specific: BeatTemplate, EventEnvelope, FrontendSemanticCore, TheaterKind, TeachingFlow, ConceptPrimitive (theater variant), 3D-scene primitives"
+      ],
+      "extends": "home ontology shared core",
+      "divergenceJustifications": [
+        "BeatTemplate is theater DSL",
+        "TheaterKind taxonomy is UX-specific",
+        "Theater-canvas-renderer.ts pending deletion (interactive-beat evaluator bridge required)",
+        "Runtime wiring: teaching-flow.ts Enter via enterSteps; should prefer beat.beatTemplate",
+        "Per-primitive Playwright goldens pending",
+        "FPS-driven adaptive tier auto-switch pending"
+      ]
+    }
+  },
+
+  "crossCuttingConcerns": [
+    "Schema lock: ~/.claude/schemas/ontology/types.ts and semantics.ts stay read-only per managed-settings.d deny rules during Phase A. v1.0 creates new canonical source in primitives/ layer and retires legacy types.ts/semantics.ts sections superseded by primitives.",
+    "Version reconciliation: palantir-mini plugin package.json shows 0.1.0 but docs + CLAUDE.md reference 0.2.0. Reconcile to true 0.2.x before v1.0 bump so version lineage is unambiguous.",
+    "Atomic 3-consumer migration: All three projects (~, palantir-math, mathcrew) must bump peerDep pin to @palantirKC/claude-schemas@1.0.0 simultaneously. Wave pattern required (home → math → crew or parallel coordinated PRs).",
+    "DC5 principle enforcement: DDD (bounded contexts — schemas axes, home/project ontology, plugin subsystems). DRY (shared core in ~/ontology/ is THE v1.0 win). OCP (versioned extension via per-axis version gates + CapabilityToken additive layer). PECS (in-out variance in Reducer<In,Out> + Edits[] producer/consumer contract).",
+    "Browse protocol: No broad scanning. All retrieval goes through BROWSE.md recipes. Marketplace/ only has BROWSE.md + INDEX.md today — content files may be stubs; flagged for review in legacy audit.",
+    "Event emission discipline: Every ontology-state file edit MUST emit ontology_edit event BEFORE write (enforced by hooks + plugin). v1.0 expands EVENT_TYPE_REGISTRY from 10 → 16+ variants.",
+    "ForwardProp repair: ~/ontology/ directory addition is THE critical repair. Without it, palantir-math + mathcrew have unmanaged duplication (both declare ConceptPrimitive, both define frontend patterns independently). This is the highest-leverage structural change in v1.0.",
+    "BackwardProp automation: Evaluator R1-R15 gate signals currently manual. v1.0 target: drift_detected + evaluation_recorded auto-trigger pm-codegen suggestions; evaluator signals emit ontology-refinement events consumable by /ontology-register skill. Reduces manual loop to automated.",
+    "Per-project ontology/ divergence: Documented + justified at primitive-level. palantir-math diverges on JSXGraph/math-concept. mathcrew diverges on theater/beat-template. Home ontology captures the intersection; divergences are leaf extensions.",
+    "Adapter-gap-analysis.md staleness: [Inference] dated 2026-03-17 references frontend-dashboard/convex paths from prior iteration — may not match current 3-project scope (palantirkc home / palantir-math / mathcrew). Useful for gap patterns, not for current code paths. Update or annotate as historical."
+  ]
 }

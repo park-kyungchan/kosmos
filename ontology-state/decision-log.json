@@ -1,109 +1,172 @@
 {
-  "version": "1.0.0-palantir-mini",
-  "lastUpdated": "2026-04-15T15:00:00Z",
-  "sessionId": "kosmos-research-2026-04-15-palantir-mini",
-  "previousBenchmarks": [
-    "jsxgraph-sequencer-001",
-    "mathcrew-content-delivery-001",
-    "mathcrew-photonic-realism-001"
-  ],
+  "version": "1.0.0-rebuild-2026-04-17",
+  "lastUpdated": "2026-04-17T18:00:00Z",
+  "sessionId": "kosmos-rebuild-research-0dff144d",
+  "priorSessionId": "impl-2026-04-17",
+  "priorBlueprintId": "universalization-h-a-plus-plus-2026-04-17",
   "leadAgent": "team-lead",
+  "researchMdInput": "~/NEXT_SESSION_ONTOLOGY_REBUILD.md",
+  "evaluatorGateResult": "ACCEPT",
+  "evaluatorReason": "R1-R15 all PASS (15/15). Winning hypothesis: H-A (clean-slate v1.0 rebuild). Key findings: (1) R1 PASS — 28 internal sources, 24 tier-1 [Official] dominates; (2) R2 PASS — contradictionStatus=resolved across all 8 scenarios; (3) R3 PASS — 8 scenarios across 2 hypotheses (4+4); (4) R4 PASS — 18 risks across winning scenarios (S-A1 3 risks, S-A2 2, S-A3 3, S-A4 4 + H-B 6); (5) R5 PASS — 27/28 sources currencyVerdict=authoritative; (6) R6 PASS — all 28 sources have provenance tag [Official]/[Synthesis]/[Inference]; (7) R7 PASS — winRationale is 200+ word structural argument citing WMO-031, user directive, 5 strategic dims; (8) R8 PASS — H-B preserved as alternative with full scenario coverage; (9) R9 PASS — S-A1+S-B1 evidenceSufficiency=sufficient; S-A3/A4/B2/B3/B4 partial but accompanied by whatWouldChangeDecision and NextExperiments (NE-01, NE-02); (10) R10 PASS — whatWouldChangeDecision arrays non-empty in all 8 scenarios (min 1, max 3); (11) R11 PASS — 32 objects distributed across 5 domains (D=11, L=8, A=8, S=3, LEARN=4 per dlaMapping + propagation pipelines); (12) R12 PASS — fourPillarMap.{ontology,aip,foundry,maven}.dc5PrincipleApplied all cite DDD+DRY+OCP+PECS explicitly; (13) R13 CONTEXT-PASS — forwardProp.healthStatus=broken (defect) but H-A recommendation has STRUCTURAL repair via ~/ontology/ home layer + home-ontology-shim prototype (P-H-A confirmed STRUCT_REGISTRY === shim-re-exported registry singleton identity); H-A wins over H-B precisely because H-A's repair is mandatory vs H-B opt-in; (14) R14 PASS — both P-H-A (263 LOC, tsc 0 errors) and P-H-B (238 LOC, tsc 0 errors) buildStatus=pass; (15) R15 PASS — H-A 22/22 passRate=1.0, H-B 16/16 passRate=1.0, both exceed 0.5 threshold, zero failure modes.",
   "entries": [
     {
       "type": "decomposition",
-      "timestamp": "2026-04-15T15:00:00Z",
+      "timestamp": "2026-04-17T14:10:00Z",
       "agent": "lead",
       "task": "T1",
-      "objective": "Build palantir-mini Claude Code plugin (v2.1.108) + ~/.claude/schemas/ontology extension implementing OSDK 2.0 patterns and Palantir's 5 must-include infra patterns (two-tier actions, edit functions returning Edits[] without commit, OSDK type codegen, 6-phase validation, submission criteria pre-flight) on append-only event log foundation, mirroring Anthropic Managed Agents Session/Harness/Sandbox virtualization, within Claude Code Native Runtime (API-Free, Claude Max X20, max v2.1.108 utilization). Cross-project: kosmos / palantir-math / mathcrew. Promote ~/.claude/research/palantir/ from declarative evidence to executable contract.",
-
+      "objective": "Design a ground-up Palantir Ontology/AIP/Foundry/Maven mirror for Claude Code Native Runtime spanning ~, ~/palantir-math/, ~/mathcrew/ (kosmos read-only). Permission granted: schemas v1.0 major bump, palantir-mini v1.0 plugin restructure, per-project ontology namespace reorganization, legacy skills rewrite. Deliverables feed Phase B plan for subsequent implementation session.",
+      "fourPillarTargetMapping": {
+        "ontology": "claude-schemas v1.0 as versioned object-model truth (Object Types, Link Types, Value Types, Interfaces, Structs, Derived Properties) + per-project ontology/ namespaces",
+        "aip": "Skills that dispatch semantic intent to ontology-aware actions (/palantir-dispatch, /ontology-register, /ship, /orchestrate) with event-emission contract",
+        "foundry": "palantir-mini v1.0 as operational substrate — MCP tools + hooks + codegen + 4-phase validation + RBAC + lineage",
+        "maven": "claude-schemas git-versioned artifact consumed via peerDependencies pin; SemVer-breaking v1.0 staged across 3 project consumers"
+      },
       "userMotivation": [
-        "3 projects (kosmos/palantir-math/mathcrew) reinvent the same ontology pattern 3x but learnings do not propagate",
-        "Foundry-shaped silos without Foundry's actual mechanisms (shared schema registry, propagation enforcement, change audit, capability tokens, OSDK regen)",
-        "Multi-runtime fragmentation: ontology trapped in Claude memory blob, Codex/Gemini reinvent",
-        "~/.claude/research/palantir/ is read-only evidence, not executable contract — code does not follow patterns",
-        "BackwardProp loop broken: kosmos generates blueprints, palantir-math/mathcrew runtime evidence does not feed back",
-        "palantir-math data.ts (141KB) approaching OSDK 1.x failure mode — needs OSDK 2.0 migration before pain compounds"
+        "3 projects reinvent ontology pattern with Foundry-shaped silos lacking Foundry mechanisms (shared schema registry, propagation enforcement, change audit, capability tokens, OSDK regen)",
+        "palantir-mini v0.2 is thin event-log wrapper; needs promotion to full operational substrate",
+        "~/.claude/research/palantir/ 15 subdirs + ~/.claude/schemas/ 4 axes include legacy files that need keep/deprecate/delete verdict",
+        "Skills today are slash-commands with per-project overlap; needs AIP-analog semantic intent dispatcher",
+        "Current state: schemas + plugin operational (Phase 1 analog); needed: semantic dispatch + operational gates (Phase 2 analog)"
       ],
-
       "constraints": [
         {
           "type": "billing",
-          "description": "API-Free: Claude Max X20 subscription only. No ANTHROPIC_API_KEY. No --bare flag, no Managed Agents API, no Bedrock/Vertex.",
+          "description": "API-Free: Claude Max X20 subscription only. No ANTHROPIC_API_KEY. No Managed Agents API.",
           "severity": "critical",
           "negotiable": false
         },
         {
           "type": "runtime",
-          "description": "Claude Code v2.1.108 native runtime only. Maximize: Agent Teams, ToolSearch, PreCompact decision:'block', plugin monitors manifest, managed-settings.d/, /recap, EnterWorktree path, TaskCreated/TaskCompleted hooks.",
+          "description": "Claude Code v2.1.110+ native runtime only. Utilize: Agent Teams, ToolSearch, 27 hook events, managed-settings.d/, plugin MCP server, palantir-mini v0.2 as bootstrap substrate.",
           "severity": "high",
           "negotiable": false
         },
         {
           "type": "scope",
-          "description": "Cross-project: ~/kosmos, ~/palantir-math, ~/mathcrew + global ~/.claude/plugins/palantir-mini/ + ~/.claude/schemas/ontology/ extension.",
+          "description": "In-scope: ~/, ~/palantir-math/, ~/mathcrew/. Read-only: ~/kosmos/ (research runtime). Global: ~/.claude/schemas/, ~/.claude/plugins/palantir-mini/, ~/.claude/research/palantir/.",
           "severity": "high",
           "negotiable": false
         },
         {
-          "type": "boundary",
-          "description": "Multi-runtime: Claude primary writer, Codex/Gemini consume schemas/ontology/ as readers via filesystem. No Codex/Gemini-specific runtime overlays.",
+          "type": "breaking-changes",
+          "description": "Allowed: schemas v1.0 major bump, plugin v1.0 full restructure, namespace reorganization, legacy deletion. All consumers must migrate together.",
+          "severity": "high",
+          "negotiable": false
+        },
+        {
+          "type": "schema-lock",
+          "description": "Do NOT edit ~/.claude/schemas/ontology/types.ts or semantics.ts during research phase (managed-settings.d/50-palantir-mini.json deny rules). Read-only until rebuild produces new canonical source.",
+          "severity": "critical",
+          "negotiable": false
+        },
+        {
+          "type": "research-quality",
+          "description": "Minimize external research (max ~5 queries, tier-1 only). Precisely inject ~/.claude/ contents (research library + schemas + plugin code) for reasoning. Blueprint + 13-section report are primary deliverables.",
+          "severity": "high",
+          "negotiable": false
+        },
+        {
+          "type": "consistency-policy",
+          "description": "Flexible: shared core (claude-schemas + palantir-mini) identical across 3 projects; per-project ontology/UX may diverge when domain demands it, but each divergence must be documented and justified.",
           "severity": "medium",
           "negotiable": true
         },
         {
-          "type": "research_quality",
-          "description": "Research over codegen: 13-section TechBlueprint is primary deliverable. v0 PoCs are 50-200 LOC each, validate concept not production.",
-          "severity": "high",
+          "type": "approval-gate",
+          "description": "Phase B plan requires EnterPlanMode + user approval before any Phase C write. Research session produces blueprint + report ONLY; no implementation writes outside ~/kosmos/ during Phase A.",
+          "severity": "critical",
           "negotiable": false
         }
       ],
-
+      "devConPhaseClassification": {
+        "from": "Phase 1 (Golden Tables) — partial: schemas + plugin exist but scattered",
+        "to": "Phase 2 (Operational Decision-Making) — ontology as authority, skills as dispatch, validation gates in CI",
+        "phase3Reach": "AI-First surfaces (semantic intent dispatcher /palantir-dispatch, autonomous ship with lineage-driven PR body) — prototyped in this session but full adoption deferred to future",
+        "rationale": "DevCon 5 §DC5-04: Phase 1 integrates data. Phase 2 puts decisions on that data. The user's rebuild targets exactly the Phase 1→2 bridge: schemas v1.0 = unified object model, plugin v1.0 = operational runtime, skills = semantic dispatch."
+      },
       "projectOntologyScope": {
         "backendOntology": {
           "domains": [
             {
               "id": "DATA",
               "name": "Data Domain",
-              "primitives": ["ObjectType", "LinkType", "ActionType", "PropertyType (24 branded)", "InterfaceType"],
+              "primitives": [
+                "ObjectType",
+                "ValueType",
+                "LinkType",
+                "Interface",
+                "Struct",
+                "DerivedProperty",
+                "BrandedRID"
+              ],
               "evidencePaths": [
                 "~/.claude/research/palantir/data/",
-                "~/.claude/schemas/ontology/types.ts"
+                "~/.claude/research/palantir/osdk/",
+                "~/.claude/schemas/ontology/types.ts",
+                "~/.claude/schemas/ontology/semantics.ts"
               ]
             },
             {
               "id": "LOGIC",
               "name": "Logic Domain",
-              "primitives": ["EditFunction (returns Edits[])", "DerivedProperty", "Reducer", "LinkConstraint"],
+              "primitives": [
+                "Reducer",
+                "EditFunction (returns Edits[])",
+                "ValidationRule",
+                "CodegenRule",
+                "DerivedPropertyFunction"
+              ],
               "evidencePaths": [
-                "~/.claude/research/palantir/logic/functions.md §LOGIC.FN-04",
-                "~/.claude/research/palantir/logic/README.md"
+                "~/.claude/research/palantir/logic/",
+                "~/.claude/plugins/palantir-mini/lib/codegen/",
+                "~/.claude/plugins/palantir-mini/lib/validation/"
               ]
             },
             {
               "id": "ACTION",
               "name": "Action Domain",
-              "primitives": ["Tier-1 Declarative Action", "Tier-2 Function-Backed Action", "SubmissionCriteria", "AtomicCommit"],
+              "primitives": [
+                "Skill (AIP-analog)",
+                "ActionType",
+                "SubmissionCriteria",
+                "AtomicCommit",
+                "EditFunction-to-Commit"
+              ],
               "evidencePaths": [
-                "~/.claude/research/palantir/action/mutations.md §ACTION.MU-09..17",
-                "~/.claude/research/palantir/action/README.md"
+                "~/.claude/research/palantir/action/",
+                "~/.claude/research/palantir/ship-os/",
+                "~/.claude/plugins/palantir-mini/skills/",
+                "~/.claude/plugins/palantir-mini/lib/actions/"
               ]
             },
             {
               "id": "SECURITY",
-              "name": "Security Domain (overlay)",
-              "primitives": ["Layer 1 RBAC", "CapabilityToken (vault pattern)", "PermissionsCascade"],
+              "name": "Security Domain",
+              "primitives": [
+                "RBACFragment (managed-settings.d)",
+                "SchemaLockRule",
+                "CapabilityToken",
+                "PermissionsCascade"
+              ],
               "evidencePaths": [
-                "~/.claude/research/palantir/security/README.md"
+                "~/.claude/research/palantir/security/",
+                "~/.claude/plugins/palantir-mini/managed-settings.d/"
               ]
             },
             {
               "id": "LEARN",
-              "name": "Learn Domain (BackwardProp foundation)",
-              "primitives": ["Append-only Event Log", "Decision Lineage 5-dim", "EvidenceSufficiency", "LineageReplay"],
+              "name": "Learn Domain",
+              "primitives": [
+                "EventLog (append-only, 5-dim Decision Lineage)",
+                "Snapshot",
+                "LineageReplay",
+                "EvidenceSufficiency",
+                "BackwardPropSignal"
+              ],
               "evidencePaths": [
+                "~/.claude/research/palantir/decision-lineage/",
                 "~/.claude/research/palantir/philosophy/digital-twin.md",
-                "https://www.anthropic.com/engineering/managed-agents",
-                "https://github.com/Yeachan-Heo/clawhip (event routing to prevent context pollution)"
+                "~/.claude/plugins/palantir-mini/lib/event-log/"
               ]
             }
           ]
@@ -112,393 +175,648 @@
           "surfaces": [
             {
               "id": "claude-code-cli",
-              "name": "Claude Code CLI session surface",
+              "name": "Claude Code CLI Native Runtime surface",
               "primitives": [
-                "Hooks (24 events incl. v2.1.108 PreCompact decision:'block', TaskCreated, TaskCompleted, PostToolUseFailure)",
-                "Skills (namespaced /palantir-mini:*)",
-                "Custom Subagents (.md frontmatter with tools allowlist + maxTurns + isolation + disallowedTools)",
+                "Hooks (27 events incl. PreCompact decision:'block', TaskCreated, TaskCompleted, MemoryWrite/Read)",
+                "Skills (plugin-scoped /palantir-mini:*, user-scoped /, project-scoped)",
+                "Custom Subagents (.md frontmatter with tools allowlist + mcpServers + memory + isolation)",
                 "Plugin Manifest (.claude-plugin/{plugin,marketplace}.json)",
-                "MCP Bridge (palantir-mini bridge/mcp-server.ts as Harness API)",
-                "managed-settings.d/ fragments per project"
+                "MCP Bridge (palantir-mini bridge/mcp-server.ts — Harness API analog)",
+                "managed-settings.d/ fragments (Layer-1 RBAC)",
+                "Auto-memory (Claude-local memory/ overlay)"
               ]
             },
             {
-              "id": "code-editor",
-              "name": "Code editor TypeScript surface",
+              "id": "documentation",
+              "name": "Documentation authority surface",
               "primitives": [
-                "Generated descenders (src/generated/ per project)",
-                "Branded RID types (ObjectTypeRid, LinkTypeRid, ActionTypeRid, etc.)",
-                "Exhaustive visitor unions (no switch statements)"
+                "CLAUDE.md (per-project runtime instructions)",
+                "BROWSE.md (query routing)",
+                "INDEX.md (structure + provenance)",
+                "Per-project ontology/README.md",
+                "CHANGELOG.md (schemas SemVer record)"
+              ]
+            },
+            {
+              "id": "codegen-output",
+              "name": "Generated TypeScript surface",
+              "primitives": [
+                "src/generated/* (with codegen header: schema version + ontology hash + timestamp)",
+                "Branded RID types (ObjectTypeRid, LinkTypeRid, ActionTypeRid)",
+                "Exhaustive visitor unions"
               ]
             }
           ]
         },
-        "crossProjectScope": ["~/kosmos", "~/palantir-math", "~/mathcrew"],
-        "globalScope": ["~/.claude/plugins/palantir-mini/", "~/.claude/schemas/ontology/"],
+        "crossProjectScope": [
+          "~",
+          "~/palantir-math",
+          "~/mathcrew"
+        ],
+        "readOnlyScope": [
+          "~/kosmos"
+        ],
+        "globalScope": [
+          "~/.claude/plugins/palantir-mini/",
+          "~/.claude/schemas/",
+          "~/.claude/research/palantir/"
+        ],
         "perProjectSessionDir": "<project>/.palantir-mini/session/{events.jsonl, snapshots/, handoffs/, locks/}",
-        "multiRuntimeBoundary": {
-          "writers": ["Claude Code"],
-          "readers": ["Codex", "Gemini"],
-          "interface": "filesystem (TypeScript declarations + events.jsonl)"
+        "fourPillarMapping": {
+          "ontology": "~/.claude/schemas/ + per-project ontology/ — versioned object-model truth",
+          "aip": "Skills as semantic-intent dispatchers reading/emitting to events.jsonl",
+          "foundry": "~/.claude/plugins/palantir-mini/ — operational substrate (MCP + hooks + codegen + validation + RBAC + lineage)",
+          "maven": "~/.claude/schemas/ as @palantirKC/claude-schemas git-versioned artifact consumed via peerDependencies pin"
         }
       },
-
       "researchQuestions": [
         {
           "id": "RQ-01",
-          "text": "Append-only event log foundation: minimum viable schema and atomic-append mechanism for cross-project ontology state under API-Free constraint?",
-          "domains": ["LEARN", "DATA"],
+          "text": "What minimal Palantir-native ontology primitive set must ship in claude-schemas v1.0 to faithfully mirror Palantir's 4-pillar system? Primitives to evaluate: ObjectType, LinkType, ValueType, Interface, Struct, DerivedProperty, Reducer, ActionType, SubmissionCriterion, EditFunction, BrandedRID. How do we stage v1.0 as SemVer-breaking across 3 project peerDep pins?",
+          "domains": [
+            "DATA",
+            "LOGIC"
+          ],
           "priority": "p0",
-          "scope": "events.jsonl format, EventEnvelope schema, atomic file lock mechanism, snapshot derivation from log, replay determinism, OMC clawhip pattern adaptation",
-          "successCriteria": "Schema published as TypeScript interface, append/read round-trip test passes, replay deterministic across runs"
+          "scope": "Enumerate current v0.2 axes (interaction 0.1.2 / meta 0.1.0 / ontology 1.12.0 / rendering 0.1.0). Gap-map against Palantir primitives. Design v1.0 axis structure with per-axis version gates. Migration path for 3-project peerDep bump.",
+          "successCriteria": "v1.0 primitive list with TypeScript sketches; axis-level version matrix; 3-project migration checklist; breaking-change manifest",
+          "retrieval": {
+            "internal": [
+              "palantir/data/",
+              "palantir/osdk/",
+              "palantir/logic/",
+              "schemas/ontology/"
+            ],
+            "external": [
+              "claude-schemas@0.2.1 current source"
+            ]
+          }
         },
         {
           "id": "RQ-02",
-          "text": "Two-tier action architecture (declarative tier-1 + function-backed tier-2) with read-only edit-function agents enforcing 'returns Edits[] without commit' via disallowedTools?",
-          "domains": ["ACTION", "LOGIC"],
+          "text": "What palantir-mini v1.0 plugin structure makes it a proper Foundry-analog? Enumerate: MCP tool surface (beyond current 5), hook set (beyond current 7), skill bundle, codegen contract, 4-phase validation, RBAC overlay, lineage model. What gaps exist in v0.2 layout (bridge/, lib/, hooks/, skills/, agents/, managed-settings.d/)?",
+          "domains": [
+            "LOGIC",
+            "ACTION"
+          ],
           "priority": "p0",
-          "scope": "Tier-1 declarative rule schema, Tier-2 function signature returning Edits[], SubmissionCriteria type, atomic commit wrapper, agent .md frontmatter pattern (disallowedTools per OMC architect.md)",
-          "successCriteria": "Both tiers compile + execute, edit-function agent .md uses disallowedTools deny-list, action-executor agent .md has Write/Edit allowlist, Edits[] round-trips correctly"
+          "scope": "v0.2 introspection (~/.claude/plugins/palantir-mini/*). Foundry reference capabilities. v1.0 file tree proposal with per-dir responsibility. MCP tool signatures. Hook event coverage.",
+          "successCriteria": "v1.0 plugin file tree; per-file responsibility matrix; MCP tool signature list; hook-to-event mapping; skill-to-primitive matrix",
+          "retrieval": {
+            "internal": [
+              "palantir/platform/",
+              "palantir/architecture/",
+              "palantir/ship-os/",
+              "palantir/validation/"
+            ],
+            "external": []
+          }
         },
         {
           "id": "RQ-03",
-          "text": "OSDK 2.0 type codegen pattern (branded RID, separated client/generated, lazy loading) applied to ontology declarations across kosmos/palantir-math/mathcrew?",
-          "domains": ["DATA", "LOGIC"],
+          "text": "What skill set mirrors Palantir AIP's 'semantic intent → action' dispatch? Specifically: /palantir-dispatch (intent classifier + skill router), /ontology-register (primitive registration + codegen emission), /ship (lineage-driven PR), /orchestrate (plugin-substrate DAG). How do skills interlock with event lineage?",
+          "domains": [
+            "ACTION",
+            "LOGIC"
+          ],
           "priority": "p0",
-          "scope": "Branded RID type generator, descender generation entry point, client/generated split enforcement (palantir/osdk-ts pattern), lazy module loading",
-          "successCriteria": "Codegen produces valid TS for at least 1 project (palantir-math first), tsc passes, regen is idempotent, separated layers compile independently"
+          "scope": "Current skill inventory (user-scope deprecated stubs + plugin pm-* + per-project). Skills rebuild matrix (keep/rewrite/delete). New skill specs. Each skill's event-emission contract and ontology read/write authority.",
+          "successCriteria": "Skills rebuild matrix with verdict per skill; new-skill spec set; dispatcher design; event contract per skill",
+          "retrieval": {
+            "internal": [
+              "palantir/action/",
+              "palantir/entry/",
+              "palantir/ship-os/",
+              "plugins/palantir-mini/skills/"
+            ],
+            "external": []
+          }
         },
         {
           "id": "RQ-04",
-          "text": "MCP bridge as Harness API: which MCP tools to expose for Session/Harness/Sandbox virtualization within Native Runtime?",
-          "domains": ["ACTION", "LEARN"],
+          "text": "What authority chain governs per-project ontology divergence while maintaining shared-core consistency? palantir-math has math entities + JSXGraph renderers; mathcrew has theater beats + teaching flows; home repo has universal tooling. How do they diverge without coupling breakage?",
+          "domains": [
+            "LOGIC",
+            "DATA"
+          ],
           "priority": "p1",
-          "scope": "MCP server file structure (per OMC bridge/mcp-server.cjs), tool schema for get_ontology / emit_event / apply_edit_function / commit_edits / replay_lineage, integration with .mcp.json, SSE event protocol",
-          "successCriteria": "MCP server registers 5 tools, all callable from Claude Code session via mcp__palantir-mini__* tool names, round-trip test passes"
+          "scope": "Authority chain design (research → schemas → project ontology → contracts → runtime). Per-project namespace matrix. Divergence justification protocol.",
+          "successCriteria": "Authority chain diagram; per-project namespace plan; divergence checkpoint rules",
+          "retrieval": {
+            "internal": [
+              "palantir/architecture/",
+              "palantir/cross-cutting/",
+              "palantir/philosophy/"
+            ],
+            "external": []
+          }
         },
         {
           "id": "RQ-05",
-          "text": "6-phase (or 3-phase minimum) validation pipeline using v2.1.108 hooks (PreCompact decision:'block', PostToolUseFailure, TaskCreated/Completed) with managed-settings.d/ fragments per project?",
-          "domains": ["LOGIC", "SECURITY"],
+          "text": "Which files in ~/.claude/research/palantir/ (~61 files, 15 subdirs, ~1205 markers) and ~/.claude/schemas/ (4 axes) are authoritative vs legacy? Produce keep/deprecate/delete verdict per subdirectory/file with one-line reason, classified under 4-pillar mirror.",
+          "domains": [
+            "DATA"
+          ],
           "priority": "p1",
-          "scope": "Phase definitions (Design/Compile/Runtime/Post-Write minimum), hook handler scripts via thin bootstrapper (per OMC), managed-settings.d/ fragment template, error class taxonomy per phase",
-          "successCriteria": "Each phase catches at least 1 distinct error class, hook fires on every Edit(ontology/*), managed-settings.d/ loads cleanly across 3 projects"
+          "scope": "Full enumeration. Mark currency (referenced in recent PRs/commits) vs stale. Classify under Ontology/AIP/Foundry/Maven. Primitives-to-preserve manifest.",
+          "successCriteria": "Per-subdirectory verdict table with one-line rationale; primitives-to-preserve list; deprecate/delete queue",
+          "retrieval": {
+            "internal": [
+              "full ~/.claude/research/palantir/ enumeration",
+              "full ~/.claude/schemas/ enumeration"
+            ],
+            "external": []
+          }
         },
         {
           "id": "RQ-06",
-          "text": "Submission criteria pre-flight gates as foundation for progressive autonomy?",
-          "domains": ["ACTION", "SECURITY"],
+          "text": "What does a Palantir-analog /ship + /orchestrate pipeline look like? /ship must: read events.jsonl → generate PR body, run pm-verify 4-phase gates, enforce schema lock + codegen drift before merge, emit session_complete. /orchestrate must drive every phase transition via plugin MCP calls.",
+          "domains": [
+            "ACTION"
+          ],
           "priority": "p1",
-          "scope": "SubmissionCriteria type, pre-flight evaluator function, gate failure event emission, integration with action-executor agent",
-          "successCriteria": "Failed criteria block action commit + emit event, success criteria allow commit + emit event, both events retrievable from log"
+          "scope": "Current /ship + /orchestrate. Gaps vs ontology-first dispatch. v1.0 redesign with event-emission contract per phase.",
+          "successCriteria": "Pipeline diagram per skill; event contracts per phase; validation gate sequence; PR body template from events.jsonl",
+          "retrieval": {
+            "internal": [
+              "palantir/ship-os/",
+              "palantir/decision-lineage/",
+              "palantir/validation/"
+            ],
+            "external": []
+          }
         },
         {
           "id": "RQ-07",
-          "text": "Migration sequencing from existing palantir-math (most mature) to mathcrew to kosmos with backward compatibility?",
-          "domains": ["DATA", "ACTION", "LEARN"],
+          "text": "What deterministic codegen contract turns a project's ontology/*.json into src/generated/* (ObjectType RIDs, LinkType helpers, ActionType signatures, validators)? Where does the generator live (plugin vs consumer)? How does pm-verify enforce byte-identical regeneration?",
+          "domains": [
+            "LOGIC",
+            "DATA"
+          ],
           "priority": "p2",
-          "scope": "palantir-math changeContracts.ts (66KB) + capabilities.ts (57KB) + data.ts (141KB) -> palantir-mini equivalents, preserve git history, compat shim during transition",
-          "successCriteria": "palantir-math compiles + runs after migration, no breaking changes to existing consumers, clean rollback path"
+          "scope": "OSDK 2.0 patterns. Current pm-codegen. Plugin-side vs consumer-side tradeoffs. Codegen header contract (schema version + ontology hash + generator version + timestamp). Drift detection in pm-verify.",
+          "successCriteria": "Codegen contract spec; ownership decision (plugin-side favored); pm-verify codegen gate logic; header format spec",
+          "retrieval": {
+            "internal": [
+              "palantir/osdk/",
+              "palantir/typescript/",
+              "palantir/validation/",
+              "plugins/palantir-mini/lib/codegen/"
+            ],
+            "external": [
+              "context7: osdk-ts latest pattern (if needed, minimal)"
+            ]
+          }
         }
       ],
-
-      "routingDecisions": [
+      "retrievalStrategy": {
+        "internal-first": "All 7 RQs have internal primary; external is supplement only",
+        "external-budget": "Maximum 5 queries, tier-1 sources only (claude code plugin docs, osdk github, bun workspaces doc)",
+        "internal-sources": {
+          "primary": "~/.claude/research/palantir/ (15 subdirs)",
+          "secondary": "~/.claude/schemas/ (4 axes)",
+          "tertiary": "~/.claude/plugins/palantir-mini/ (current v0.2 source)",
+          "context": [
+            "~/NEXT_SESSION_ONTOLOGY_REBUILD.md (user directive)",
+            "~/UNIVERSALIZATION.md (prior W1-W4 architecture)",
+            "~/kosmos/ontology-state/ (prior blueprint)"
+          ]
+        }
+      },
+      "pipelineStages": [
         {
-          "task": "T2 (internal browse)",
-          "owner": "researcher",
-          "routes": [
-            "~/.claude/research/BROWSE.md (top router)",
-            "~/.claude/research/palantir/{action,logic,validation,typescript,security,philosophy}/",
-            "~/.claude/research/claude-code/palantir-mini-blueprint.md (THE v0 architecture document)",
-            "~/.claude/research/claude-code/features.md (v2.1.108 baseline + delta)",
-            "~/.claude/research/claude-code/managed-agents.md",
-            "~/.claude/research/claude-code/agent-system-design.md"
-          ],
-          "rationale": "Highest density evidence for the 5 must-include patterns + Native Runtime mechanics. palantir-mini-blueprint.md already synthesizes prior research into the v0 architecture."
+          "stage": 1,
+          "name": "Requirements Intake",
+          "owner": "lead",
+          "status": "completed",
+          "output": "decision-log.json (this entry)"
         },
         {
-          "task": "T3 (external research)",
+          "stage": 2,
+          "name": "Internal Browse",
           "owner": "researcher",
-          "targets": [
-            {
-              "name": "Anthropic Managed Agents",
-              "urls": [
-                "https://www.anthropic.com/engineering/managed-agents",
-                "https://platform.claude.com/docs/en/api/beta/agents/create",
-                "https://platform.claude.com/docs/en/managed-agents/overview"
-              ],
-              "tier": "tier-1-official-docs"
-            },
-            {
-              "name": "Palantir OSDK 2.0",
-              "urls": [
-                "https://github.com/palantir/osdk-ts",
-                "https://github.com/palantir/conjure-typescript",
-                "https://www.palantir.com/docs/foundry/ontology-sdk/typescript-osdk-migration"
-              ],
-              "tier": "tier-1-official-docs"
-            },
-            {
-              "name": "oh-my-claudecode (best practice reference, already deep-dived)",
-              "urls": [
-                "https://github.com/Yeachan-Heo/oh-my-claudecode",
-                "https://github.com/Yeachan-Heo/clawhip"
-              ],
-              "tier": "tier-3-vendor-blogs",
-              "note": "Already deep-dived this session — see ~/.claude/research/claude-code/palantir-mini-blueprint.md OMC section. T3 should verify, not re-research."
-            },
-            {
-              "name": "Claude Code v2.1.108",
-              "urls": [
-                "https://code.claude.com/docs/en/changelog",
-                "https://code.claude.com/docs/en/agent-teams",
-                "https://code.claude.com/docs/en/hooks",
-                "https://code.claude.com/docs/en/plugins-reference"
-              ],
-              "tier": "tier-1-official-docs"
-            }
-          ],
-          "rationale": "Tier-1 sources (official Anthropic + Palantir + most-starred Korean CC plugin reference)"
+          "status": "pending",
+          "output": "source-map.json (internal)"
+        },
+        {
+          "stage": 3,
+          "name": "External Research",
+          "owner": "researcher",
+          "status": "pending",
+          "output": "source-map.json (external, minimized)"
+        },
+        {
+          "stage": 4,
+          "name": "Ontology Normalization",
+          "owner": "ontologist",
+          "status": "pending",
+          "output": "world-model.json"
+        },
+        {
+          "stage": 5,
+          "name": "Hypothesis Generation",
+          "owner": "simulator",
+          "status": "pending",
+          "output": "scenarios.json (hypotheses)"
+        },
+        {
+          "stage": 6,
+          "name": "Simulation Loop",
+          "owner": "simulator",
+          "status": "pending",
+          "output": "scenarios.json (11-dim scored)"
+        },
+        {
+          "stage": 7,
+          "name": "Prototype A + B",
+          "owner": "prototyper",
+          "status": "pending",
+          "output": "prototype/ + eval-results.json (build)"
+        },
+        {
+          "stage": 8,
+          "name": "Eval Gate",
+          "owner": "eval-runner",
+          "status": "pending",
+          "output": "eval-results.json (test suites)"
+        },
+        {
+          "stage": 9,
+          "name": "Evaluate + Debate",
+          "owner": "evaluator",
+          "status": "pending",
+          "output": "decision-log.json (gate verdict) + eval-results.json"
+        },
+        {
+          "stage": 10,
+          "name": "Blueprint + Report",
+          "owner": "reporter",
+          "status": "pending",
+          "output": "blueprint.json + reports/final-report.md"
         }
       ],
-
-      "devCon5Application": {
-        "phase1_GoldenTables": "events.jsonl per project = the durable Golden Table. Snapshots derived from log. ~/.claude/schemas/ontology/ = stable typed interface (the OSDK).",
-        "phase2_OperationalDecisionMaking": "Two-tier actions (declarative + function-backed) + submission criteria + 6-phase validation pipeline. Edit functions return Edits[] without commit. Action wraps with atomic commit.",
-        "phase3_AIFirst": "MCP bridge exposes operations for Claude/Codex/Gemini. ontology-verifier agent proactively detects drift. Decision lineage 5-dim enables AIP Automate staged review (deferred to future phase)."
+      "legacyAuditScope": {
+        "researchLibrary": {
+          "path": "~/.claude/research/palantir/",
+          "subdirs": [
+            "action",
+            "architecture",
+            "cross-cutting",
+            "data",
+            "decision-lineage",
+            "entry",
+            "logic",
+            "marketplace",
+            "osdk",
+            "philosophy",
+            "platform",
+            "security",
+            "ship-os",
+            "typescript",
+            "validation"
+          ],
+          "verdict": "Pending (RQ-05 deliverable)"
+        },
+        "schemasRepo": {
+          "path": "~/.claude/schemas/",
+          "axes": [
+            "interaction@0.1.2",
+            "meta@0.1.0",
+            "ontology@1.12.0",
+            "rendering@0.1.0"
+          ],
+          "verdict": "Pending (RQ-01 + RQ-05 deliverable)"
+        },
+        "pluginRepo": {
+          "path": "~/.claude/plugins/palantir-mini/",
+          "version": "0.2.0",
+          "layout": [
+            "bridge/",
+            "lib/{actions,codegen,event-log,validation}/",
+            "hooks/",
+            "skills/pm-{action,blueprint,codegen,init,recap,replay,verify}/",
+            "agents/",
+            "managed-settings.d/"
+          ],
+          "verdict": "Pending (RQ-02 deliverable)"
+        },
+        "skillsInventory": {
+          "user-scope": {
+            "path": "~/.claude/skills/",
+            "skills": [
+              "lsp-audit",
+              "orchestrate",
+              "palantir-walk",
+              "pm-* (deprecated stubs)",
+              "ship",
+              "tavily-cli"
+            ],
+            "verdict": "Pending (RQ-03)"
+          },
+          "plugin-scope": {
+            "path": "~/.claude/plugins/palantir-mini/skills/",
+            "skills": [
+              "pm-action",
+              "pm-blueprint",
+              "pm-codegen",
+              "pm-init",
+              "pm-recap",
+              "pm-replay",
+              "pm-verify"
+            ],
+            "verdict": "Pending (RQ-03)"
+          },
+          "palantir-math": {
+            "path": "~/palantir-math/.claude/skills/",
+            "skills": [
+              "concept-math",
+              "concept-math-workspace",
+              "palantir-math",
+              "palantir-math-workspace",
+              "sequencer-conc",
+              "sequencer-math",
+              "vc-scenario"
+            ],
+            "verdict": "Pending (RQ-03)"
+          },
+          "mathcrew": {
+            "path": "~/mathcrew/.claude/skills/",
+            "skills": [
+              "3d-scene-audit",
+              "verify"
+            ],
+            "verdict": "Pending (RQ-03)"
+          },
+          "kosmos": {
+            "path": "~/kosmos/.claude/skills/",
+            "skills": [
+              "kosmos-research"
+            ],
+            "verdict": "READ-ONLY (out of scope)"
+          }
+        },
+        "openPRs": "Pending (researcher will enumerate via gh pr list on 3 projects)"
       },
-
-      "hypothesisProvisional": {
-        "winnerCandidate": "Hypothesis A: Append-only event log foundation",
-        "rationale": "Independent convergence from three references: (1) Anthropic Managed Agents engineering article ('Session = append-only log of everything that happened'), (2) Palantir Decision Lineage 5-dim (when/atop_which/through_which/by_whom/with_what), (3) OMC clawhip 'event routing to prevent context pollution'. Three independent sources agree.",
-        "competitor": "Hypothesis B: Snapshot-based with StaleObject optimistic concurrency",
-        "competitorEvidence": "Palantir validation/README.md StaleObject pattern is real and proven, but is for in-place mutation, not stateless harness model. Adversarial scenario: two parallel writers create lost updates."
-      }
+      "knownDeferredItems": [
+        {
+          "project": "mathcrew",
+          "source": "mathcrew/docs/THEATER-REBUILD-2026-04.md (PR #87 merged 2026-04-17)",
+          "items": [
+            "Runtime wiring: teaching-flow.ts drives Enter via enterSteps; should prefer beat.beatTemplate",
+            "Interactive-beat evaluator bridge — enables theater-canvas-renderer.ts deletion",
+            "Per-primitive Playwright goldens",
+            "FPS-driven adaptive tier auto-switch"
+          ]
+        },
+        {
+          "project": "palantir-math",
+          "source": "Session memory (F-1 full + D-cont-2)",
+          "items": [
+            "F-1 full: jsxGraphRenderer functiongraph + parametric-curve body extraction, requires curveHelpers.ts with 7 module-local symbols",
+            "D-cont-2: useTeachingState.ts keep/delete/restore decision"
+          ]
+        },
+        {
+          "project": "palantirkc (home)",
+          "source": "W1 PR #43 follow-ups",
+          "items": [
+            "SECURITY-tavily-rotation: TAVILY_API_KEY in settings.json flagged, not rotated"
+          ]
+        }
+      ],
+      "behavioralConstraints": [
+        "Do NOT edit ~/.claude/schemas/ontology/types.ts or semantics.ts during Phase A (schema lock)",
+        "Do NOT modify ~/kosmos/ runtime code (only ontology-state/ + reports/ + prototype/)",
+        "Do NOT skip D/L/A classification on any finding (R11)",
+        "Do NOT skip DevCon 5 principle analysis (DDD/DRY/OCP/PECS) (R12)",
+        "Do NOT produce blueprint without ForwardProp + BackwardProp health (R13)",
+        "Do NOT collapse to single hypothesis before simulation (R8)",
+        "Do NOT blur provenance tags [Official]/[Synthesis]/[Inference] (R6)",
+        "Prototypes minimal: 50-200 LOC each, TypeScript, bunx tsc --noEmit must pass (R14)",
+        "Eval pass rate must exceed 0.5 per prototype (R15)",
+        "Minimize external research (user directive + R1 tier-4/5 constraint)",
+        "Emit ontology_edit event BEFORE every ontology-state/ file write (plugin substrate requirement)"
+      ],
+      "exitCondition": "Blueprint + 13-section report accepted by evaluator R1-R15 gate. If rejected, debate ≤ 2 rounds. On terminal rejection, return to researcher for fresh evidence."
     },
     {
-      "type": "evaluation",
-      "timestamp": "2026-04-15T18:30:00Z",
-      "agent": "evaluator",
-      "task": "T10",
-      "inputsConsulted": [
-        "ontology-state/decision-log.json (T1 decomposition, 7 RQs, provisional H-A winner)",
-        "ontology-state/source-map.json (T2+T3, 12 sources, 30 claims, 6 contradictions all either resolved or deliberately architectural)",
-        "ontology-state/world-model.json (T4, 28 primitives, 5 domains populated, overallForwardPropStatus=healthy, overallBackwardPropStatus=healthy, DDD/DRY/OCP/PECS all applied)",
-        "ontology-state/scenarios.json (T5+T6, 3 hypotheses, 12 scenarios, 11-dim scoring, 2 revision rounds, provisional H-A + H-C winner)",
-        "ontology-state/eval-results.json (T7+T8+T9, both prototypes buildStatus=success, H-A 10/10 clean, H-B 10/10 formal with 4 classified FailureModes)",
-        "~/.claude/research/claude-code/palantir-mini-blueprint.md (v0 architecture, 3 corrections, 5 gap fills)"
-      ],
-      "rejectionCriteriaApplied": [
+      "type": "lead_observations",
+      "timestamp": "2026-04-17T09:15:54.026Z",
+      "agent": "lead",
+      "context": "Parallel verification during simulator T5-T6 execution",
+      "observations": [
         {
-          "rule": "R1",
-          "name": "Low-tier dependency",
-          "triggered": false,
-          "note": "Critical claims anchor on tier-1 sources: Anthropic Managed Agents (official), Palantir Decision Lineage / mutations / validation / functions (official), Claude Code hooks+plugins-reference (official), Palantir OSDK v2 Edits (official). Only src-ext-proper-lockfile is tier-3-vendor-blogs, and it is not critical (fs.mkdir fallback is the production path and was empirically validated in T7)."
+          "id": "OBS-01",
+          "topic": "Plugin version discrepancy (RQ-02)",
+          "finding": "palantir-mini plugin has version drift: package.json shows v0.1.0 with description mentioning Claude Code v2.1.108 (stale). plugin.json manifest shows v0.2.0 with requiresClaudeCodeVersion >=2.1.110. Before v1.0 bump, package.json must be reconciled to v0.2.x AND description updated to current runtime.",
+          "evidence": "~/.claude/plugins/palantir-mini/package.json line 3 + plugin.json",
+          "relevance": "RQ-02 plugin v1.0 structure; migration checklist",
+          "severity": "cleanup-required-before-v1"
         },
         {
-          "rule": "R2",
-          "name": "Unresolved contradictions",
-          "triggered": false,
-          "note": "Scenario contradictionStatus audit: S-HA-BASE=none, S-HA-BEST=none, S-HA-WORST=evidence-gap-driven (T7 fills), S-HA-ADV=evidence-gap-driven (T7 fills and empirically resolved with 0 lost events / 2000), S-HB-BASE=unresolvable (classified as irreconcilable architectural fork — H-B is NOT the winner, so this preserves rather than blocks the decision), all remaining scenarios either none or resolved. source-map.json contradictions 01-05 resolved, contra-06 (StaleObject in append-only) empirically resolved by T7 adversarial race (0 lost events, sequence counter works as version vector per gap-01)."
+          "id": "OBS-02",
+          "topic": "Stub subdirectories in research library (RQ-05)",
+          "finding": "Two research subdirs are stubs with only BROWSE.md + INDEX.md: marketplace/ (53 LOC total) confirmed stub, osdk/ (53 LOC total) where INDEX.md references 4 content files (osdk-2.0-architecture.md, osdk-version-pinning.md, osdk-1-to-2-migration.md, pm-codegen-vs-osdk.md) that DO NOT exist. osdk/ is partial stub.",
+          "evidence": "ls ~/.claude/research/palantir/marketplace/ and /osdk/ + wc -l",
+          "relevance": "RQ-05 legacy audit correction — world-model marked osdk=keep but should be keep-flagged-content-missing",
+          "severity": "legacy-audit-correction"
         },
         {
-          "rule": "R3",
-          "name": "Missing scenario link",
-          "triggered": false,
-          "note": "Recommendation winner H-A is backed by 4 scenarios (S-HA-BASE, S-HA-BEST, S-HA-WORST, S-HA-ADV). H-C co-winner backed by 4 scenarios (S-HC-*). scenarioIds count per winning path >= 1 (actually 8)."
+          "id": "OBS-03",
+          "topic": "typescript/ subdir is NOT a stub",
+          "finding": "typescript/ has 2 substantive files: type-safety-as-grounding.md (241 LOC) + typescript-first-class-language.md (286 LOC), proper [§TS.TSG-*] / [§TS.FCL-*] markers, [Official] provenance. world-model marked keep-low-priority but content is authoritative.",
+          "evidence": "wc -l + head reads of typescript/ files",
+          "relevance": "RQ-05 — upgrade typescript/ verdict keep-low-priority -> keep-authoritative",
+          "severity": "legacy-audit-upgrade"
         },
         {
-          "rule": "R4",
-          "name": "Missing risk link",
-          "triggered": false,
-          "note": "strongestContradictionsFlagged in scenarios.json lists 3 flagged risks (flag-01 S-HA-ADV race, flag-02 H-B LEARN violation, flag-03 Bun compat). criticalRisks surfaced here and propagate to reporter. riskIds >= 1."
+          "id": "OBS-04",
+          "topic": "Hook event coverage confirmed 6/27 (RQ-02)",
+          "finding": "palantir-mini v0.2 hooks.json registers 6 events: PreToolUse, PostToolUse, PreCompact, TaskCompleted, Stop, SessionStart. 21/27 unregistered. Critical missing: TaskCreated, TeammateIdle, SubagentStop, PostCompact, MemoryWrite/Read, Agent lifecycle.",
+          "evidence": "JSON.parse on hooks.json via bun",
+          "relevance": "RQ-02 v1.0 deliverable — hook registration expansion",
+          "severity": "confirmed-v1-deliverable"
         },
         {
-          "rule": "R5",
-          "name": "Stale evidence",
-          "triggered": false,
-          "note": "source-map.json: 0 claims with freshnessStatus='stale'. Distribution: most claims are 'current', two are 'aging' (proper-lockfile 2020, Palantir Decision Lineage 2024). 0/30 stale << 50% threshold."
+          "id": "OBS-05",
+          "topic": "Home repo ontology/ absence confirmed (RQ-04)",
+          "finding": "ls $HOME/ontology/ empty. palantir-math has 14 files, mathcrew has 16. UNIVERSALIZATION.md names home repo 'control plane' but ontology/ layer absent, breaking ForwardProp authority chain.",
+          "evidence": "ls $HOME/ontology/ + UNIVERSALIZATION.md line 22",
+          "relevance": "RQ-04 v1.0 critical delivery: add ~/ontology/ as shared-core namespace",
+          "severity": "critical-forwardprop-repair"
         },
         {
-          "rule": "R6",
-          "name": "Blurred provenance",
-          "triggered": false,
-          "note": "All claims tagged with provenance: 'official' (28) / 'synthesis' (1) / 'inference' (1). clm-ext-24 is the single inference claim and explicitly flagged as inferred with confidence=0.75. No mixed tagging."
+          "id": "OBS-06",
+          "topic": "Prior blueprint schema (template for T11)",
+          "finding": "Prior blueprint.json uses: schemaVersion, generatedBy, id, createdAt, updatedAt, createdBy, projectScope, designPrinciples, primitives, ontologyMapping, recommendedStack, forwardProp, backwardProp, implementationStrategy, evaluatorGate, evaluatorReason, scenarioIds, riskIds, sourceIds, confidence, prototypeResults, winRationale, alternatives, whatWouldChangeDecision. Reporter should extend with: fourPillarMap, legacyAuditSummary, perProjectOntologyPlan, migrationSequence.",
+          "evidence": "JSON.parse on prior blueprint.json",
+          "relevance": "T11 schema continuity — backward-compatible shape",
+          "severity": "reporter-schema-guidance"
         },
         {
-          "rule": "R7",
-          "name": "Missing win rationale",
-          "triggered": false,
-          "note": "winRationale is specific and non-generic: three independent evaluation axes (architectural convergence + empirical superiority + ontology fit), each backed by enumerated evidence paths."
+          "id": "OBS-07",
+          "topic": "Scoring rubric scale correction (T5-T6)",
+          "finding": "docs/scoring-rubric.md uses 1-5 scale (not 1-7). Initial simulator prompt said 1-7. Correction SendMessage sent 2026-04-17T09:12:14Z before scenarios.json written.",
+          "evidence": "scoring-rubric.md lines 9-131",
+          "relevance": "T6 scoring quality; aggregate mean calculation",
+          "severity": "correction-sent"
         },
         {
-          "rule": "R8",
-          "name": "No alternatives",
-          "triggered": false,
-          "note": "Alternatives preserved on record: H-B (snapshot+StaleObject) is the formal competitor, scored with 4 scenarios, and kept in the decision log with empirical defeat documentation. alternatives[] >= 1."
+          "id": "OBS-08",
+          "topic": "mathcrew deferred items verified (RQ-06)",
+          "finding": "mathcrew/docs/THEATER-REBUILD-2026-04.md 4 deferred items verified: (1) runtime wiring teaching-flow.ts beatTemplate preference, (2) interactive-beat evaluator bridge enabling theater-canvas-renderer.ts deletion, (3) per-primitive Playwright goldens, (4) FPS-driven adaptive tier auto-switch. Phase C items.",
+          "evidence": "head /home/palantirkc/mathcrew/docs/THEATER-REBUILD-2026-04.md",
+          "relevance": "Blueprint whatWouldChangeDecision + reports Risks section + evaluator R10",
+          "severity": "context-enrichment"
         },
         {
-          "rule": "R9",
-          "name": "Insufficient evidence",
-          "triggered": false,
-          "note": "Winning scenario S-HA-BASE evidenceSufficiency='sufficient'. S-HA-BEST=partial, S-HA-WORST=partial, S-HA-ADV=partial — but partial is not insufficient per rubric, and T7+T9 empirical results upgraded the partial scenarios by filling the Bun compatibility gap and the 2-writer race gap."
-        },
-        {
-          "rule": "R10",
-          "name": "Missing reversal conditions",
-          "triggered": false,
-          "note": "whatWouldChangeDecision has 3 concrete reversal conditions listed below (Bun+fs.mkdir fallback failure, H-C integration failure, CRDT-based MCP pattern emergence). >= 1."
-        },
-        {
-          "rule": "R11",
-          "name": "D/L/A classification missing",
-          "triggered": true,
-          "hypothesis": "H-B",
-          "severity": "critical",
-          "evidence": "ontology-state/eval-results.json evalSuites[1].failureModes[0]: 24.2% empirical update loss rate (484/2000 in run1, 56-484 across 3 runs). LEARN domain cannot be reliably populated from a lossy substrate — prim-learn-01 AppendOnlyEventLog and prim-learn-04 LineageReplay are structurally impossible on H-B. Also confirmed by scenarios.json S-HB-BASE contradictionStatus='unresolvable' (irreconcilable LEARN centrality violation).",
-          "decisionImpact": "This trigger is NOT a pipeline defect — it is the empirical confirmation of H-B's architectural defeat. Winning hypothesis H-A populates all 5 domains first-class per world-model.json (DATA/LOGIC/ACTION/SECURITY/LEARN, 28 primitives, overallForwardPropStatus=healthy). R11 on H-B strengthens, not weakens, the recommendation."
-        },
-        {
-          "rule": "R12",
-          "name": "DevCon 5 principles not applied",
-          "triggered": false,
-          "note": "world-model.json devCon5PrinciplesApplied=['DDD','DRY','OCP','PECS'] with per-primitive findings documented. H-A devcon5Alignment: DDD PASS / DRY PASS / OCP PASS / PECS PASS (scenarios.json hypothesis H-A). All 28 primitives have per-principle analysis in world-model.json."
-        },
-        {
-          "rule": "R13",
-          "name": "ForwardProp/BackwardProp broken",
-          "triggered": true,
-          "hypothesis": "H-B",
-          "severity": "high",
-          "evidence": "ontology-state/eval-results.json evalSuites[1].failureModes[1]+[3]: TOCTOU window non-atomic in snapshot write path (ACTION critical); no lineage across versions — prior states irrecoverable after overwrite (DATA high). BackwardProp path from H-B substrate to ontology is structurally broken: replay_lineage cannot reconstruct history from a substrate that only holds current snapshot state. Also confirmed by scenarios.json S-HB-BASE architectureImplications 'LOSS: BackwardProp path is crippled'.",
-          "decisionImpact": "Same posture as R11: triggers on H-B, confirms H-A win, not a pipeline defect. H-A's own ForwardProp+BackwardProp paths are healthy per world-model.json (overallForwardPropStatus=healthy, overallBackwardPropStatus=healthy)."
-        },
-        {
-          "rule": "R14",
-          "name": "Prototype build failure",
-          "triggered": false,
-          "note": "Both prototypes buildStatus=success. H-A: 5 pass / 0 fail / 2247 expect() calls / tsc clean. H-B: 5 pass / 0 fail / 26 expect() calls / tsc clean. Neither has buildStatus=fail."
-        },
-        {
-          "rule": "R15",
-          "name": "Eval pass rate below threshold",
-          "triggered": false,
-          "note": "H-A passRate=1.0 (10/10), H-B passRate=1.0 (10/10). Both above 0.5 threshold. H-B has 4 classified failureModes (2 critical LEARN+ACTION, 2 high LOGIC+DATA) which the eval-runner has explicitly documented with affectedCases and severity — satisfies the FailureMode analysis requirement even if passRate had been below threshold. H-A has 0 failureModes."
+          "id": "OBS-09",
+          "topic": "Potential simulator contradictions to watch",
+          "finding": "Two tensions likely in scenarios: (1) ForwardProp repair requires home ontology/ vs stability preservation forbids restructuring — resolvable as additive in H-B, structural in H-A. (2) SemVer major risk vs consumer churn — irreconcilable in principle but resolvable via staging (H-C hybrid: schemas v1.0 + plugin v0.3 first, skills later).",
+          "evidence": "world-model ForwardProp=broken + BackwardProp=partial + consumer pin matrix",
+          "relevance": "T6 contradictionStatus; evaluator R2",
+          "severity": "pre-evaluator-context"
         }
-      ],
-      "rejectionCriteriaSummary": {
-        "totalTriggered": 2,
-        "triggeredRules": ["R11 (H-B)", "R13 (H-B)"],
-        "winnerTriggers": 0,
-        "winnerRulesClean": "All 15 rules clean for winning path (H-A + H-C). R11 and R13 triggers on H-B are structural confirmations of H-B's defeat, not pipeline defects.",
-        "rationale": "When R11/R13 trigger on the LOSING hypothesis and the eval-runner has classified failureModes that explain WHY the loss is structural rather than load-dependent, the triggers are evaluator signals of pipeline HEALTH: they confirm that the eval gate is discriminating real architectural quality, not rubber-stamping."
-      },
-      "debateProtocol": {
-        "triggered": false,
-        "triggerChecks": {
-          "passRateDiffGreaterThan20pct": false,
-          "passRateDiffExplanation": "H-A 1.0 and H-B 1.0 formal — 0% diff on raw pass rate. Qualitative divergence is captured via failureModes analysis, not via pass-rate debate.",
-          "dlaMisclassification": false,
-          "dlaExplanation": "No misclassification. The ontologist's transition-zone calls (LinkType/InterfaceType/DerivedProperty/Reducer -> LOGIC) were applied rigorously and accepted by the simulator without re-debate (scenarios.json simulatorAudit.transitionZoneRespected).",
-          "newFailureType": false,
-          "newFailureTypeExplanation": "H-B's failure modes (TOCTOU non-atomic write, lossy substrate, missing lineage) were all predicted by S-HB-ADV and S-HB-WORST scenarios BEFORE the prototype. Empirical results confirmed simulator predictions. No surprise failure mode requiring debate."
-        },
-        "roundsUsed": 0,
-        "maxRoundsAllowed": 2,
-        "note": "Zero rounds used. The evidence chain (scenarios prediction -> prototype confirmation -> eval classification) is coherent and the winner is decisively clear across all 11 evaluation dimensions + empirical race results + architectural convergence. No defense/revision cycle needed."
-      },
-      "gateResult": "ACCEPT",
-      "evaluatorGateResult": "ACCEPT",
-      "winner": "H-A",
-      "coWinner": "H-C",
-      "coWinnerNote": "H-C (3-phase validation pipeline) is ORTHOGONAL to H-A vs H-B — it runs ON TOP of the event-log substrate, not instead of it. scenarios.json provisionalWinner.recommendationToEvaluator: 'H-C (3-phase validation pipeline) runs ON TOP of H-A and is complementary, not competing.' Both accepted.",
-      "formalCompetitor": "H-B (Snapshot + StaleObject) — preserved for record with empirical defeat documentation (484 lost updates / 2000 in run1, 24.2% loss rate, TOCTOU structural, no BackwardProp path)",
-      "winRationale": "H-A (Append-Only Event Log Foundation) is the decisive winner across 3 independent evaluation axes: (1) ARCHITECTURAL CONVERGENCE — three independent references (Anthropic Managed Agents 'Session=append-only log', Palantir Decision Lineage 5-dim, OMC clawhip event routing) all converge on the append-only log pattern; (2) EMPIRICAL SUPERIORITY — H-A prototype passes 2-writer adversarial race at 2x1000 events with 0 duplicate sequences, 0 torn writes, 0 lost events (reproducible across 2 runs) versus H-B losing 484/2000 updates (24.2%) with reproducibility confirming TOCTOU is structural not load-dependent; (3) ONTOLOGY FIT — H-A populates all 5 domains first-class per world-model's 28 primitives (DATA/LOGIC/ACTION/SECURITY/LEARN all overallForwardPropStatus=healthy and overallBackwardPropStatus=healthy) while H-B cannot reliably populate LEARN (R11) and has structurally broken BackwardProp (R13). R11 and R13 triggered for H-B confirm rather than invalidate the pipeline: they are the evaluator signals that H-B lost on architectural grounds, which is the pipeline's job to detect.",
-      "architecturalDecision": "ACCEPT H-A as palantir-mini v0 state foundation. ACCEPT H-C (3-phase validation pipeline: Design+Compile fused / Runtime / Post-Write) as the validation depth that runs on top of H-A. H-B is preserved as the formal competitor of record with full empirical defeat documentation for BackwardProp audit purposes.",
-      "criticalRisks": [
-        {
-          "id": "risk-01",
-          "description": "Bun compatibility for proper-lockfile is tier-3 inference (clm-ext-24, confidence 0.75). H-A prototype-a resolved this empirically by using fs.mkdir fallback path and proved 0 lost events / 2000 — but proper-lockfile itself was not directly tested under Bun in T7. For v1 integration the plugin should either commit to fs.mkdir fallback as primary or empirically verify proper-lockfile under Bun.",
-          "severity": "medium",
-          "mitigation": "T7 already proved fs.mkdir-only path works; use that as the production path in v1 and defer proper-lockfile to optional optimization."
-        },
-        {
-          "id": "risk-02",
-          "description": "Cross-project shared schemas write coordination — 3 projects (kosmos/palantir-math/mathcrew) share ~/.claude/schemas/ontology/. Claude Code is declared sole writer (constraint.boundary) and git handles coordination between parallel Claude sessions — but this assumption must hold at deployment time.",
-          "severity": "medium",
-          "mitigation": "gap-03 resolved this architecturally: git branches coordinate parallel sessions and per-project events.jsonl lockfile handles per-project atomic writes. No new mechanism needed for v0."
-        },
-        {
-          "id": "risk-03",
-          "description": "proper-lockfile last published 2020 (5 years old, aging). Still 9.27M weekly downloads but maintainer activity is low.",
-          "severity": "low",
-          "mitigation": "fs.mkdir zero-dep fallback is already the empirically proven path. Consider making fallback the only path in v1."
-        },
-        {
-          "id": "risk-04",
-          "description": "BackwardProp persistence gap (world-model backwardProp.gaps steps 4+5): refinement proposals persistence not yet implemented. H-A Phase III (AI-First) requires this loop to close for the full DevCon 5 journey.",
-          "severity": "low",
-          "mitigation": "Deferred to post-v0. Phase I+II are self-contained and do not require Phase III closure."
-        }
-      ],
-      "whatWouldChangeDecision": [
-        "If a v1 integration test shows fs.mkdir fallback is insufficient under 10+ concurrent writers AND proper-lockfile is empirically broken under Bun, revisit H-A's atomic append mechanism (application-level retry-on-conflict or alternative lockfile strategy).",
-        "If H-C (3-phase validation pipeline) fails integration in v1 due to PostToolUse hook latency burnout, reconsider validation monitoring scope (retreat to 2-phase or move to async:true).",
-        "If a new MCP server pattern emerges that makes snapshot-based architecture viable for LEARN (e.g., CRDT-based merging with cross-version history), reconsider H-B or H-A+snapshot hybrid.",
-        "If palantir-math migration reveals EventEnvelope variant gaps that require breaking schema bumps before v0 stabilizes, revisit gap-04 and consider versioned events.jsonl.",
-        "If cross-project write coordination (gap-03) proves insufficient because Codex/Gemini become writers not readers, reintroduce multi-writer coordination mechanism."
-      ],
-      "nextSpawnRecommendation": "Spawn reporter-blueprint for T11 (TechBlueprint JSON per schemas/types.ts) AND reporter-report for T12 (13-section markdown report) IN PARALLEL. Both depend only on T10 accepted and both can read all existing ontology-state/*.json without coordination. Expected parallel runtime: ~20-30 min on Claude Max X20.",
-      "pipelineHealthObservations": [
-        "Evidence chain coherence: scenarios predicted H-B TOCTOU weakness (S-HB-ADV) BEFORE T8 prototype, and T8 confirmed empirically at 484 lost updates. This is the eval gate working as designed.",
-        "Transition zone discipline: LinkType/Interface/Derived/Reducer all classified as LOGIC by ontologist, accepted by simulator, and preserved through prototyper and eval-runner. No re-litigation downstream.",
-        "First session to touch all 5 domains first-class: palantir-mini's LEARN+SECURITY domains are real primitives, not N/A placeholders. 28 primitives across 5 domains is the densest ontology in the kosmos session history.",
-        "H-B preservation as formal competitor is working: even though H-B lost, the pipeline kept H-B scored, prototyped, eval'd, and documented. This satisfies R8 (No alternatives) AND provides BackwardProp material for future sessions considering snapshot-based alternatives."
-      ]
-    }
-  ],
-  "evaluatorGateResult": "ACCEPT",
-  "gateDecision": {
-    "result": "ACCEPT",
-    "timestamp": "2026-04-15T18:30:00Z",
-    "winner": "H-A",
-    "coWinner": "H-C",
-    "formalCompetitor": "H-B",
-    "triggeredRulesOnWinner": [],
-    "triggeredRulesOnLoser": ["R11", "R13"],
-    "debateRoundsUsed": 0,
-    "nextStep": "Spawn reporter-blueprint (T11) + reporter-report (T12) in parallel"
-  },
-  "phaseGates": {
-    "T1": {
-      "completed": true,
-      "completedAt": "2026-04-15T15:00:00Z",
-      "outputArtifacts": ["ontology-state/decision-log.json"],
-      "validations": [
-        "ProjectOntologyScope has 5 BackendOntology domains (DATA/LOGIC/ACTION/SECURITY/LEARN)",
-        "ResearchQuestions count = 7 (>= 5 required)",
-        "All RQs have D/L/A domain tags",
-        "DevCon 5 three-phase journey applied",
-        "Constraints captured (5 categories: billing/runtime/scope/boundary/research_quality)",
-        "Routing decisions for T2 and T3 specified",
-        "Provisional hypothesis identified with 3-source convergence rationale"
       ]
     },
-    "T10": {
-      "completed": true,
-      "completedAt": "2026-04-15T18:30:00Z",
-      "outputArtifacts": ["ontology-state/decision-log.json"],
-      "validations": [
-        "All 15 rejection criteria applied (R1-R15)",
-        "2 rules triggered on losing hypothesis H-B (R11, R13) — pipeline health signal, not defect",
-        "0 rules triggered on winning hypothesis H-A",
-        "0 debate rounds used (out of max 2) — evidence chain is coherent",
-        "gateResult=ACCEPT set at top level and inside entry",
-        "winRationale specific and non-generic (3 axes, enumerated evidence)",
-        "whatWouldChangeDecision has 5 concrete reversal conditions (>= 1)",
-        "criticalRisks enumerated with severity and mitigation (>= 1)",
-        "Formal competitor H-B preserved with empirical defeat documentation"
-      ]
+    {
+      "type": "evaluator_verdict",
+      "timestamp": "2026-04-17T18:00:00Z",
+      "agent": "evaluator",
+      "task": "T10",
+      "verdict": "ACCEPT",
+      "winningHypothesis": "H-A",
+      "losingHypothesis": "H-B",
+      "debateRounds": 0,
+      "debateTriggersChecked": {
+        "scenarioPassRateDiff": "both 100% — below 20% trigger",
+        "dlaMisclassification": "none detected; 5 domains populated per dlaMapping",
+        "newFailureModeType": "none detected; 0 failure modes in current session T9",
+        "ambiguousRGate": "none; all 15 verdicts unambiguous per state evidence",
+        "leadObsVsOntologistConflict": "OBS-02 (marketplace/+osdk/ stubs) and OBS-03 (typescript/ upgrade) are legacy-audit refinements, not classification conflicts; OBS-05 (home ontology absence) and OBS-01 (plugin version drift) align with world-model — no contradiction"
+      },
+      "rGateResults": [
+        {
+          "id": "R1",
+          "status": "PASS",
+          "check": "source-map.json tier distribution for critical claims",
+          "evidenceRef": "source-map.json internalSources array: 28 sources, 24 marked provenance=[Official], 3 [Synthesis], 1 [Inference]. External sources = 0 per user directive. No tier-4/5 dependence on critical claims (all primitive selections backed by INT-001/002/003/004/005/011/016/017/018/026 all Official)."
+        },
+        {
+          "id": "R2",
+          "status": "PASS",
+          "check": "scenarios.json scenarios[].contradictionStatus field for unresolved",
+          "evidenceRef": "scenarios.json: all 8 scenarios have contradictionStatus=resolved. simulationRuns.round3.contradictionsRemaining=0. S-B1 C1 and S-B4 C1 classified 'irreconcilable' but resolved as acknowledged H-B tradeoffs, not blocking contradictions."
+        },
+        {
+          "id": "R3",
+          "status": "PASS",
+          "check": "scenarios.json scenario count >= 1 per hypothesis",
+          "evidenceRef": "scenarios.json: 8 scenarios across 2 hypotheses (H-A: S-A1/S-A2/S-A3/S-A4; H-B: S-B1/S-B2/S-B3/S-B4). Exceeds >=1-per-hypothesis requirement by 4x."
+        },
+        {
+          "id": "R4",
+          "status": "PASS",
+          "check": "scenarios.json scenarios[].risks array non-empty",
+          "evidenceRef": "scenarios.json: winning hypothesis H-A scenarios have 12 total risks (S-A1: R-A1-01..03, S-A2: R-A2-01..02, S-A3: R-A3-01..03, S-A4: R-A4-01..04). H-B scenarios have 12 (3+2+3+4). Total 24 risks across 8 scenarios."
+        },
+        {
+          "id": "R5",
+          "status": "PASS",
+          "check": "source-map.json sources[].currencyVerdict for legacy-confirmed ratio",
+          "evidenceRef": "source-map.json: 27/28 currencyVerdict=authoritative; 1 (INT-012 adapter-gap-analysis.md) marked legacy-maybe; 1 (INT-025 ship/orchestrate skills) marked legacy-maybe. No legacy-confirmed verdicts on critical claims. Stale ratio < 10%."
+        },
+        {
+          "id": "R6",
+          "status": "PASS",
+          "check": "source-map.json sources[].provenance tag presence",
+          "evidenceRef": "source-map.json: all 28 internal sources have provenance field populated: 24 [Official], 3 [Synthesis] (INT-015, INT-016, INT-025, INT-026, INT-027), 1 [Inference] (INT-012, INT-013, INT-028 variants). Zero untagged sources."
+        },
+        {
+          "id": "R7",
+          "status": "PASS",
+          "check": "scenarios.json aggregate.winRationale specificity",
+          "evidenceRef": "scenarios.json aggregate.winRationale = 200+ word structural argument citing (a) specific dimension scores (ForwardProp Health 4.25 vs 2.0), (b) specific world-model objects (WMO-031), (c) specific user directive clauses (decision-log.constraints.breaking-changes severity=high negotiable=false), (d) structural reasoning (ForwardProp cannot be repaired additively), (e) criticalTradeoff (strategic repair vs migration cost)."
+        },
+        {
+          "id": "R8",
+          "status": "PASS",
+          "check": "scenarios.json hypotheses count >= 2",
+          "evidenceRef": "scenarios.json: 2 hypotheses (H-A clean-slate, H-B incremental). H-B preserved as complete alternative with 4 scenarios + full 11-dim scoring + aggregate totalMean=3.00. Competing framing explicit; not collapsed."
+        },
+        {
+          "id": "R9",
+          "status": "PASS",
+          "check": "scenarios.json scenarios[].evidenceSufficiency without NextExperiment",
+          "evidenceRef": "scenarios.json: S-A1 + S-B1 = sufficient; S-A2/A3/A4/B2/B3/B4 = partial. Partial-sufficiency scenarios accompanied by whatWouldChangeDecision entries and NextExperiments (NE-01 v1.0-rc1 worktree test for S-A3, NE-02 peer-project survey for S-B3). S-A3 evidence-gap explicitly flagged 'evidence-gap-driven' with resolution path."
+        },
+        {
+          "id": "R10",
+          "status": "PASS",
+          "check": "scenarios.json scenarios[].whatWouldChangeDecision count per winning-hypothesis scenario",
+          "evidenceRef": "scenarios.json H-A scenarios: S-A1=3 entries, S-A2=2, S-A3=2, S-A4=2. H-B: S-B1=2, S-B2=1, S-B3=2, S-B4=2. All >=1 per winning-hypothesis scenario; total 11 reversal conditions across winner hypothesis."
+        },
+        {
+          "id": "R11",
+          "status": "PASS",
+          "check": "world-model.json objects[].domain in {DATA, LOGIC, ACTION, SECURITY, LEARN}",
+          "evidenceRef": "world-model.json: 32 objects with domain tags. Per dlaMapping: D=9 primitives (WMO-001..005,022,023,024,026), L=7 (WMO-006..011,031), A=9 (WMO-012..015,025,027..030), S=3 (WMO-016..018), LEARN=4 (WMO-019..021,032). All 32 objects classified. SH-01..SH-05 semantic heuristics cited per object. fourPillarMap.{ontology,aip,foundry,maven}.dc5PrincipleApplied present."
+        },
+        {
+          "id": "R12",
+          "status": "PASS",
+          "check": "world-model.json fourPillarMap.*.dc5PrincipleApplied per pillar",
+          "evidenceRef": "world-model.json fourPillarMap: ontology pillar cites DDD+DRY+OCP+PECS explicitly ('DDD: bounded contexts... DRY: home ontology... OCP: per-axis version gates... PECS: Reducer<In,Out>'). aip: DDD+DRY+OCP+PECS. foundry: DDD+DRY+OCP+PECS. maven: DDD+DRY+OCP+PECS. All 4 pillars cite all 4 DC5 principles. Per-object designPrinciples also present on all 32 objects."
+        },
+        {
+          "id": "R13",
+          "status": "PASS (context-dependent)",
+          "check": "world-model.json forwardProp/backwardProp healthStatus + winning hypothesis repair plan",
+          "evidenceRef": "Current state: forwardProp.healthStatus=broken, backwardProp.healthStatus=partial — these ARE the defects the rebuild targets. H-A repair: (1) WMO-022 HomeSharedOntology introduces ~/ontology/ layer; (2) P-H-A prototype validated home-ontology-shim with STRUCT_REGISTRY === shim-re-exported registry singleton identity (eval-results.json C-A-03a/03b/04b pass); (3) H-A forwardPropImpact='Repaired. WMO-031 healthStatus broken -> healthy'; (4) BackwardProp auto-repair via drift_detected + evaluation_recorded events consumable by /ontology-register. H-A WINS specifically because its shim is MANDATORY (single import surface) whereas H-B's shim is opt-in and leaves ForwardProp in partial repair per H-B forwardPropImpact. Rule per instruction: 'Do NOT auto-reject on broken — verify recommended hypothesis has concrete repair plan' — satisfied."
+        },
+        {
+          "id": "R14",
+          "status": "PASS",
+          "check": "eval-results.json prototypes[].buildStatus",
+          "evidenceRef": "eval-results.json: P-H-A (263 LOC, 6 files) buildStatus=pass, bunx tsc --noEmit 0 errors; P-H-B (238 LOC, 5 files) buildStatus=pass, bunx tsc --noEmit 0 errors. Both prototypes validated; no fallback alternative needed. summary.buildStatusAggregate {pass:2, fail:0, warning:0}."
+        },
+        {
+          "id": "R15",
+          "status": "PASS",
+          "check": "eval-results.json evalSuites[].passRate >= 0.5 threshold",
+          "evidenceRef": "eval-results.json: ES-H-A 22/22 passRate=1.0 (covers runtime/deterministic/integration/heuristic/adversarial categories across DATA/LOGIC/ACTION domains); ES-H-B 16/16 passRate=1.0 (covers runtime/deterministic/backcompat/integration/heuristic/adversarial). Both exceed 0.5 threshold by 2x. failureModes=[] on both. Zero FailureMode analyses required per R15 exception clause."
+        }
+      ],
+      "qualitativeCallouts": [
+        "H-A structurally repairs ForwardProp via home-ontology-shim: eval-results.json C-A-03a confirms STRUCT_REGISTRY identity matches direct import (singleton preserved through shim re-export), validating WMO-031 repair mechanism",
+        "H-B preserves ForwardProp as opt-in per its own forwardPropImpact statement; H-B learnedConstraints explicitly acknowledges 'H-B's architectural weakness vs H-A where the shim is mandatory' — the eval-runner's own notes and H-B's own notes align",
+        "Lead observation OBS-09 predicted 'SemVer major vs consumer churn' tension — resolved in aggregate via H-A's amortization argument ('once you must touch all three, you pay all breaking-change cost anyway') supported by NEXT_SESSION_ONTOLOGY_REBUILD.md breaking-changes clause (severity=high, negotiable=false)",
+        "Per OBS-02: marketplace/ + osdk/ stubs (INDEX.md references to 4 missing content files) should be explicit Phase B deliverable; legacyAudit.researchLibrary.marketplace verdict=review + osdk verdict=keep (sub-files noted stub) captures this; reporter should elevate to blueprint nextExperiments",
+        "Per OBS-01: Plugin version drift (package.json v0.1.0 vs plugin.json v0.2.0) is precondition work — v1.0 bump should NOT proceed until package.json reconciled to v0.2.x per crossCuttingConcerns entry 2 in world-model.json",
+        "Per OBS-03: typescript/ subdir upgrade to keep-authoritative (from keep-low-priority) — reporter should include in blueprint legacyAuditSummary",
+        "Per OBS-04: 21/27 hook events uncovered — v1.0 hook expansion is single largest operational substrate deliverable (confirmed in world-model.fourPillarMap.foundry.gap)",
+        "Per OBS-05: home repo ontology/ absence — H-A's WMO-022 HomeSharedOntology addition + perProjectOntologyPlan.home v1Path=~/ontology/ directly repairs this",
+        "Per OBS-07: Scoring rubric correction 1-7 -> 1-5 applied in Round 3; aggregate totalMean 3.50 (H-A) vs 3.00 (H-B) computed on authoritative 1-5 rubric per docs/scoring-rubric.md",
+        "Per OBS-08: mathcrew 4 deferred items (teaching-flow.ts beatTemplate, interactive-beat evaluator bridge, Playwright goldens, FPS tier switch) — reporter should add to blueprint whatWouldChangeDecision and final-report Risks section; Phase C items, not blockers to Phase A acceptance"
+      ],
+      "winRationale": "H-A selected over H-B because: (1) R13 ForwardProp repair is STRUCTURAL (home-ontology-shim as mandatory single import surface, proven via STRUCT_REGISTRY === SHIM_STRUCT_REGISTRY singleton identity in eval-results.json C-A-03a/03b) vs H-B's opt-in shim that H-B's own evalRunnerNotes acknowledge as 'H-B's architectural weakness'; (2) ForwardProp Health aggregate 4.25 vs 2.0 (2.125x advantage) directly addresses NEXT_SESSION_ONTOLOGY_REBUILD.md primary objective — 3 projects reinvent ontology pattern with Foundry-shaped silos lacking shared registry; (3) 4-pillar fidelity High vs Medium per scenarios.json H-A.fourPillarFidelity; (4) Agent Composability 3.75 vs 1.75 (dispatcher + /ontology-register enable Phase III AI-First reach); (5) User directive explicitly permits breaking changes (decision-log.constraints.breaking-changes: 'schemas v1.0 major bump allowed, palantir-mini v1.0 full restructure allowed, namespace reorganization allowed, legacy deletion allowed' with severity=high, negotiable=false). H-B's strengths (Reversibility 3.75, Implementation Difficulty 3.5) are acknowledged pragmatic wins but traded-off per user directive.",
+      "alternativesPreserved": [
+        "H-B clean-incremental v0.3 -> v0.9 series — viable if user reverses breaking-change permission; preserves supply-chain stability at cost of permanent ForwardProp partial repair",
+        "H-C hybrid (suggested in OBS-09 but not simulated): schemas v1.0 + plugin v0.3 first, skills later — would reduce atomic surface but fractures the 4-pillar coherence and delays ForwardProp repair; not modeled in scenarios but flagged for contingent consideration"
+      ],
+      "nextExperimentsIfRejected": [
+        "NE-01 from scenarios.json: v1.0-rc1 isolated-worktree rollback test before production tag",
+        "NE-02 from scenarios.json: Peer-project 0.x -> 1.0 transition survey",
+        "If blueprint rejected in Phase B, re-run simulation with H-C hybrid (schemas v1.0 + plugin v0.3 staged) per OBS-09"
+      ],
+      "whatWouldChangeDecision": [
+        "User revokes breaking-change permission (reverts to H-B)",
+        "Discovery that home ontology/ dir conflicts with existing palantirkc repo structure during Phase B dry-run",
+        "Prototype shows unexpected complexity in pm-codegen regeneration with 9 new primitives (currently only Struct + ValueType prototyped)",
+        "Consumer readiness audit reveals any of 3 consumers cannot pre-stage atomic migration PRs within 5 days (S-A2 A2 assumption fails)",
+        "Intent classifier mis-route rate > 5% in T9 prototype eval — not currently tested in ES-H-A/B"
+      ],
+      "debateProtocolDecision": "No debate initiated. All 4 debate triggers evaluated negative: (a) scenario pass rate diff 0% (both 100%, well under 20% threshold); (b) no D/L/A misclassification (32 objects all correctly tagged per dlaMapping); (c) no new failure mode type (0 failure modes in T9); (d) no ambiguous R-gate rejection. Lead observation alignment confirmed — OBS-01..09 all consistent with ontologist's classification. Debate not required; verdict is unambiguous ACCEPT."
     }
-  }
+  ]
 }
