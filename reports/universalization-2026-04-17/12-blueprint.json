@@ -13,7 +13,7 @@
     "effort": "max"
   },
 
-  "projectScope": {
+  "scope": {
     "backendOntology": {
       "domains": ["DATA", "LOGIC", "ACTION", "SECURITY", "LEARN"],
       "description": "Cross-project palantir-mini plugin universalization: event log + codegen + RBAC + verify pipeline"
@@ -24,7 +24,7 @@
     "globalConfigScope": "~/.claude/ (research, schemas, rules, plugins)"
   },
 
-  "designPrinciples": {
+  "principles": {
     "devCon5": ["DDD", "DRY", "OCP", "PECS"],
     "notes": "DDD via 5-domain classification; DRY via shared schemas; OCP via plugin extension; PECS via idempotent pm-init"
   },
