@@ -1,0 +1,30 @@
+# CLAUDE.md — {{PROJECT_NAME}}
+
+Scaffolded by `create-palantir-project` on {{CREATED_AT}}.
+
+## palantir-mini v0.2 adoption
+
+- `@palantirKC/claude-schemas` pinned at `0.2.x` via `package.json#peerDependencies`.
+  `pm-verify` gates on this compatibility range.
+- `palantir-mini@0.2.0` plugin provides the `mcp__palantir-mini__*` tool suite
+  via the plugin-bundled MCP server — no per-project `.mcp.json` needed.
+- `.claude/managed-settings.d/50-palantir-mini.json` is the Layer-1 RBAC fragment
+  that grants plugin MCP tools + event-log write + `src/generated/` write.
+- `.palantir-mini/session/events.jsonl` is the append-only event log. Never
+  rewrite, reorder, or truncate per rule 10.
+- `src/generated/` is owned exclusively by `pm-codegen`. Never hand-edit per
+  rule 11 — regenerate from `ontology/` instead.
+
+## Next steps
+
+1. `/pm-init` — emits the first `session_started` event.
+2. Define project ontology under `ontology/*.ts`.
+3. `/pm-codegen` — generate `src/generated/` from ontology.
+4. `/pm-verify` — 4-phase validation pipeline (Design + Compile + Runtime + Post-Write).
+
+## Claude authority chain
+
+`meaning → ontology → contracts → runtime → artifacts → audit/learn`.
+
+Shared project truth lives in `ontology/`, `src/`, and `tests/`.
+`.claude/rules/` overlays, if any, are Claude-local only.

@@ -1,0 +1,31 @@
+{
+  "description": "palantir-mini per-project Layer-1 RBAC fragment (v0.2). Loaded by Claude Code from managed-settings.d/ into the effective permission policy. Layer-1 only — Markings/ObjectSecurity/PermissionsCascade deferred to v1.",
+  "permissions": {
+    "allow": [
+      "Read(~/.claude/schemas/ontology/**)",
+      "Read(~/.claude/research/palantir/**)",
+      "Read(./ontology/**)",
+      "Read(./.palantir-mini/session/**)",
+      "Write(./.palantir-mini/session/events.jsonl)",
+      "Write(./.palantir-mini/session/snapshots/**)",
+      "Write(./src/generated/**)",
+      "Bash(bun run ${CLAUDE_PLUGIN_ROOT}/scripts/*)",
+      "Bash(bun test *)",
+      "Bash(bunx tsc *)",
+      "mcp__palantir-mini__get_ontology",
+      "mcp__palantir-mini__emit_event",
+      "mcp__palantir-mini__apply_edit_function",
+      "mcp__palantir-mini__commit_edits",
+      "mcp__palantir-mini__replay_lineage"
+    ],
+    "deny": [
+      "Write(~/.claude/schemas/ontology/types.ts)",
+      "Write(~/.claude/schemas/ontology/semantics.ts)"
+    ]
+  },
+  "env": {
+    "PALANTIR_MINI_SESSION_DIR": "./.palantir-mini/session",
+    "PALANTIR_MINI_SNAPSHOT_DIR": "./.palantir-mini/session/snapshots",
+    "PALANTIR_MINI_EVENTS_FILE": "./.palantir-mini/session/events.jsonl"
+  }
+}
