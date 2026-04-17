@@ -22,6 +22,8 @@ The output feeds downstream tools: ontology-design, writing-plans, or direct imp
 - No external runtime dependencies for core schemas
 - MCP tools for external research (scrapling, context7, WebSearch)
 - Claude Code Native Runtime: hooks, Agent Teams, file-based state
+- **`@palantirKC/claude-schemas`** pinned via `package.json#peerDependencies` at `0.2.x` (SemVer minor range)
+- **`palantir-mini@0.2.0`** plugin provides mcp__palantir-mini__* tools via plugin-bundled MCP server
 
 ---
 
