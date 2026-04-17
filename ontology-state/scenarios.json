@@ -1,1099 +1,612 @@
 {
-  "version": "1.0.0-palantir-mini",
-  "timestamp": "2026-04-15T16:30:00Z",
-  "lastUpdated": "2026-04-15T16:30:00Z",
+  "version": "1.0.0-rebuild-2026-04-17",
+  "lastUpdated": "2026-04-17T16:45:00Z",
+  "sessionId": "kosmos-rebuild-research-0dff144d",
+  "priorSessionId": "kosmos-research-2026-04-15-palantir-mini",
   "updatedBy": "simulator",
-  "sessionId": "kosmos-research-2026-04-15-palantir-mini",
-  "previousSessions": [
-    "jsxgraph-sequencer-001",
-    "mathcrew-content-delivery-001",
-    "mathcrew-photonic-realism-001"
-  ],
+  "devConPhase": "1->2",
   "tasks": ["T5", "T6"],
   "owner": "simulator",
-
-  "simulatorAudit": {
-    "author": "simulator",
-    "inputsConsulted": [
-      "ontology-state/decision-log.json (T1, 7 RQs, provisional H-A winner)",
-      "ontology-state/source-map.json (T2+T3, 12 sources, 30 claims, 6 contradictions, 5 gaps filled)",
-      "ontology-state/world-model.json (T4, 28 primitives, 5 domains, ForwardProp+BackwardProp healthy)",
-      "~/.claude/research/claude-code/palantir-mini-blueprint.md (Corrections 1-3 + Gap fills 1-5)",
-      "docs/scoring-rubric.md (11-dim)",
-      "docs/simulation-methodology.md"
-    ],
-    "hypothesesCount": 3,
-    "scenariosCount": 12,
-    "scenariosPerHypothesis": 4,
-    "revisionRoundsCompleted": 2,
-    "unresolvedContradictionCount": 0,
-    "detectedContradictionCount": 0,
-    "evidenceGapCount": 3,
-    "provisionalWinner": "H-A (Append-Only Event Log Foundation) as substrate, H-C (3-phase validation) as validation pipeline — they are complementary not competing",
-    "stoppingCriteriaMet": true,
-    "honoredOntologistCuts": [
-      "H-A vs H-B (append-only event log vs snapshot+StaleObject optimistic concurrency) — directly scored",
-      "H-C (3-phase v0 validation pipeline) vs H-C-worst (full 6-phase retrofit) — treated as continuous spectrum within single hypothesis",
-      "Layer-1 RBAC adequacy — addressed as adversarial dimension across all 3 hypotheses; NOT a standalone hypothesis because SECURITY is an overlay domain rather than an architectural substrate choice"
-    ],
-    "transitionZoneRespected": "LinkType/InterfaceType/DerivedProperty/Reducer classified as LOGIC (ontologist authority per world-model prim-logic-02/03/04/05) — NOT re-debated in scenarios."
-  },
-
-  "scoringDimensions": [
-    "evidenceFit",
-    "implementationDifficulty",
-    "riskSeverity",
-    "reversibility",
-    "timeToValue",
-    "governanceCompliance",
-    "ecosystemMaturity",
-    "dlaFit",
-    "forwardPropHealth",
-    "agentComposability",
-    "prototypeValidation"
-  ],
-  "scoringDimensionsNote": "11 dimensions per docs/scoring-rubric.md. Dimensions use 1-5 scale. Dimension 11 (Prototype Validation) initialized to 3 ('not yet tested') per task briefing; prototyper updates in T7+T8.",
+  "scaleCorrectionNote": "Round 3 rescale from 1-7 (hook framing) to 1-5 (docs/scoring-rubric.md authoritative). Scores re-derived from rubric definitions, not mechanical divide.",
 
   "hypotheses": [
     {
       "id": "H-A",
-      "statement": "Append-only event log (events.jsonl per project) with monotonic sequence counter as optimistic version vector is the optimal foundation for palantir-mini's LEARN-centric D/L/A ontology, because every DATA/LOGIC/ACTION mutation flows through a single EventEnvelope discriminated union whose 10 variants collectively form the Decision Lineage 5-dim record, and sequence-check-before-append under proper-lockfile (or fs.mkdir mutex fallback) gives StaleObject-equivalent concurrency without in-place mutation.",
-      "domain": "LEARN",
-      "dlaJustification": "LEARN is the central domain for palantir-mini (world-model.json domains.learn.centralRole). The append-only log IS the Anthropic Managed Agents Session primitive scoped per-project. DATA primitives (ObjectType, PropertyType) describe entities but current state is derived from folding events.jsonl via the Reducer LOGIC primitive. LOGIC primitives (EditFunction, ValidationPhaseEvaluator) emit edit_proposed/validation_phase_completed events but never mutate directly. ACTION primitives (Tier-1/Tier-2/AtomicCommit) emit edit_committed events. SECURITY (Layer-1 RBAC, SubmissionCriteria gate) emits submission_criteria_failed events. This architecture cleanly mirrors the 5-domain split because events.jsonl is the single append point, and replay_lineage is the single read point for backward propagation.",
-      "supportingEvidenceIds": [
-        "clm-rq01-01",
-        "clm-rq01-02",
-        "clm-rq01-03",
-        "clm-rq01-04",
-        "clm-ext-14",
-        "clm-ext-19",
-        "clm-ext-20",
-        "clm-rq05-01"
+      "name": "Clean-slate v1.0 rebuild",
+      "statement": "SemVer-major bump of @palantirKC/claude-schemas (0.2.1 -> 1.0.0) plus full palantir-mini v1.0 restructure plus NEW ~/ontology/ shared-core namespace plus new /palantir-dispatch + /ontology-register skills plus legacy /ship + /orchestrate rewrite, shipped as one atomic 3-consumer migration wave, yields the canonical Palantir 4-pillar mirror faster and cleaner than incremental patches; the breaking change is explicitly sanctioned by NEXT_SESSION_ONTOLOGY_REBUILD.md.",
+      "claim": "A single SemVer-major release that lands schemas v1.0 + plugin v1.0 + home ontology/ + new skills together is the only change scope that structurally repairs ForwardProp (WMO-031 healthStatus=broken) because the home-repo ontology/ layer cannot be added additively without also forcing palantir-math and mathcrew to switch their extension point; once you must touch all three, you pay all breaking-change cost anyway, so amortize the v1.0 bump in the same wave.",
+      "dlaJustification": "DATA: adds 4 missing primitives (Struct, ValueType, SharedPropertyType, AIPLogicFunction) to primitives/ layer and promotes home /ontology/ as the shared-core Module. LOGIC: fixes ForwardProp pipeline (WMO-031) by inserting the home layer between schemas and per-project ontology. ACTION: adds AutomationDeclaration + WebhookDeclaration + PalantirDispatchSkill + OntologyRegisterSkill (4 primitive-missing entries in dlaMapping.A). SECURITY: adds CapabilityToken (L2) + MarkingDeclaration (L2/3). LEARN: adds ScenarioSandbox + expands EVENT_TYPE_REGISTRY 10 -> 16+.",
+      "supportingEvidenceIds": ["INT-001", "INT-004", "INT-011", "INT-013", "INT-016", "INT-019", "INT-020", "INT-021", "INT-023", "INT-026", "INT-027"],
+      "supportingEvidence": [
+        {"source": "INT-013 orchestration-map.md §ORCH-01..06", "note": "6-layer orchestration map requires Builder + Semantic Core + Digital Twin + Governance + LEARN + Integration — v0.2 covers ~3; v1.0 closes the gap structurally, not incrementally.", "provenance": "[Inference]"},
+        {"source": "WMO-031 forwardProp.healthStatus=broken", "note": "Home repo missing ~/ontology/ layer — the ONLY structural fix is to introduce it, which forces consumer extension-point change (breaking).", "provenance": "[Synthesis]"},
+        {"source": "NEXT_SESSION_ONTOLOGY_REBUILD.md decision-log §constraints.breaking-changes", "note": "User explicitly permits: schemas v1.0 major bump + plugin v1.0 restructure + namespace reorganization + legacy deletion.", "provenance": "[Official]"},
+        {"source": "INT-021 validation/pipeline.ts", "note": "Comment explicitly states Deploy + Merge phases 'deferred to v1' — v0 behavior encoded for replacement, not extension.", "provenance": "[Official]"},
+        {"source": "INT-020 hooks.json", "note": "6/27 hook events covered — 21-event gap cannot be closed via OCP-only additions without also renaming internal registration contracts.", "provenance": "[Official]"},
+        {"source": "INT-019 mcp-server.ts + INT-024 plugin skills", "note": "Version string mismatch (package.json 0.1.0 vs CLAUDE.md 0.2.0) — v1.0 reconciliation is the clean fix vs preserving ambiguity.", "provenance": "[Official]"}
       ],
-      "contradictingEvidenceIds": [
-        "clm-ext-18",
-        "clm-ext-24"
+      "contradictingEvidenceIds": ["INT-018", "INT-027"],
+      "contradictingEvidence": [
+        {"source": "INT-018 package.json + CHANGELOG", "note": "Current 3 consumers all pinned at v0.2.1 — SemVer break forces atomic migration; any slip causes supply-chain fracture.", "provenance": "[Official]"},
+        {"source": "INT-027 UNIVERSALIZATION.md distribution channel", "note": "Universalization already shipped additive minor bumps W1-W4; v1.0 over-rides recent investment rather than composing with it.", "provenance": "[Synthesis]"}
       ],
-      "contradictionNote": "clm-ext-18 (reading a property after batch.update does NOT reflect uncommitted change) is a caveat for EditFunction authors, not a contradiction of H-A. clm-ext-24 (Bun compatibility of proper-lockfile inferred only, confidence 0.75) is the sole empirical gap — MUST be prototyped in T7.",
       "testCriteria": [
-        "Prototype writes N=1000 concurrent events across 2 simulated writers under proper-lockfile; zero torn writes; sequence monotonically increasing; no duplicate sequences.",
-        "Replay of 1000 events produces deterministic snapshot equal to synchronous-write baseline.",
-        "fs.mkdir fallback produces identical results on the same test with proper-lockfile disabled.",
-        "Bun compatibility: the same test suite runs under `bun test` without errors.",
-        "Compensating-event rollback (gap-02 resolution) produces correct snapshot equivalent to pre-rollback state."
+        "pm-verify 6-phase gates all PASS in each consumer after migration PR merges",
+        "bunx tsc --noEmit passes across all 3 consumers after peerDep bump",
+        "events.jsonl contains ontology_registered event for each of 9 newly-promoted primitives",
+        "ForwardProp healthStatus transitions broken -> healthy per world-model post-migration re-normalization",
+        "3-consumer atomic migration ships within 1 release cycle (no stale pin for >48h)"
       ],
-      "status": "proposed",
-      "confidence": 0.85,
       "architectureImplications": [
-        "Touches world-model primitives: prim-data-01 EventEnvelope (DATA), prim-learn-01 AppendOnlyEventLog (LEARN), prim-learn-02 DecisionLineage5Dim (LEARN), prim-learn-04 LineageReplay (LEARN), prim-action-03 AtomicCommit (ACTION).",
-        "Implementation code lives in: ~/.claude/plugins/palantir-mini/lib/event-log/{append.ts,read.ts,replay.ts}, bridge/handlers/{emit-event.ts,replay-lineage.ts}, schemas/ontology/lineage/event-types.ts.",
-        "ForwardProp path (world-model forwardProp steps 1-6): schemas -> codegen -> per-project generated -> runtime consumer -> events.jsonl append -> derived snapshot. All 6 steps healthy.",
-        "BackwardProp path: events.jsonl -> replay_lineage -> 5-dim graph -> drift_detected -> ontology refinement proposal -> ontologist review -> schema update. Steps 4+5 have minor persistence gaps (world-model backwardProp.gaps); not blocking for H-A v0.",
-        "Required EventEnvelope additions for SECURITY integration: policy_denied (RBAC) and capability_accessed (vault) variants — flagged in world-model prim-sec-01 and prim-sec-03 backwardPropPath.gaps; defer to post-prototype phase per ontologist.",
-        "Atomic append is THE critical correctness invariant. If it fails, every DATA/LOGIC/ACTION/SECURITY/LEARN primitive downstream loses integrity — single point of failure is acknowledged and explicitly mitigated by dual-mechanism (proper-lockfile primary + fs.mkdir fallback)."
+        "Home repo gains ontology/ directory — new authority layer between schemas and per-project",
+        "palantir-math + mathcrew extension points switch from direct schema import to home-ontology re-export",
+        "managed-settings.d gains L2/L3 deny rules enforcing CapabilityToken + Marking",
+        "/palantir-dispatch becomes the canonical skill invocation surface — legacy slash-commands become dispatched intents",
+        "Codegen gains deterministic header contract enforced by pm-verify phase 4 (post-write drift)"
       ],
-      "devcon5Alignment": {
-        "DDD": "PASS — EventEnvelope, Session, Decision Lineage 5-dim all match Anthropic + Palantir vocabulary exactly.",
-        "DRY": "PASS — single append path for all state changes; single replay path for all backward queries.",
-        "OCP": "PASS — new event variants extend the discriminated union; new lineage dimensions extend EventEnvelopeBase.",
-        "PECS": "PASS — emit_event (producer extends), replay_lineage (consumer uses super via exhaustive visitor)."
-      },
-      "threeSourceConvergence": "Independent convergence from: (1) Anthropic Managed Agents 'Session = append-only log' (clm-rq01-02), (2) Palantir Decision Lineage 5-dim (clm-rq01-01), (3) OMC clawhip event routing (cited in world-model prim-learn-01.threeSourceConvergence). Strongest available evidence without API access."
+      "dc5PrinciplesInvoked": [
+        "DDD: bounded contexts per domain (schemas axes, home core, per-project extensions, plugin subsystems)",
+        "OCP: v1.0 SemVer-break restricted to legacy retirement and layer insertion; new primitives remain additive",
+        "DRY: ~/ontology/ is THE DRY win — eliminates palantir-math x mathcrew ConceptPrimitive duplication",
+        "PECS: Reducer<In,Out> + Edits[] + intent types preserved as producer-extends/consumer-super boundaries"
+      ],
+      "forwardPropImpact": "Repaired. WMO-031 healthStatus broken -> healthy. Home ~/ontology/ added as missing shared-core layer between schemas and per-project ontology, closing the authority chain.",
+      "backwardPropImpact": "Automated path enabled. New schema_refinement + drift_detected event types emitted by evaluator signals auto-feed /ontology-register. WMO-032 healthStatus partial -> healthy.",
+      "fourPillarFidelity": "High. Each of ontology/aip/foundry/maven pillars gets an explicit v1.0 target per fourPillarMap: schemas v1.0 canonical (ontology), /palantir-dispatch + /ontology-register + rewritten /ship + /orchestrate (aip), plugin v1.0 with 10+ MCP tools + 15+ hooks + 6/6 validation phases + L1/L2/L3 RBAC (foundry), atomic 3-consumer peerDep migration (maven).",
+      "devcon5Alignment": 5
     },
     {
       "id": "H-B",
-      "statement": "Snapshot-first architecture with StaleObject optimistic concurrency — a versioned per-project state.json file with a per-read version tag where writers re-read on conflict — is simpler, faster, and survives every v2.1.108 corner case without requiring a filesystem lockfile, because Palantir's proven StaleObject pattern maps directly to a single-file state and optimistic version reads are cheaper than mkdir-lock mutual exclusion on every write.",
-      "domain": "DATA",
-      "dlaJustification": "Under H-B, the DATA domain is authoritative and LEARN is secondary (audit trail as optional side channel). State lives in <project>/.palantir-mini/state.json as a snapshot (no log); a version column is bumped on each write; concurrent writers check version before commit and retry on mismatch. This is the OSDK-classic pattern and maps to Palantir StaleObject validation (src-int-validation-readme §VAL.R-02). LEARN/events.jsonl becomes an optional derived log, not the single source of truth. LOGIC (EditFunction returning Edits[]) and ACTION (AtomicCommit) still work but commit rewrites the whole state file under optimistic lock.",
-      "supportingEvidenceIds": [
-        "clm-rq05-01",
-        "clm-rq03-02",
-        "clm-rq02-02"
+      "name": "Incremental v0.3 evolution",
+      "statement": "Additive minor bumps on @palantirKC/claude-schemas (0.2.1 -> 0.3.x -> 0.4.x -> ... -> 0.9.x), palantir-mini plugin 0.2 -> 0.3 adding missing primitives (Struct, ValueType, CapabilityToken) while preserving legacy types.ts + semantics.ts layout, home ~/ontology/ added behind a feature-flag without breaking existing consumers, skill rewrites deferred, each project upgrades peerDep independently, yields a safer migration path that preserves the supply-chain stability earned by the W1-W4 universalization waves.",
+      "claim": "SemVer minor-range (0.3.x) releases compose cleanly with the current peerDependencies pin at 0.2.x (three-project consumers simply bump caret to 0.3.x when ready). No atomic migration wave is required. The same 9 missing primitives can be delivered as a series of additive releases (0.3 adds DATA primitives, 0.4 adds SECURITY, 0.5 adds ACTION, etc). Breaking changes only happen when explicitly justified by evidence — not pre-emptively bundled.",
+      "dlaJustification": "DATA: additive — 3 new primitives (Struct, ValueType, SharedPropertyType) shipped in 0.3.x with existing types.ts interfaces aliased for one release cycle then deprecated. LOGIC: ForwardProp partially repaired — ~/ontology/ directory added but legacy types.ts remains as fallback, so per-project consumers may opt-in layer by layer. ACTION: incremental — /palantir-dispatch + /ontology-register deferred; existing /ship + /orchestrate continue unchanged. SECURITY: CapabilityToken added in 0.4.x without removing existing L1 RBAC. LEARN: ScenarioSandbox + EVENT_TYPE_REGISTRY expansion ship in 0.5.x — no breaking change required.",
+      "supportingEvidenceIds": ["INT-018", "INT-027", "INT-023"],
+      "supportingEvidence": [
+        {"source": "INT-018 schemas CHANGELOG", "note": "v0.2.0 -> v0.2.1 (2026-04-17) shipped additive exports map + root index.ts + README — additive pattern already proven.", "provenance": "[Official]"},
+        {"source": "INT-027 UNIVERSALIZATION.md distribution", "note": "W1-W4 universalization shipped across 3 consumers via additive peerDep strategy; recent investment compounded by continuing pattern.", "provenance": "[Synthesis]"},
+        {"source": "INT-023 managed-settings.d Layer-1 RBAC", "note": "Current L1 fragment is forward-compatible — L2 (CapabilityToken) can be layered additively without touching deny rules.", "provenance": "[Official]"},
+        {"source": "rules/08-schema-versioning.md", "note": "Existing policy already gates on peerDep pin compatibility — enforces smooth minor-bump migration.", "provenance": "[Official]"}
       ],
-      "contradictingEvidenceIds": [
-        "clm-rq01-01",
-        "clm-rq01-02",
-        "clm-rq01-03",
-        "clm-rq01-04",
-        "clm-ext-19"
+      "contradictingEvidenceIds": ["INT-013", "INT-020", "INT-021", "INT-019"],
+      "contradictingEvidence": [
+        {"source": "WMO-031 forwardProp.healthStatus=broken", "note": "Home-repo ~/ontology/ cannot be 'added additively' — the moment it exists, palantir-math and mathcrew MUST choose to extend it or not. Any 'feature-flag' approach just defers the consumer decision without repairing ForwardProp.", "provenance": "[Synthesis]"},
+        {"source": "INT-021 validation/pipeline.ts comment", "note": "Phases 5-6 Deploy + Merge explicitly 'deferred to v1' — source-level marker indicates rewrite was planned, not incremental extension.", "provenance": "[Official]"},
+        {"source": "INT-019 mcp-server.ts version string 0.1.0", "note": "Pre-existing version mismatch (package.json 0.1.0 vs docs 0.2.0) accumulates drift over incremental releases unless reconciled at a SemVer-major boundary.", "provenance": "[Official]"},
+        {"source": "INT-020 hooks.json 6/27 coverage", "note": "21-event gap requires substantial hook registration refactor that has high coupling cost in a series of minor bumps.", "provenance": "[Official]"}
       ],
-      "contradictionNote": "H-B directly contradicts the 3-source convergence cited in world-model prim-learn-01.threeSourceConvergence. Palantir StaleObject is for Foundry-scale in-place mutation; palantir-mini is a stateless harness model where Session = log, not state. H-B also loses BackwardProp (no event history to replay), violating the LEARN central role in world-model domains.learn.centralRole.",
       "testCriteria": [
-        "Prototype: 100 concurrent writes with version-read-before-write; measure conflict rate and lost-update count.",
-        "Compare read performance (snapshot hot path) vs H-A replay cost.",
-        "Compensating-edit rollback: does StaleObject support it cleanly, or require full in-place revert?",
-        "BackwardProp query: given state.json and optional events.jsonl tail, can we replay a targeted 5-dim lineage query?"
+        "pm-verify 4-phase gates continue to PASS on 0.3.x and each subsequent minor bump",
+        "bunx tsc --noEmit succeeds in each consumer across the 0.3 -> 0.9 range without lockstep upgrade",
+        "events.jsonl backfilled with primitives_added events per incremental release",
+        "ForwardProp healthStatus stays partial throughout — only reaches healthy when per-project consumers opt in",
+        "No session cleanup required between bumps (incremental does not force state reset)"
       ],
-      "status": "proposed",
-      "confidence": 0.45,
       "architectureImplications": [
-        "Touches world-model primitives: prim-data-04 SnapshotManifest (DATA, elevated to primary), prim-action-03 AtomicCommit (ACTION, rewritten as rewrite-under-lock), prim-learn-01 AppendOnlyEventLog (LEARN, demoted to optional), prim-learn-04 LineageReplay (LEARN, degraded — cannot replay without full history).",
-        "LOSS: BackwardProp path is crippled. Without events.jsonl as truth, replay_lineage can only operate on an optional log side channel — no guarantee of completeness.",
-        "LOSS: Decision Lineage 5-dim cannot be captured with per-mutation fidelity if writes go into state.json in place; best case is an append-only audit log beside state.json, which collapses back toward H-A.",
-        "LOSS: Cross-project coordination story breaks — gap-03 resolution depends on Claude Code being sole writer, but H-B's optimistic concurrency assumes multi-writer scenarios. If multi-writer is unused, H-A's simpler append-only model dominates.",
-        "GAIN: Read performance on latest state is O(1) file read vs H-A's O(events) replay (though H-A mitigates via snapshot cache).",
-        "GAIN: Simpler mental model for developers without Anthropic Managed Agents background."
+        "Home repo ontology/ added but extension is opt-in — consumers can stay at direct-schema import",
+        "Legacy types.ts + semantics.ts preserved as shims for duration of 0.x range",
+        "Event log accumulates version drift markers (each bump emits a version_bumped event)",
+        "Skill rewrites deferred — /ship + /orchestrate remain 465 LOC + 406 LOC user-scope",
+        "Codegen continues to emit AUTO-GENERATED marker without deterministic header contract until a future bump"
       ],
-      "devcon5Alignment": {
-        "DDD": "PARTIAL — 'StaleObject' matches Palantir vocabulary, but 'snapshot as truth' diverges from Anthropic Managed Agents vocabulary. Cross-project shared language weakens.",
-        "DRY": "PASS — single state file per project.",
-        "OCP": "PARTIAL — new ObjectTypes still added as declarations, but changing the state-file schema is a breaking migration (vs discriminated union extension in H-A).",
-        "PECS": "WEAKER — no producer/consumer generic boundary at the log layer; state file is a plain struct."
-      },
-      "note": "H-B is the formal competitor hypothesis named in decision-log.json hypothesisProvisional.competitor. Must be scored seriously. Simulator's expectation: H-B will lose on D/L/A Fit, ForwardProp Health, and Agent Composability but may be competitive on Implementation Difficulty and Time-to-Value."
-    },
-    {
-      "id": "H-C",
-      "statement": "A 3-phase validation pipeline (Design+Compile fused, Runtime, Post-Write) is the right v0 minimum for palantir-mini, because CC v2.1.108 hooks map cleanly to exactly 3 hook-event classes (SessionStart+PostToolUse for Design/Compile, MCP commit_edits for Runtime, PostToolUse for Post-Write), the remaining 3 Palantir phases (Deploy/Merge-time) presume a Foundry-like branching workflow that Native Runtime does not mirror, and deferring full 6-phase coverage until after the prototype has observed real error classes avoids over-engineering hooks that carry no actionable signal.",
-      "domain": "LOGIC",
-      "dlaJustification": "H-C is a LOGIC-domain question: how many distinct error classes should palantir-mini's ValidationPhaseEvaluator (prim-logic-08) enumerate? The ontologist's world-model prim-logic-08.phaseToHookMapping documents all 6 phases but notes v0 implements minimum 3 (Design+Compile / Runtime / Post-Write). H-C hypothesizes that 3 is not just a v0 minimum but the correct architectural endpoint, because Deploy/Merge phases map to git workflows that already exist outside palantir-mini and adding hooks for them would duplicate git's own validation. This directly tests the ontologist's recommended scenario cut #2 (world-model nextAgent.handoffSummary).",
-      "supportingEvidenceIds": [
-        "clm-rq05-01",
-        "clm-rq05-02",
-        "clm-rq05-03",
-        "clm-ext-01"
+      "dc5PrinciplesInvoked": [
+        "OCP: primary win — every change is an additive extension, no modification of existing types",
+        "DRY: partially applied — home ontology enables DRY for opt-in consumers but legacy duplication persists until deprecation cycle completes",
+        "DDD: preserved at axis level but home/per-project boundary remains blurred until opt-in complete",
+        "PECS: maintained where existing"
       ],
-      "contradictingEvidenceIds": [
-        "clm-rq05-01"
-      ],
-      "contradictionNote": "clm-rq05-01 is cited as both supporting (6 phases are real and distinct per Palantir) and contradicting (cutting to 3 loses signal on 3 distinct error classes). The tension is whether Palantir's Foundry scale justifies all 6 for palantir-mini's smaller scope.",
-      "testCriteria": [
-        "Prototype 3-phase: Design+Compile hook catches schema-level errors; Runtime hook catches submission criteria failures; Post-Write hook catches codegen drift. Does every distinct error class from world-model prim-logic-08.phaseToHookMapping have a home?",
-        "Count error classes observed in palantir-math's existing 141KB data.ts — do any require Deploy/Merge phase discrimination?",
-        "Measure hook latency: is per-Edit PostToolUse tolerable or does it burn out token budget?",
-        "Would adding Deploy/Merge hooks yield events that are actionable (drive refinement) or noise?"
-      ],
-      "status": "proposed",
-      "confidence": 0.70,
-      "architectureImplications": [
-        "Touches world-model primitives: prim-logic-08 ValidationPhaseEvaluator (LOGIC), prim-action-04 ActionExecutorAgent (ACTION, because hook-triggered validation gates commit), prim-sec-02 SubmissionCriteria gate (SECURITY, runtime phase).",
-        "3-phase: hooks/hooks.json registers SessionStart+PostToolUse(schemas/ontology/*) / MCP commit_edits pre-flight / PostToolUse(Edit) drift check. Total ~3 hook entries, ~150 LOC handler code.",
-        "6-phase: hooks/hooks.json adds Stop (Deploy), SessionStart(resume) branch-check (Merge), and PostToolUseFailure (for uncaught cases). ~6 hook entries, ~300 LOC, requires git state inspection.",
-        "If H-C wins (3-phase): Deploy/Merge concerns handled by git pre-commit/pre-push hooks OUTSIDE palantir-mini. Separation of concerns clean.",
-        "If H-C loses (full 6-phase wins): palantir-mini duplicates git validation surface, at the cost of consistency with Palantir's reference model.",
-        "Note: H-C is ORTHOGONAL to H-A vs H-B — 3-phase vs 6-phase works on either event-log or snapshot substrate. Simulator treats H-C as a separate axis, not a competitor to H-A."
-      ],
-      "devcon5Alignment": {
-        "DDD": "PASS — 3-phase names 'Design+Compile', 'Runtime', 'Post-Write' all map to Palantir VAL.R-03..R-08 markers.",
-        "DRY": "PASS — single ValidationPhaseEvaluator interface; fewer phases means less template duplication.",
-        "OCP": "PASS — new phase evaluators can be added later (3 -> 6) without modifying the 3 existing.",
-        "PECS": "PASS — PhaseEvaluator<Input, Output> is generic at call site."
-      },
-      "note": "H-C is the second ontologist-recommended cut. The runner-up outcome (full 6-phase) is scored as H-C worst case, not a separate hypothesis, because the architectural decision is continuous not discrete."
+      "forwardPropImpact": "Partially repaired. Home ~/ontology/ added but consumer extension remains optional; legacy types.ts + semantics.ts persist as fallback. WMO-031 healthStatus stays broken -> partial until last opt-in lands.",
+      "backwardPropImpact": "Manual. Evaluator R-gate signals remain manual Phase-B planning; no new event types that auto-feed refinement. WMO-032 healthStatus remains partial across the 0.x series.",
+      "fourPillarFidelity": "Medium. Pillars get incremental improvement but preserve legacy: ontology axis adds 3 DATA primitives in 0.3 and skips 6 others until later; aip pillar unchanged (no dispatcher); foundry pillar adds 1-2 MCP tools per bump (5 -> 6 -> 7 ...); maven axis benefits from continued additive discipline but delays v1.0 canonical moment indefinitely.",
+      "devcon5Alignment": 3
     }
   ],
 
   "scenarios": [
     {
-      "id": "S-HA-BASE",
+      "id": "S-A1",
       "hypothesisId": "H-A",
-      "type": "base",
-      "title": "H-A Base: append-only events.jsonl + proper-lockfile + sequence check works on all 3 projects",
-      "description": "palantir-mini ships with proper-lockfile as primary atomic-append mechanism. Each project's events.jsonl grows monotonically. Writers acquire lockfile, read tail sequence, append with sequence+1, release. Replay reduces log to snapshot via DC5-06 Reducer primitive. Compensating events handle rollback. palantir-math migrates first (step 1-7 from blueprint.md gap fill 5), kosmos and mathcrew follow.",
+      "variant": "base",
+      "description": "Standard execution: 4-week rebuild in 3 Phase-B waves. Wave B1 (week 1-2): schemas v1.0 tag with 9 missing primitives + home ~/ontology/ scaffold + plugin v1.0 mcp-server expansion 5 -> 10 tools + hooks 6 -> 15 + validation 4 -> 6 phases + L1/L2/L3 RBAC. Wave B2 (week 3): 3-consumer atomic peerDep migration PR bundle. Wave B3 (week 4): /palantir-dispatch + /ontology-register ship; /ship + /orchestrate rewritten to consume events.jsonl; pm-verify 6/6 gates enforce codegen header contract + schema lock.",
       "assumptions": [
-        {"id": "A1", "text": "proper-lockfile works under Bun (inferred from standard fs API usage)", "evidenceIds": ["clm-ext-20", "clm-ext-24"]},
-        {"id": "A2", "text": "Sequence-check-before-append is sufficient for single-writer-per-project (gap-03 resolution — Claude Code is sole writer)", "evidenceIds": ["clm-rq01-02", "clm-ext-20"]},
-        {"id": "A3", "text": "10-variant EventEnvelope union covers all mutation types encountered in palantir-math data.ts refactor", "evidenceIds": ["clm-rq03-03", "clm-ext-14"]},
-        {"id": "A4", "text": "Snapshot derivation via Reducer primitive is deterministic under event replay", "evidenceIds": ["clm-rq01-03"]},
-        {"id": "A5", "text": "Decision Lineage 5-dim captured on every envelope via EventEnvelopeBase", "evidenceIds": ["clm-rq01-01"]}
+        {"id": "A1", "statement": "4-week sprint is enough", "evidenceIds": ["INT-027", "INT-021", "INT-020"]},
+        {"id": "A2", "statement": "3-consumer atomic migration window coordinates within 48h", "evidenceIds": ["INT-018", "INT-027"]},
+        {"id": "A3", "statement": "9 missing primitives delivered with TypeScript sketches only (no deep business logic)", "evidenceIds": ["INT-001", "INT-026"]},
+        {"id": "A4", "statement": "pm-verify phases 5-6 (Deploy + Merge) implemented per INT-021 comment intent", "evidenceIds": ["INT-021"]},
+        {"id": "A5", "statement": "Codegen header contract adopted without breaking existing src/generated/ consumers", "evidenceIds": ["INT-022"]}
       ],
-      "evidenceBaseIds": ["clm-rq01-01", "clm-rq01-02", "clm-rq01-03", "clm-rq01-04", "clm-ext-14", "clm-ext-19", "clm-ext-20"],
-      "contradictions": [],
-      "contradictionStatus": "none",
+      "evidenceBaseIds": ["INT-001", "INT-004", "INT-011", "INT-013", "INT-016", "INT-019", "INT-020", "INT-021", "INT-022", "INT-023", "INT-026", "INT-027"],
+      "contradictions": [
+        {"id": "C1", "statement": "H-B argues incremental preserves supply-chain stability", "classification": "resolvable", "resolution": "Atomic 3-consumer migration window (<=48h) is acceptable precisely because all 3 consumers are in one org (palantirkc) and can coordinate. H-B supply-chain argument applies to cross-org distribution, not intra-org coordinated releases."}
+      ],
+      "contradictionStatus": "resolved",
       "evidenceSufficiency": "sufficient",
-      "implementationPhase": "Phase I (Golden Tables) + Phase II (Operational)",
-      "evaluationScores": {
-        "evidenceFit": 5,
-        "implementationDifficulty": 4,
-        "riskSeverity": 4,
-        "reversibility": 4,
-        "timeToValue": 4,
-        "governanceCompliance": 4,
-        "ecosystemMaturity": 4,
-        "dlaFit": 5,
-        "forwardPropHealth": 5,
-        "agentComposability": 5,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "All 5 assumptions backed by tier-1 evidence. 3-source convergence (Anthropic MA, Palantir DL, OMC clawhip).",
-        "implementationDifficulty": "Proven patterns; blueprint.md Gap fill 1 gives concrete TypeScript schema. 1-2 weeks for PoC (proper-lockfile is 1 import).",
-        "riskSeverity": "Minor — worst case is atomic-append race which blueprint Gap fill 3 mitigates with dual mechanism.",
-        "reversibility": "Mostly reversible. Event log format is JSONL — can be re-read by any successor system. Migration to StaleObject later = fold log to state.",
-        "timeToValue": "1-2 weeks for first working prototype on palantir-math; events.jsonl schema is fully concrete.",
-        "governanceCompliance": "Layer-1 RBAC via managed-settings.d/ + disallowedTools. v0 defers Markings/PermissionsCascade.",
-        "ecosystemMaturity": "proper-lockfile 9.27M dl/week; OSDK 2.0 stable; Anthropic MA current.",
-        "dlaFit": "All 5 domains populated, 28 primitives, EventEnvelope is single touchpoint across all 5 domains per world-model keyInsight.",
-        "forwardPropHealth": "6-step ForwardProp chain from world-model verified healthy. Names match across layers.",
-        "agentComposability": "5 MCP tools (get_ontology, emit_event, apply_edit_function, commit_edits, replay_lineage) compose cleanly. disallowedTools enforces LOGIC/ACTION separation mechanically.",
-        "prototypeValidation": "Not yet tested; prototyper-a will update in T7."
-      },
+      "evaluationScores": [
+        {"dimension": "Evidence Fit", "score": 4, "rationale": "All 5 assumptions backed by tier-1/2 internal evidence (INT-001/004/011/013/016/019/020/021/023/026 Official + INT-027 Synthesis); per rubric §1 score 4 — most backed, minor gap on A2 external benchmarks for atomic migration window."},
+        {"dimension": "Implementation Difficulty", "score": 3, "rationale": "Moderate per rubric §2 score 3 (2-4 weeks custom work). Large surface but bounded: 9 primitive additions + plugin 5 -> 10 MCP tools + 21-event hook expansion + skill rewrite + 3-consumer atomic migration."},
+        {"dimension": "Risk Severity", "score": 3, "rationale": "Moderate per rubric §3 score 3. Atomic migration delay causes noticeable impact but mitigation available (coordinated revert). Worst case 48h stall, no data loss, no compliance violation."},
+        {"dimension": "Reversibility", "score": 3, "rationale": "Partially reversible per rubric §4 score 3. SemVer-major bump requires significant refactoring to reverse; v1.0.1 rollback tag available within days; architectural commitment to home ontology layer persists."},
+        {"dimension": "Time-to-Value", "score": 3, "rationale": "2-4 week MVP timeline per rubric §5 score 3. Full v1.0 at week 4."},
+        {"dimension": "Governance Compliance", "score": 5, "rationale": "Fully compliant per rubric §6 score 5. pm-verify 6/6 phases + L2/L3 RBAC + CapabilityToken enforced. Exceeds current L1-only state."},
+        {"dimension": "Ecosystem Maturity", "score": 4, "rationale": "Stable per rubric §7 score 4. Bun 1.x + Claude Code v2.1.110 GA + OSDK 2.0 patterns (INT-014) 2-5 years active maintenance; palantir-mini + schemas 1+ year production."},
+        {"dimension": "D/L/A Fit", "score": 5, "rationale": "All 5 domains (D/L/A/S/LEARN) cleanly classified per dlaMapping. Transition zones (EditFunction L vs A) explicitly handled via SH-03 heuristic. Per rubric §8 score 5."},
+        {"dimension": "ForwardProp Health", "score": 5, "rationale": "Full chain: research -> schemas -> home -> project -> contracts -> runtime per world-model.forwardProp.authorityChain. Home ~/ontology/ layer inserted; runtime names match ontology. Per rubric §9 score 5."},
+        {"dimension": "Agent Composability", "score": 4, "rationale": "Most operations agent-composable per rubric §10 score 4: /palantir-dispatch intent classifier + /ontology-register registration + events.jsonl lineage substrate + plugin MCP tools agent-addressable. Minor gap: agent prompt updates for 9 new primitives."},
+        {"dimension": "Prototype Validation", "score": 3, "rationale": "Provisional per rubric §11 score 3 (moderate uncertainty pre-T7/T8)."}
+      ],
       "devcon5AlignmentScore": 5,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: added A5 (Decision Lineage 5-dim capture) which was implicit in Round 1. No score changes."
+      "implementationPhase": "Phase II Operational -> Phase III AI-First bridge",
+      "implementationPhaseRationale": "Targets the Phase 1 -> 2 transition per decision-log.devConPhaseClassification. Schemas v1.0 + plugin v1.0 = operational substrate. Skills as dispatchers + lineage-driven PR = Phase III AI-First reach prototype.",
+      "risks": [
+        {"id": "R-A1-01", "statement": "3-consumer atomic migration window slips beyond 48h", "severity": "medium", "mitigation": "Pre-stage migration PRs on feature branches; coordinate merge via Lead dispatcher; rollback plan via v1.0.1 shim tag"},
+        {"id": "R-A1-02", "statement": "9 new primitives ship as TypeScript sketches without deep business logic validation", "severity": "medium", "mitigation": "pm-verify phase 3 runtime + T9 eval suites catch incomplete primitives; v1.0.x patch releases close gaps incrementally"},
+        {"id": "R-A1-03", "statement": "Legacy types.ts + semantics.ts retirement breaks undocumented consumers", "severity": "low", "mitigation": "Schema lock rule + grep across 3 consumers before retirement; keep-read-only-until-retire verdict per legacyAudit.schemasFiles preserves rollback option"}
+      ],
+      "whatWouldChangeDecision": [
+        "Evidence that 3-consumer atomic migration coordination requires > 1 week (would re-favor H-B staged bumps)",
+        "Discovery of a fourth in-scope project that was not accounted for in atomic migration window",
+        "Breaking-change manifest at v1.0 cut-over exceeds 20 symbols (would indicate legacy-retirement scope underestimated)"
+      ],
+      "revisionRound": 3
     },
     {
-      "id": "S-HA-BEST",
+      "id": "S-A2",
       "hypothesisId": "H-A",
-      "type": "best",
-      "title": "H-A Best: events.jsonl becomes cross-project single source of truth; BackwardProp closes the loop",
-      "description": "Best case: Bun compatibility confirmed. All 3 projects migrate successfully. replay_lineage surfaces high-signal drift events that drive actual ontology refinements via the ontologist loop. events.jsonl becomes THE cross-project shared substrate — kosmos consumes mathcrew events via replay MCP tool, driving cross-project BackwardProp. Lessons from prior sessions (jsxgraph-sequencer, mathcrew-content-delivery, mathcrew-photonic-realism) become automatically retrievable as historical lineage.",
+      "variant": "best",
+      "description": "Optimistic: 3-week execution. Wave B1 compresses to 10 days via parallel branch work (schemas-v1 + plugin-v1 + home-ontology-scaffold as 3 concurrent PRs). Wave B2 atomic migration completes within 24h (all 3 consumers have blueprint-ready peerDep updates pre-staged). Wave B3 skills ship in week 3. Fresh pm-verify 6/6 gates PASS first try. No rollback. Lead-direct orchestration succeeds without team-lead debate.",
       "assumptions": [
-        {"id": "A1", "text": "Bun runs proper-lockfile without errors (empirical verification planned for T7)", "evidenceIds": ["clm-ext-24"]},
-        {"id": "A2", "text": "BackwardProp closes loop — refinement proposals persist, get reviewed, lead to ontology updates", "evidenceIds": ["clm-rq01-02", "clm-rq01-03"]},
-        {"id": "A3", "text": "Cross-project event replay is useful (kosmos can learn from palantir-math BackwardProp)", "evidenceIds": ["clm-rq01-04"]},
-        {"id": "A4", "text": "All 3 projects migrate within 2 weeks each following gap-fill-5 migration sequence", "evidenceIds": ["clm-rq03-03"]}
+        {"id": "A1", "statement": "Parallel branch work compresses Wave B1 to 10 days", "evidenceIds": ["INT-021", "INT-026"]},
+        {"id": "A2", "statement": "3 consumers have pre-staged migration PRs before Wave B2 starts", "evidenceIds": ["INT-027"]},
+        {"id": "A3", "statement": "pm-verify 6/6 gates pass on first v1.0 tag", "evidenceIds": ["INT-021", "INT-024"]},
+        {"id": "A4", "statement": "All 9 new primitives have complete implementations, not sketches", "evidenceIds": ["INT-001", "INT-026"]}
       ],
-      "evidenceBaseIds": ["clm-rq01-01", "clm-rq01-02", "clm-rq01-04", "clm-ext-14", "clm-ext-19", "clm-ext-20"],
-      "contradictions": [],
-      "contradictionStatus": "none",
+      "evidenceBaseIds": ["INT-001", "INT-004", "INT-016", "INT-021", "INT-024", "INT-026", "INT-027"],
+      "contradictions": [
+        {"id": "C1", "statement": "Best-case assumes parallel branch work is coordination-free; reality has inter-branch conflicts", "classification": "resolvable", "resolution": "Pre-registered merge order (schemas -> plugin -> home) eliminates most conflicts since each depends on prior; remaining conflicts in plugin vs schemas resolved via 24h coordination window"}
+      ],
+      "contradictionStatus": "resolved",
       "evidenceSufficiency": "partial",
-      "evidenceSufficiencyNote": "A1 rests on inference (clm-ext-24, confidence 0.75). A2 persistence gap known (world-model backwardProp.gaps steps 4+5). Partial, not sufficient.",
-      "implementationPhase": "Phase III (AI-First) — realized only after Phase I+II complete",
-      "evaluationScores": {
-        "evidenceFit": 4,
-        "implementationDifficulty": 3,
-        "riskSeverity": 5,
-        "reversibility": 4,
-        "timeToValue": 3,
-        "governanceCompliance": 4,
-        "ecosystemMaturity": 4,
-        "dlaFit": 5,
-        "forwardPropHealth": 5,
-        "agentComposability": 5,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "Tier-1 sources on core but A1 and A2 have inference/gap. Downgraded from 5.",
-        "implementationDifficulty": "Cross-project integration adds complexity; 2-4 weeks (moderate).",
-        "riskSeverity": "Best case = best outcome — negligible risk.",
-        "reversibility": "Same as base — JSONL is portable.",
-        "timeToValue": "2-4 weeks because Phase III requires Phase I+II on all 3 projects first.",
-        "governanceCompliance": "Same as base. Phase-III also unlocks richer audit via cross-project replay.",
-        "ecosystemMaturity": "Same as base.",
-        "dlaFit": "All 5 domains; cross-project scope amplifies DDD win.",
-        "forwardPropHealth": "6-step chain healthy on all 3 projects.",
-        "agentComposability": "MCP tools composable across projects — Codex/Gemini also consume via filesystem.",
-        "prototypeValidation": "Not yet tested."
-      },
+      "evaluationScores": [
+        {"dimension": "Evidence Fit", "score": 4, "rationale": "Tier-1/2 on most; A2 (pre-staged consumer PRs) depends on unmeasured consumer readiness. Per rubric §1 score 4 (minor gaps)."},
+        {"dimension": "Implementation Difficulty", "score": 4, "rationale": "Straightforward per rubric §2 score 4 (1-2 weeks proven pattern) under best-case parallelism; 3-week total with clear dependencies."},
+        {"dimension": "Risk Severity", "score": 4, "rationale": "Minor per rubric §3 score 4 (small delay or workaround needed). Best-case assumes no rollback, clean gates."},
+        {"dimension": "Reversibility", "score": 3, "rationale": "Same architectural commitment as S-A1 base. Per rubric §4 score 3."},
+        {"dimension": "Time-to-Value", "score": 4, "rationale": "1-2 weeks working demo (Wave B1 at 10 days); 3 weeks full v1.0. Per rubric §5 score 4."},
+        {"dimension": "Governance Compliance", "score": 5, "rationale": "Full 6/6 pm-verify gates + L2/L3 RBAC in same wave. Per rubric §6 score 5."},
+        {"dimension": "Ecosystem Maturity", "score": 4, "rationale": "Same stack as base. Per rubric §7 score 4."},
+        {"dimension": "D/L/A Fit", "score": 5, "rationale": "All 5 domains classified; no degradation. Per rubric §8 score 5."},
+        {"dimension": "ForwardProp Health", "score": 5, "rationale": "Fully repaired; no difference from base. Per rubric §9 score 5."},
+        {"dimension": "Agent Composability", "score": 5, "rationale": "Actions, functions, queries all composable — agent prompts updated within v1.0 release (vs base which defers to v1.0.1). Full Phase III reach. Per rubric §10 score 5."},
+        {"dimension": "Prototype Validation", "score": 3, "rationale": "Provisional pre-T7/T8."}
+      ],
       "devcon5AlignmentScore": 5,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: A2 downgraded evidenceSufficiency from 'sufficient' to 'partial' after reviewing world-model backwardProp.gaps persistence notes."
+      "implementationPhase": "Phase II Operational -> Phase III AI-First full reach",
+      "implementationPhaseRationale": "Best-case pushes into Phase III AI-First proper: /palantir-dispatch as semantic dispatcher + BackwardProp automation goes live.",
+      "risks": [
+        {"id": "R-A2-01", "statement": "Parallel branch conflicts require > 24h coordination", "severity": "low", "mitigation": "Fallback to base-case 4-week plan if parallelism stalls"},
+        {"id": "R-A2-02", "statement": "Pre-staged consumer PRs stale if upstream changes land mid-Wave-B1", "severity": "low", "mitigation": "Consumer PR rebases automated via github actions"}
+      ],
+      "whatWouldChangeDecision": [
+        "Consumer readiness audit reveals any of 3 cannot pre-stage within 5 days",
+        "Inter-branch conflict rate exceeds 20% on Wave B1 dry-run"
+      ],
+      "revisionRound": 3
     },
     {
-      "id": "S-HA-WORST",
+      "id": "S-A3",
       "hypothesisId": "H-A",
-      "type": "worst",
-      "title": "H-A Worst: Bun compat breaks proper-lockfile; fs.mkdir fallback works but under-performs; migration stalls",
-      "description": "Bun is not fully compatible with proper-lockfile (e.g. different fd semantics on Linux). The fs.mkdir zero-dep fallback works but is slow under high write rate. palantir-math migration reveals edge cases in data.ts that require EventEnvelope variant additions beyond the initial 10, forcing schema bumps during v0. mathcrew migration blocks on codegen maturity.",
+      "variant": "worst",
+      "description": "Pessimistic: 8-week execution with 2 rollback cycles. Wave B1 schemas v1.0 tag fails pm-verify phase 3 runtime on first attempt due to incomplete AIPLogicFunction implementation. Rollback to v1.0-rc1; rework 1 week. Wave B2 atomic migration stalls because palantir-math deferred items (F-1 full curve helpers) conflict with primitive renames — 2-week recovery with mathcrew waiting. Wave B3 ships /palantir-dispatch but /ontology-register hit by L2 CapabilityToken not being ready. Legacy /ship + /orchestrate not rewritten within window — pushed to v1.1.",
       "assumptions": [
-        {"id": "A1", "text": "Bun has subtle fs API differences from Node that break proper-lockfile at scale", "evidenceIds": ["clm-ext-24"]},
-        {"id": "A2", "text": "fs.mkdir fallback exponential backoff adds 50-200ms latency per commit under contention", "evidenceIds": ["clm-ext-20"]},
-        {"id": "A3", "text": "palantir-math data.ts has patterns not covered by initial 10 variants", "evidenceIds": ["clm-rq03-03"]},
-        {"id": "A4", "text": "Schema bump during v0 requires events.jsonl migration tooling", "evidenceIds": ["clm-rq01-03"]}
+        {"id": "A1", "statement": "pm-verify phase 3 runtime gate fails on first v1.0-rc", "evidenceIds": ["INT-021"]},
+        {"id": "A2", "statement": "palantir-math F-1 deferred items (jsxGraph parametric-curve body extraction) conflict with shared primitive renames", "evidenceIds": ["INT-028"]},
+        {"id": "A3", "statement": "L2 CapabilityToken implementation under-scoped for Wave B3 /ontology-register", "evidenceIds": ["INT-011"]},
+        {"id": "A4", "statement": "Skill rewrites (/ship + /orchestrate) exceed 4-week scope and defer to v1.1", "evidenceIds": ["INT-025"]}
       ],
-      "evidenceBaseIds": ["clm-ext-20", "clm-ext-24", "clm-rq03-03"],
+      "evidenceBaseIds": ["INT-011", "INT-021", "INT-025", "INT-028"],
       "contradictions": [
-        {
-          "id": "contra-ha-worst-1",
-          "description": "A1 (Bun broken) vs A2 (fs.mkdir fallback works). If both hold, system degrades gracefully but slowly. If only A1 holds, fallback saves the day. Tension is not fundamental, but requires empirical resolution.",
-          "classification": "evidence-gap-driven",
-          "action": "T7 prototype validates both paths"
-        }
+        {"id": "C1", "statement": "Worst-case assumes rollback but repo evidence shows no prior v1.0 rollbacks to pattern against", "classification": "evidence-gap-driven", "resolution": "Flagged as NextExperiment: prototype schemas v1.0-rc1 in isolated worktree before production tag to measure rollback readiness"}
       ],
-      "contradictionStatus": "evidence-gap-driven",
-      "contradictionResolutionPath": "T7 prototype tests both mechanisms under Bun; if both work, H-A worst is mild. If proper-lockfile fails, fallback is primary and latency impact dominates.",
+      "contradictionStatus": "resolved",
       "evidenceSufficiency": "partial",
-      "implementationPhase": "Phase I (Golden Tables — blocked on atomic append correctness)",
-      "evaluationScores": {
-        "evidenceFit": 3,
-        "implementationDifficulty": 2,
-        "riskSeverity": 2,
-        "reversibility": 4,
-        "timeToValue": 2,
-        "governanceCompliance": 3,
-        "ecosystemMaturity": 3,
-        "dlaFit": 4,
-        "forwardPropHealth": 4,
-        "agentComposability": 4,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "A1 is speculation grounded in known-unknown; A2 is measurable but not measured yet.",
-        "implementationDifficulty": "Fallback adds complexity; schema bump tooling is new territory.",
-        "riskSeverity": "Severe — slow commit path degrades agent experience, schema bumps break backward compat.",
-        "reversibility": "Still reversible — events.jsonl is portable.",
-        "timeToValue": "1-2 months if schema bumps force re-migration.",
-        "governanceCompliance": "Same core compliance, but schema bumps add audit burden.",
-        "ecosystemMaturity": "proper-lockfile last published 2020 (source-map contra-01); aging flag becomes material.",
-        "dlaFit": "Domain boundaries still clean; worst case does not blur classifications.",
-        "forwardPropHealth": "Chain exists but commit latency degrades effective propagation speed.",
-        "agentComposability": "Still composable; agents tolerate slower commit.",
-        "prototypeValidation": "Not yet tested — this is explicitly what T7 validates."
-      },
-      "devcon5AlignmentScore": 4,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: resolved classification from 'detected' to 'evidence-gap-driven' per rubric — T7 prototype fills the gap. Evidence sufficiency stays partial."
-    },
-    {
-      "id": "S-HA-ADV",
-      "hypothesisId": "H-A",
-      "type": "adversarial",
-      "title": "H-A Adversarial: two parallel Claude Code sessions in same project race on events.jsonl; sequence check fails silently",
-      "description": "An adversarial scenario the ontologist explicitly flagged (world-model nextAgent.handoffSummary: 'adversarial is CRITICAL because gap-01 resolution depends on sequence-check correctness under concurrent writers'). Two parallel CC sessions write to same events.jsonl. Sequence-check wraps read+write in lockfile, but if the lockfile SILENTLY fails (stale lock not cleaned up, or mkdir fallback exits retry loop), both writers proceed with same lastSequence, producing two events with same sequence number. Replay sees two events claiming sequence=N; undefined which wins. DATA integrity violated.",
-      "assumptions": [
-        {"id": "A1", "text": "Two CC sessions can run concurrently against same project (git worktree scenario, user running /kosmos-research in two tmux panes)", "evidenceIds": ["clm-rq01-02"]},
-        {"id": "A2", "text": "Stale lock cleanup timing (proper-lockfile stale: 10000) can leave orphan locks on crash", "evidenceIds": ["clm-ext-20"]},
-        {"id": "A3", "text": "fs.mkdir fallback retry exhaustion (5 attempts, max ~1.5s backoff) can surrender under heavy contention", "evidenceIds": ["clm-ext-20"]},
-        {"id": "A4", "text": "Sequence-check-then-append is NOT atomic unless held under same lock", "evidenceIds": ["clm-ext-20"]}
+      "evaluationScores": [
+        {"dimension": "Evidence Fit", "score": 3, "rationale": "Core assumptions supported; A2 + A4 inferential — per rubric §1 score 3 (core supported, some inference)."},
+        {"dimension": "Implementation Difficulty", "score": 2, "rationale": "Difficult per rubric §2 score 2: rollback loops + inter-project coordination stalls + skill rewrite deferral = 1-2 month timeline."},
+        {"dimension": "Risk Severity", "score": 2, "rationale": "Severe per rubric §3 score 2: 8-week slip + deferred skill rewrite + L2 CapabilityToken gap = significant rework; still recoverable."},
+        {"dimension": "Reversibility", "score": 2, "rationale": "Difficult to reverse per rubric §4 score 2: rollback already happened once; architectural commitment to home ontology persists."},
+        {"dimension": "Time-to-Value", "score": 2, "rationale": "8 weeks = 1-2 months significant lead time per rubric §5 score 2."},
+        {"dimension": "Governance Compliance", "score": 3, "rationale": "Partially compliant per rubric §6 score 3: L1 RBAC remains, L2 deferred to v1.0.x patch — gap present but not blocking."},
+        {"dimension": "Ecosystem Maturity", "score": 4, "rationale": "Same stack; variance is in execution, not stack. Per rubric §7 score 4."},
+        {"dimension": "D/L/A Fit", "score": 4, "rationale": "Most concepts clear; some primitives (MarkingDeclaration, ScenarioSandbox) shipping in v1.1 leave transition-zone items flagged. Per rubric §8 score 4."},
+        {"dimension": "ForwardProp Health", "score": 4, "rationale": "Chain mostly complete; minor gaps in S + LEARN propagation until v1.0.x patches. Per rubric §9 score 4."},
+        {"dimension": "Agent Composability", "score": 3, "rationale": "Core operations composable (dispatcher ships); complex workflows (/ontology-register) require human orchestration due to delay. Per rubric §10 score 3."},
+        {"dimension": "Prototype Validation", "score": 3, "rationale": "Provisional pre-T7/T8."}
       ],
-      "evidenceBaseIds": ["clm-rq01-02", "clm-ext-20", "clm-ext-24"],
-      "contradictions": [
-        {
-          "id": "contra-ha-adv-1",
-          "description": "gap-01 (world-model gapsResolved) claims 'Zero-dep fs.mkdir lockfile provides mutual exclusion so check-and-append is atomic'. Adversarial scenario questions whether retry exhaustion or stale cleanup can break that invariant.",
-          "classification": "evidence-gap-driven",
-          "action": "T7 prototype MUST include adversarial write test — two concurrent writers at high rate, verify zero torn writes AND zero duplicate sequences."
-        }
-      ],
-      "contradictionStatus": "evidence-gap-driven",
-      "contradictionResolutionPath": "Prototype test: spawn 2 bun processes, each emit 1000 events to same file, verify tail -n 2000 shows sequence 1..2000 with no duplicates. If fails, either increase lockfile retries, or implement application-level sequence conflict rejection with retry.",
-      "evidenceSufficiency": "partial",
-      "implementationPhase": "Phase I (Golden Tables — atomic append is THE correctness invariant)",
-      "evaluationScores": {
-        "evidenceFit": 3,
-        "implementationDifficulty": 3,
-        "riskSeverity": 1,
-        "reversibility": 3,
-        "timeToValue": 3,
-        "governanceCompliance": 2,
-        "ecosystemMaturity": 3,
-        "dlaFit": 4,
-        "forwardPropHealth": 3,
-        "agentComposability": 3,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "Hypothetical race but supported by real mkdir semantics and proper-lockfile's documented stale cleanup.",
-        "implementationDifficulty": "Adversarial mitigation requires application-level retry-on-conflict + fsync durability.",
-        "riskSeverity": "Critical if unmitigated — silent data loss or duplicate sequences break every downstream reducer.",
-        "reversibility": "Partial — duplicate sequences require manual reconciliation via timestamp or human review.",
-        "timeToValue": "2-4 weeks if adversarial hardening required.",
-        "governanceCompliance": "Significant gap — audit trail integrity is core governance property.",
-        "ecosystemMaturity": "proper-lockfile aging (last publish 2020); fallback is custom code.",
-        "dlaFit": "LEARN domain integrity at stake; boundaries still clear.",
-        "forwardPropHealth": "Chain can fail silently if writes lost.",
-        "agentComposability": "Agents tolerate retries gracefully.",
-        "prototypeValidation": "This is THE scenario T7 must cover."
-      },
-      "devcon5AlignmentScore": 4,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: strengthened A4 to be explicit that sequence-check+append must be atomic under same lock, not two separate locks. This is the implementation detail gap-01 resolution depends on."
-    },
-
-    {
-      "id": "S-HB-BASE",
-      "hypothesisId": "H-B",
-      "type": "base",
-      "title": "H-B Base: state.json + version column + read-before-write optimistic concurrency",
-      "description": "Per-project state.json holds current snapshot. Each write: read version, check expected, write new state with version+1. Palantir StaleObject maps cleanly (src-int-validation-readme). Events.jsonl reduced to optional audit side channel. Simpler mental model; no lockfile complexity.",
-      "assumptions": [
-        {"id": "A1", "text": "StaleObject optimistic concurrency is production-proven in Palantir Foundry", "evidenceIds": ["clm-rq05-01"]},
-        {"id": "A2", "text": "Single-file state.json is sufficient for palantir-mini scope (not Foundry scale)", "evidenceIds": ["clm-rq03-03"]},
-        {"id": "A3", "text": "Read-before-write is cheaper than mkdir-lock on hot path", "evidenceIds": []},
-        {"id": "A4", "text": "Optional events.jsonl side channel is sufficient for audit requirements", "evidenceIds": ["clm-rq01-01"]}
-      ],
-      "evidenceBaseIds": ["clm-rq05-01", "clm-rq03-02", "clm-rq03-03"],
-      "contradictions": [
-        {
-          "id": "contra-hb-base-1",
-          "description": "A4 contradicts world-model domains.learn.centralRole which states LEARN is foundational and events.jsonl is primary, not optional.",
-          "classification": "irreconcilable",
-          "action": "H-B either accepts LEARN demotion (breaking ontologist model) or adopts events.jsonl as primary (collapsing to H-A)."
-        }
-      ],
-      "contradictionStatus": "unresolvable",
-      "contradictionResolutionPath": "IRRECONCILABLE — H-B's architectural premise contradicts LEARN-centrality. Preserved as a decision fork, not resolved.",
-      "evidenceSufficiency": "partial",
-      "implementationPhase": "Phase I (Golden Tables) — but sacrifices Phase III (AI-First) amplification",
-      "evaluationScores": {
-        "evidenceFit": 3,
-        "implementationDifficulty": 5,
-        "riskSeverity": 3,
-        "reversibility": 3,
-        "timeToValue": 5,
-        "governanceCompliance": 3,
-        "ecosystemMaturity": 5,
-        "dlaFit": 3,
-        "forwardPropHealth": 3,
-        "agentComposability": 3,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "StaleObject is real but applied to wrong context — Foundry has ontology server; palantir-mini has filesystem only. A3 has no evidence (no hot-path benchmark).",
-        "implementationDifficulty": "Trivial — 1 state file, 1 version column, 50 LOC.",
-        "riskSeverity": "Moderate — lost BackwardProp leaves drift detection blind.",
-        "reversibility": "Partial — once you commit to state.json truth, migrating to events.jsonl requires synthesizing event history from snapshot (non-deterministic).",
-        "timeToValue": "Days — can ship a prototype in 48h.",
-        "governanceCompliance": "Partial — audit via optional side channel is not reliable.",
-        "ecosystemMaturity": "Mature — JSON files are as stable as it gets.",
-        "dlaFit": "Core D/L/A clear but SECURITY/LEARN domains are thin or absent. Violates world-model claim that all 5 domains are first-class.",
-        "forwardPropHealth": "Chain exists but truncated — no events, no replay, no drift detection at the LEARN layer.",
-        "agentComposability": "Core operations composable but no audit surface for agents to reason about past behavior.",
-        "prototypeValidation": "Not yet tested."
-      },
       "devcon5AlignmentScore": 3,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: contradictionStatus elevated to 'unresolvable' — the LEARN-centrality conflict is architectural, not empirical. Rubric requires splitting. H-B's own base is the fork."
+      "implementationPhase": "Phase II Operational (Phase III deferred to v1.1)",
+      "implementationPhaseRationale": "Worst-case achieves Phase 2 but Phase 3 AI-First slips to v1.1.",
+      "risks": [
+        {"id": "R-A3-01", "statement": "Cascading rollbacks erode team confidence in v1.0 strategy", "severity": "high", "mitigation": "Pre-publish explicit rollback runbook; treat first failure as learning not blocker"},
+        {"id": "R-A3-02", "statement": "palantir-math F-1 deferred items block shared primitive rename", "severity": "high", "mitigation": "Resolve F-1 full (parametric-curve body extraction to curveHelpers.ts) BEFORE Wave B2"},
+        {"id": "R-A3-03", "statement": "Skill rewrite deferred to v1.1 means legacy 865 LOC stays production-critical 4+ weeks longer", "severity": "medium", "mitigation": "Ship /palantir-dispatch with legacy skill fallback path"}
+      ],
+      "whatWouldChangeDecision": [
+        "If worst-case timeline (8 weeks) materializes, reassess H-B incremental merit after Wave B1 rollback",
+        "L2 CapabilityToken scoping audit reveals readiness < 60% going into Wave B3"
+      ],
+      "revisionRound": 3
     },
     {
-      "id": "S-HB-BEST",
-      "hypothesisId": "H-B",
-      "type": "best",
-      "title": "H-B Best: state.json ships in 3 days; palantir-math migration lightweight; no lockfile headaches",
-      "description": "Best case for H-B: no Bun surprises, minimal code, palantir-math migrates in 3 days. Developers with non-Anthropic-MA background find it trivial. Contracting mental surface area wins.",
+      "id": "S-A4",
+      "hypothesisId": "H-A",
+      "variant": "adversarial",
+      "description": "What breaks v1.0? (1) Hostile merge-window slip: palantir-math PR lands while mathcrew CI is red; atomic migration bisects — consumers end up on mixed v0.2.1 and v1.0.0 for 5 days. (2) Codegen drift: pm-codegen regenerates src/generated/* with v1.0 header but consumer's local build uses cached v0.2 generated — runtime object RID mismatches leak into events.jsonl. (3) Schema-lock bypass attempt: contributor edits types.ts directly (deny rule stale in per-project managed-settings.d/ fragment) — silent drift. (4) /palantir-dispatch mis-routes intents after EVENT_TYPE_REGISTRY expansion — events emitted under wrong variant, replay_lineage returns incomplete lineage.",
       "assumptions": [
-        {"id": "A1", "text": "Palantir StaleObject pattern maps 1:1 to single state.json file", "evidenceIds": ["clm-rq05-01"]},
-        {"id": "A2", "text": "Audit requirements can be satisfied without event log", "evidenceIds": []},
-        {"id": "A3", "text": "Developer velocity beats ontological purity for v0", "evidenceIds": []}
+        {"id": "A1", "statement": "Atomic migration can bisect if a consumer CI fails mid-window", "evidenceIds": ["INT-027"]},
+        {"id": "A2", "statement": "pm-codegen cache invalidation gap produces generated file drift", "evidenceIds": ["INT-022"]},
+        {"id": "A3", "statement": "Per-project managed-settings.d/ fragment may lack updated schema-lock deny rule", "evidenceIds": ["INT-023"]},
+        {"id": "A4", "statement": "Intent classifier error rate > 5% under expanded EVENT_TYPE_REGISTRY", "evidenceIds": ["INT-019"]}
       ],
-      "evidenceBaseIds": ["clm-rq05-01"],
+      "evidenceBaseIds": ["INT-019", "INT-022", "INT-023", "INT-027"],
       "contradictions": [
-        {
-          "id": "contra-hb-best-1",
-          "description": "A2 has NO evidence. Decision-log.json makes LEARN a first-class domain.",
-          "classification": "resolvable",
-          "action": "Resolve: downgrade A2 to 'for simple auditing with documented caveats'. Reduces scenario optimism."
-        }
+        {"id": "C1", "statement": "Adversarial A3 contradicts managed-settings.d deny rule enforcement claim in INT-023", "classification": "resolvable", "resolution": "Per-project fragment drift is exactly the scenario L2 CapabilityToken on 'schema-write' would catch. Confirms worst-case need for L2 in v1.0."}
       ],
       "contradictionStatus": "resolved",
-      "evidenceSufficiency": "insufficient",
-      "evidenceSufficiencyNote": "Only 1 of 3 assumptions has evidence. < 50%.",
-      "implementationPhase": "Phase I (Golden Tables)",
-      "evaluationScores": {
-        "evidenceFit": 2,
-        "implementationDifficulty": 5,
-        "riskSeverity": 4,
-        "reversibility": 3,
-        "timeToValue": 5,
-        "governanceCompliance": 3,
-        "ecosystemMaturity": 5,
-        "dlaFit": 3,
-        "forwardPropHealth": 3,
-        "agentComposability": 3,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "2 of 3 assumptions unsupported; A2 (audit without log) unsupported.",
-        "implementationDifficulty": "Trivial — state.json + version.",
-        "riskSeverity": "Minor if correctness holds; team can tolerate.",
-        "reversibility": "Partial — migration to H-A requires event history reconstruction.",
-        "timeToValue": "Days.",
-        "governanceCompliance": "Partial audit.",
-        "ecosystemMaturity": "Mature.",
-        "dlaFit": "Same as base — LEARN thin.",
-        "forwardPropHealth": "Truncated at LEARN layer.",
-        "agentComposability": "Core composable.",
-        "prototypeValidation": "Not yet tested."
-      },
+      "evidenceSufficiency": "partial",
+      "evaluationScores": [
+        {"dimension": "Evidence Fit", "score": 3, "rationale": "A1-A4 each supported by one tier-1 source but adversarial composite is inferential. Per rubric §1 score 3."},
+        {"dimension": "Implementation Difficulty", "score": 2, "rationale": "Mitigating 4 adversarial paths adds pm-verify gates + merge-window lock + L2 enforcement = novel patterns, 1-2 months. Per rubric §2 score 2."},
+        {"dimension": "Risk Severity", "score": 2, "rationale": "Severe per rubric §3 score 2: bisected consumer state + codegen drift + silent schema-lock bypass compound to user-facing failure."},
+        {"dimension": "Reversibility", "score": 3, "rationale": "Partially reversible per rubric §4 score 3: bisect recoverable via CI rollback; codegen drift via force-regenerate; schema-lock needs per-project fragment audit."},
+        {"dimension": "Time-to-Value", "score": 3, "rationale": "Adversarial mitigation extends timeline to 4-6 weeks. Per rubric §5 score 3."},
+        {"dimension": "Governance Compliance", "score": 4, "rationale": "L2 CapabilityToken mitigates schema-write bypass; pm-verify 6/6 catches codegen drift; governance mostly compliant minor gaps. Per rubric §6 score 4."},
+        {"dimension": "Ecosystem Maturity", "score": 4, "rationale": "Stack mature; exposure is process + tooling integration. Per rubric §7 score 4."},
+        {"dimension": "D/L/A Fit", "score": 4, "rationale": "Classifications preserved; adversarial paths target enforcement gaps not classification. Per rubric §8 score 4."},
+        {"dimension": "ForwardProp Health", "score": 3, "rationale": "Backend propagation healthy but frontend/consumer-side temporarily divergent during migration window on 1/3 consumers. Per rubric §9 score 3."},
+        {"dimension": "Agent Composability", "score": 3, "rationale": "Core composable; /palantir-dispatch mis-routing degrades intent classification; post-ship calibration required. Per rubric §10 score 3."},
+        {"dimension": "Prototype Validation", "score": 3, "rationale": "Provisional — T7/T8 should explicitly test codegen drift + intent mis-route paths."}
+      ],
+      "devcon5AlignmentScore": 4,
+      "implementationPhase": "Phase II Operational (adversarial stress-test)",
+      "implementationPhaseRationale": "Adversarial scenario targets enforcement layer integrity at Phase 1 -> 2 boundary.",
+      "risks": [
+        {"id": "R-A4-01", "statement": "Bisected consumer state during atomic migration window", "severity": "high", "mitigation": "Pre-publish merge-window lock protocol; require all 3 consumer CIs green before Wave B2 merge authorization"},
+        {"id": "R-A4-02", "statement": "Codegen cache invalidation gap", "severity": "medium", "mitigation": "Force-regenerate step mandatory in pm-verify phase 4 post-write; emit codegen_regenerated event with schema hash"},
+        {"id": "R-A4-03", "statement": "Schema-lock deny rule drift across consumer managed-settings.d fragments", "severity": "medium", "mitigation": "Plugin bundles authoritative fragment; consumer fragments merge, not override"},
+        {"id": "R-A4-04", "statement": "/palantir-dispatch mis-routing after EVENT_TYPE_REGISTRY expansion", "severity": "medium", "mitigation": "T9 eval suite includes intent-classification adversarial test set; mis-route event type emitted for retrospective"}
+      ],
+      "whatWouldChangeDecision": [
+        "Adversarial evaluation run reveals mitigation cost > 1 week on any single path (consider splitting v1.0 into v1.0 + v1.1 to defer highest-cost mitigation)",
+        "Intent classifier mis-route rate exceeds 5% in T9 prototype eval"
+      ],
+      "revisionRound": 3
+    },
+    {
+      "id": "S-B1",
+      "hypothesisId": "H-B",
+      "variant": "base",
+      "description": "Standard execution: 6-week rollout across 0.3.x -> 0.6.x. 0.3.x (week 1-2): Struct + ValueType + SharedPropertyType primitives shipped; types.ts interface aliases preserved. 0.4.x (week 3): CapabilityToken added in policies/ with L1 RBAC opt-in; no L2 enforcement yet. 0.5.x (week 4): AutomationDeclaration + WebhookDeclaration primitives. 0.6.x (week 5-6): home ~/ontology/ directory added with opt-in flag; palantir-math + mathcrew each decides independently whether to extend. Skill rewrites deferred to v1.0 'when needed'. Plugin MCP tool count grows 5 -> 7 (adds ontology_schema_get + codegen_trigger). Hook count grows 6 -> 10. Validation stays 4-phase.",
+      "assumptions": [
+        {"id": "A1", "statement": "6-week timeline accommodates 4 minor bumps", "evidenceIds": ["INT-018", "INT-027"]},
+        {"id": "A2", "statement": "types.ts interface aliases preserve existing consumer code unchanged", "evidenceIds": ["INT-017", "INT-026"]},
+        {"id": "A3", "statement": "Consumers opt in to home ontology on their own timelines", "evidenceIds": ["INT-028"]},
+        {"id": "A4", "statement": "Skill rewrites genuinely deferrable — /ship + /orchestrate continue to work", "evidenceIds": ["INT-025"]},
+        {"id": "A5", "statement": "Each minor bump is independently reversible via pin revert", "evidenceIds": ["INT-018"]}
+      ],
+      "evidenceBaseIds": ["INT-017", "INT-018", "INT-025", "INT-026", "INT-027", "INT-028"],
+      "contradictions": [
+        {"id": "C1", "statement": "Assumption A3 (consumer opt-in to home ontology) contradicts WMO-031 ForwardProp repair requirement — if even 1 consumer stays at direct-schema import, ForwardProp stays broken", "classification": "irreconcilable", "resolution": "Acknowledged: H-B accepts 'partial' ForwardProp repair as the tradeoff for preserving supply-chain stability. This is the central irreconcilable tradeoff between H-A and H-B."}
+      ],
+      "contradictionStatus": "resolved",
+      "evidenceSufficiency": "sufficient",
+      "evaluationScores": [
+        {"dimension": "Evidence Fit", "score": 4, "rationale": "Assumptions backed by tier-1/2 internal evidence; additive pattern proven in W1-W4 waves. Per rubric §1 score 4."},
+        {"dimension": "Implementation Difficulty", "score": 4, "rationale": "Straightforward per rubric §2 score 4: each minor bump is 1-2 weeks of additive work; no atomic coordination."},
+        {"dimension": "Risk Severity", "score": 4, "rationale": "Minor per rubric §3 score 4: no SemVer break; per-consumer pin revert handles failure. Small delay or workaround needed on version drift."},
+        {"dimension": "Reversibility", "score": 4, "rationale": "Mostly reversible per rubric §4 score 4: each minor bump independently reversible via peerDep pin revert + caret-range constraint; days of work per rollback."},
+        {"dimension": "Time-to-Value", "score": 3, "rationale": "First value (Struct + ValueType) at 2 weeks; full 0.3-0.6 suite in 6 weeks. Per rubric §5 score 3 (MVP timeline)."},
+        {"dimension": "Governance Compliance", "score": 3, "rationale": "Partially compliant per rubric §6 score 3: L1 RBAC remains; L2 opt-in without enforcement for duration of 0.x."},
+        {"dimension": "Ecosystem Maturity", "score": 4, "rationale": "Same stack as H-A. Per rubric §7 score 4."},
+        {"dimension": "D/L/A Fit", "score": 3, "rationale": "Core D/L/A clean; Security (L2 opt-in) and Learn (ScenarioSandbox deferred) thin. Per rubric §8 score 3."},
+        {"dimension": "ForwardProp Health", "score": 2, "rationale": "Significant gaps per rubric §9 score 2: home ontology added but opt-in. Runtime names diverge from ontology on consumers that stay at direct schema import."},
+        {"dimension": "Agent Composability", "score": 2, "rationale": "Limited composability per rubric §10 score 2: no /palantir-dispatch, no /ontology-register; agents need custom integration per ontology registration operation."},
+        {"dimension": "Prototype Validation", "score": 3, "rationale": "Provisional pre-T7/T8."}
+      ],
       "devcon5AlignmentScore": 3,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: evidenceSufficiency marked 'insufficient' per rubric — most assumptions lack evidence. Scenario MUST NOT support a recommendation without NextExperiment."
+      "implementationPhase": "Phase I Golden Tables -> Phase II Operational (slow bridge)",
+      "implementationPhaseRationale": "Incremental path remains at Phase 1 + partial Phase 2 for duration of 0.x series; Phase 3 unreachable without dispatcher + /ontology-register.",
+      "risks": [
+        {"id": "R-B1-01", "statement": "Version drift accumulates — consumers end up spread across 0.3/0.4/0.5/0.6 pins simultaneously", "severity": "medium", "mitigation": "pm-verify schema-version gate enforces minimum 0.3.x pin once any consumer upgrades"},
+        {"id": "R-B1-02", "statement": "Home ontology opt-in stalls — 1 consumer never extends, ForwardProp stays broken indefinitely", "severity": "high", "mitigation": "Accepted tradeoff per hypothesis contradictionStatus; /ship adds warning when consumer not on home-ontology extension"},
+        {"id": "R-B1-03", "statement": "Legacy types.ts + semantics.ts stay production through 0.x range; future v1.0 still needs the same retirement work", "severity": "medium", "mitigation": "Mark types.ts for retire in 0.9 deprecation notice; document delta"}
+      ],
+      "whatWouldChangeDecision": [
+        "Evidence that 1+ consumer is unwilling to opt in to home ontology within 3 minor bumps (forces back to H-A atomic)",
+        "Version drift audit shows > 2 minor-version spread across 3 consumers for > 1 week (supply-chain stability claim fails)"
+      ],
+      "revisionRound": 3
     },
     {
-      "id": "S-HB-WORST",
+      "id": "S-B2",
       "hypothesisId": "H-B",
-      "type": "worst",
-      "title": "H-B Worst: optimistic concurrency retries cascade into lost updates; BackwardProp unrecoverable",
-      "description": "Worst case: multiple retries in high-concurrency scenario compound into silent lost updates. Since there is no event log, LineageReplay cannot recover history. Drift detection is impossible. palantir-math migration produces state that is hard to debug; reverting to events.jsonl requires re-extracting history from git logs (lossy).",
+      "variant": "best",
+      "description": "Optimistic: 4-week rollout. All 3 consumers eagerly opt in to home ontology by 0.4.x. Each minor bump ships in 1 week clean with pm-verify 4/4 PASS. Legacy types.ts interface aliases retired opportunistically in 0.6.x without breaking anything. Plugin v0.3 ships parallel to schemas 0.3.x with 3 new MCP tools. /palantir-dispatch prototyped as experimental behind feature flag by 0.6.x. By end of 0.9.x (6 weeks out), effective v1.0 state reached without breaking-change ceremony.",
       "assumptions": [
-        {"id": "A1", "text": "StaleObject optimistic concurrency degrades under high write rate without serialization", "evidenceIds": ["clm-rq05-01"]},
-        {"id": "A2", "text": "No event log means no recovery surface", "evidenceIds": ["clm-rq01-02"]},
-        {"id": "A3", "text": "Git history as fallback audit is lossy", "evidenceIds": []}
+        {"id": "A1", "statement": "All 3 consumers opt in to home ontology by 0.4.x", "evidenceIds": ["INT-027", "INT-028"]},
+        {"id": "A2", "statement": "Legacy aliases retire opportunistically without consumer coordination", "evidenceIds": ["INT-017", "INT-026"]},
+        {"id": "A3", "statement": "Plugin v0.3 + schemas 0.3.x ship in parallel without conflict", "evidenceIds": ["INT-019", "INT-020", "INT-021"]},
+        {"id": "A4", "statement": "/palantir-dispatch shippable experimentally without full intent-registry", "evidenceIds": ["INT-024"]}
       ],
-      "evidenceBaseIds": ["clm-rq01-02", "clm-rq05-01"],
+      "evidenceBaseIds": ["INT-017", "INT-019", "INT-020", "INT-021", "INT-024", "INT-026", "INT-027", "INT-028"],
       "contradictions": [
-        {
-          "id": "contra-hb-worst-1",
-          "description": "A3 (git as audit fallback) is an unsupported inference — git doesn't know about ontology semantics.",
-          "classification": "resolvable",
-          "action": "Resolve: mark as known-lossy; document workaround (dual-write state.json + events.jsonl), which collapses to H-A."
-        }
+        {"id": "C1", "statement": "Best-case A2 (opportunistic alias retirement without coordination) conflicts with schema-lock discipline", "classification": "resolvable", "resolution": "Each alias retirement happens in the bump that replaces it; consumer pin bump to the next minor forces adoption. No separate coordination needed because the aliases' only purpose was alias."}
       ],
       "contradictionStatus": "resolved",
       "evidenceSufficiency": "partial",
-      "implementationPhase": "Phase I (Golden Tables) — blocked",
-      "evaluationScores": {
-        "evidenceFit": 3,
-        "implementationDifficulty": 3,
-        "riskSeverity": 2,
-        "reversibility": 2,
-        "timeToValue": 2,
-        "governanceCompliance": 2,
-        "ecosystemMaturity": 4,
-        "dlaFit": 2,
-        "forwardPropHealth": 2,
-        "agentComposability": 2,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "Partial — A3 unsupported.",
-        "implementationDifficulty": "Moderate — recovery logic after lost updates is non-trivial.",
-        "riskSeverity": "Severe — lost updates corrupt downstream.",
-        "reversibility": "Difficult — no event history to replay.",
-        "timeToValue": "Weeks of remediation.",
-        "governanceCompliance": "Major gap — audit trail unreliable.",
-        "ecosystemMaturity": "StaleObject pattern mature.",
-        "dlaFit": "Domain confusion — LEARN effectively absent.",
-        "forwardPropHealth": "Significant gaps; runtime events invisible.",
-        "agentComposability": "Custom adapters needed for replay equivalent.",
-        "prototypeValidation": "Not yet tested."
-      },
-      "devcon5AlignmentScore": 2,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: confirmed contradiction resolved via documentation of lossy nature."
+      "evaluationScores": [
+        {"dimension": "Evidence Fit", "score": 3, "rationale": "A1 (all 3 consumers eager) is the optimistic linchpin — evidence present but partial support. Per rubric §1 score 3."},
+        {"dimension": "Implementation Difficulty", "score": 4, "rationale": "Straightforward per rubric §2 score 4 via parallel plugin/schemas releases."},
+        {"dimension": "Risk Severity", "score": 5, "rationale": "Negligible per rubric §3 score 5: no break, eager consumer adoption, fast pm-verify passes."},
+        {"dimension": "Reversibility", "score": 4, "rationale": "Same per-bump reversibility as S-B1; mostly reversible. Per rubric §4 score 4."},
+        {"dimension": "Time-to-Value", "score": 4, "rationale": "Working demo at 1 week; effective v1.0 at 4-6 weeks. Per rubric §5 score 4."},
+        {"dimension": "Governance Compliance", "score": 4, "rationale": "L2 CapabilityToken ships with enforcement — mostly compliant, minor gaps. Per rubric §6 score 4."},
+        {"dimension": "Ecosystem Maturity", "score": 4, "rationale": "Same. Per rubric §7 score 4."},
+        {"dimension": "D/L/A Fit", "score": 4, "rationale": "Most primitives classified; MarkingDeclaration deferred to 0.9.x — minor transition-zone item flagged. Per rubric §8 score 4."},
+        {"dimension": "ForwardProp Health", "score": 4, "rationale": "Best-case repair: all 3 consumers on home ontology by 0.4.x = chain mostly complete; minor naming convention differences remain across bumps. Per rubric §9 score 4."},
+        {"dimension": "Agent Composability", "score": 3, "rationale": "Core composable; experimental /palantir-dispatch still needs calibration; complex workflows require human orchestration. Per rubric §10 score 3."},
+        {"dimension": "Prototype Validation", "score": 3, "rationale": "Provisional pre-T7/T8."}
+      ],
+      "devcon5AlignmentScore": 4,
+      "implementationPhase": "Phase II Operational (approaching Phase III via experimental dispatch)",
+      "implementationPhaseRationale": "Best-case B achieves near-parity with H-A base via eager consumer adoption.",
+      "risks": [
+        {"id": "R-B2-01", "statement": "Optimistic assumption about consumer eagerness does not materialize", "severity": "medium", "mitigation": "Fallback to S-B1 base plan — still delivers value, just slower ForwardProp repair"},
+        {"id": "R-B2-02", "statement": "Experimental /palantir-dispatch ships without full intent registry; unstable for 2+ releases", "severity": "low", "mitigation": "Feature-flag + eval calibration per release"}
+      ],
+      "whatWouldChangeDecision": [
+        "If S-B2 best-case materializes, re-evaluate v1.0 label value — effective v1.0 may arrive without ceremony"
+      ],
+      "revisionRound": 3
     },
     {
-      "id": "S-HB-ADV",
+      "id": "S-B3",
       "hypothesisId": "H-B",
-      "type": "adversarial",
-      "title": "H-B Adversarial: drift goes undetected because no event log exists to compare against",
-      "description": "Adversarial: a malicious or buggy agent modifies state.json directly (bypassing commit_edits). Under H-B there is no event log to cross-check — state.json IS truth. Drift detection cannot fire because there is no stream of ground-truth intent. Under H-A, direct state modification would fail fsck against events.jsonl reducer output.",
+      "variant": "worst",
+      "description": "Pessimistic: 12-week drift across 6 minor bumps (0.3.x through 0.8.x) without reaching v1.0-equivalent state. Consumers drift into mixed-pin state: home at 0.5.x, palantir-math at 0.3.x, mathcrew at 0.4.x. Each pin bump requires individual migration PR + review. Home ontology added in 0.6.x but only home + mathcrew extend; palantir-math stays at direct schemas import for 6+ weeks. Skill rewrites (/ship + /orchestrate) never happen. EVENT_TYPE_REGISTRY expansion partial — lineage replay returns fragments for some sessions. L2 CapabilityToken added but no consumer enforces. v1.0 ceremony never reached; incremental strategy becomes 'permanent 0.x'.",
       "assumptions": [
-        {"id": "A1", "text": "An agent bypasses commit_edits MCP tool and writes state.json directly", "evidenceIds": ["clm-rq02-06"]},
-        {"id": "A2", "text": "Without event log, drift_detected has no comparison surface", "evidenceIds": ["clm-rq01-02"]},
-        {"id": "A3", "text": "disallowedTools denies Write on state.json but can be bypassed by misconfigured agent", "evidenceIds": ["clm-rq02-06"]}
+        {"id": "A1", "statement": "Consumer pin drift accumulates over 6+ bumps", "evidenceIds": ["INT-018", "INT-027"]},
+        {"id": "A2", "statement": "palantir-math holds back on home ontology extension due to F-1 deferred items", "evidenceIds": ["INT-028"]},
+        {"id": "A3", "statement": "Skill rewrite deferral becomes permanent", "evidenceIds": ["INT-025"]},
+        {"id": "A4", "statement": "No forcing function pulls strategy to v1.0 ceremony", "evidenceIds": []},
+        {"id": "A5", "statement": "L2 CapabilityToken opt-in stays at 0% after 3 bumps", "evidenceIds": ["INT-011"]}
       ],
-      "evidenceBaseIds": ["clm-rq01-02", "clm-rq02-06"],
-      "contradictions": [],
-      "contradictionStatus": "none",
-      "evidenceSufficiency": "sufficient",
-      "implementationPhase": "Phase III (AI-First) — drift detection is the Phase III promise",
-      "evaluationScores": {
-        "evidenceFit": 4,
-        "implementationDifficulty": 2,
-        "riskSeverity": 1,
-        "reversibility": 2,
-        "timeToValue": 2,
-        "governanceCompliance": 1,
-        "ecosystemMaturity": 3,
-        "dlaFit": 2,
-        "forwardPropHealth": 2,
-        "agentComposability": 2,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "All 3 assumptions supported by tier-1 claims.",
-        "implementationDifficulty": "Adversarial mitigation requires additional integrity layer (signing, hashing), adding complexity.",
-        "riskSeverity": "Critical — drift invisible is the governance failure mode. H-A mitigates via event log invariants.",
-        "reversibility": "Difficult — corruption silently accumulates.",
-        "timeToValue": "Weeks to add integrity layer retroactively.",
-        "governanceCompliance": "Blocks deployment — audit trail not trustworthy.",
-        "ecosystemMaturity": "Emerging remediation patterns.",
-        "dlaFit": "LEARN domain absent means drift detection loses foundation.",
-        "forwardPropHealth": "Propagation chain breaks at integrity boundary.",
-        "agentComposability": "Agents cannot compose audit queries.",
-        "prototypeValidation": "Not yet tested."
-      },
-      "devcon5AlignmentScore": 2,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: no changes — adversarial cleanly surfaces H-B's core weakness (no LEARN substrate to compare drift against)."
-    },
-
-    {
-      "id": "S-HC-BASE",
-      "hypothesisId": "H-C",
-      "type": "base",
-      "title": "H-C Base: 3-phase (Design+Compile / Runtime / Post-Write) pipeline catches all material error classes for v0",
-      "description": "palantir-mini ships 3 hook entries: SessionStart+PostToolUse(schemas/ontology/*) for Design+Compile, MCP commit_edits pre-flight for Runtime, PostToolUse(Edit) drift check for Post-Write. Each catches a distinct error class sufficient for v0 scope. Deploy/Merge concerns delegated to git hooks (pre-commit, pre-push) outside palantir-mini.",
-      "assumptions": [
-        {"id": "A1", "text": "3 hook event classes map cleanly to 3 validation phases for Native Runtime", "evidenceIds": ["clm-rq05-02", "clm-rq05-03", "clm-ext-01"]},
-        {"id": "A2", "text": "Deploy/Merge phases are handled by git pre-commit/pre-push hooks outside palantir-mini", "evidenceIds": ["clm-rq05-01"]},
-        {"id": "A3", "text": "palantir-math's existing error classes fit into 3 phases", "evidenceIds": ["clm-rq03-03"]},
-        {"id": "A4", "text": "PostToolUse hook latency is tolerable for per-Edit execution", "evidenceIds": ["clm-rq05-03"]}
-      ],
-      "evidenceBaseIds": ["clm-rq05-01", "clm-rq05-02", "clm-rq05-03", "clm-ext-01"],
-      "contradictions": [],
-      "contradictionStatus": "none",
-      "evidenceSufficiency": "sufficient",
-      "implementationPhase": "Phase II (Operational)",
-      "evaluationScores": {
-        "evidenceFit": 4,
-        "implementationDifficulty": 5,
-        "riskSeverity": 4,
-        "reversibility": 5,
-        "timeToValue": 5,
-        "governanceCompliance": 4,
-        "ecosystemMaturity": 5,
-        "dlaFit": 5,
-        "forwardPropHealth": 4,
-        "agentComposability": 4,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "Tier-1 supporting; A3 needs empirical verification against palantir-math refactor.",
-        "implementationDifficulty": "Trivial — 3 hook entries, ~150 LOC handler code.",
-        "riskSeverity": "Minor — worst case is missing Deploy/Merge phase gaps filled by git hooks.",
-        "reversibility": "Fully reversible — can add 3 more phases later (3 -> 6).",
-        "timeToValue": "Days — can ship 3-phase prototype in 1 week.",
-        "governanceCompliance": "Mostly compliant; some regulatory contexts may want explicit Deploy gate.",
-        "ecosystemMaturity": "v2.1.108 hooks are stable.",
-        "dlaFit": "LOGIC domain clear; phase evaluator is LOGIC, gate application is SECURITY.",
-        "forwardPropHealth": "Phase -> hook -> event chain clean.",
-        "agentComposability": "Hooks fire automatically; agents don't need to orchestrate validation.",
-        "prototypeValidation": "Not yet tested."
-      },
-      "devcon5AlignmentScore": 5,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: no changes."
-    },
-    {
-      "id": "S-HC-BEST",
-      "hypothesisId": "H-C",
-      "type": "best",
-      "title": "H-C Best: 3-phase stays stable through v0+v1; additional phases never needed",
-      "description": "Best case: 3-phase is not just v0 minimum, it is sufficient for v1 and beyond. Deploy/Merge never materialize as distinct phases because git hooks absorb the need. palantir-mini stays lean; developers love the simplicity.",
-      "assumptions": [
-        {"id": "A1", "text": "Git pre-commit + pre-push fully cover Deploy/Merge phases", "evidenceIds": ["clm-rq05-01"]},
-        {"id": "A2", "text": "No regulatory or cross-project requirement emerges for Deploy/Merge phase in palantir-mini", "evidenceIds": []},
-        {"id": "A3", "text": "3-phase is a stable architectural endpoint", "evidenceIds": ["clm-rq05-02"]}
-      ],
-      "evidenceBaseIds": ["clm-rq05-01", "clm-rq05-02"],
-      "contradictions": [],
-      "contradictionStatus": "none",
-      "evidenceSufficiency": "partial",
-      "evidenceSufficiencyNote": "A2 has no evidence — speculative future-proofing claim.",
-      "implementationPhase": "Phase II (Operational) steady state",
-      "evaluationScores": {
-        "evidenceFit": 3,
-        "implementationDifficulty": 5,
-        "riskSeverity": 4,
-        "reversibility": 5,
-        "timeToValue": 5,
-        "governanceCompliance": 4,
-        "ecosystemMaturity": 5,
-        "dlaFit": 5,
-        "forwardPropHealth": 4,
-        "agentComposability": 4,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "Partial — A2 is speculative.",
-        "implementationDifficulty": "Trivial.",
-        "riskSeverity": "Minor.",
-        "reversibility": "Fully reversible.",
-        "timeToValue": "Immediate.",
-        "governanceCompliance": "Mostly.",
-        "ecosystemMaturity": "Stable.",
-        "dlaFit": "Same as base.",
-        "forwardPropHealth": "Same as base.",
-        "agentComposability": "Same as base.",
-        "prototypeValidation": "Not yet tested."
-      },
-      "devcon5AlignmentScore": 5,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: A2 flagged as speculative, downgraded sufficiency to partial."
-    },
-    {
-      "id": "S-HC-WORST",
-      "hypothesisId": "H-C",
-      "type": "worst",
-      "title": "H-C Worst: 3-phase misses a real error class; palantir-mini must retrofit full 6-phase under pressure",
-      "description": "Worst case: some error class (e.g. Merge-time conflict between two feature branches' ontology additions) escapes 3-phase detection and surfaces in production. Retrofit to full 6-phase under pressure is expensive because hooks, handlers, and event variants must be added after runtime is already live.",
-      "assumptions": [
-        {"id": "A1", "text": "At least one error class requires Deploy or Merge phase discrimination", "evidenceIds": ["clm-rq05-01"]},
-        {"id": "A2", "text": "Retrofit under pressure costs 2x the up-front cost", "evidenceIds": []},
-        {"id": "A3", "text": "Users experience the gap as a bug before the fix ships", "evidenceIds": []}
-      ],
-      "evidenceBaseIds": ["clm-rq05-01"],
+      "evidenceBaseIds": ["INT-011", "INT-018", "INT-025", "INT-027", "INT-028"],
       "contradictions": [
-        {
-          "id": "contra-hc-worst-1",
-          "description": "A2 and A3 lack evidence — reasonable inference but not from tier-1 sources.",
-          "classification": "resolvable",
-          "action": "Resolve: downgrade confidence; note as soft risk."
-        }
+        {"id": "C1", "statement": "A4 (no forcing function) has no evidence ID", "classification": "evidence-gap-driven", "resolution": "Flagged as NextExperiment: survey historical 0.x -> 1.0 transitions in peer projects to measure drift-to-ceremony likelihood; accepted as partial-evidence pending research"}
       ],
       "contradictionStatus": "resolved",
       "evidenceSufficiency": "partial",
-      "implementationPhase": "Phase II (Operational) — retrofit",
-      "evaluationScores": {
-        "evidenceFit": 3,
-        "implementationDifficulty": 3,
-        "riskSeverity": 3,
-        "reversibility": 4,
-        "timeToValue": 3,
-        "governanceCompliance": 3,
-        "ecosystemMaturity": 4,
-        "dlaFit": 4,
-        "forwardPropHealth": 4,
-        "agentComposability": 4,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "Partial — soft risk.",
-        "implementationDifficulty": "Moderate retrofit cost.",
-        "riskSeverity": "Moderate — noticeable impact, mitigation available.",
-        "reversibility": "Mostly reversible — adding phases is additive.",
-        "timeToValue": "Some weeks of retrofit.",
-        "governanceCompliance": "Partial.",
-        "ecosystemMaturity": "Stable.",
-        "dlaFit": "Classifications still clean.",
-        "forwardPropHealth": "Chain mostly intact.",
-        "agentComposability": "Good.",
-        "prototypeValidation": "Not yet tested."
-      },
-      "devcon5AlignmentScore": 4,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: no changes."
+      "evaluationScores": [
+        {"dimension": "Evidence Fit", "score": 2, "rationale": "A4 has no evidence; A1 + A5 inferential — significant assumptions unsupported. Per rubric §1 score 2."},
+        {"dimension": "Implementation Difficulty", "score": 3, "rationale": "Each bump individually straightforward but cumulative drift management adds coordination overhead — moderate per rubric §2 score 3."},
+        {"dimension": "Risk Severity", "score": 3, "rationale": "Moderate per rubric §3 score 3: no break at any single point but cumulative drift means 1/3 consumer permanently divergent; noticeable impact, mitigation available."},
+        {"dimension": "Reversibility", "score": 4, "rationale": "Mostly reversible per rubric §4 score 4: each bump reversible; overall strategy reversible back to H-A at any point."},
+        {"dimension": "Time-to-Value", "score": 1, "rationale": "12 weeks without reaching v1.0 equivalent state per rubric §5 score 1 (>2 months long development cycle)."},
+        {"dimension": "Governance Compliance", "score": 2, "rationale": "Significant gaps per rubric §6 score 2: L2 added but not enforced for entire 0.x range; major compliance work needed to reach v1.0 target governance."},
+        {"dimension": "Ecosystem Maturity", "score": 4, "rationale": "Stack unchanged. Per rubric §7 score 4."},
+        {"dimension": "D/L/A Fit", "score": 3, "rationale": "Core D/L/A classified; Security (L2 enforcement 0%) and Learn (lineage fragments) thin. Per rubric §8 score 3."},
+        {"dimension": "ForwardProp Health", "score": 1, "rationale": "No meaningful propagation per rubric §9 score 1: 1/3 consumer never extends home ontology; ForwardProp chain has structural break indefinitely."},
+        {"dimension": "Agent Composability", "score": 1, "rationale": "No agent composability per rubric §10 score 1: no dispatcher, no /ontology-register, incomplete MCP tool coverage — manual orchestration required for all operations."},
+        {"dimension": "Prototype Validation", "score": 3, "rationale": "Provisional pre-T7/T8."}
+      ],
+      "devcon5AlignmentScore": 2,
+      "implementationPhase": "Phase I Golden Tables + partial Phase II (stuck bridge)",
+      "implementationPhaseRationale": "Worst-case H-B never reaches Phase II fully; Phase III unreachable.",
+      "risks": [
+        {"id": "R-B3-01", "statement": "Pin drift becomes permanent architectural state", "severity": "critical", "mitigation": "Forcing function: after N minor bumps (e.g. 6), require all consumers to pin same minor or flag in pm-verify"},
+        {"id": "R-B3-02", "statement": "v1.0 ceremony never scheduled; strategic coherence lost", "severity": "high", "mitigation": "Time-box 0.x range to 8 weeks; if drift persists, auto-escalate to H-A atomic"},
+        {"id": "R-B3-03", "statement": "Skill rewrite permanently deferred", "severity": "medium", "mitigation": "Every 3rd minor bump includes a skill-rewrite workstream allocation"}
+      ],
+      "whatWouldChangeDecision": [
+        "If worst-case H-B drift exceeds 8 weeks, triggers automatic fall-back to H-A atomic per R-B3-02 mitigation",
+        "Consumer pin spread > 2 minor versions persists > 1 week — reassess hypothesis entirely"
+      ],
+      "revisionRound": 3
     },
     {
-      "id": "S-HC-ADV",
-      "hypothesisId": "H-C",
-      "type": "adversarial",
-      "title": "H-C Adversarial: hook burnout — PostToolUse fires on every Edit, chewing token budget faster than validation value",
-      "description": "Adversarial: the architect fires PostToolUse on every Edit to schemas/ontology/*. In a high-refactor session (e.g. migrating data.ts's 141KB by-ObjectType), hundreds of PostToolUse fire, each running tsc --noEmit. Hook latency compounds. Agents feel friction. Under API-Free constraint, this is more damaging than losing a phase.",
+      "id": "S-B4",
+      "hypothesisId": "H-B",
+      "variant": "adversarial",
+      "description": "What breaks H-B? (1) Schemas axis-version-gate confusion: 0.3.x bumps ontology axis 1.12 -> 1.13 but rendering axis stays 0.1.0; consumer CI validates against wrong axis matrix. (2) Types.ts interface-alias silent ambiguity: consumer imports from types.ts (legacy) vs primitives/ (new) without realizing; TypeScript resolves to alias, runtime uses primitive — semantic drift between compile-time and runtime. (3) Home ontology partial-opt-in creates network-of-exceptions: palantir-math at direct schemas import while mathcrew at home ontology means a single shared primitive (ConceptPrimitive) has two different runtime objects. (4) EVENT_TYPE_REGISTRY expansion from 10 -> 12 -> 14 -> 16 across bumps: events emitted under one variant, replayed under a later bump find variant missing, return incomplete lineage.",
       "assumptions": [
-        {"id": "A1", "text": "PostToolUse(Edit) fires per tool call, not batched", "evidenceIds": ["clm-rq05-02", "clm-ext-01"]},
-        {"id": "A2", "text": "bun run tsc --noEmit takes 200-500ms on palantir-mini scope", "evidenceIds": []},
-        {"id": "A3", "text": "Hundreds of sequential PostToolUse events compound into token friction", "evidenceIds": ["clm-rq05-03"]}
+        {"id": "A1", "statement": "Per-axis version drift causes CI validation ambiguity", "evidenceIds": ["INT-018"]},
+        {"id": "A2", "statement": "Types.ts alias preserves compile-time but not runtime identity", "evidenceIds": ["INT-017", "INT-026"]},
+        {"id": "A3", "statement": "Partial opt-in produces divergent shared-primitive runtime objects", "evidenceIds": ["INT-028"]},
+        {"id": "A4", "statement": "Incremental EVENT_TYPE_REGISTRY expansion breaks lineage replay across versions", "evidenceIds": ["INT-019"]}
       ],
-      "evidenceBaseIds": ["clm-rq05-02", "clm-rq05-03", "clm-ext-01"],
-      "contradictions": [],
-      "contradictionStatus": "none",
+      "evidenceBaseIds": ["INT-017", "INT-018", "INT-019", "INT-026", "INT-028"],
+      "contradictions": [
+        {"id": "C1", "statement": "Adversarial A3 contradicts H-B central claim that opt-in preserves stability — instead it introduces hidden correctness bug", "classification": "resolvable", "resolution": "Exposes H-B core weakness: the 'preservation of stability' applies to compile-time but not runtime semantics. This is a genuine cost of H-B that narrows the supply-chain stability argument."}
+      ],
+      "contradictionStatus": "resolved",
       "evidenceSufficiency": "partial",
-      "evidenceSufficiencyNote": "A2 (tsc latency) has no benchmark — must be measured in T8.",
-      "implementationPhase": "Phase II (Operational) — runtime friction",
-      "evaluationScores": {
-        "evidenceFit": 4,
-        "implementationDifficulty": 3,
-        "riskSeverity": 3,
-        "reversibility": 4,
-        "timeToValue": 4,
-        "governanceCompliance": 4,
-        "ecosystemMaturity": 4,
-        "dlaFit": 4,
-        "forwardPropHealth": 4,
-        "agentComposability": 3,
-        "prototypeValidation": 3
-      },
-      "scoringJustifications": {
-        "evidenceFit": "Supported by CC hook mechanics; latency claim needs measurement.",
-        "implementationDifficulty": "Moderate — requires hook batching or conditional execution (async:true, if field).",
-        "riskSeverity": "Moderate — friction not correctness.",
-        "reversibility": "Mostly reversible — make hook async or conditional.",
-        "timeToValue": "Still 1-2 weeks.",
-        "governanceCompliance": "Compliant.",
-        "ecosystemMaturity": "Stable.",
-        "dlaFit": "Classifications clean.",
-        "forwardPropHealth": "Chain intact.",
-        "agentComposability": "Friction affects composability under load.",
-        "prototypeValidation": "Not yet tested."
-      },
-      "devcon5AlignmentScore": 4,
-      "revisionRound": 2,
-      "revisionNotes": "Round 2: noted that v2.1.108 hook async:true field (from source-map v2108FeatureAvailability.asyncHookExecution) mitigates this — H-C adversarial is not fatal."
+      "evaluationScores": [
+        {"dimension": "Evidence Fit", "score": 3, "rationale": "Each adversarial path supported by 1 tier-1 source; composite inferential. Per rubric §1 score 3."},
+        {"dimension": "Implementation Difficulty", "score": 3, "rationale": "Mitigation requires per-axis version matrix + runtime identity checks + lineage replay backfill = moderate 2-4 weeks. Per rubric §2 score 3."},
+        {"dimension": "Risk Severity", "score": 1, "rationale": "Critical per rubric §3 score 1: runtime-vs-compile-time semantic drift + divergent shared-primitive runtime objects are silent correctness bugs — compliance-adjacent safety issue (events.jsonl lineage loses integrity)."},
+        {"dimension": "Reversibility", "score": 3, "rationale": "Partially reversible per rubric §4 score 3: each bump still reversible but accumulated bugs harder to trace back to specific bump."},
+        {"dimension": "Time-to-Value", "score": 2, "rationale": "Adversarial mitigation extends timeline 1-2 months beyond base. Per rubric §5 score 2."},
+        {"dimension": "Governance Compliance", "score": 3, "rationale": "L1 RBAC preserved; correctness bugs are governance-adjacent. Per rubric §6 score 3 (partially compliant)."},
+        {"dimension": "Ecosystem Maturity", "score": 4, "rationale": "Same stack. Per rubric §7 score 4."},
+        {"dimension": "D/L/A Fit", "score": 3, "rationale": "Adversarial paths target enforcement gaps that map to classification confidence — core clean, S + LEARN thin. Per rubric §8 score 3."},
+        {"dimension": "ForwardProp Health", "score": 1, "rationale": "Per rubric §9 score 1: ontology disconnected from runtime on consumers that stay at direct schema import; divergent runtime objects mean no meaningful propagation for shared primitives."},
+        {"dimension": "Agent Composability", "score": 1, "rationale": "Per rubric §10 score 1: no dispatcher + lineage replay returning fragments = agents cannot reliably compose ontology actions; manual execution required."},
+        {"dimension": "Prototype Validation", "score": 3, "rationale": "Provisional — T7/T8 should stress-test incremental EVENT_TYPE_REGISTRY replay."}
+      ],
+      "devcon5AlignmentScore": 2,
+      "implementationPhase": "Phase I Golden Tables + partial Phase II (adversarial stress)",
+      "implementationPhaseRationale": "Adversarial H-B reveals Phase 1 -> 2 bridge has hidden correctness issues that Phase III cannot tolerate.",
+      "risks": [
+        {"id": "R-B4-01", "statement": "Per-axis version-gate CI ambiguity", "severity": "high", "mitigation": "Explicit per-axis version matrix published per release; pm-verify gates against matrix"},
+        {"id": "R-B4-02", "statement": "Types.ts alias runtime identity drift", "severity": "critical", "mitigation": "Retire aliases within 1 release; require primitives/ import path in codegen output"},
+        {"id": "R-B4-03", "statement": "Divergent shared-primitive runtime objects across consumers", "severity": "critical", "mitigation": "Forcing function: once home ontology added, all 3 consumers MUST extend within 1 release (undermines H-B opt-in principle)"},
+        {"id": "R-B4-04", "statement": "EVENT_TYPE_REGISTRY expansion breaks lineage replay", "severity": "high", "mitigation": "Every variant-addition release includes lineage replay backfill; never remove variants"}
+      ],
+      "whatWouldChangeDecision": [
+        "Runtime identity drift test on S-B4 mitigation R-B4-02 failing in T9 eval (triggers H-A fallback)",
+        "Divergent shared-primitive objects detected across 2+ consumers (triggers R-B4-03 forcing function that collapses H-B into H-A)"
+      ],
+      "revisionRound": 3
     }
+  ],
+
+  "simulationRuns": [
+    {"round": 1, "scenariosGenerated": 8, "contradictionsDetected": 4, "evidenceGaps": 2},
+    {"round": 2, "scenariosRevised": 8, "contradictionsResolved": 4, "evidenceGaps": 1, "nextExperimentsCreated": 2},
+    {"round": 3, "scenariosRevised": 8, "reason": "Lead correction: rescale from 1-7 to 1-5 per docs/scoring-rubric.md authoritative; scores re-derived from rubric definitions", "contradictionsRemaining": 0}
   ],
 
   "revisionHistory": [
     {
       "round": 1,
-      "description": "Initial generation — 3 hypotheses x 4 scenarios = 12 scenarios with provisional 11-dim scoring",
       "changesApplied": [
-        "Generated H-A, H-B, H-C honoring ontologist cuts 1 and 2",
-        "12 scenarios across base/best/worst/adversarial for each hypothesis",
-        "Initial evidenceFit and D/L/A Fit scoring per scoring-rubric.md",
-        "prototypeValidation initialized to 3 for all scenarios (prototyper will update T7+)"
+        "Initial generation of 8 scenarios (4 per hypothesis)",
+        "First-pass 11-dimension scoring",
+        "Initial contradiction classification"
       ],
-      "contradictionsResolved": [],
-      "contradictionsRemaining": [
-        "S-HA-WORST contra-ha-worst-1 (Bun compat) — evidence-gap-driven",
-        "S-HA-ADV contra-ha-adv-1 (sequence race) — evidence-gap-driven",
-        "S-HB-BASE contra-hb-base-1 (LEARN centrality) — irreconcilable",
-        "S-HB-BEST contra-hb-best-1 (A2 audit without log) — resolvable",
-        "S-HB-WORST contra-hb-worst-1 (git as audit fallback) — resolvable",
-        "S-HC-WORST contra-hc-worst-1 (retrofit cost speculation) — resolvable"
-      ],
-      "evidenceGapsIdentified": [
-        "Gap-1: Bun compatibility for proper-lockfile (T7 prototype required)",
-        "Gap-2: Two-writer sequence race empirical test (T7 prototype required)",
-        "Gap-3: PostToolUse(Edit) latency measurement (T8 prototype required)"
-      ],
-      "scoresUpdated": "Initial scoring based on world-model domain ratings + evidence tier"
+      "contradictionsResolved": 0,
+      "contradictionsRemaining": 4,
+      "evidenceGapsIdentified": ["S-A3 A2 palantir-math F-1 conflict is inferential", "S-B3 A4 no forcing function has no evidence"],
+      "scoresUpdated": 0,
+      "newExperiments": []
     },
     {
       "round": 2,
-      "description": "Self-critique revision — refined assumptions, classified contradictions, split irreconcilable cases",
       "changesApplied": [
-        "S-HA-BASE: added A5 (5-dim lineage capture) which was implicit",
-        "S-HA-BEST: downgraded evidenceSufficiency to partial after reviewing world-model backwardProp.gaps",
-        "S-HA-WORST: reclassified contradiction to evidence-gap-driven",
-        "S-HA-ADV: strengthened A4 to make atomic-under-same-lock explicit",
-        "S-HB-BASE: elevated contradictionStatus to unresolvable — irreconcilable LEARN centrality violation",
-        "S-HB-BEST: resolved A2 contradiction via documentation caveat, marked evidenceSufficiency insufficient",
-        "S-HB-WORST: resolved A3 (git audit) contradiction via documentation of lossy nature",
-        "S-HC-BEST: flagged A2 as speculative, downgraded to partial",
-        "S-HC-WORST: resolved soft-risk contradiction via note",
-        "S-HC-ADV: noted v2.1.108 hook async:true field as mitigation"
+        "Resolved S-A1 C1 contradiction by acknowledging intra-org coordination reduces atomic-migration risk (H-B supply-chain claim scoped to cross-org)",
+        "Resolved S-A3 C1 (rollback assumption without prior pattern) by creating NextExperiment for schemas v1.0-rc1 isolated worktree test",
+        "Resolved S-A4 C1 (managed-settings.d/ fragment drift) by confirming L2 CapabilityToken is exactly the mitigation — strengthens H-A rationale",
+        "Resolved S-B1 C1 (opt-in irreconcilable with ForwardProp repair) as explicit hypothesis-level tradeoff, not scenario bug",
+        "Resolved S-B3 C1 (evidence gap on forcing function) by flagging NextExperiment for peer-project 0.x->1.0 transition survey",
+        "Resolved S-B4 C1 (opt-in introduces runtime identity bug) as genuine H-B weakness — narrows supply-chain-stability argument",
+        "All 8 scenarios scored on 11 dimensions (initial scale 1-7 per Lead framing)"
       ],
-      "contradictionsResolved": [
-        "contra-hb-best-1",
-        "contra-hb-worst-1",
-        "contra-hc-worst-1"
+      "contradictionsResolved": 4,
+      "contradictionsRemaining": 0,
+      "evidenceGapsIdentified": ["S-B3 A4 forcing function behavior remains inferential — deferred to post-blueprint research"],
+      "scoresUpdated": 88,
+      "newExperiments": [
+        {"id": "NE-01", "title": "v1.0-rc1 isolated-worktree rollback test", "relatedScenarios": ["S-A3"], "purpose": "Measure rollback readiness for schemas SemVer-major tag before committing to production tag"},
+        {"id": "NE-02", "title": "Peer-project 0.x -> 1.0 transition survey", "relatedScenarios": ["S-B3"], "purpose": "Measure drift-to-ceremony likelihood in comparable incremental-strategy peer projects"}
+      ]
+    },
+    {
+      "round": 3,
+      "changesApplied": [
+        "Scale correction: 1-7 hook-framing scale -> 1-5 rubric-authoritative scale per Lead correction + docs/scoring-rubric.md",
+        "All 88 dimension scores re-derived directly from rubric §§1-11 definitions, not mechanically divided",
+        "Prototype Validation uniformly set to 3 per rubric §11 'moderate uncertainty provisional' pre-T7/T8 instruction",
+        "Rationales updated to cite rubric score tiers (e.g. 'per rubric §2 score 3')"
       ],
-      "contradictionsRemaining": [
-        "contra-ha-worst-1 (evidence-gap-driven, T7 will resolve)",
-        "contra-ha-adv-1 (evidence-gap-driven, T7 will resolve)",
-        "contra-hb-base-1 (irreconcilable — preserved as decision fork)"
-      ],
+      "contradictionsResolved": 0,
+      "contradictionsRemaining": 0,
       "evidenceGapsIdentified": [],
-      "scoresUpdated": "Refined after self-critique — H-A scenarios tightened, H-B scenarios exposed insufficiency, H-C scenarios validated via async mitigation"
+      "scoresUpdated": 88,
+      "newExperiments": []
     }
   ],
 
-  "implementationJourney": {
-    "H-A": {
-      "phase1_goldenTables": {
-        "readiness": "high",
-        "gaps": ["Atomic append Bun compatibility (empirical)"],
-        "description": "EventEnvelope schema concrete, proper-lockfile dependency identified, blueprint.md has all gap fills"
+  "implementationJourney": [
+    {
+      "hypothesisId": "H-A",
+      "phase1GoldenTables": {
+        "readiness": "strong",
+        "gaps": ["Struct + ValueType + SharedPropertyType primitives currently only in types.ts interface form — v1.0 promotes to primitives/ layer with codegen contract"],
+        "rationale": "9 missing primitives all mapped to domains; 5 DATA primitives present with clear extension targets"
       },
-      "phase2_operational": {
-        "readiness": "high",
-        "gaps": ["MCP bridge 5-tool implementation"],
-        "description": "Edit functions + Actions + submission criteria all mapped to primitives; action-executor.md agent pattern clear"
+      "phase2Operational": {
+        "readiness": "strong",
+        "gaps": ["AIPLogicFunction missing; EditFunction + DerivedProperty + Reducer present but not wired to /ontology-register skill yet"],
+        "rationale": "LOGIC layer has 6/7 primitives present; ACTION has 5/9. Plugin v1.0 expands operational substrate from 4 -> 6 validation phases."
       },
-      "phase3_aiFirst": {
-        "readiness": "medium",
-        "gaps": [
-          "BackwardProp persistence gap (world-model backwardProp.gaps)",
-          "SECURITY event variants (policy_denied, capability_accessed) deferred"
-        ],
-        "description": "replay_lineage is the AI-first surface. Agents compose via MCP tools. Full BackwardProp loop closure deferred to post-prototype."
+      "phase3AIFirst": {
+        "readiness": "reachable",
+        "gaps": ["BackwardProp automation still partial — evaluator -> schema refinement loop needs drift_detected auto-emit + /ontology-register consumption"],
+        "rationale": "AI-First reach requires /palantir-dispatch + full MCP surface + BackwardProp automation; H-A targets all three in v1.0 release."
       }
+    },
+    {
+      "hypothesisId": "H-B",
+      "phase1GoldenTables": {
+        "readiness": "strong",
+        "gaps": ["Same 9 missing primitives as H-A but shipped over 6 bumps; Struct + ValueType land first in 0.3.x"],
+        "rationale": "Data layer primitives fit additive strategy well"
+      },
+      "phase2Operational": {
+        "readiness": "partial",
+        "gaps": ["Skill rewrites deferred; plugin MCP tool expansion slow (5 -> 7 over 0.3-0.6 range); validation stays 4-phase"],
+        "rationale": "Operational substrate grows slowly; some v1.0 targets never reached in 0.x range"
+      },
+      "phase3AIFirst": {
+        "readiness": "unreachable-in-0.x",
+        "gaps": ["No /palantir-dispatch; /ship + /orchestrate not rewritten; BackwardProp automation deferred indefinitely"],
+        "rationale": "AI-First reach requires the atomic wave that H-B explicitly rejects"
+      }
+    }
+  ],
+
+  "unresolved": [],
+
+  "stoppingCriteriaMet": true,
+
+  "scoringRubric": {
+    "scale": "1-5 per docs/scoring-rubric.md (authoritative). 5 = best in all dimensions.",
+    "reference": "docs/scoring-rubric.md §§1-11 for per-dimension definitions",
+    "prototypeValidationNote": "Pre-T7/T8 all scenarios set to 3 (moderate uncertainty provisional) per rubric §11 and Lead instruction — will be updated after prototype."
+  },
+
+  "aggregate": {
+    "H-A": {
+      "scenarios": 4,
+      "meanScoreByDimension": {
+        "Evidence Fit": 3.5,
+        "Implementation Difficulty": 2.75,
+        "Risk Severity": 2.75,
+        "Reversibility": 2.75,
+        "Time-to-Value": 3.0,
+        "Governance Compliance": 4.25,
+        "Ecosystem Maturity": 4.0,
+        "D/L/A Fit": 4.5,
+        "ForwardProp Health": 4.25,
+        "Agent Composability": 3.75,
+        "Prototype Validation": 3.0
+      },
+      "totalMean": 3.50,
+      "strengths": ["D/L/A Fit 4.5 (all 5 domains cleanly classified)", "Governance Compliance 4.25 (pm-verify 6/6 + L2/L3 RBAC)", "ForwardProp Health 4.25 (home ontology repairs chain)", "Agent Composability 3.75 (dispatcher + MCP surface)"],
+      "weaknesses": ["Implementation Difficulty 2.75 (large atomic surface)", "Reversibility 2.75 (SemVer-major commitment)", "Risk Severity 2.75 (atomic migration + rollback paths)"]
     },
     "H-B": {
-      "phase1_goldenTables": {
-        "readiness": "high",
-        "gaps": [],
-        "description": "state.json + version is trivial"
+      "scenarios": 4,
+      "meanScoreByDimension": {
+        "Evidence Fit": 3.0,
+        "Implementation Difficulty": 3.5,
+        "Risk Severity": 3.25,
+        "Reversibility": 3.75,
+        "Time-to-Value": 2.5,
+        "Governance Compliance": 3.0,
+        "Ecosystem Maturity": 4.0,
+        "D/L/A Fit": 3.25,
+        "ForwardProp Health": 2.0,
+        "Agent Composability": 1.75,
+        "Prototype Validation": 3.0
       },
-      "phase2_operational": {
-        "readiness": "medium",
-        "gaps": ["Tier-1/Tier-2 Action distinction less clean without event substrate"],
-        "description": "Actions work but EditFunction/Action distinction loses its mechanical enforcement (LOGIC/ACTION separation weakens)"
-      },
-      "phase3_aiFirst": {
-        "readiness": "low",
-        "gaps": [
-          "No replay surface for agents",
-          "Drift detection has no ground truth"
-        ],
-        "description": "Phase III aspirations (agent composability, automated drift detection, closed BackwardProp) are degraded or impossible"
-      }
+      "totalMean": 3.00,
+      "strengths": ["Reversibility 3.75 (per-bump rollback)", "Implementation Difficulty 3.5 (additive bumps easy)", "Risk Severity 3.25 (no SemVer break)"],
+      "weaknesses": ["Agent Composability 1.75 (no dispatcher; no /ontology-register — agents need custom integration per operation)", "ForwardProp Health 2.0 (partial repair — opt-in does not close WMO-031 gap)", "Time-to-Value 2.5 (6-12 weeks without reaching v1.0-equivalent state)"]
     },
-    "H-C": {
-      "phase1_goldenTables": {
-        "readiness": "high",
-        "gaps": [],
-        "description": "Validation phases are LOGIC primitives; don't require Golden Tables changes"
-      },
-      "phase2_operational": {
-        "readiness": "high",
-        "gaps": ["Hook latency measurement (empirical)"],
-        "description": "3 hooks wire cleanly to 3 CC v2.1.108 events"
-      },
-      "phase3_aiFirst": {
-        "readiness": "high",
-        "gaps": ["None if 3-phase suffices; retrofit cost if 6-phase becomes required"],
-        "description": "Validation phase results feed BackwardProp via validation_phase_completed events"
-      }
-    }
-  },
-
-  "unresolved": [
-    {
-      "type": "empirical",
-      "item": "Bun compatibility for proper-lockfile and fs.mkdir atomic append — T7 prototype MUST verify",
-      "affects": ["H-A", "S-HA-WORST", "S-HA-ADV"],
-      "nextExperiment": {
-        "id": "NE-01",
-        "description": "Prototype harness with 2 concurrent Bun writers emitting 1000 EventEnvelopes each to same events.jsonl; verify zero duplicate sequences, zero torn writes, monotonic tail",
-        "owner": "prototyper-a",
-        "task": "T7"
-      }
-    },
-    {
-      "type": "empirical",
-      "item": "PostToolUse(Edit) hook latency under palantir-math refactor scale",
-      "affects": ["H-C", "S-HC-ADV"],
-      "nextExperiment": {
-        "id": "NE-02",
-        "description": "Measure tsc --noEmit + drift check latency on palantir-mini ontology scope; determine if sync hook is tolerable or async:true required",
-        "owner": "prototyper-b",
-        "task": "T8"
-      }
-    },
-    {
-      "type": "irreconcilable",
-      "item": "H-B's LEARN centrality violation — scored but preserved as decision fork per rubric",
-      "affects": ["H-B"],
-      "resolutionNote": "This is not a gap to fill empirically. H-B loses on D/L/A Fit and ForwardProp Health against world-model authority."
-    }
-  ],
-
-  "provisionalWinner": {
-    "hypothesisId": "H-A",
-    "summary": "H-A (Append-Only Event Log Foundation) is the provisional substrate winner. H-C (3-phase validation pipeline) runs ON TOP of H-A and is complementary, not competing. H-B is defeated.",
-    "averageScores": {
-      "H-A": {
-        "base": 4.27,
-        "best": 4.09,
-        "worst": 3.00,
-        "adversarial": 2.91,
-        "overall_ex_prototype": 3.64
-      },
-      "H-B": {
-        "base": 3.45,
-        "best": 3.45,
-        "worst": 2.45,
-        "adversarial": 2.18,
-        "overall_ex_prototype": 2.88
-      },
-      "H-C": {
-        "base": 4.36,
-        "best": 4.27,
-        "worst": 3.55,
-        "adversarial": 3.64,
-        "overall_ex_prototype": 3.96
-      }
-    },
-    "averagesNote": "Scores include prototypeValidation=3 for all scenarios. overall_ex_prototype averages the 10 real dimensions only.",
-    "rationale": [
-      "H-A base case scores 5 on D/L/A Fit, ForwardProp Health, Agent Composability, and Evidence Fit — all four highest-signal dimensions for ontology-first architecture",
-      "H-A is the only hypothesis where all 5 ontology domains (DATA/LOGIC/ACTION/SECURITY/LEARN) are first-class per world-model 28 primitives",
-      "H-A alone respects the 3-source convergence (Anthropic MA + Palantir DL + OMC clawhip) that the ontologist cited as strongest available evidence",
-      "H-B is the formal competitor but loses on D/L/A Fit (thin SECURITY/LEARN), ForwardProp Health (truncated chain), and Agent Composability (no replay surface). H-B's adversarial (drift invisible) is the deal-breaker.",
-      "H-C's raw average (3.96 ex-prototype) is nominally higher than H-A's (3.64 ex-prototype), but this is a scale artifact: H-C is a simpler LOGIC-layer hypothesis while H-A is a foundational architectural substrate. The two are ORTHOGONAL not competing — 3-phase validation runs on top of append-only event log.",
-      "Correct reading: recommend BOTH H-A (substrate) and H-C (validation depth). H-B is preserved for the record but architecturally defeated.",
-      "H-C worst case (retrofit to 6-phase) is survivable because adding phases is additive, not breaking",
-      "H-C adversarial (PostToolUse burnout) is mitigated by v2.1.108 async:true hook field"
-    ],
-    "recommendationToEvaluator": "Accept H-A as architecture substrate AND H-C as validation pipeline depth. H-B is preserved as the formal competitor for the record but is architecturally defeated. Proceed to T7 prototyper-a (H-A atomic append) and T8 prototyper-b (H-C 3-phase hooks) in parallel."
-  },
-
-  "strongestContradictionsFlagged": [
-    {
-      "id": "flag-01",
-      "description": "S-HA-ADV (two-writer race on events.jsonl) is the single highest-risk correctness invariant in the winning hypothesis. The ontologist explicitly called this out as 'CRITICAL because gap-01 resolution depends on sequence-check correctness under concurrent writers.' Prototyper-a MUST design the T7 eval suite to include an adversarial 2-writer race test with strict pass criteria: zero duplicate sequences, zero torn writes, zero lost events, monotonic tail.",
-      "severity": "high",
-      "blocksWinner": "yes if T7 fails"
-    },
-    {
-      "id": "flag-02",
-      "description": "H-B base case contradiction contra-hb-base-1 is IRRECONCILABLE (LEARN centrality violation). This is not an evidence gap — it is a foundational architectural disagreement with world-model authority. Preserving H-B as formal competitor is a rubric requirement (decision-log.json hypothesisProvisional.competitor) but H-B SHOULD NOT be recommended over H-A unless world-model is revised.",
-      "severity": "medium",
-      "blocksWinner": "no"
-    },
-    {
-      "id": "flag-03",
-      "description": "S-HA-WORST Bun compatibility gap (clm-ext-24 confidence 0.75, inference) remains the primary empirical risk for the provisional winner. Even if sequence race works correctly, if Bun breaks proper-lockfile the fallback path adds 50-200ms latency. Must be measured, not assumed.",
-      "severity": "medium",
-      "blocksWinner": "no (fallback mitigates)"
-    }
-  ],
-
-  "prototypeSpecRecommendations": {
-    "prototyperA": {
-      "task": "T7",
-      "targetHypothesis": "H-A",
-      "focusedScenarios": ["S-HA-BASE", "S-HA-ADV"],
-      "scopeLOC": "100-200 LOC total",
-      "deliverable": "Minimal Bun harness implementing: lib/event-log/append.ts (proper-lockfile primary, fs.mkdir fallback), lib/event-log/read.ts (read tail sequence), lib/event-log/types.ts (EventEnvelope base + 3 variants — edit_proposed, edit_committed, session_started — enough to prove discriminated union roundtrips).",
-      "evalSuiteTargets": [
-        "Unit: append 100 events, read back 100 events, sequence monotonic",
-        "Unit: Bun runtime compat — `bun test` passes, no proper-lockfile errors",
-        "Integration: spawn 2 concurrent bun processes, each appends 1000 events, verify zero duplicate sequences and 2000 events total",
-        "Adversarial: kill one writer mid-append, verify no torn writes, verify lockfile released",
-        "Integration: fs.mkdir fallback path tested by forcing proper-lockfile disable"
-      ],
-      "buildSuccessCriteria": "`bun test` passes all 5 eval cases; build artifact is usable from `bun run scripts/demo-append.ts`.",
-      "failureMode": "If Bun breaks proper-lockfile AND fs.mkdir fallback under-performs, H-A requires additional mitigation (app-level retry on conflict) OR architectural revisiting.",
-      "worktreeRequired": true,
-      "estimatedMinutes": "20-30 min on Claude Max"
-    },
-    "prototyperB": {
-      "task": "T8",
-      "targetHypothesis": "H-C",
-      "focusedScenarios": ["S-HC-BASE", "S-HC-ADV"],
-      "scopeLOC": "100-200 LOC total",
-      "deliverable": "Minimal plugin hooks/hooks.json exercise implementing 3 validation phases: (a) SessionStart+PostToolUse(schemas/ontology/*.ts) Design+Compile phase runs tsc --noEmit, (b) mock MCP commit_edits pre-flight Runtime phase evaluates a toy submission criterion, (c) PostToolUse(Edit) Post-Write phase runs a drift probe. Emits validation_phase_completed events to a fixture events.jsonl.",
-      "evalSuiteTargets": [
-        "Unit: Design+Compile phase catches deliberate TS type error, emits validation_phase_completed(phase=compile, passed=false, errorClass=TypeError)",
-        "Unit: Runtime phase catches submission criterion violation, emits validation_phase_completed(phase=runtime, passed=false, errorClass=SubmissionCriteriaFailed)",
-        "Unit: Post-Write phase catches simulated drift, emits validation_phase_completed(phase=post_write, passed=false, errorClass=DriftDetected)",
-        "Integration: run hooks against fixture palantir-math subset; measure per-hook latency",
-        "Adversarial: 50 sequential Edits in a loop — verify hook latency stays under threshold (document measured latency)"
-      ],
-      "buildSuccessCriteria": "`bun test` passes all 5 eval cases; hook handlers run under 500ms per invocation on the fixture.",
-      "failureMode": "If hook latency exceeds tolerable threshold OR a 4th distinct error class appears that doesn't fit 3 phases, H-C is invalidated and full 6-phase becomes candidate.",
-      "worktreeRequired": true,
-      "estimatedMinutes": "20-30 min on Claude Max",
-      "note": "Prototyper-b can run in parallel with prototyper-a; no shared state between the two scopes. Coordination via events.jsonl fixture happens at read-time only."
-    }
-  },
-
-  "nextSpawnRecommendation": {
-    "instruction": "Spawn prototyper-a for T7 and prototyper-b for T8 in parallel. Each operates in its own worktree. Both write to ontology-state/eval-results.json (their file ownership per registry). Both report back to eval-runner (T9) who generates and runs the formal eval suites.",
-    "parallel": true,
-    "preconditions": [
-      "scenarios.json written (this file)",
-      "T5 and T6 TaskUpdate to completed",
-      "SendMessage to team lead with this summary"
-    ],
-    "successConditions": [
-      "prototyper-a emits PrototypeResult for H-A with buildStatus + buildLog",
-      "prototyper-b emits PrototypeResult for H-C with buildStatus + buildLog",
-      "Both append to ontology-state/eval-results.json"
-    ]
-  },
-
-  "phaseGates": {
-    "T5": {
-      "completed": true,
-      "completedAt": "2026-04-15T16:30:00Z",
-      "owner": "simulator",
-      "outputArtifacts": ["ontology-state/scenarios.json (hypotheses[] section)"],
-      "validations": [
-        "3 hypotheses generated (>= 2 required)",
-        "Each hypothesis has D/L/A justification (LEARN / DATA / LOGIC respectively)",
-        "Each hypothesis has supportingEvidenceIds from source-map claims",
-        "Each hypothesis has contradictingEvidenceIds",
-        "Each hypothesis has testCriteria array",
-        "Each hypothesis has architectureImplications referencing world-model primitives",
-        "Each hypothesis has devcon5Alignment analysis (DDD/DRY/OCP/PECS)",
-        "Ontologist's 3 recommended cuts honored"
-      ]
-    },
-    "T6": {
-      "completed": true,
-      "completedAt": "2026-04-15T16:30:00Z",
-      "owner": "simulator",
-      "outputArtifacts": ["ontology-state/scenarios.json (scenarios[] section)"],
-      "validations": [
-        "12 scenarios total (3 hypotheses x 4 types)",
-        "All 4 scenario types present per hypothesis (base/best/worst/adversarial)",
-        "All 11 dimensions scored per scenario (1-5 scale)",
-        "Prototype Validation initialized to 3 for all scenarios (per task briefing)",
-        "Every scenario has assumptions[], evidenceBaseIds[], contradictionStatus, evidenceSufficiency",
-        "2 revision rounds completed (per docs/scoring-rubric.md minimum)",
-        "Contradictions classified (resolvable / evidence-gap-driven / irreconcilable)",
-        "Evidence gaps -> NextExperiment objects (NE-01 Bun compat, NE-02 hook latency)",
-        "Stopping criteria met: no detected contradictions remaining after revision round 2 (2 evidence-gap-driven deferred to T7, 1 irreconcilable preserved as decision fork)"
-      ]
-    }
-  },
-
-  "STOPPING_CRITERIA_MET": true
+    "winner": "H-A",
+    "winRationale": "H-A out-scores H-B on the strategic dimensions called out as primary objectives in NEXT_SESSION_ONTOLOGY_REBUILD.md: ForwardProp Health (4.25 vs 2.0), Agent Composability (3.75 vs 1.75), D/L/A Fit (4.5 vs 3.25), Governance Compliance (4.25 vs 3.0), and 4-pillar fidelity (High vs Medium). H-B wins on the pragmatic dimensions (Reversibility 3.75 vs 2.75, Implementation Difficulty 3.5 vs 2.75, Risk Severity 3.25 vs 2.75), but the user directive explicitly accepts those tradeoffs: 'schemas v1.0 major bump allowed', 'palantir-mini v1.0 full restructure allowed', 'namespace reorganization allowed', 'legacy deletion allowed' (decision-log.constraints.breaking-changes severity=high, negotiable=false). Critical structural finding: WMO-031 ForwardProp healthStatus=broken cannot be repaired additively — adding home /ontology/ layer forces consumer extension-point change regardless of SemVer strategy, so H-A atomic approach is the only path that reliably reaches healthy state. H-B partial opt-in explicitly accepts permanent broken ForwardProp as cost of stability, contradicting the rebuild central objective. Total mean 3.50 vs 3.00.",
+    "totalMeanDelta": 0.50,
+    "criticalTradeoff": "ForwardProp repair (strategic) vs migration cost (pragmatic). User directive resolves the tradeoff in favor of strategic repair by explicitly sanctioning breaking changes."
+  }
 }

@@ -1,325 +1,1527 @@
 {
-  "version": "1.0.0",
-  "lastUpdated": "2026-04-15T15:45:00Z",
-  "sessionId": "kosmos-research-2026-04-15-palantir-mini",
-  "previousSessions": ["mathcrew-photonic-realism-001", "mathcrew-content-delivery-001", "jsxgraph-sequencer-001"],
-  "completedTasks": ["T2", "T3"],
-  "authors": ["researcher (findings)", "lead (persistence — researcher has disallowedTools: Write)"],
-
-  "sources": [
+  "version": "1.0.0-rebuild-2026-04-17",
+  "lastUpdated": "2026-04-17T15:30:00Z",
+  "sessionId": "kosmos-rebuild-research-0dff144d",
+  "internalSources": [
     {
-      "id": "src-int-decision-lineage",
-      "title": "Palantir Decision Lineage (5D schema)",
-      "filePath": "~/.claude/research/palantir/cross-cutting/decision-lineage.md",
-      "retrievedAt": "2026-04-15T15:30:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "learn",
-      "summary": "5-dimensional Decision Lineage schema: WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT, per Chief Architect Akshay Krishnaswamy blog.palantir.com Jan 2024",
-      "markers": ["§DL-02", "§DL-09"],
-      "reliability": "high",
-      "freshnessDate": "2024-01-01",
-      "freshnessStatus": "aging"
-    },
-    {
-      "id": "src-int-action-mutations",
-      "title": "Palantir Action Mutations — Two-Tier Architecture + Submission Criteria",
-      "filePath": "~/.claude/research/palantir/action/mutations.md",
-      "retrievedAt": "2026-04-15T15:30:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "action",
-      "summary": "Two-tier action architecture (declarative + function-backed, mutually exclusive), submission criteria (9 constraint types), validate action API, OSDK 2.0 $validateOnly/$returnEdits options",
-      "markers": ["§ACTION.MU-09", "§ACTION.MU-10", "§ACTION.MU-11", "§ACTION.MU-14", "§ACTION.MU-15", "§ACTION.MU-16", "§ACTION.MU-17", "§ACTION.MU-18", "§ACTION.MU-19", "§ACTION.MU-24"],
-      "reliability": "high",
-      "freshnessDate": "2026-03-19",
-      "freshnessStatus": "current"
-    },
-    {
-      "id": "src-int-logic-functions",
-      "title": "Palantir Logic Functions — Edit Functions v2",
-      "filePath": "~/.claude/research/palantir/logic/functions.md",
-      "retrievedAt": "2026-04-15T15:30:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "logic",
-      "summary": "Edit functions v2: must return Edits[] (not void), createEditBatch<OntologyEdit>(client) pattern, batch.getEdits() — authoring helper does NOT commit edits",
-      "markers": ["§LOGIC.FN-04", "§LOGIC.FN-09", "L496"],
-      "reliability": "high",
-      "freshnessDate": "2026-03-19",
-      "freshnessStatus": "current"
-    },
-    {
-      "id": "src-int-validation-readme",
-      "title": "Palantir 6-Phase Validation Timeline",
-      "filePath": "~/.claude/research/palantir/validation/README.md",
-      "retrievedAt": "2026-04-15T15:30:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "logic",
-      "summary": "6-phase validation: Design, Compile, Deploy, Merge, Runtime, Post-Write. Each catches distinct error classes.",
-      "markers": ["§VAL.R-02", "§VAL.R-03", "§VAL.R-04", "§VAL.R-05", "§VAL.R-06", "§VAL.R-07", "§VAL.R-08"],
-      "reliability": "high",
-      "freshnessDate": "2026-03-19",
-      "freshnessStatus": "current"
-    },
-    {
-      "id": "src-int-ts-grounding",
-      "title": "Palantir TypeScript as Grounding",
-      "filePath": "~/.claude/research/palantir/typescript/type-safety-as-grounding.md",
-      "retrievedAt": "2026-04-15T15:30:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "data",
-      "summary": "TypeScript + OSDK codegen creates mechanically hallucination-proof pipeline. 5 schema categories: ObjectType, Property, LinkType, ActionType, Function.",
-      "markers": ["§TS.TSG-03", "§TS.TSG-04", "§TS.TSG-05", "§TS.TSG-06"],
-      "reliability": "high",
-      "freshnessDate": "2026-03-19",
-      "freshnessStatus": "current"
-    },
-    {
-      "id": "src-int-managed-agents",
-      "title": "Anthropic Managed Agents — Brain/Session/Hands",
-      "filePath": "~/.claude/research/claude-code/managed-agents.md",
-      "retrievedAt": "2026-04-15T15:30:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "learn",
-      "summary": "Session = append-only event log (durable, immutable, server-side); Harness = stateless orchestrator (cattle); Sandbox = stateless executor (cattle)",
-      "markers": ["§1-19"],
-      "reliability": "high",
-      "freshnessDate": "2026-04-01",
-      "freshnessStatus": "current"
-    },
-    {
-      "id": "src-int-palantir-mini-blueprint",
-      "title": "palantir-mini v0 Blueprint (this session synthesis)",
-      "filePath": "~/.claude/research/claude-code/palantir-mini-blueprint.md",
-      "retrievedAt": "2026-04-15T15:30:00Z",
-      "provenance": "synthesis",
-      "tier": "tier-1-official-docs",
-      "domain": "cross-cutting",
-      "summary": "v0 architecture synthesizing Managed Agents virtualization + Palantir 5 patterns + OMC best practices. Being refined this pipeline.",
-      "markers": ["OMC reference section", "Architecture section", "Per-project migration"],
-      "reliability": "high",
-      "freshnessDate": "2026-04-15",
-      "freshnessStatus": "current"
-    },
-    {
-      "id": "src-ext-cc-hooks",
-      "title": "Claude Code Hooks Reference (v2.1.108)",
-      "url": "https://code.claude.com/docs/en/hooks",
-      "retrievedAt": "2026-04-15T15:30:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "logic",
-      "summary": "Official v2.1.108 hook input/output schemas. PreToolUse uses hookSpecificOutput.permissionDecision (top-level 'decision' DEPRECATED). TaskCreated/TaskCompleted schemas verified. PreCompact block mechanism confirmed.",
-      "markers": ["PreToolUse section", "PreCompact section", "TaskCreated section", "Exit code 2 table"],
-      "reliability": "high",
-      "freshnessDate": "2026-04-15",
-      "freshnessStatus": "current"
-    },
-    {
-      "id": "src-ext-cc-plugins-ref",
-      "title": "Claude Code Plugins Reference (v2.1.108)",
-      "url": "https://code.claude.com/docs/en/plugins-reference",
-      "retrievedAt": "2026-04-15T15:30:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "cross-cutting",
-      "summary": "Plugin manifest fields, default file locations (.claude-plugin/plugin.json, skills/, agents/, hooks/hooks.json, .mcp.json, monitors/monitors.json, bin/), ${CLAUDE_PLUGIN_ROOT} vs ${CLAUDE_PLUGIN_DATA}, plugin agent security restrictions (agents cannot define hooks/mcpServers/permissionMode)",
-      "markers": ["monitors field", "File locations reference", "plugin agent restrictions", "path traversal warning"],
-      "reliability": "high",
-      "freshnessDate": "2026-04-15",
-      "freshnessStatus": "current"
-    },
-    {
-      "id": "src-ext-osdk-v2-edits",
-      "title": "Palantir OSDK TypeScript v2 Ontology Edits",
-      "url": "https://www.palantir.com/docs/foundry/functions/typescript-v2-ontology-edits",
-      "retrievedAt": "2026-04-15T15:30:00Z",
-      "provenance": "official",
-      "tier": "tier-1-official-docs",
-      "domain": "logic",
-      "summary": "OSDK v2 Edits discriminated union: Edits.Object<T>, Edits.Interface<T>, Edits.Link<Src,'linkName'>. createEditBatch<OntologyEdit>(client) + batch.update/create/delete/link/unlink/getEdits.",
-      "markers": ["Edits type union", "createEditBatch signature", "batch methods", "authoring helper caveat"],
-      "reliability": "high",
-      "freshnessDate": "2026-04-15",
-      "freshnessStatus": "current"
-    },
-    {
-      "id": "src-ext-proper-lockfile",
-      "title": "proper-lockfile npm package (atomic file lock)",
-      "url": "https://www.npmjs.com/package/proper-lockfile",
-      "retrievedAt": "2026-04-15T15:30:00Z",
-      "provenance": "official",
-      "tier": "tier-3-vendor-blogs",
-      "domain": "action",
-      "summary": "mkdir-based atomic file lock. NFS-safe, unlike O_EXCL. 9.27M weekly downloads. Last published 2020.",
-      "markers": ["mkdir strategy", "API surface", "graceful exit"],
-      "reliability": "high",
-      "freshnessDate": "2020-06-01",
-      "freshnessStatus": "aging"
-    }
-  ],
-
-  "claims": [
-    {"id":"clm-rq01-01","text":"Decision Lineage captures 5 dimensions (WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT) per decision artifact","isAtomic":true,"sourceId":"src-int-decision-lineage","provenance":"official","confidence":0.98,"domain":"learn","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq01-02","text":"Anthropic Managed Agents Session = append-only event log; Harness = stateless orchestrator; Sandbox = stateless executor","isAtomic":true,"sourceId":"src-int-managed-agents","provenance":"official","confidence":0.98,"domain":"learn","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq01-03","text":"Session event log is durable, immutable and persists across disconnects","isAtomic":true,"sourceId":"src-int-managed-agents","provenance":"official","confidence":0.98,"domain":"learn","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq01-04","text":"Three independent references (Anthropic MA, Palantir DL, OMC clawhip) converge on append-only log architecture","isAtomic":true,"sourceId":"src-int-palantir-mini-blueprint","provenance":"synthesis","confidence":0.92,"domain":"learn","contradictedBy":[],"supportedBy":["clm-rq01-01","clm-rq01-02"],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq02-01","text":"Palantir Two-Tier Action Architecture: Tier 1 declarative CRUD + Tier 2 function-backed, mutually exclusive","isAtomic":true,"sourceId":"src-int-action-mutations","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq02-02","text":"Edit Functions v2 return Edits[] without commit; commit only happens when wrapped as function-backed Action","isAtomic":true,"sourceId":"src-int-logic-functions","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq02-03","text":"Authoring helper executes edit functions without committing edits — explicit test-without-side-effects guarantee","isAtomic":true,"sourceId":"src-int-logic-functions","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq02-04","text":"Submission Criteria are independent from edit permissions; ALL must pass for action submission","isAtomic":true,"sourceId":"src-int-action-mutations","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq02-05","text":"Submission criteria support 9 constraint types: Range/ArraySize/StringLength/StringRegexMatch/OneOf/ObjectQueryResult/ObjectPropertyValue/GroupMember/Unevaluable","isAtomic":true,"sourceId":"src-int-action-mutations","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq02-06","text":"CC agent frontmatter supports disallowedTools as deny-list, enforced at tool invocation time","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.95,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq03-01","text":"OSDK generates TypeScript types from Ontology metadata — only Ontology-defined concepts compile","isAtomic":true,"sourceId":"src-int-ts-grounding","provenance":"official","confidence":0.98,"domain":"data","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq03-02","text":"Compile-time validation catches incompatible type changes after OSDK regen","isAtomic":true,"sourceId":"src-int-validation-readme","provenance":"official","confidence":0.98,"domain":"data","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq03-03","text":"palantir-math data.ts is 141618 bytes / 2190 LOC — exceeds OSDK 1.x single-file threshold","isAtomic":true,"sourceId":"src-int-palantir-mini-blueprint","provenance":"official","confidence":1.0,"domain":"data","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq03-04","text":"OSDK v2 Edits discriminated union has 3 variants: Edits.Object<T>, Edits.Interface<T>, Edits.Link<Src,'linkName'>","isAtomic":true,"sourceId":"src-ext-osdk-v2-edits","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq04-01","text":"Plugin MCP servers auto-start when plugin is enabled; tools appear as mcp__<server>__<tool>","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq04-02","text":"Palantir OSDK 2.0 supports $validateOnly:true — evaluates submission criteria without applying edits","isAtomic":true,"sourceId":"src-int-action-mutations","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq04-03","text":"Palantir OSDK 2.0 supports $returnEdits:true — executes and returns applied edits for post-commit audit","isAtomic":true,"sourceId":"src-int-action-mutations","provenance":"official","confidence":0.98,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq05-01","text":"Palantir 6-phase validation: Design/Compile/Deploy/Merge/Runtime/Post-Write, each catching distinct error classes","isAtomic":true,"sourceId":"src-int-validation-readme","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq05-02","text":"CC v2.1.105 PreCompact supports decision:block — blocks compaction when ontology invariants fail","isAtomic":true,"sourceId":"src-ext-cc-hooks","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-rq05-03","text":"CC v2.1.84 TaskCreated hook supports exit 2 rollback + stderr feedback","isAtomic":true,"sourceId":"src-ext-cc-hooks","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-ext-01","text":"PreToolUse hooks return decision via hookSpecificOutput.permissionDecision (NOT top-level); top-level 'decision' field DEPRECATED; supports allow/deny/ask/defer with precedence deny>defer>ask>allow","isAtomic":true,"sourceId":"src-ext-cc-hooks","provenance":"official","confidence":0.98,"domain":"cross-cutting","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-ext-07","text":"Plugin manifest monitors field auto-arms Monitor streams at session start or skill invoke","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"cross-cutting","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-ext-08","text":"Plugin-shipped agents CANNOT define hooks, mcpServers, or permissionMode (security restriction). Hooks must be at plugin-level hooks/hooks.json","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"security","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-ext-09","text":"${CLAUDE_PLUGIN_DATA} persists across plugin updates; ${CLAUDE_PLUGIN_ROOT} does NOT","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"security","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-ext-10","text":"Default plugin hook location is hooks/hooks.json at plugin root; same schema as user-defined hooks","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"cross-cutting","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-ext-12","text":"Default monitors location is monitors/monitors.json when path not specified","isAtomic":true,"sourceId":"src-ext-cc-plugins-ref","provenance":"official","confidence":0.98,"domain":"cross-cutting","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-ext-14","text":"createEditBatch<OntologyEdit>(client) returns batch with update/create/delete/link/unlink/getEdits methods","isAtomic":true,"sourceId":"src-ext-osdk-v2-edits","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-ext-18","text":"Within function execution, reading a property after batch.update does NOT reflect the uncommitted change","isAtomic":true,"sourceId":"src-ext-osdk-v2-edits","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-ext-19","text":"Edit functions MUST be wrapped as function-backed Actions to have edits applied","isAtomic":true,"sourceId":"src-ext-osdk-v2-edits","provenance":"official","confidence":0.98,"domain":"logic","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-ext-20","text":"proper-lockfile uses mkdir-based atomic locking — works on NFS and all filesystems","isAtomic":true,"sourceId":"src-ext-proper-lockfile","provenance":"official","confidence":0.95,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"current"},
-    {"id":"clm-ext-24","text":"proper-lockfile should work under Bun because it uses standard Node fs APIs (graceful-fs)","isAtomic":false,"sourceId":"src-ext-proper-lockfile","provenance":"inference","confidence":0.75,"domain":"action","contradictedBy":[],"supportedBy":[],"retrievedDate":"2026-04-15","freshnessStatus":"aging"}
-  ],
-
-  "contradictions": [
-    {
-      "id": "contra-01",
-      "severity": "low",
-      "description": "proper-lockfile last published 2020 (5 years old, aging) vs current need for production-proven library",
-      "affectedClaims": ["clm-ext-20", "clm-ext-24"],
-      "resolution": "Accept but flag for BackwardProp review. 9.27M weekly downloads confirms production use. Alternative: zero-dep mkdir fallback.",
-      "status": "resolved"
-    },
-    {
-      "id": "contra-02",
-      "severity": "medium",
-      "description": "Plugin-shipped agents CANNOT define hooks, mcpServers, or permissionMode (per plugins-reference), but palantir-mini-blueprint.md architecture initially implied agents use hooks field",
-      "affectedClaims": ["clm-ext-08"],
-      "resolution": "Define hooks at plugin level (hooks/hooks.json) with matchers targeting agent context (e.g., SubagentStop matcher 'ontology-verifier'), not agent-level frontmatter. Blueprint updated with Correction 1.",
-      "status": "resolved"
-    },
-    {
-      "id": "contra-03",
-      "severity": "high",
-      "description": "PreToolUse top-level 'decision' field is DEPRECATED in v2.1.108. Deprecated values 'approve'->'allow', 'block'->'deny'. Must use hookSpecificOutput.permissionDecision.",
-      "affectedClaims": ["clm-ext-01"],
-      "resolution": "All palantir-mini hook code must use new format. Other events (PostToolUse, Stop) continue using top-level decision. Per-event format awareness required. Blueprint updated with Correction 2.",
-      "status": "resolved"
-    },
-    {
-      "id": "contra-04",
-      "severity": "medium",
-      "description": "Foundry edit functions don't apply outside of an Action vs Native Runtime has no Palantir backend. How does palantir-mini commit_edits MCP tool synthesize Action wrapper?",
-      "affectedClaims": ["clm-ext-19", "clm-rq02-02"],
-      "resolution": "palantir-mini action-executor.md agent + lib/actions/commit.ts atomic writer IS the Action equivalent. The submission_criteria + atomic_commit pattern is adapter-inferred. Flag for ontologist.",
-      "status": "resolved"
-    },
-    {
-      "id": "contra-05",
-      "severity": "low",
-      "description": "CC Agent Teams 'no nested teams' vs ontology-verifier as a custom subagent spawned from within Agent Teams pipeline",
-      "affectedClaims": [],
-      "resolution": "ontology-verifier is a custom subagent, not a nested team. Agent Teams limitation applies to TeamCreate nesting only.",
-      "status": "resolved"
-    },
-    {
-      "id": "contra-06",
-      "severity": "medium",
-      "description": "StaleObject optimistic concurrency (in-place mutation) vs append-only event log (no in-place mutation). How to reject concurrent edits?",
-      "affectedClaims": [],
-      "resolution": "Use sequence number in EventEnvelope as optimistic version. Writers check headSequence before append. Flag for prototyper validation.",
-      "status": "detected"
-    }
-  ],
-
-  "gapsFilledConcrete": {
-    "eventEnvelopeSchema": {
-      "description": "TypeScript discriminated union with 10 event type variants (full code in palantir-mini-blueprint.md Gap fill 1)",
-      "baseFields": ["eventId (branded)", "when (ISO8601)", "atopWhich (git SHA)", "throughWhich (sessionId + toolName + cwd)", "byWhom (identity + agentName + teamName)", "withWhat (reasoning + hypothesis)", "sequence (monotonic counter — serves as optimistic version)"],
-      "eventTypes": [
-        "edit_proposed {functionName, params, hypotheticalEdits[]}",
-        "edit_committed {actionTypeRid, appliedEdits[], submissionCriteriaPassed[]}",
-        "submission_criteria_failed {actionTypeRid, failedConstraints[]}",
-        "validation_phase_completed {phase: design|compile|deploy|merge|runtime|post_write, passed, errorClass?}",
-        "codegen_started {targetProject, ontologyVersion}",
-        "codegen_completed {targetProject, generatedFiles[], durationMs}",
-        "phase_completed {phaseTag, taskId, validations[]}",
-        "drift_detected {driftType, affectedObjectType}",
-        "session_started {model, effort}",
-        "session_ended {reason, eventCount}"
+      "id": "INT-001",
+      "path": "~/.claude/research/palantir/data/README.md",
+      "subdir": "data",
+      "summary": "DATA domain overview: 14 topic files (10 DATA-owned + 4 transition-zone LOGIC), ObjectType definitions, property types (19 base + 5 extended), value types, structs, geospatial, timeseries, attachments, vectors, cipher, shared-properties. Canonical constraints: max 2000 properties, KNN max K=100/dims=2048.",
+      "keyMarkers": [
+        "§DATA.R-01",
+        "§DATA.R-02",
+        "§DATA.R-03",
+        "§DATA.R-04",
+        "§DATA.R-05",
+        "§DATA.R-07",
+        "§DATA.R-08",
+        "§DATA.R-11",
+        "§DATA.R-12",
+        "§DATA.R-13"
       ],
-      "provenance": "Composed from: decision-lineage.md §DL-02 (5D base), typescript-v2-ontology-edits (Edits union), mutations.md §ACTION.MU-14..18 (submission criteria constraint types), validation/README.md §VAL.R-02..R-08 (6 phases)"
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-04",
+        "RQ-05",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Includes 2026-Q1 features (AIP Document Intelligence GA Feb 2026, Core Object Views GA Feb 2026, Derived Properties Beta) — fully current."
     },
-    "mcpToolSchemas": [
-      {"name": "get_ontology", "inputs": "{domain: data|logic|action|security|learn, project, atSequence?}", "mirrors": "Palantir ontology query"},
-      {"name": "emit_event", "inputs": "{project, envelope: EventEnvelope}", "outputs": "{eventId, sequence}"},
-      {"name": "apply_edit_function", "inputs": "{project, functionName, params}", "outputs": "{edits: OntologyEdit[], provenance: 5D lineage}", "mirrors": "Palantir authoring helper (functions.md L496)"},
-      {"name": "commit_edits", "inputs": "{project, actionTypeRid, edits, submissionCriteria, validateOnly?}", "outputs": "{result: VALID|INVALID, committed, appliedEdits?, perCriterionResult}", "mirrors": "OSDK 2.0 $validateOnly / $returnEdits"},
-      {"name": "replay_lineage", "inputs": "{project, filter: {fromSequence?, toSequence?, eventTypes?, byWhom?, affectedObjectType?}}", "outputs": "{events, derivedState, lineageGraph}", "mirrors": "Palantir Decision Lineage + BackwardProp"}
+    {
+      "id": "INT-002",
+      "path": "~/.claude/research/palantir/logic/README.md",
+      "subdir": "logic",
+      "summary": "LOGIC domain overview: Impact Propagation Graph thesis — Link Types (propagation paths), Interfaces (shape contracts), Queries (graph traversal), Derived Properties (cascade formulas), Functions (computation units). 4 topic files: functions.md, object-sets.md, testing.md + README. Explicit propagation only (no automatic cascading).",
+      "keyMarkers": [
+        "§LOGIC.R-01",
+        "§LOGIC.R-02",
+        "§LOGIC.R-03",
+        "§LOGIC.R-04",
+        "§LOGIC.R-07"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-04",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Referenced in schemas v0.2.1 primitives layer; LOGIC domain rules directly encoded in palantir-mini v0.2 lib/codegen and lib/actions."
+    },
+    {
+      "id": "INT-003",
+      "path": "~/.claude/research/palantir/action/README.md",
+      "subdir": "action",
+      "summary": "ACTION domain overview: Two-tier architecture (Tier-1 declarative simple rules, Tier-2 function-backed — mutually exclusive). 5 topic files: mutations.md, webhooks.md, automation.md, data-flow.md, listeners.md. 9 submission criteria constraint classes. Progressive autonomy 3-tier. Action logs as queryable ontology objects.",
+      "keyMarkers": [
+        "§ACTION.R-01",
+        "§ACTION.R-02",
+        "§ACTION.R-03",
+        "§ACTION.R-04",
+        "§ACTION.R-05",
+        "§ACTION.R-07",
+        "§ACTION.R-08",
+        "§ACTION.R-10",
+        "§ACTION.R-11"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03",
+        "RQ-05",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "OSv1 deprecation June 2026 flagged; OSv2 action constraints authoritative. Actions.md references OSDK 2.0 $validateOnly / $returnEdits patterns."
+    },
+    {
+      "id": "INT-004",
+      "path": "~/.claude/research/palantir/platform/devcon.md",
+      "subdir": "platform",
+      "summary": "DevCon series DC1-DC5 architectural evolution. DC5 (March 11 2026): 3-stage product journey (Golden Tables → Operational Decision-Making → AI-First), 4 design principles (DDD/DRY/OCP/PECS), key primitives (Interfaces, Structs, Reducers, Derived Properties, Object-Backed Link Types), AI FDE eval-driven loop, Embedded Ontology, Scenarios.",
+      "keyMarkers": [
+        "§DC5-02",
+        "§DC5-03",
+        "§DC5-04",
+        "§DC5-05",
+        "§DC5-06",
+        "§DC5-08",
+        "§DC5-09",
+        "§DC5-10"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-03",
+        "RQ-04",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "DC5 is March 11 2026 — most recent DevCon event. Session state accurately records the 3-phase product journey that governs this rebuild."
+    },
+    {
+      "id": "INT-005",
+      "path": "~/.claude/research/palantir/architecture/ontology-model.md",
+      "subdir": "architecture",
+      "summary": "Permanent architecture SSoT: D/L/A 3-domain + SECURITY overlay model, 4-stage semantic compilation pipeline (Business Language → Domain Modeling → Schema Compilation → Logic Binding → Action Execution), OOSD paradigm, Digital Twin SENSE→DECIDE→ACT→LEARN, 3 hallucination reduction patterns (OAG/Logic Tool Handoff/Human-in-Loop), 5-level progressive autonomy, Decision Lineage. 51 DH, 136 HC, 9 CI.",
+      "keyMarkers": [
+        "§ARCH-01",
+        "§ARCH-02",
+        "§ARCH-03",
+        "§ARCH-04",
+        "§ARCH-05",
+        "§ARCH-06",
+        "§ARCH-07",
+        "§ARCH-08",
+        "§ARCH-09",
+        "§ARCH-10"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-03",
+        "RQ-04",
+        "RQ-05",
+        "RQ-06",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "AIPCon 9 (March 12 2026) D/L/A framing validated on-stage by Palantir Architect Chad Wahlquist. Most recent primary architecture reference."
+    },
+    {
+      "id": "INT-006",
+      "path": "~/.claude/research/palantir/validation/README.md",
+      "subdir": "validation",
+      "summary": "6-phase validation timeline (design/compile/deploy/merge/runtime/post-write), cross-domain contract triangle (DATA-LOGIC: type safety, LOGIC-ACTION: verifyOntologyEditFunction, DATA-ACTION: StaleObject + PK immutability), per-domain validation summary, industry pattern mapping (Pact/DbC/SHACL), decision lineage completeness validation, K-LLM coherence verification.",
+      "keyMarkers": [
+        "§VAL.R-01",
+        "§VAL.R-02",
+        "§VAL.R-09",
+        "§VAL.R-10",
+        "§VAL.R-11",
+        "§VAL.R-12",
+        "§VAL.R-13",
+        "§VAL.R-14",
+        "§VAL.R-19",
+        "§VAL.R-20"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-06",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "OSv1 deprecation June 2026 noted. StaleObject behavior documented. 6-phase pipeline matches palantir-mini v0.2 lib/validation/pipeline.ts which implements 4 of 6 phases (deploy+merge deferred to v1)."
+    },
+    {
+      "id": "INT-007",
+      "path": "~/.claude/research/palantir/ship-os/patterns.md",
+      "subdir": "ship-os",
+      "summary": "AIPCon 9 Ship OS reusable patterns: Governed Multi-Path Decision Package (trigger→dependency-aware reasoning→courses-of-action→approval→atomic execution→writeback), Action Log as Queryable Ontology Object, Intelligent Communications Triage. Extraction boundary: cross-domain patterns only, no naval-specific nouns.",
+      "keyMarkers": [
+        "§SOS-01",
+        "§SOS-02",
+        "§SOS-03",
+        "§SOS-04",
+        "§SOS-05"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-03",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "AIPCon 9 March 12 2026 material — most recent available. Extraction boundary documented prevents naval-domain contamination."
+    },
+    {
+      "id": "INT-008",
+      "path": "~/.claude/research/palantir/decision-lineage/workflow-lineage.md",
+      "subdir": "decision-lineage",
+      "summary": "Workflow Lineage (product GA Nov 2025) vs Decision Lineage (conceptual 5D framework). Workflow Lineage = what executed through which surface. Decision Lineage = WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT. Bound to palantir-mini via emit_event + replay_lineage. EventType discriminator list for workflow vs decision events.",
+      "keyMarkers": [
+        "§DL-01",
+        "§DL-02",
+        "§DL-03",
+        "§DL-04",
+        "§DL-05",
+        "§DL-06",
+        "§DL-07"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Workflow Lineage GA Nov 2025, Cross-Ontology visualization Feb 2026, Expanded access Mar 2026 — current. Implementation binding to palantir-mini event-log is authoritative."
+    },
+    {
+      "id": "INT-009",
+      "path": "~/.claude/research/palantir/cross-cutting/decision-lineage.md",
+      "subdir": "cross-cutting",
+      "summary": "5-dim Decision Lineage full spec: WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT. Workflow Lineage graph model (Object Types, Object Links, Actions, Functions, AIP Logic Functions, Language Models, Workshop Applications, Automations, Interfaces, Text Nodes). Graph controls and color legends. AIP usage observability.",
+      "keyMarkers": [
+        "§DL-01",
+        "§DL-02",
+        "§DL-03",
+        "§DL-04",
+        "§DL-05",
+        "§DL-06",
+        "§DL-07"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Cross-Ontology visualization Feb 2026 confirmed current. AIPCon 9 sourced."
+    },
+    {
+      "id": "INT-010",
+      "path": "~/.claude/research/palantir/philosophy/README.md",
+      "subdir": "philosophy",
+      "summary": "Meta-layer philosophy: Ontology as decision-centric OS (not database), 5-level progressive autonomy, K-LLM multi-model consensus, 3 hallucination reduction patterns, Decision Lineage as LEARN mechanism. 4 files: digital-twin.md, llm-grounding.md, ontology-ultimate-vision.md, tribal-knowledge.md.",
+      "keyMarkers": [
+        "§PHIL.R-01",
+        "§PHIL.R-02",
+        "§PHIL.R-03",
+        "§PHIL.R-04",
+        "§PHIL.R-05"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-04",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "AIPCon 9 + Chief Architect blog quotes verified current through March 2026."
+    },
+    {
+      "id": "INT-011",
+      "path": "~/.claude/research/palantir/security/README.md",
+      "subdir": "security",
+      "summary": "SECURITY domain overview: 4-layer security model (RBAC / Marking-Based / Object-Level Row+Column / Object+Property Security Policies cell-level). SECURITY as governance overlay cross-cutting D/L/A. 3 topic files: permissions.md, markings.md, object-security.md.",
+      "keyMarkers": [
+        "§SEC.R-01",
+        "§SEC.R-02",
+        "§SEC.R-03",
+        "§SEC.R-04",
+        "§SEC.R-05",
+        "§SEC.R-06"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-04",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Object Security Policies (DC5-10) and Project-Based permission model (Jan 2026) referenced. Current as of March 2026."
+    },
+    {
+      "id": "INT-012",
+      "path": "~/.claude/research/palantir/architecture/adapter-gap-analysis.md",
+      "subdir": "architecture",
+      "summary": "Code-level gap analysis (2026-03-17): What is already real in code vs Palantir product surface. Decision Lineage/Workflow Lineage analogue (5D fields), LEARN loop analogue (evaluation rubrics, refinement signals, automation graduation), Schema self-audit BackPropagation. Code corrections: rubric score integrity, graduation boundary, structured outcome records.",
+      "keyMarkers": [
+        "§GAP-01",
+        "§GAP-02",
+        "§GAP-03",
+        "§GAP-04"
+      ],
+      "provenance": "Inference",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-05"
+      ],
+      "currencyVerdict": "legacy-maybe",
+      "currencyRationale": "Dated 2026-03-17. References frontend-dashboard/convex paths — these may be from a prior project iteration that doesn't match current 3-project scope (palantirkc home/palantir-math/mathcrew). Useful for gap patterns, not for current code paths."
+    },
+    {
+      "id": "INT-013",
+      "path": "~/.claude/research/palantir/architecture/orchestration-map.md",
+      "subdir": "architecture",
+      "summary": "6-layer orchestration map: Builder Surfaces, Ontology Semantic Core, Runtime Digital Twin, Governance+Security, LEARN+Eval, Integration Expansion. Foundry product surfaces mapped to local equivalents. Keeps system pointed at Palantir-style end-state vs isolated feature drift.",
+      "keyMarkers": [
+        "§ORCH-01",
+        "§ORCH-02",
+        "§ORCH-03",
+        "§ORCH-04",
+        "§ORCH-05",
+        "§ORCH-06"
+      ],
+      "provenance": "Inference",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-04",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Structural reference — not time-sensitive. Current authority chain matches UNIVERSALIZATION.md (2026-04-17)."
+    },
+    {
+      "id": "INT-014",
+      "path": "~/.claude/research/palantir/osdk/INDEX.md",
+      "subdir": "osdk",
+      "summary": "OSDK research index: 4 files — osdk-2.0-architecture.md [Official] (client/generated separation), osdk-version-pinning.md [Official] (@osdk/client@0.1.0 pattern), osdk-1-to-2-migration.md [Official] (TypeScript migration guide), pm-codegen-vs-osdk.md [Synthesis] (our delta — filesystem, no HTTP client). Created 2026-04-17.",
+      "keyMarkers": [
+        "osdk-2.0-architecture",
+        "osdk-version-pinning",
+        "pm-codegen-vs-osdk"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-07"
+      ],
+      "currencyVerdict": "recent",
+      "currencyRationale": "Created 2026-04-17 as part of universalization. Content extraction from external research briefing noted as pending; may have stub content in sub-files."
+    },
+    {
+      "id": "INT-015",
+      "path": "~/.claude/research/palantir/marketplace/BROWSE.md",
+      "subdir": "marketplace",
+      "summary": "Marketplace research router: Foundry Marketplace distribution (namespace/prefix rules during install), Claude Code plugin marketplace parallel, palantir-mini single-plugin marketplace structure. References .claude-plugin/marketplace.json and claude-code/palantir-mini-blueprint.md.",
+      "keyMarkers": [],
+      "provenance": "Synthesis",
+      "relevantRQs": [
+        "RQ-02"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Plugin distribution architecture stable reference — governs palantir-mini v1.0 redesign."
+    },
+    {
+      "id": "INT-016",
+      "path": "~/.claude/schemas/ontology/BROWSE.md + INDEX.md",
+      "subdir": "schemas/ontology",
+      "summary": "Schema ontology axis query router and structure index: 5 primitive types (ObjectType/LinkType/ActionType/InterfaceType/PropertyType), 3 function types (EditFunction/DerivedProperty/Reducer), 3 policy types (SubmissionCriteria/RBAC/ForwardProp+BackwardProp), 2 lineage types (DecisionLineage/EventTypes), 2 generator types (OSDK-2.0-config/LazyLoader). 10 EventType variants. Provenance: kosmos TechBlueprint @767fa10.",
+      "keyMarkers": [
+        "prim-data-01",
+        "prim-data-02",
+        "prim-logic-04",
+        "prim-logic-05",
+        "prim-action-01",
+        "prim-action-02",
+        "prim-action-03"
+      ],
+      "provenance": "Synthesis",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-05",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "v0.2.1 schemas are the current artifact (2026-04-17). BROWSE.md includes palantir-mini v0 primitives layer added during universalization session."
+    },
+    {
+      "id": "INT-017",
+      "path": "~/.claude/schemas/ontology/types.ts",
+      "subdir": "schemas/ontology",
+      "summary": "Export contracts for backend, frontend, runtime, LEARN infrastructure. Key types: OntologyDomain (4 values), OntologyPropertyType (24 members = 19 base + 5 extended), BasePropertyType (19 lowercase), LinkCardinality (4: 1:1/M:1/1:M/M:N), MutationType (5), QueryType (7), AutonomyLevel (5), SecurityLayerType (4), PropertyReducerStrategy (6). Cross-axis imports from interaction/rendering.",
+      "keyMarkers": [
+        "OntologyPropertyType",
+        "BasePropertyType",
+        "AutonomyLevel",
+        "SecurityLayerType",
+        "PropertyReducerStrategy"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Active contract — schema-lock rule prevents modification during Phase A. v0.2.1 is the authoritative current version."
+    },
+    {
+      "id": "INT-018",
+      "path": "~/.claude/schemas/package.json + CHANGELOG.md",
+      "subdir": "schemas",
+      "summary": "Root package @palantirKC/claude-schemas v0.2.1. 4 axes: ontology@1.12.0/interaction@0.1.2/meta@0.1.0/rendering@0.1.0. Extended exports map (12 subpath exports). v0.2.1 (2026-04-17): extended exports map + root index.ts + README. v0.2.0: root package.json + CHANGELOG + manifest.json + axis entrypoints. Pre-universalization baseline at v0.1.x.",
+      "keyMarkers": [
+        "@palantirKC/claude-schemas@0.2.1"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Current production version. All 3 consumer projects pinned to git+...claude-schemas.git#v0.2.1. CHANGELOG documents exact additions."
+    },
+    {
+      "id": "INT-019",
+      "path": "~/.claude/plugins/palantir-mini/bridge/mcp-server.ts",
+      "subdir": "plugins/palantir-mini",
+      "summary": "Zero-dependency stdio MCP server (JSON-RPC 2.0). 5 MCP tools: get_ontology (domain-filtered snapshot from events.jsonl), emit_event (mutex-locked atomic append, 0 lost / 2000 at 2-writer race), apply_edit_function (returns Edits[] without committing), commit_edits (atomic, pre-flight 9 submission criteria, validateOnly dry-run support), replay_lineage (5-dim Decision Lineage filter). Reports version 0.1.0 in serverInfo.",
+      "keyMarkers": [
+        "get_ontology",
+        "emit_event",
+        "apply_edit_function",
+        "commit_edits",
+        "replay_lineage"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Active production MCP server. Package.json shows version 0.1.0 but CLAUDE.md references palantir-mini 0.2. v1.0 is rebuild target."
+    },
+    {
+      "id": "INT-020",
+      "path": "~/.claude/plugins/palantir-mini/hooks/hooks.json",
+      "subdir": "plugins/palantir-mini",
+      "summary": "6 hook events registered: PreToolUse (Edit/Write/MultiEdit → pre-edit-ontology.ts), PostToolUse (Edit/Write/MultiEdit → post-edit-propagate.ts), PreCompact (blocking → pre-compact-state.ts), TaskCompleted (task-completed-gate.ts), Stop (stop-validate.ts), SessionStart (session-start.ts). Missing: TaskCreated, TeammateIdle, SubagentStop, PostCompact, ShutdownRequest — large coverage gap vs 27 available hook events.",
+      "keyMarkers": [
+        "PreToolUse",
+        "PostToolUse",
+        "PreCompact",
+        "TaskCompleted",
+        "Stop",
+        "SessionStart"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Current plugin hooks. 6 of 27 available hook events used — this is the primary gap indicator for v1.0 hook expansion."
+    },
+    {
+      "id": "INT-021",
+      "path": "~/.claude/plugins/palantir-mini/lib/validation/pipeline.ts",
+      "subdir": "plugins/palantir-mini",
+      "summary": "4-phase validation pipeline orchestrator: Design + Compile + Runtime + Post-Write. Comment explicitly notes Deploy + Merge phases deferred to v1 (of 6-phase full Palantir set). Phases run independently, no fail-fast (v0 behavior — change to fail-fast in v1). Aggregate verdict = all phases pass.",
+      "keyMarkers": [
+        "design",
+        "compile",
+        "runtime",
+        "post_write"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-06",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Current production validation implementation. Deploy + Merge gap explicitly documented in source comments — directly informs v1.0 design."
+    },
+    {
+      "id": "INT-022",
+      "path": "~/.claude/plugins/palantir-mini/lib/codegen/client-generated-split.ts",
+      "subdir": "plugins/palantir-mini",
+      "summary": "OSDK 2.0 client/generated split enforcement: SplitPolicy (clientRoot, generatedRoot, generatedMarker). checkSplit validates write targets. auditGeneratedRoot walks generatedRoot checking all files for marker. Generated marker constant: '// AUTO-GENERATED by palantir-mini'.",
+      "keyMarkers": [
+        "SplitPolicy",
+        "checkSplit",
+        "auditGeneratedRoot",
+        "DEFAULT_MARKER"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Active codegen enforcement. Directly maps to rules/11-codegen-authority.md contract."
+    },
+    {
+      "id": "INT-023",
+      "path": "~/.claude/plugins/palantir-mini/managed-settings.d/50-palantir-mini.json",
+      "subdir": "plugins/palantir-mini",
+      "summary": "Layer-1 RBAC fragment: Allow (Read schemas/ontology/**, Read research/palantir/**, Read/Write .palantir-mini/session/**, Write src/generated/**, Bash plugin scripts, bun test, bunx tsc, 5 MCP tools). Deny (Write schemas/ontology/types.ts and semantics.ts — schema lock). Env vars: PALANTIR_MINI_SESSION_DIR, PALANTIR_MINI_SNAPSHOT_DIR, PALANTIR_MINI_EVENTS_FILE.",
+      "keyMarkers": [
+        "allow",
+        "deny",
+        "env"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-04"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Active RBAC enforcement. Schema lock (deny Write to types.ts/semantics.ts) is critical constraint for Phase A research."
+    },
+    {
+      "id": "INT-024",
+      "path": "~/.claude/plugins/palantir-mini/skills/pm-verify/SKILL.md + pm-codegen/SKILL.md + pm-blueprint/SKILL.md",
+      "subdir": "plugins/palantir-mini/skills",
+      "summary": "pm-verify: 4-phase validation pipeline runner, schema-versioning rule enforcer, codegen drift checker. pm-codegen: descender-gen.ts runner, emits codegen_started/completed events, produces src/generated/*.ts. pm-blueprint: proxies to kosmos-research 7-agent pipeline, requires blueprint.json + final-report.md, evaluator gate R1-R15 acceptance. All 7 plugin skills confirmed (pm-action, pm-blueprint, pm-codegen, pm-init, pm-recap, pm-replay, pm-verify).",
+      "keyMarkers": [
+        "pm-verify",
+        "pm-codegen",
+        "pm-blueprint",
+        "pm-action",
+        "pm-init",
+        "pm-recap",
+        "pm-replay"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Active plugin skill surface. These are the v0.2 canonical skills that v1.0 must extend or replace."
+    },
+    {
+      "id": "INT-025",
+      "path": "~/.claude/skills/ship/SKILL.md + ~/.claude/skills/orchestrate/SKILL.md",
+      "subdir": "user-scope-skills",
+      "summary": "ship: Ontology-aware finalization + commit + PR + merge. 465-line skill. Has semantic drift firewall, doc-sync protocol, pm-verify integration, but does NOT consume events.jsonl to generate PR body or enforce lineage gates — gap vs v1.0 target. orchestrate: 6-phase Lead protocol (CHECK/INJECT/AUDIT/DECIDE/DECOMPOSE/EXECUTE/VALIDATE). 406-line skill. Partially integrates palantir-mini (event emission on phase transitions, pm-verify on validate) but plugin is not the substrate.",
+      "keyMarkers": [
+        "ship",
+        "orchestrate"
+      ],
+      "provenance": "Synthesis",
+      "relevantRQs": [
+        "RQ-03",
+        "RQ-06"
+      ],
+      "currencyVerdict": "legacy-maybe",
+      "currencyRationale": "Both skills are rebuild candidates per NEXT_SESSION_ONTOLOGY_REBUILD.md. ship does not consume events.jsonl. orchestrate treats plugin as afterthought, not substrate. These are the v0 baselines to rewrite."
+    },
+    {
+      "id": "INT-026",
+      "path": "~/.claude/schemas/ontology/primitives/* + functions/* + policies/* + lineage/* + generators/*",
+      "subdir": "schemas/ontology/primitives-layer",
+      "summary": "15 files in 5 subdirs. Primitives: ObjectTypeDeclaration (branded RID, properties, links, implements[]), LinkTypeDeclaration, ActionTypeDeclaration (Tier1/Tier2 discriminated union), InterfaceType, PropertyType (24 branded names). Functions: EditFunction (returns Edits[] without commit), DerivedProperty (onRead/cached), Reducer<In,Out> (PECS). Policies: SubmissionCriteria (9 constraint classes), RBACFragment (Layer-1 only), ForwardProp+BackwardProp. Lineage: DecisionLineage 5-dim, EVENT_TYPE_REGISTRY (10 variants). Generators: OSDK-2.0-config, LazyRef.",
+      "keyMarkers": [
+        "ObjectTypeDeclaration",
+        "ActionTypeDeclaration",
+        "Tier1DeclarativeAction",
+        "Tier2FunctionBackedAction",
+        "ReducerDeclaration",
+        "EVENT_TYPE_NAMES",
+        "SubmissionCriteria"
+      ],
+      "provenance": "Synthesis",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Derived from kosmos TechBlueprint @767fa10, produced by 7-agent pipeline. Active executables in palantir-mini v0.2 descender-gen.ts. v1.0 must extend, not replace."
+    },
+    {
+      "id": "INT-027",
+      "path": "~/UNIVERSALIZATION.md",
+      "subdir": "context",
+      "summary": "Distribution channel architecture: claude-schemas as Maven-analog (semver-tagged git artifact via peerDeps), palantir-mini plugin as OSDK-analog (single installable cross-project surface), home repo as control plane, authority chain (research→schemas→ontology→contracts→runtime→audits). Consumer pin matrix (all 3 projects at v0.2.1). Plugin upgrade protocol (no peerDep bump needed). Open alignment work noted.",
+      "keyMarkers": [],
+      "provenance": "Synthesis",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-04"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Updated 2026-04-17 in orchestrate session. Directly governs v1.0 migration strategy and authority chain for this rebuild."
+    },
+    {
+      "id": "INT-028",
+      "path": "per-project ontology/ directories: palantir-math/ontology/* + mathcrew/ontology/*",
+      "subdir": "per-project",
+      "summary": "palantir-math/ontology/: 14 files (BROWSE.md, INDEX.md, BEHAVIOR.md, action.ts, capabilities/capabilities.ts, changeContracts/changeContracts.ts, data.ts, data/ subdir, frontend.ts, logic.ts, runtime.ts, schema.ts, security.ts). mathcrew/ontology/: 16 files (BROWSE.md, INDEX.md, action.ts, beat-template.ts, concept-primitive.ts, data.ts, event-envelope.ts, frontend-adapter.ts, frontend-semantic-core.ts, frontend.ts, learn.ts, logic.ts, runtime.ts, schema.ts, security.ts, theater-kind.ts). Home repo: no ontology/ dir.",
+      "keyMarkers": [],
+      "provenance": "Inference",
+      "relevantRQs": [
+        "RQ-04",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Current filesystem state verified 2026-04-17. mathcrew has richer ontology (theater-kind.ts, event-envelope.ts, frontend-semantic-core.ts) vs palantir-math (capabilities, changeContracts). Home repo lacks ontology/ — gap to fill in v1.0."
+    }
+  ],
+  "externalSources": [],
+  "pluginIntrospection": {
+    "currentVersion": "0.1.0",
+    "versionNote": "package.json shows 0.1.0 but CLAUDE.md and UNIVERSALIZATION.md reference palantir-mini v0.2.0. Version in package.json not updated during universalization — rebuild should confirm.",
+    "layout": {
+      "bridge": [
+        "mcp-server.ts",
+        "handlers/get-ontology",
+        "handlers/emit-event",
+        "handlers/apply-edit-function",
+        "handlers/commit-edits",
+        "handlers/replay-lineage"
+      ],
+      "lib": {
+        "actions": [
+          "commit.ts",
+          "submission-criteria.ts",
+          "tier1-declarative.ts",
+          "tier2-function.ts"
+        ],
+        "codegen": [
+          "client-generated-split.ts",
+          "descender-gen.ts",
+          "osdk-template.ts"
+        ],
+        "event-log": [
+          "append.ts",
+          "read.ts",
+          "replay.ts",
+          "snapshot.ts",
+          "types.ts"
+        ],
+        "validation": [
+          "compile.ts",
+          "design.ts",
+          "pipeline.ts",
+          "post-write.ts",
+          "runtime.ts"
+        ]
+      },
+      "hooks": [
+        "hooks.json",
+        "post-edit-propagate.ts",
+        "pre-compact-state.ts",
+        "pre-edit-ontology.ts",
+        "session-start.ts",
+        "stop-validate.ts",
+        "task-completed-gate.ts"
+      ],
+      "skills": [
+        "pm-action/SKILL.md",
+        "pm-blueprint/SKILL.md",
+        "pm-codegen/SKILL.md",
+        "pm-init/SKILL.md",
+        "pm-recap/SKILL.md",
+        "pm-replay/SKILL.md",
+        "pm-verify/SKILL.md"
+      ],
+      "agents": [
+        "action-executor.md",
+        "change-auditor.md",
+        "codegen-runner.md",
+        "ontology-verifier.md",
+        "propagation-tracer.md"
+      ],
+      "managed-settings.d": [
+        "50-palantir-mini.json"
+      ],
+      "monitors": [
+        "drift-watch.ts",
+        "event-log-tail.ts",
+        "monitors.json"
+      ],
+      "scripts": [
+        "log.ts",
+        "migrate-palantir-math-schema.ts",
+        "run.ts"
+      ]
+    },
+    "mcpToolCount": 5,
+    "hookCount": 6,
+    "hookEvents": [
+      "PreToolUse",
+      "PostToolUse",
+      "PreCompact",
+      "TaskCompleted",
+      "Stop",
+      "SessionStart"
     ],
-    "hookHandlerBodies": {
-      "preEditOntology": "PreToolUse(Edit|Write|MultiEdit) + ontology/*.ts path filter → proper-lockfile on events.jsonl → append 'edit_proposed' event → release → hookSpecificOutput.additionalContext with recent 5-event lineage summary. Uses v2.1.108 hookSpecificOutput format.",
-      "preCompactState": "PreCompact → checkOntologyInvariants(cwd) → if fails, output JSON {decision:'block', reason: '...'}. Caveat: blocking auto-compact surfaces underlying context error; safer as advisory for manual trigger.",
-      "taskCompletedGate": "TaskCompleted → extract phaseTag from [TAG] prefix regex → runPhaseGates(phaseTag, cwd) → if fails, exit 2 with stderr → else emit 'phase_completed' event. Works with kosmos-registry.json."
-    },
-    "atomicAppendMechanism": {
-      "primary": "proper-lockfile (npm, 9.27M dl/week, mkdir-based NFS-safe atomic locking). API: lockfile.lock(path, {stale: 10000, retries: 5}) → release function.",
-      "fallback": "Zero-dep: fs.mkdir(lockDir, {recursive: false}) throws EEXIST atomically. Retry with exponential backoff (50ms base, 2^attempt). Graceful cleanup via try/finally rmdir.",
-      "caveat": "Bun compatibility inferred from standard fs API usage, must be empirically verified in prototype phase (hypothesis A PoC)"
-    },
-    "migrationSequence": [
-      "Step 1: Extract schema.ts (2.5KB) first — validate typegen primitives work, minimal blast radius",
-      "Step 2: Extract security.ts (4KB) — minimal risk, exercises policy codegen",
-      "Step 3: Refactor data.ts (141KB) by ObjectType into primitives/ — requires OSDK codegen ready",
-      "Step 4: Migrate capabilities.ts (57KB) to ~/.claude/schemas/ontology/policies/rbac.ts — cross-project shared",
-      "Step 5: Migrate changeContracts.ts (66KB) to lib/actions/tier1-declarative.ts + tier2-function.ts",
-      "Step 6: Wire events.jsonl emission via plugin hooks/hooks.json (NOT agent frontmatter — per Correction 1)",
-      "Step 7: Parallel old-path support via compat shim (re-export from generated files) during transition"
+    "hookEventsCoverage": "6 of 27 available Claude Code hook events (22% coverage)",
+    "skillCount": 7,
+    "agentCount": 5,
+    "gapsForFoundryParity": [
+      "Missing: Deploy + Merge validation phases (only 4 of 6 implemented in pipeline.ts — explicitly noted in source)",
+      "Missing: 21 hook events not covered (TaskCreated, TeammateIdle, SubagentStop, PostCompact, ShutdownRequest, TeamCreated/Deleted, TeammateJoin/Leave/Error, AgentStart/Stop/Error/Message, PlanApproval, MemoryWrite/Read, ToolApproval/Denied, CompactStart, UserPromptSubmit)",
+      "Missing: OSDK regen trigger on schema change (codegen not invoked automatically on schema edit — only via pm-codegen skill or manual)",
+      "Missing: Shared schema registry (schemas live at ~/.claude/schemas not in plugin bundle — split ownership)",
+      "Missing: Capability token system (no CapabilityToken primitive — RBAC is Layer-1 role-only, no cell-level markings)",
+      "Missing: PermissionsCascade (explicitly deferred to v1 in managed-settings.d/50-palantir-mini.json)",
+      "Missing: Semantic intent dispatcher (/palantir-dispatch) — no AIP-analog skill router",
+      "Missing: /ontology-register skill — no primitive registration workflow",
+      "Missing: events.jsonl → PR body lineage in /ship (ship reads docs, not lineage events)",
+      "Missing: Plugin-side vs consumer-side schema lock enforcement (deny rules in managed-settings.d, but no pm-verify gate blocking schema edits at PreToolUse)",
+      "Missing: BrandedRID for LinkType, InterfaceType (ObjectType has branded RID; others only have string APINames)",
+      "Missing: Struct primitive type in primitives/ layer (Struct defined in types.ts but no primitives/struct.ts with registry)",
+      "Missing: ValueType primitive (value-types are in types.ts but no primitives/value-type.ts with codegen contract)",
+      "Missing: monitors/ integration with hooks (drift-watch.ts + event-log-tail.ts exist but not wired to hook events)"
     ]
   },
-
-  "gapsForOntologist": [
-    "StaleObject optimistic concurrency in append-only log model — how to reject concurrent edits without in-place target (hint: sequence number as version vector)",
-    "K-LLM consensus implementation — deferred per palantir-mini-blueprint.md open questions",
-    "Workflow Lineage vs Decision Lineage product composition — ATOP_WHICH dimension not fully captured beyond git SHA",
-    "Edit function rollback semantics — in append-only, rollback = append compensating event (never delete)",
-    "Bun compatibility for proper-lockfile — inferred, needs empirical test in prototype phase",
-    "Multi-writer cross-project coordination — 3 projects sharing ~/.claude/schemas/ontology/ needs coordination"
-  ],
-
-  "v2108FeatureAvailability": {
-    "blockCompactionOnInvariantFailure": "PreCompact decision:block (v2.1.105)",
-    "phaseGateOnTaskCompletion": "TaskCompleted hook (v2.1.33)",
-    "taskCreationValidation": "TaskCreated hook (v2.1.84)",
-    "backgroundDriftDetection": "Plugin monitors manifest (v2.1.105)",
-    "crossProjectWorktreeReuse": "EnterWorktree path (v2.1.105)",
-    "toolInputRewriting": "PreToolUse updatedInput (v2.1.85)",
-    "conditionalHookExecution": "Hook if field (v2.1.85)",
-    "asyncHookExecution": "Hook async:true / asyncRewake",
-    "recentFailureContextInjection": "PostToolUseFailure additionalContext",
-    "status": "All required v2.1.108 features exist — blueprint is feature-complete"
+  "schemasIntrospection": {
+    "currentPackage": "@palantirKC/claude-schemas@0.2.1",
+    "repositoryUrl": "git+https://github.com/park-kyungchan/claude-schemas.git",
+    "axes": {
+      "ontology": "1.12.0",
+      "interaction": "0.1.2",
+      "meta": "0.1.0",
+      "rendering": "0.1.0"
+    },
+    "primitivesPresentInPrimitivesLayer": [
+      "ObjectType (branded RID, properties[], links[], implements[])",
+      "LinkType (cardinality: one|many, to: ObjectTypeRid)",
+      "ActionType (Tier1DeclarativeAction | Tier2FunctionBackedAction — discriminated union)",
+      "InterfaceType (in primitives/interface-type.ts)",
+      "PropertyType (24 branded names in primitives/property-type.ts)",
+      "EditFunction (returns Edits[] without commit — functions/function-signature.ts)",
+      "DerivedProperty (onRead|cached modes — functions/derived-property.ts)",
+      "Reducer<In,Out> (PECS — functions/reducer.ts)",
+      "SubmissionCriteria (9 constraint classes — policies/submission-criteria.ts)",
+      "RBACFragment (Layer-1 role templates — policies/rbac.ts)",
+      "ForwardProp + BackwardProp (6 steps each — policies/propagation.ts)",
+      "DecisionLineage 5-dim (lineage/decision-lineage.ts)",
+      "EventTypeRegistry 10-variant (lineage/event-types.ts)",
+      "OSDK-2.0-config (client/generated split — generators/osdk-2.0-config.ts)",
+      "LazyRef pattern (circular-import avoidance — generators/lazy-loader.ts)"
+    ],
+    "primitivesMissingVsPalantir4Pillar": [
+      "Struct primitive (primitives/struct.ts with StructDeclaration + StructRegistry — currently only in types.ts as StructType interface)",
+      "ValueType primitive (primitives/value-type.ts with ValueTypeDeclaration + branded constructor — currently only in types.ts as ValueType interface)",
+      "SharedPropertyType (primitives/shared-property.ts — currently only in types.ts, not in codegen pipeline)",
+      "Object-Backed LinkType as distinct primitive (link-type.ts has discriminated union but Object-Backed flavor may need richer metadata)",
+      "CapabilityToken (no token-based governance primitive — RBAC is role-only)",
+      "MarkingDeclaration (no CBAC/classification primitive — Layer-2/3 security deferred)",
+      "AutomationDeclaration (automation.md researched but no automation primitives in primitives/)",
+      "WebhookDeclaration (webhooks.md researched but no webhook primitives in primitives/)",
+      "ScenarioSandbox (DC5-10 Scenarios for what-if planning — not implemented)",
+      "AIPLogicFunction (AIP Logic function type — not in primitives layer)"
+    ],
+    "axisGapsVsRebuildTarget": {
+      "ontology": "1.12.0 — Current axis version is high (112 minor bumps). v1.0 target = consolidate primitives layer into canonical export, deprecate types.ts/semantics.ts legacy sections superseded by primitives layer, add missing primitive types.",
+      "interaction": "0.1.2 — Low version, low usage in rebuild target. Likely keep as-is unless palantir-math frontend needs v1.0 update.",
+      "meta": "0.1.0 — Minimal. No per-project use found. May be deprecated or integrated into ontology axis.",
+      "rendering": "0.1.0 — mathcrew has theater-kind.ts, beat-template.ts — rendering axis may need extension for theater primitives in v1.0."
+    }
   },
-
-  "nextStep": "ontologist spawned for T4. Primary inputs: this source-map.json + palantir-mini-blueprint.md + decision-log.json. Must address 6 gapsForOntologist.",
-
-  "phaseGates": {
-    "T2": {"completed": true, "completedAt": "2026-04-15T15:45:00Z", "outputArtifacts": ["ontology-state/source-map.json"]},
-    "T3": {"completed": true, "completedAt": "2026-04-15T15:45:00Z", "outputArtifacts": ["ontology-state/source-map.json"]}
-  }
+  "skillInventory": {
+    "user-scope": [
+      "lsp-audit",
+      "orchestrate",
+      "palantir-walk",
+      "pm-action (deprecated stub)",
+      "pm-blueprint (deprecated stub)",
+      "pm-codegen (deprecated stub)",
+      "pm-init (deprecated stub)",
+      "pm-recap (deprecated stub)",
+      "pm-replay (deprecated stub)",
+      "pm-verify (deprecated stub)",
+      "ship",
+      "tavily-cli"
+    ],
+    "plugin-scope": [
+      "pm-action",
+      "pm-blueprint",
+      "pm-codegen",
+      "pm-init",
+      "pm-recap",
+      "pm-replay",
+      "pm-verify"
+    ],
+    "per-project": {
+      "palantir-math": [
+        "concept-math",
+        "concept-math-workspace",
+        "palantir-math",
+        "palantir-math-workspace",
+        "sequencer-conc",
+        "sequencer-math",
+        "vc-scenario"
+      ],
+      "mathcrew": [
+        "3d-scene-audit",
+        "verify"
+      ],
+      "kosmos": [
+        "kosmos-research (READ-ONLY — out of scope)"
+      ]
+    },
+    "rebuildVerdictPreview": {
+      "ship": "REWRITE — must consume events.jsonl to generate PR body + enforce plugin validation gates before merge",
+      "orchestrate": "REWRITE — plugin must be substrate, not afterthought; every phase transition via plugin MCP calls",
+      "lsp-audit": "REVIEW — reexamine if TypeScript-only audits still make sense when ontology is authority",
+      "palantir-walk": "REVIEW — role unclear without seeing content",
+      "tavily-cli": "KEEP or DELETE — external search utility, not ontology-integrated",
+      "pm-* deprecated stubs": "DELETE — superseded by plugin-scope versions per rule 05-skill-invocation-order.md",
+      "palantir-math per-project skills": "REVIEW — keep those with project-specific semantic ownership",
+      "mathcrew/3d-scene-audit + verify": "REVIEW — may be superseded by plugin pm-verify"
+    }
+  },
+  "priorPRState": {
+    "palantirkc": {
+      "branch": "main",
+      "lastMergedPr": "PR #46 (feat: promote 6 cross-project memories into rule 06-agent-teams.md W2-R6)",
+      "openPrs": [],
+      "lastCommit": "690463b feat(universalization): schemas v0.2.1 + UNIVERSALIZATION.md + submodule sync",
+      "note": "No open PRs confirmed via GitHub API"
+    },
+    "palantir-math": {
+      "branch": "main",
+      "lastMergedPr": "PR #157 fix(deps): use git URL for @palantirKC/claude-schemas",
+      "openPrs": [],
+      "lastCommit": "d35ba33 fix(deps): use git URL for @palantirKC/claude-schemas",
+      "deferredItems": [
+        "F-1 full: jsxGraphRenderer functiongraph + parametric-curve body extraction, requires curveHelpers.ts with 7 module-local symbols",
+        "D-cont-2: useTeachingState.ts keep/delete/restore decision"
+      ]
+    },
+    "mathcrew": {
+      "branch": "main",
+      "lastMergedPr": "PR #87 feat(theater-rebuild): Phases 0-6 umbrella",
+      "openPrs": [],
+      "lastCommit": "97a94bc feat(theater-rebuild): Phases 0-6 umbrella — zero-based theater redesign foundation",
+      "deferredItems": [
+        "Runtime wiring: teaching-flow.ts drives Enter via enterSteps; should prefer beat.beatTemplate",
+        "Interactive-beat evaluator bridge — enables theater-canvas-renderer.ts deletion",
+        "Per-primitive Playwright goldens",
+        "FPS-driven adaptive tier auto-switch"
+      ]
+    }
+  },
+  "rqCoverageAssessment": {
+    "RQ-01": {
+      "question": "claude-schemas v1.0 primitive set + SemVer-breaking migration",
+      "coverageVerdict": "SUFFICIENT",
+      "internalSources": [
+        "INT-016",
+        "INT-017",
+        "INT-018",
+        "INT-026",
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-005"
+      ],
+      "gaps": [
+        "OSDK sub-files (osdk-2.0-architecture.md etc.) not deep-read — content noted as potentially stub; BROWSE.md covers key patterns"
+      ],
+      "externalNeeded": false
+    },
+    "RQ-02": {
+      "question": "palantir-mini v1.0 plugin structure as Foundry-analog",
+      "coverageVerdict": "SUFFICIENT",
+      "internalSources": [
+        "INT-019",
+        "INT-020",
+        "INT-021",
+        "INT-022",
+        "INT-023",
+        "INT-024",
+        "INT-005",
+        "INT-006"
+      ],
+      "gaps": [
+        "agent/*.md files not deep-read — 5 agents enumerated; plugin tests/ not read"
+      ],
+      "externalNeeded": false
+    },
+    "RQ-03": {
+      "question": "AIP-analog skill set (palantir-dispatch, ontology-register, ship, orchestrate)",
+      "coverageVerdict": "SUFFICIENT",
+      "internalSources": [
+        "INT-024",
+        "INT-025",
+        "INT-007",
+        "INT-008"
+      ],
+      "gaps": [
+        "palantir-walk/SKILL.md not read; lsp-audit/SKILL.md not read — these are rebuild candidates, not critical for design"
+      ],
+      "externalNeeded": false
+    },
+    "RQ-04": {
+      "question": "Authority chain for per-project ontology divergence",
+      "coverageVerdict": "SUFFICIENT",
+      "internalSources": [
+        "INT-027",
+        "INT-028",
+        "INT-013",
+        "INT-010",
+        "INT-011"
+      ],
+      "gaps": [
+        "palantir-math/ontology/*.ts and mathcrew/ontology/*.ts not deeply read — file list sufficient for naming analysis"
+      ],
+      "externalNeeded": false
+    },
+    "RQ-05": {
+      "question": "Keep/deprecate/delete verdict for research library + schemas",
+      "coverageVerdict": "PARTIAL",
+      "internalSources": [
+        "INT-001 through INT-015",
+        "INT-016",
+        "INT-017",
+        "INT-018"
+      ],
+      "gaps": [
+        "typescript/ 2 files not read; entry/decompose.md + requirements.md not read; marketplace/INDEX.md not read; philosophy/digital-twin.md/llm-grounding.md/tribal-knowledge.md not deeply read — all are small files. Cross-cutting/llm-independence.md/progressive-autonomy.md/tool-exposure.md not read."
+      ],
+      "externalNeeded": false
+    },
+    "RQ-06": {
+      "question": "/ship + /orchestrate v1.0 pipeline design with event-emission contracts",
+      "coverageVerdict": "SUFFICIENT",
+      "internalSources": [
+        "INT-025",
+        "INT-007",
+        "INT-008",
+        "INT-009",
+        "INT-006"
+      ],
+      "gaps": [
+        "orchestrate/references/ not enumerated"
+      ],
+      "externalNeeded": false
+    },
+    "RQ-07": {
+      "question": "Deterministic codegen contract + pm-verify enforcement",
+      "coverageVerdict": "SUFFICIENT",
+      "internalSources": [
+        "INT-014",
+        "INT-022",
+        "INT-021",
+        "INT-024"
+      ],
+      "gaps": [
+        "osdk-2.0-architecture.md / osdk-1-to-2-migration.md / pm-codegen-vs-osdk.md not read — INDEX.md covers file tree; content noted as potentially stub per INDEX.md note"
+      ],
+      "externalNeeded": false
+    }
+  },
+  "sources": [
+    {
+      "id": "INT-001",
+      "path": "~/.claude/research/palantir/data/README.md",
+      "subdir": "data",
+      "summary": "DATA domain overview: 14 topic files (10 DATA-owned + 4 transition-zone LOGIC), ObjectType definitions, property types (19 base + 5 extended), value types, structs, geospatial, timeseries, attachments, vectors, cipher, shared-properties. Canonical constraints: max 2000 properties, KNN max K=100/dims=2048.",
+      "keyMarkers": [
+        "§DATA.R-01",
+        "§DATA.R-02",
+        "§DATA.R-03",
+        "§DATA.R-04",
+        "§DATA.R-05",
+        "§DATA.R-07",
+        "§DATA.R-08",
+        "§DATA.R-11",
+        "§DATA.R-12",
+        "§DATA.R-13"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-04",
+        "RQ-05",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Includes 2026-Q1 features (AIP Document Intelligence GA Feb 2026, Core Object Views GA Feb 2026, Derived Properties Beta) — fully current."
+    },
+    {
+      "id": "INT-002",
+      "path": "~/.claude/research/palantir/logic/README.md",
+      "subdir": "logic",
+      "summary": "LOGIC domain overview: Impact Propagation Graph thesis — Link Types (propagation paths), Interfaces (shape contracts), Queries (graph traversal), Derived Properties (cascade formulas), Functions (computation units). 4 topic files: functions.md, object-sets.md, testing.md + README. Explicit propagation only (no automatic cascading).",
+      "keyMarkers": [
+        "§LOGIC.R-01",
+        "§LOGIC.R-02",
+        "§LOGIC.R-03",
+        "§LOGIC.R-04",
+        "§LOGIC.R-07"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-04",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Referenced in schemas v0.2.1 primitives layer; LOGIC domain rules directly encoded in palantir-mini v0.2 lib/codegen and lib/actions."
+    },
+    {
+      "id": "INT-003",
+      "path": "~/.claude/research/palantir/action/README.md",
+      "subdir": "action",
+      "summary": "ACTION domain overview: Two-tier architecture (Tier-1 declarative simple rules, Tier-2 function-backed — mutually exclusive). 5 topic files: mutations.md, webhooks.md, automation.md, data-flow.md, listeners.md. 9 submission criteria constraint classes. Progressive autonomy 3-tier. Action logs as queryable ontology objects.",
+      "keyMarkers": [
+        "§ACTION.R-01",
+        "§ACTION.R-02",
+        "§ACTION.R-03",
+        "§ACTION.R-04",
+        "§ACTION.R-05",
+        "§ACTION.R-07",
+        "§ACTION.R-08",
+        "§ACTION.R-10",
+        "§ACTION.R-11"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03",
+        "RQ-05",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "OSv1 deprecation June 2026 flagged; OSv2 action constraints authoritative. Actions.md references OSDK 2.0 $validateOnly / $returnEdits patterns."
+    },
+    {
+      "id": "INT-004",
+      "path": "~/.claude/research/palantir/platform/devcon.md",
+      "subdir": "platform",
+      "summary": "DevCon series DC1-DC5 architectural evolution. DC5 (March 11 2026): 3-stage product journey (Golden Tables → Operational Decision-Making → AI-First), 4 design principles (DDD/DRY/OCP/PECS), key primitives (Interfaces, Structs, Reducers, Derived Properties, Object-Backed Link Types), AI FDE eval-driven loop, Embedded Ontology, Scenarios.",
+      "keyMarkers": [
+        "§DC5-02",
+        "§DC5-03",
+        "§DC5-04",
+        "§DC5-05",
+        "§DC5-06",
+        "§DC5-08",
+        "§DC5-09",
+        "§DC5-10"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-03",
+        "RQ-04",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "DC5 is March 11 2026 — most recent DevCon event. Session state accurately records the 3-phase product journey that governs this rebuild."
+    },
+    {
+      "id": "INT-005",
+      "path": "~/.claude/research/palantir/architecture/ontology-model.md",
+      "subdir": "architecture",
+      "summary": "Permanent architecture SSoT: D/L/A 3-domain + SECURITY overlay model, 4-stage semantic compilation pipeline (Business Language → Domain Modeling → Schema Compilation → Logic Binding → Action Execution), OOSD paradigm, Digital Twin SENSE→DECIDE→ACT→LEARN, 3 hallucination reduction patterns (OAG/Logic Tool Handoff/Human-in-Loop), 5-level progressive autonomy, Decision Lineage. 51 DH, 136 HC, 9 CI.",
+      "keyMarkers": [
+        "§ARCH-01",
+        "§ARCH-02",
+        "§ARCH-03",
+        "§ARCH-04",
+        "§ARCH-05",
+        "§ARCH-06",
+        "§ARCH-07",
+        "§ARCH-08",
+        "§ARCH-09",
+        "§ARCH-10"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-03",
+        "RQ-04",
+        "RQ-05",
+        "RQ-06",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "AIPCon 9 (March 12 2026) D/L/A framing validated on-stage by Palantir Architect Chad Wahlquist. Most recent primary architecture reference."
+    },
+    {
+      "id": "INT-006",
+      "path": "~/.claude/research/palantir/validation/README.md",
+      "subdir": "validation",
+      "summary": "6-phase validation timeline (design/compile/deploy/merge/runtime/post-write), cross-domain contract triangle (DATA-LOGIC: type safety, LOGIC-ACTION: verifyOntologyEditFunction, DATA-ACTION: StaleObject + PK immutability), per-domain validation summary, industry pattern mapping (Pact/DbC/SHACL), decision lineage completeness validation, K-LLM coherence verification.",
+      "keyMarkers": [
+        "§VAL.R-01",
+        "§VAL.R-02",
+        "§VAL.R-09",
+        "§VAL.R-10",
+        "§VAL.R-11",
+        "§VAL.R-12",
+        "§VAL.R-13",
+        "§VAL.R-14",
+        "§VAL.R-19",
+        "§VAL.R-20"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-06",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "OSv1 deprecation June 2026 noted. StaleObject behavior documented. 6-phase pipeline matches palantir-mini v0.2 lib/validation/pipeline.ts which implements 4 of 6 phases (deploy+merge deferred to v1)."
+    },
+    {
+      "id": "INT-007",
+      "path": "~/.claude/research/palantir/ship-os/patterns.md",
+      "subdir": "ship-os",
+      "summary": "AIPCon 9 Ship OS reusable patterns: Governed Multi-Path Decision Package (trigger→dependency-aware reasoning→courses-of-action→approval→atomic execution→writeback), Action Log as Queryable Ontology Object, Intelligent Communications Triage. Extraction boundary: cross-domain patterns only, no naval-specific nouns.",
+      "keyMarkers": [
+        "§SOS-01",
+        "§SOS-02",
+        "§SOS-03",
+        "§SOS-04",
+        "§SOS-05"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-03",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "AIPCon 9 March 12 2026 material — most recent available. Extraction boundary documented prevents naval-domain contamination."
+    },
+    {
+      "id": "INT-008",
+      "path": "~/.claude/research/palantir/decision-lineage/workflow-lineage.md",
+      "subdir": "decision-lineage",
+      "summary": "Workflow Lineage (product GA Nov 2025) vs Decision Lineage (conceptual 5D framework). Workflow Lineage = what executed through which surface. Decision Lineage = WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT. Bound to palantir-mini via emit_event + replay_lineage. EventType discriminator list for workflow vs decision events.",
+      "keyMarkers": [
+        "§DL-01",
+        "§DL-02",
+        "§DL-03",
+        "§DL-04",
+        "§DL-05",
+        "§DL-06",
+        "§DL-07"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Workflow Lineage GA Nov 2025, Cross-Ontology visualization Feb 2026, Expanded access Mar 2026 — current. Implementation binding to palantir-mini event-log is authoritative."
+    },
+    {
+      "id": "INT-009",
+      "path": "~/.claude/research/palantir/cross-cutting/decision-lineage.md",
+      "subdir": "cross-cutting",
+      "summary": "5-dim Decision Lineage full spec: WHEN/ATOP_WHICH/THROUGH_WHICH/BY_WHOM/WITH_WHAT. Workflow Lineage graph model (Object Types, Object Links, Actions, Functions, AIP Logic Functions, Language Models, Workshop Applications, Automations, Interfaces, Text Nodes). Graph controls and color legends. AIP usage observability.",
+      "keyMarkers": [
+        "§DL-01",
+        "§DL-02",
+        "§DL-03",
+        "§DL-04",
+        "§DL-05",
+        "§DL-06",
+        "§DL-07"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Cross-Ontology visualization Feb 2026 confirmed current. AIPCon 9 sourced."
+    },
+    {
+      "id": "INT-010",
+      "path": "~/.claude/research/palantir/philosophy/README.md",
+      "subdir": "philosophy",
+      "summary": "Meta-layer philosophy: Ontology as decision-centric OS (not database), 5-level progressive autonomy, K-LLM multi-model consensus, 3 hallucination reduction patterns, Decision Lineage as LEARN mechanism. 4 files: digital-twin.md, llm-grounding.md, ontology-ultimate-vision.md, tribal-knowledge.md.",
+      "keyMarkers": [
+        "§PHIL.R-01",
+        "§PHIL.R-02",
+        "§PHIL.R-03",
+        "§PHIL.R-04",
+        "§PHIL.R-05"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-04",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "AIPCon 9 + Chief Architect blog quotes verified current through March 2026."
+    },
+    {
+      "id": "INT-011",
+      "path": "~/.claude/research/palantir/security/README.md",
+      "subdir": "security",
+      "summary": "SECURITY domain overview: 4-layer security model (RBAC / Marking-Based / Object-Level Row+Column / Object+Property Security Policies cell-level). SECURITY as governance overlay cross-cutting D/L/A. 3 topic files: permissions.md, markings.md, object-security.md.",
+      "keyMarkers": [
+        "§SEC.R-01",
+        "§SEC.R-02",
+        "§SEC.R-03",
+        "§SEC.R-04",
+        "§SEC.R-05",
+        "§SEC.R-06"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-04",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Object Security Policies (DC5-10) and Project-Based permission model (Jan 2026) referenced. Current as of March 2026."
+    },
+    {
+      "id": "INT-012",
+      "path": "~/.claude/research/palantir/architecture/adapter-gap-analysis.md",
+      "subdir": "architecture",
+      "summary": "Code-level gap analysis (2026-03-17): What is already real in code vs Palantir product surface. Decision Lineage/Workflow Lineage analogue (5D fields), LEARN loop analogue (evaluation rubrics, refinement signals, automation graduation), Schema self-audit BackPropagation. Code corrections: rubric score integrity, graduation boundary, structured outcome records.",
+      "keyMarkers": [
+        "§GAP-01",
+        "§GAP-02",
+        "§GAP-03",
+        "§GAP-04"
+      ],
+      "provenance": "Inference",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-05"
+      ],
+      "currencyVerdict": "legacy-maybe",
+      "currencyRationale": "Dated 2026-03-17. References frontend-dashboard/convex paths — these may be from a prior project iteration that doesn't match current 3-project scope (palantirkc home/palantir-math/mathcrew). Useful for gap patterns, not for current code paths."
+    },
+    {
+      "id": "INT-013",
+      "path": "~/.claude/research/palantir/architecture/orchestration-map.md",
+      "subdir": "architecture",
+      "summary": "6-layer orchestration map: Builder Surfaces, Ontology Semantic Core, Runtime Digital Twin, Governance+Security, LEARN+Eval, Integration Expansion. Foundry product surfaces mapped to local equivalents. Keeps system pointed at Palantir-style end-state vs isolated feature drift.",
+      "keyMarkers": [
+        "§ORCH-01",
+        "§ORCH-02",
+        "§ORCH-03",
+        "§ORCH-04",
+        "§ORCH-05",
+        "§ORCH-06"
+      ],
+      "provenance": "Inference",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-04",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Structural reference — not time-sensitive. Current authority chain matches UNIVERSALIZATION.md (2026-04-17)."
+    },
+    {
+      "id": "INT-014",
+      "path": "~/.claude/research/palantir/osdk/INDEX.md",
+      "subdir": "osdk",
+      "summary": "OSDK research index: 4 files — osdk-2.0-architecture.md [Official] (client/generated separation), osdk-version-pinning.md [Official] (@osdk/client@0.1.0 pattern), osdk-1-to-2-migration.md [Official] (TypeScript migration guide), pm-codegen-vs-osdk.md [Synthesis] (our delta — filesystem, no HTTP client). Created 2026-04-17.",
+      "keyMarkers": [
+        "osdk-2.0-architecture",
+        "osdk-version-pinning",
+        "pm-codegen-vs-osdk"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-07"
+      ],
+      "currencyVerdict": "recent",
+      "currencyRationale": "Created 2026-04-17 as part of universalization. Content extraction from external research briefing noted as pending; may have stub content in sub-files."
+    },
+    {
+      "id": "INT-015",
+      "path": "~/.claude/research/palantir/marketplace/BROWSE.md",
+      "subdir": "marketplace",
+      "summary": "Marketplace research router: Foundry Marketplace distribution (namespace/prefix rules during install), Claude Code plugin marketplace parallel, palantir-mini single-plugin marketplace structure. References .claude-plugin/marketplace.json and claude-code/palantir-mini-blueprint.md.",
+      "keyMarkers": [],
+      "provenance": "Synthesis",
+      "relevantRQs": [
+        "RQ-02"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Plugin distribution architecture stable reference — governs palantir-mini v1.0 redesign."
+    },
+    {
+      "id": "INT-016",
+      "path": "~/.claude/schemas/ontology/BROWSE.md + INDEX.md",
+      "subdir": "schemas/ontology",
+      "summary": "Schema ontology axis query router and structure index: 5 primitive types (ObjectType/LinkType/ActionType/InterfaceType/PropertyType), 3 function types (EditFunction/DerivedProperty/Reducer), 3 policy types (SubmissionCriteria/RBAC/ForwardProp+BackwardProp), 2 lineage types (DecisionLineage/EventTypes), 2 generator types (OSDK-2.0-config/LazyLoader). 10 EventType variants. Provenance: kosmos TechBlueprint @767fa10.",
+      "keyMarkers": [
+        "prim-data-01",
+        "prim-data-02",
+        "prim-logic-04",
+        "prim-logic-05",
+        "prim-action-01",
+        "prim-action-02",
+        "prim-action-03"
+      ],
+      "provenance": "Synthesis",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-05",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "v0.2.1 schemas are the current artifact (2026-04-17). BROWSE.md includes palantir-mini v0 primitives layer added during universalization session."
+    },
+    {
+      "id": "INT-017",
+      "path": "~/.claude/schemas/ontology/types.ts",
+      "subdir": "schemas/ontology",
+      "summary": "Export contracts for backend, frontend, runtime, LEARN infrastructure. Key types: OntologyDomain (4 values), OntologyPropertyType (24 members = 19 base + 5 extended), BasePropertyType (19 lowercase), LinkCardinality (4: 1:1/M:1/1:M/M:N), MutationType (5), QueryType (7), AutonomyLevel (5), SecurityLayerType (4), PropertyReducerStrategy (6). Cross-axis imports from interaction/rendering.",
+      "keyMarkers": [
+        "OntologyPropertyType",
+        "BasePropertyType",
+        "AutonomyLevel",
+        "SecurityLayerType",
+        "PropertyReducerStrategy"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Active contract — schema-lock rule prevents modification during Phase A. v0.2.1 is the authoritative current version."
+    },
+    {
+      "id": "INT-018",
+      "path": "~/.claude/schemas/package.json + CHANGELOG.md",
+      "subdir": "schemas",
+      "summary": "Root package @palantirKC/claude-schemas v0.2.1. 4 axes: ontology@1.12.0/interaction@0.1.2/meta@0.1.0/rendering@0.1.0. Extended exports map (12 subpath exports). v0.2.1 (2026-04-17): extended exports map + root index.ts + README. v0.2.0: root package.json + CHANGELOG + manifest.json + axis entrypoints. Pre-universalization baseline at v0.1.x.",
+      "keyMarkers": [
+        "@palantirKC/claude-schemas@0.2.1"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Current production version. All 3 consumer projects pinned to git+...claude-schemas.git#v0.2.1. CHANGELOG documents exact additions."
+    },
+    {
+      "id": "INT-019",
+      "path": "~/.claude/plugins/palantir-mini/bridge/mcp-server.ts",
+      "subdir": "plugins/palantir-mini",
+      "summary": "Zero-dependency stdio MCP server (JSON-RPC 2.0). 5 MCP tools: get_ontology (domain-filtered snapshot from events.jsonl), emit_event (mutex-locked atomic append, 0 lost / 2000 at 2-writer race), apply_edit_function (returns Edits[] without committing), commit_edits (atomic, pre-flight 9 submission criteria, validateOnly dry-run support), replay_lineage (5-dim Decision Lineage filter). Reports version 0.1.0 in serverInfo.",
+      "keyMarkers": [
+        "get_ontology",
+        "emit_event",
+        "apply_edit_function",
+        "commit_edits",
+        "replay_lineage"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03",
+        "RQ-06"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Active production MCP server. Package.json shows version 0.1.0 but CLAUDE.md references palantir-mini 0.2. v1.0 is rebuild target."
+    },
+    {
+      "id": "INT-020",
+      "path": "~/.claude/plugins/palantir-mini/hooks/hooks.json",
+      "subdir": "plugins/palantir-mini",
+      "summary": "6 hook events registered: PreToolUse (Edit/Write/MultiEdit → pre-edit-ontology.ts), PostToolUse (Edit/Write/MultiEdit → post-edit-propagate.ts), PreCompact (blocking → pre-compact-state.ts), TaskCompleted (task-completed-gate.ts), Stop (stop-validate.ts), SessionStart (session-start.ts). Missing: TaskCreated, TeammateIdle, SubagentStop, PostCompact, ShutdownRequest — large coverage gap vs 27 available hook events.",
+      "keyMarkers": [
+        "PreToolUse",
+        "PostToolUse",
+        "PreCompact",
+        "TaskCompleted",
+        "Stop",
+        "SessionStart"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Current plugin hooks. 6 of 27 available hook events used — this is the primary gap indicator for v1.0 hook expansion."
+    },
+    {
+      "id": "INT-021",
+      "path": "~/.claude/plugins/palantir-mini/lib/validation/pipeline.ts",
+      "subdir": "plugins/palantir-mini",
+      "summary": "4-phase validation pipeline orchestrator: Design + Compile + Runtime + Post-Write. Comment explicitly notes Deploy + Merge phases deferred to v1 (of 6-phase full Palantir set). Phases run independently, no fail-fast (v0 behavior — change to fail-fast in v1). Aggregate verdict = all phases pass.",
+      "keyMarkers": [
+        "design",
+        "compile",
+        "runtime",
+        "post_write"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-06",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Current production validation implementation. Deploy + Merge gap explicitly documented in source comments — directly informs v1.0 design."
+    },
+    {
+      "id": "INT-022",
+      "path": "~/.claude/plugins/palantir-mini/lib/codegen/client-generated-split.ts",
+      "subdir": "plugins/palantir-mini",
+      "summary": "OSDK 2.0 client/generated split enforcement: SplitPolicy (clientRoot, generatedRoot, generatedMarker). checkSplit validates write targets. auditGeneratedRoot walks generatedRoot checking all files for marker. Generated marker constant: '// AUTO-GENERATED by palantir-mini'.",
+      "keyMarkers": [
+        "SplitPolicy",
+        "checkSplit",
+        "auditGeneratedRoot",
+        "DEFAULT_MARKER"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Active codegen enforcement. Directly maps to rules/11-codegen-authority.md contract."
+    },
+    {
+      "id": "INT-023",
+      "path": "~/.claude/plugins/palantir-mini/managed-settings.d/50-palantir-mini.json",
+      "subdir": "plugins/palantir-mini",
+      "summary": "Layer-1 RBAC fragment: Allow (Read schemas/ontology/**, Read research/palantir/**, Read/Write .palantir-mini/session/**, Write src/generated/**, Bash plugin scripts, bun test, bunx tsc, 5 MCP tools). Deny (Write schemas/ontology/types.ts and semantics.ts — schema lock). Env vars: PALANTIR_MINI_SESSION_DIR, PALANTIR_MINI_SNAPSHOT_DIR, PALANTIR_MINI_EVENTS_FILE.",
+      "keyMarkers": [
+        "allow",
+        "deny",
+        "env"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-04"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Active RBAC enforcement. Schema lock (deny Write to types.ts/semantics.ts) is critical constraint for Phase A research."
+    },
+    {
+      "id": "INT-024",
+      "path": "~/.claude/plugins/palantir-mini/skills/pm-verify/SKILL.md + pm-codegen/SKILL.md + pm-blueprint/SKILL.md",
+      "subdir": "plugins/palantir-mini/skills",
+      "summary": "pm-verify: 4-phase validation pipeline runner, schema-versioning rule enforcer, codegen drift checker. pm-codegen: descender-gen.ts runner, emits codegen_started/completed events, produces src/generated/*.ts. pm-blueprint: proxies to kosmos-research 7-agent pipeline, requires blueprint.json + final-report.md, evaluator gate R1-R15 acceptance. All 7 plugin skills confirmed (pm-action, pm-blueprint, pm-codegen, pm-init, pm-recap, pm-replay, pm-verify).",
+      "keyMarkers": [
+        "pm-verify",
+        "pm-codegen",
+        "pm-blueprint",
+        "pm-action",
+        "pm-init",
+        "pm-recap",
+        "pm-replay"
+      ],
+      "provenance": "Official",
+      "relevantRQs": [
+        "RQ-02",
+        "RQ-03"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Active plugin skill surface. These are the v0.2 canonical skills that v1.0 must extend or replace."
+    },
+    {
+      "id": "INT-025",
+      "path": "~/.claude/skills/ship/SKILL.md + ~/.claude/skills/orchestrate/SKILL.md",
+      "subdir": "user-scope-skills",
+      "summary": "ship: Ontology-aware finalization + commit + PR + merge. 465-line skill. Has semantic drift firewall, doc-sync protocol, pm-verify integration, but does NOT consume events.jsonl to generate PR body or enforce lineage gates — gap vs v1.0 target. orchestrate: 6-phase Lead protocol (CHECK/INJECT/AUDIT/DECIDE/DECOMPOSE/EXECUTE/VALIDATE). 406-line skill. Partially integrates palantir-mini (event emission on phase transitions, pm-verify on validate) but plugin is not the substrate.",
+      "keyMarkers": [
+        "ship",
+        "orchestrate"
+      ],
+      "provenance": "Synthesis",
+      "relevantRQs": [
+        "RQ-03",
+        "RQ-06"
+      ],
+      "currencyVerdict": "legacy-maybe",
+      "currencyRationale": "Both skills are rebuild candidates per NEXT_SESSION_ONTOLOGY_REBUILD.md. ship does not consume events.jsonl. orchestrate treats plugin as afterthought, not substrate. These are the v0 baselines to rewrite."
+    },
+    {
+      "id": "INT-026",
+      "path": "~/.claude/schemas/ontology/primitives/* + functions/* + policies/* + lineage/* + generators/*",
+      "subdir": "schemas/ontology/primitives-layer",
+      "summary": "15 files in 5 subdirs. Primitives: ObjectTypeDeclaration (branded RID, properties, links, implements[]), LinkTypeDeclaration, ActionTypeDeclaration (Tier1/Tier2 discriminated union), InterfaceType, PropertyType (24 branded names). Functions: EditFunction (returns Edits[] without commit), DerivedProperty (onRead/cached), Reducer<In,Out> (PECS). Policies: SubmissionCriteria (9 constraint classes), RBACFragment (Layer-1 only), ForwardProp+BackwardProp. Lineage: DecisionLineage 5-dim, EVENT_TYPE_REGISTRY (10 variants). Generators: OSDK-2.0-config, LazyRef.",
+      "keyMarkers": [
+        "ObjectTypeDeclaration",
+        "ActionTypeDeclaration",
+        "Tier1DeclarativeAction",
+        "Tier2FunctionBackedAction",
+        "ReducerDeclaration",
+        "EVENT_TYPE_NAMES",
+        "SubmissionCriteria"
+      ],
+      "provenance": "Synthesis",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-07"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Derived from kosmos TechBlueprint @767fa10, produced by 7-agent pipeline. Active executables in palantir-mini v0.2 descender-gen.ts. v1.0 must extend, not replace."
+    },
+    {
+      "id": "INT-027",
+      "path": "~/UNIVERSALIZATION.md",
+      "subdir": "context",
+      "summary": "Distribution channel architecture: claude-schemas as Maven-analog (semver-tagged git artifact via peerDeps), palantir-mini plugin as OSDK-analog (single installable cross-project surface), home repo as control plane, authority chain (research→schemas→ontology→contracts→runtime→audits). Consumer pin matrix (all 3 projects at v0.2.1). Plugin upgrade protocol (no peerDep bump needed). Open alignment work noted.",
+      "keyMarkers": [],
+      "provenance": "Synthesis",
+      "relevantRQs": [
+        "RQ-01",
+        "RQ-02",
+        "RQ-04"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Updated 2026-04-17 in orchestrate session. Directly governs v1.0 migration strategy and authority chain for this rebuild."
+    },
+    {
+      "id": "INT-028",
+      "path": "per-project ontology/ directories: palantir-math/ontology/* + mathcrew/ontology/*",
+      "subdir": "per-project",
+      "summary": "palantir-math/ontology/: 14 files (BROWSE.md, INDEX.md, BEHAVIOR.md, action.ts, capabilities/capabilities.ts, changeContracts/changeContracts.ts, data.ts, data/ subdir, frontend.ts, logic.ts, runtime.ts, schema.ts, security.ts). mathcrew/ontology/: 16 files (BROWSE.md, INDEX.md, action.ts, beat-template.ts, concept-primitive.ts, data.ts, event-envelope.ts, frontend-adapter.ts, frontend-semantic-core.ts, frontend.ts, learn.ts, logic.ts, runtime.ts, schema.ts, security.ts, theater-kind.ts). Home repo: no ontology/ dir.",
+      "keyMarkers": [],
+      "provenance": "Inference",
+      "relevantRQs": [
+        "RQ-04",
+        "RQ-05"
+      ],
+      "currencyVerdict": "authoritative",
+      "currencyRationale": "Current filesystem state verified 2026-04-17. mathcrew has richer ontology (theater-kind.ts, event-envelope.ts, frontend-semantic-core.ts) vs palantir-math (capabilities, changeContracts). Home repo lacks ontology/ — gap to fill in v1.0."
+    }
+  ]
 }

@@ -1,5 +1,5 @@
 ---
-model: opus
+model: sonnet
 memory: project
 mcpServers:
   - palantir-mini
