@@ -1,10 +1,14 @@
 #!/usr/bin/env bun
 /**
- * Hook: inject-prior-state (SessionStart — Advisory)
+ * Hook: inject-prior-state — KOSMOS-SPECIFIC OVERRIDE (Phase A-2 W2-3)
  * Event: SessionStart
  *
- * At session start, outputs a summary of ontology-state/ files to stdout
- * so Claude gets prior session context.
+ * At session start, outputs a summary of kosmos's ontology-state/*.json files
+ * (decision-log, world-model, blueprint, source-map, scenarios) to stdout so
+ * Claude resumes with prior pipeline context.
+ *
+ * NOT covered by palantir-mini plugin v1.1 — plugin's session-start is
+ * generic (append session_started event); kosmos needs pipeline-state summary.
  *
  * Environment: KOSMOS_PROJECT_ROOT (fallback: cwd)
  *

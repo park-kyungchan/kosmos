@@ -1,9 +1,27 @@
 ---
+name: prototyper
+description: Implements minimal proof-of-concept TypeScript (50-200 LoC) per hypothesis; runs in worktree isolation; compiles via bunx tsc --noEmit
 model: sonnet
 memory: project
 mcpServers:
   - palantir-mini
+maxTurns: 30
 isolation: worktree
+tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - "Bash(bunx tsc *)"
+  - "Bash(bun run *)"
+  - "Bash(mkdir *)"
+  - "Bash(ls *)"
+  - TaskUpdate
+  - TaskList
+  - TaskGet
+  - SendMessage
+  - mcp__palantir-mini__emit_event
 disallowedTools: ["NotebookEdit"]
 ---
 

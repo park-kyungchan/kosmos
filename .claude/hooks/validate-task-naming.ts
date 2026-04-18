@@ -1,8 +1,16 @@
 /**
- * validate-task-naming.ts — TaskCreated hook
+ * validate-task-naming.ts — KOSMOS-SPECIFIC OVERRIDE (Phase A-2 W2-3)
+ * Event: TaskCreated
  *
  * Ensures all tasks in kosmos-research teams have valid [TAG] prefixes
  * drawn from the phases[] list in kosmos-registry.json.
+ *
+ * TODO(plugin-migrate): Rule 12 §Phase-gate contract calls for subject-prefix
+ * enforcement on `TaskCreated` via palantir-mini. Plugin v1.1 task-created.ts
+ * is currently emit-only. When the plugin gains a subject-prefix enforcer,
+ * migrate kosmos's registry-tag source-of-truth to consumer-supplied regex
+ * config (see rule 12 §Phase-gate contract) and delete this local override.
+ *
  * Exit 0 = allow, Exit 2 = block + stderr feedback.
  */
 

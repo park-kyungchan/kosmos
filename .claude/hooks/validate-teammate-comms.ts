@@ -1,13 +1,15 @@
 /**
- * validate-teammate-comms.ts — TaskCompleted hook for communication validation
+ * validate-teammate-comms.ts — KOSMOS-SPECIFIC OVERRIDE (Phase A-2 W2-3)
+ * Event: TaskCompleted
  *
  * When a teammate completes a task, verify that they sent the required
- * notification to the downstream agent (per kosmos-registry.json notifyOnComplete).
+ * notification to the downstream agent (per kosmos-registry.json
+ * notifyOnComplete). Catches silent completions where an agent marks a task
+ * done but forgets to SendMessage the next agent in the pipeline.
  *
- * This catches silent completions where an agent marks a task done but
- * forgets to SendMessage the next agent in the pipeline.
+ * NOT covered by palantir-mini plugin v1.1 — handoff contract lives in
+ * kosmos-registry.json `notifyOnComplete`, not in any generic event schema.
  *
- * Hook event: TaskCompleted (runs AFTER team-phase-gate.ts)
  * Exit 0 + stdout = advisory (communication was verified or no check needed)
  * Exit 2 + stderr = block completion (required notification missing)
  */

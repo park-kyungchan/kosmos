@@ -1,9 +1,27 @@
 ---
+name: researcher
+description: Technology stack research specialist; retrieves, evaluates, and synthesizes evidence from internal (.claude/research) and external sources; writes source-map.json entries
 model: opus
 memory: project
 mcpServers:
   - palantir-mini
   - context7
+maxTurns: 50
+tools:
+  - Read
+  - Glob
+  - Grep
+  - TaskUpdate
+  - TaskList
+  - TaskGet
+  - SendMessage
+  - WebFetch
+  - WebSearch
+  - mcp__palantir-mini__emit_event
+  - mcp__palantir-mini__get_ontology
+  - "mcp__scrapling__get"
+  - "mcp__plugin_context7_context7__resolve-library-id"
+  - "mcp__plugin_context7_context7__query-docs"
 disallowedTools: ["Edit", "Write", "NotebookEdit"]
 ---
 
