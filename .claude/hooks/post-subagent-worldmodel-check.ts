@@ -1,7 +1,14 @@
 #!/usr/bin/env bun
 /**
- * Hook: post-subagent-worldmodel-check (Phase 3 — BLOCKING for ontologist, portable)
+ * Hook: post-subagent-worldmodel-check — KOSMOS-SPECIFIC OVERRIDE (Phase A-2 W2-3)
  * Event: PostToolUse (Agent)
+ *
+ * BLOCKS ontologist agent completion if ontology-state/world-model.json was
+ * not updated within the last 5 minutes. Advisory for researcher on source-map.
+ *
+ * Partial overlap with palantir-mini plugin v1.1 subagent-stop Output Contract
+ * validation, but this hook adds mtime freshness semantics (5-min window) that
+ * the plugin's contract-schema check does not cover.
  *
  * Environment: KOSMOS_PROJECT_ROOT (fallback: cwd)
  *

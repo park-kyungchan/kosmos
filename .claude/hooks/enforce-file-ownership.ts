@@ -1,8 +1,13 @@
 /**
- * enforce-file-ownership.ts — PreToolUse hook for Edit|Write
+ * enforce-file-ownership.ts — KOSMOS-SPECIFIC OVERRIDE (Phase A-2 W2-3)
+ * Event: PreToolUse (Edit|Write)
  *
  * Checks that the teammate writing a file is allowed to write
- * that path per the kosmos-registry.json writablePaths.
+ * that path per the kosmos-registry.json `writablePaths` contract.
+ *
+ * NOT covered by palantir-mini plugin v1.1 — path RBAC is kosmos-specific
+ * (writablePaths live in kosmos-registry.json, not in agent frontmatter).
+ *
  * Exit 0 = allow, Exit 2 = block + stderr feedback.
  */
 

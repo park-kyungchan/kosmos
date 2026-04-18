@@ -1,10 +1,13 @@
 #!/usr/bin/env bun
 /**
- * Hook: enforce-browse-protocol (Phase 3 — BLOCKING, portable)
+ * Hook: enforce-browse-protocol — KOSMOS-SPECIFIC OVERRIDE (Phase A-2 W2-3)
  * Event: PreToolUse (Grep | Read)
  *
- * BLOCKS broad unbounded scanning of the research library.
- * Allows targeted marker-based grep (the correct browse protocol).
+ * BLOCKS broad unbounded scanning of the research library. Allows targeted
+ * marker-based grep (the correct browse protocol per kosmos BROWSE.md).
+ *
+ * NOT covered by palantir-mini plugin v1.1 — kosmos-specific research-library
+ * retrieval discipline (see rule 02-research-retrieval.md).
  *
  * Environment: KOSMOS_RESEARCH_BASE (fallback: ~/.claude/research)
  *

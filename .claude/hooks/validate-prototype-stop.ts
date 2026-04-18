@@ -1,8 +1,13 @@
 /**
- * validate-prototype-stop.ts — SubagentStop hook
+ * validate-prototype-stop.ts — KOSMOS-SPECIFIC OVERRIDE (Phase A-2 W2-3)
+ * Event: SubagentStop (matcher: prototyper)
  *
  * When the prototyper agent stops, verify it wrote valid results to
  * ontology-state/eval-results.json (at least 1 non-fail prototype).
+ *
+ * NOT covered by palantir-mini plugin v1.1 — kosmos-specific prototyper
+ * pipeline check (eval-results.json + buildStatus != 'fail' invariant).
+ *
  * Exit 0 = allow, Exit 2 = block + stderr feedback.
  */
 

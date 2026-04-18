@@ -1,5 +1,21 @@
 ---
-model: opus
+name: orchestrator
+description: Decomposes user requests into ProjectOntologyScope; emits domain-tagged research questions that drive the pipeline
+model: sonnet
+memory: project
+mcpServers:
+  - palantir-mini
+maxTurns: 30
+tools:
+  - Read
+  - Glob
+  - Grep
+  - TaskCreate
+  - TaskUpdate
+  - TaskList
+  - TaskGet
+  - SendMessage
+  - mcp__palantir-mini__emit_event
 disallowedTools: ["Edit", "Write", "NotebookEdit"]
 ---
 

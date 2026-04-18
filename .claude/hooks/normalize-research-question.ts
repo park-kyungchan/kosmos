@@ -1,10 +1,13 @@
 #!/usr/bin/env bun
 /**
- * Hook: normalize-research-question (Phase 3 — Advisory, portable)
+ * Hook: normalize-research-question — KOSMOS-SPECIFIC OVERRIDE (Phase A-2 W2-3)
  * Event: PreToolUse (Agent)
  *
- * Checks that research agents are spawned with structured questions.
- * Advisory only — logs warnings but does not block.
+ * Advisory-only check that researcher agents are spawned with structured
+ * ResearchQuestion payloads rather than free-form prompts.
+ *
+ * NOT covered by palantir-mini plugin v1.1 — kosmos-specific research pipeline
+ * discipline (retrieves evidence into ontology-state/source-map.json).
  *
  * Exit codes:
  *   0 = allow (always)

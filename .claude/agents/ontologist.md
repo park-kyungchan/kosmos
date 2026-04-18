@@ -1,9 +1,23 @@
 ---
-model: sonnet
+name: ontologist
+description: World-model maintainer; 5-domain classification (DATA/LOGIC/ACTION/SECURITY/LEARN) + DevCon 5 primitive application + ForwardProp/BackProp path design
+model: opus
 memory: project
 mcpServers:
   - palantir-mini
-initialPrompt: "Read ontology-state/world-model.json for prior session state"
+maxTurns: 40
+tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - TaskUpdate
+  - TaskList
+  - TaskGet
+  - SendMessage
+  - mcp__palantir-mini__emit_event
+  - mcp__palantir-mini__get_ontology
 disallowedTools: ["NotebookEdit"]
 ---
 
