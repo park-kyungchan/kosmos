@@ -5,6 +5,7 @@ user-invocable: true
 argument-hint: "research objective or app description (e.g., '실시간 협업 문서 편집기')"
 model: opus
 ---
+<!-- Updated 2026-04-19 for rule 12 Lead Protocol v2 compliance. -->
 
 # Kosmos Research v3 — Agent Teams Pipeline + palantir-mini Event Log
 
@@ -67,7 +68,7 @@ TeamCreate({
 
 ### 1.2 Create 12 tasks with dependencies
 
-The `[TAG]` prefix in each subject is critical — `team-phase-gate.ts`
+The `[TAG]` prefix in each subject is critical — `task-completed-gate.ts`
 uses it to determine which validations to run.
 
 **CRITICAL — Strict Dependency Enforcement:**
@@ -180,126 +181,126 @@ The Lead executes T1 without delegating:
 
 ---
 
-## Phase 3: Spawn Teammates
+## Phase 3: Spawn Teammates (Lazy — Wave by Wave)
 
-Spawn all 7 teammates in a single message (parallel).
+**Lazy-spawn protocol (rule 12 §Lazy-spawn)**: Spawn each wave only when its blockedBy tasks are cleared. Send `shutdown_request` to each agent on task completion. Do NOT pre-spawn all teammates at pipeline start.
 
-**Researcher** (Sonnet):
+**Wave 1 spawn — after T1 completes, spawn researcher only:**
+
 ```
 Agent({
   description: "Research evidence gathering",
   subagent_type: "researcher",
   name: "researcher",
   team_name: "kosmos-research",
-  model: "sonnet",
   run_in_background: true,
   prompt: "You are the researcher for Kosmos Agent Teams.
     Read .claude/agents/researcher.md for your full protocol.
     CRITICAL: Check TaskList — do NOT claim tasks until blockedBy is empty.
     Your tasks are T2 and T3. Update ontology-state/source-map.json.
-    Notify ontologist via SendMessage when done.
+    Notify Lead via SendMessage when done.
     The research objective is: $ARGUMENTS"
 })
 ```
 
-**Ontologist** (Sonnet):
+**Wave 2 spawn — after T2+T3 complete, spawn ontologist:**
+
 ```
 Agent({
   description: "Ontology classification and world model",
   name: "ontologist",
   team_name: "kosmos-research",
-  model: "sonnet",
   run_in_background: true,
   prompt: "You are the ontologist for Kosmos Agent Teams.
     Read .claude/agents/ontologist.md for your full protocol.
-    CRITICAL: Check TaskList — do NOT claim T4 until T2+T3 are completed.
-    Update ontology-state/world-model.json. Notify simulator when done.
+    Your task is T4 (T2+T3 are already completed).
+    Update ontology-state/world-model.json. Notify Lead when done.
     The research objective is: $ARGUMENTS"
 })
 ```
 
-**Simulator** (Sonnet):
+**Wave 3 spawn — after T4 completes, spawn simulator:**
+
 ```
 Agent({
   description: "Hypothesis testing and scenario generation",
   name: "simulator",
   team_name: "kosmos-research",
-  model: "sonnet",
   run_in_background: true,
   prompt: "You are the simulator for Kosmos Agent Teams.
     Read .claude/agents/simulator.md for your full protocol.
-    CRITICAL: Check TaskList — do NOT claim T5 until T4 is completed.
+    Your tasks are T5 and T6 (T4 is already completed).
     Score all 11 dimensions. Reference docs/scoring-rubric.md.
-    Update ontology-state/scenarios.json. Notify prototyper when done.
+    Update ontology-state/scenarios.json. Notify Lead when done.
     The research objective is: $ARGUMENTS"
 })
 ```
 
-**Prototyper** (Sonnet — worktree isolation):
+**Wave 4 spawn — after T6 completes, spawn prototyper:**
+
 ```
 Agent({
   description: "Hypothesis prototype implementation",
   name: "prototyper",
   team_name: "kosmos-research",
-  model: "sonnet",
   run_in_background: true,
   prompt: "You are the prototyper for Kosmos Agent Teams.
     Read .claude/agents/prototyper.md for your full protocol.
-    CRITICAL: Check TaskList — do NOT claim T7/T8 until T6 is completed.
+    Your tasks are T7 and T8 (T6 is already completed).
     Implement PoC code in prototype/ directory for each hypothesis.
     Write PrototypeResult to ontology-state/eval-results.json.
-    Notify eval-runner when done.
+    Notify Lead when done.
     The research objective is: $ARGUMENTS"
 })
 ```
 
-**Eval Runner** (Sonnet):
+**Wave 5 spawn — after T7+T8 complete, spawn eval-runner:**
+
 ```
 Agent({
   description: "Eval suite generation and execution",
   name: "eval-runner",
   team_name: "kosmos-research",
-  model: "sonnet",
   run_in_background: true,
   prompt: "You are the eval-runner for Kosmos Agent Teams.
     Read .claude/agents/eval-runner.md for your full protocol.
-    CRITICAL: Check TaskList — do NOT claim T9 until T7+T8 are completed.
+    Your task is T9 (T7+T8 are already completed).
     Generate and run test suites. Classify failure modes by D/L/A domain.
     Write EvalSuite + FailureMode to ontology-state/eval-results.json.
-    Notify evaluator when done.
+    Notify Lead when done.
     The research objective is: $ARGUMENTS"
 })
 ```
 
-**Evaluator** (Opus — adversarial quality gate + debate):
+**Wave 6 spawn — after T9 completes, spawn evaluator:**
+
 ```
 Agent({
   description: "Adversarial quality gate R1-R15 + debate",
   name: "evaluator",
   team_name: "kosmos-research",
-  model: "opus",
   run_in_background: true,
   prompt: "You are the evaluator for Kosmos Agent Teams.
     Read .claude/agents/evaluator.md for your full protocol.
-    CRITICAL: Check TaskList — do NOT claim T10 until T9 is completed.
+    Your task is T10 (T9 is already completed).
     Apply ALL 15 rejection criteria (R1-R15). If debate conditions
     are triggered, initiate debate via SendMessage to simulator + ontologist.
-    Max 2 debate rounds. On acceptance, notify reporter.
+    Max 2 debate rounds. On acceptance, notify Lead.
     The research objective is: $ARGUMENTS"
 })
 ```
 
-**Reporter** (Sonnet):
+**Wave 7 spawn — after T10 completes, spawn reporter:**
+
 ```
 Agent({
   description: "Blueprint and report production",
   name: "reporter",
   team_name: "kosmos-research",
-  model: "sonnet",
   run_in_background: true,
   prompt: "You are the reporter for Kosmos Agent Teams.
     Read .claude/agents/reporter.md for your full protocol.
-    CRITICAL: Check TaskList — do NOT claim T11/T12 until T10 is completed.
+    Your tasks are T11 and T12 (T10 is already completed).
     Produce ontology-state/blueprint.json and reports/final-report.md.
     Include prototype and eval results in the report.
     The research objective is: $ARGUMENTS"
@@ -347,7 +348,7 @@ After all 12 tasks are completed:
 - The evaluator is the ONLY agent that can approve the pipeline
 - Maximum 2 evaluator feedback loops / 2 debate rounds
 - All state flows through ontology-state/ files — this is the shared world model
-- The TaskCompleted hook (`team-phase-gate.ts`) validates state files at each phase
+- The TaskCompleted hook (`task-completed-gate.ts`) validates state files at each phase
 - Prototypes are disposable — they prove/disprove, then are deleted
 - Every failure mode MUST have a D/L/A domain classification
 - **Every ontology-state/ file edit MUST be preceded by `mcp__palantir-mini__emit_event`**

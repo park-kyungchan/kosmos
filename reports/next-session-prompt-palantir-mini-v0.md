@@ -1,3 +1,6 @@
+> **HISTORICAL** — Superseded by Phase A-2 close (2026-04-18). Plugin is now at v1.3 (Phase A-3).
+> Kept for provenance. Do NOT use as current guidance.
+
 # Next Session Prompt — palantir-mini v0 Implementation
 
 > **Purpose**: Copy-paste this prompt into a new Claude Code session to start v0 implementation of palantir-mini based on the research pipeline outputs landed in PR #5.

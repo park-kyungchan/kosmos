@@ -1,92 +1,92 @@
 # INDEX.md — Kosmos Project Structure Reference
 
-> Structural map for AI agents. For query-based navigation, use BROWSE.md instead.
+> Structural map for AI agents. For query routing, start with `BROWSE.md`.
 
 ## Directory Layout
 
-```
+```text
 kosmos/
-├── CLAUDE.md              ← Claude Code per-turn instructions (authority)
-├── AGENTS.md              ← Codex-native per-turn instructions
-├── GEMINI.md              ← Gemini-native per-turn instructions
-├── BROWSE.md              ← AI agent query interface (start here)
-├── INDEX.md               ← This file (structural reference)
+├── CLAUDE.md              ← Claude-native thin overlay
+├── AGENTS.md              ← Codex-native thin overlay
+├── GEMINI.md              ← Gemini-native thin overlay when present
+├── BROWSE.md              ← Query router (start here)
+├── INDEX.md               ← This file (structure reference)
 ├── schemas/
-│   ├── types.ts           ← 17 core types + TechBlueprint (SSoT for vocabulary)
-│   ├── validators.ts      ← Runtime type guards + lifecycle validators
+│   ├── types.ts           ← Repo-local vocabulary + TechBlueprint schema
+│   ├── validators.ts      ← Runtime guards + lifecycle validators
 │   └── index.ts           ← Re-exports
-├── ontology-state/        ← Shared world model (agents read/write during pipeline)
-│   ├── decision-log.json  ← Decomposition, routing, evaluator gate result
-│   ├── world-model.json   ← D/L/A/Security/Learn classified objects
-│   ├── source-map.json    ← Retrieved sources with provenance + tier
-│   ├── scenarios.json     ← Hypothesis testing, 10-dimension scores
+├── ontology-state/
+│   ├── decision-log.json  ← Decomposition, routing, evaluator verdicts
+│   ├── world-model.json   ← D/L/A/S/LEARN classified objects
+│   ├── source-map.json    ← Retrieved sources + provenance
+│   ├── scenarios.json     ← Hypothesis testing results
+│   ├── eval-results.json  ← Prototype + eval outcomes
 │   └── blueprint.json     ← Final TechBlueprint output
 ├── docs/
-│   ├── scoring-rubric.md  ← Evaluation dimensions 1-7 definitions
-│   ├── architecture.md    ← System architecture overview
-│   ├── ontology-mapping-rules.md  ← D/L/A classification rules
-│   ├── simulation-methodology.md  ← Scenario generation protocol
-│   ├── browse-workflow.md         ← Internal browse protocol
-│   ├── governance-security.md     ← Security/governance model
-│   ├── setup.md                   ← Environment setup
-│   └── benchmark-workflow.md      ← Research benchmark protocol
-├── reports/               ← Generated research outputs
-│   ├── final-report.md    ← 13-section research report (latest)
-│   └── *.md               ← Scenario matrices, tradeoff analyses
+│   ├── scoring-rubric.md
+│   ├── architecture.md
+│   ├── ontology-mapping-rules.md
+│   ├── simulation-methodology.md
+│   ├── browse-workflow.md
+│   ├── governance-security.md
+│   ├── setup.md
+│   └── benchmark-workflow.md
+├── reports/
+│   ├── final-report.md    ← Current main research report
+│   ├── phase-b-plan.md    ← Home-fleet v1 migration plan artifact
+│   ├── scenario-matrix.md / tradeoff-analysis.md / next-experiments.md
+│   └── benchmark-* / universalization-* outputs
+├── prototype/
+│   ├── h-a/, h-b/         ← Research prototypes
+│   └── tests/             ← Eval suites for prototype claims
+├── tools/
+│   └── create-palantir-project/
+│       ├── index.ts       ← Project scaffolder
+│       └── templates/     ← CLAUDE/AGENTS + ontology + RBAC templates
 ├── .claude/
-│   ├── settings.json      ← Hooks (8) + env vars + Agent Teams flag
-│   ├── agents/            ← 6 custom agent definitions
-│   │   ├── orchestrator.md  (legacy — Lead handles directly)
-│   │   ├── researcher.md    (Sonnet — evidence gathering)
-│   │   ├── ontologist.md    (Opus — D/L/A classification)
-│   │   ├── simulator.md     (Opus — hypothesis testing)
-│   │   ├── evaluator.md     (Opus — R1-R13 quality gate)
-│   │   └── reporter.md      (Sonnet — blueprint + report)
-│   ├── hooks/             ← 8 enforcement hooks (TypeScript + Bun)
-│   │   ├── inject-prior-state.ts         (SessionStart)
-│   │   ├── enforce-browse-protocol.ts    (PreToolUse: Grep|Read)
-│   │   ├── normalize-research-question.ts (PreToolUse: Agent)
-│   │   ├── post-subagent-worldmodel-check.ts (PostToolUse: Agent)
-│   │   ├── validate-agent-output.ts      (PostToolUse: Agent)
-│   │   ├── reinject-state-after-compact.ts (PostCompact)
-│   │   ├── validate-stop.ts             (Stop)
-│   │   └── team-phase-gate.ts           (TaskCompleted — Agent Teams)
+│   ├── settings.json      ← Hook registration + env
+│   ├── agents/            ← 8 project agents
+│   │   ├── orchestrator.md
+│   │   ├── researcher.md
+│   │   ├── ontologist.md
+│   │   ├── simulator.md
+│   │   ├── prototyper.md
+│   │   ├── eval-runner.md
+│   │   ├── evaluator.md
+│   │   └── reporter.md
+│   ├── hooks/             ← 8 project-specific hooks + 6 delegated to palantir-mini plugin v1.3
 │   └── skills/
 │       └── kosmos-research/
-│           └── SKILL.md   ← /kosmos-research — launches Agent Teams pipeline
-├── package.json           ← TypeScript + Bun only
+│           └── SKILL.md   ← Main research pipeline entrypoint
+├── package.json           ← Current checkout still pins claude-schemas v0.2.1
 └── tsconfig.json
 ```
 
 ## Authority Chain
 
-```
-schemas/types.ts (type vocabulary — SSoT)
-  → schemas/validators.ts (runtime guards)
-  → .claude/agents/*.md (agent protocols)
-  → ontology-state/*.json (shared runtime state)
-  → reports/*.md (generated outputs)
-```
-
-Higher layers win when there's a conflict. Types define what exists;
-agents define how to reason about it; state captures current reality.
-
-## Agent Teams Pipeline (9-Task DAG)
-
-```
-T1: [INTAKE] ──→ T2,T3: [RESEARCH] ──→ T4: [ONTOLOGY]
-                                              ↓
-                    T5: [HYPOTHESIS] ──→ T6: [SIMULATION]
-                                              ↓
-                              T7: [EVALUATE] ──→ T8,T9: [BLUEPRINT,REPORT]
+```text
+~/.claude/research/palantir/
+  -> ~/.claude/schemas/ontology/
+  -> ~/ontology/shared-core/
+  -> kosmos/schemas/*
+  -> ontology-state/*.json
+  -> reports/*.md
 ```
 
-Each wave is blocked until the previous wave completes.
-TaskCompleted hook (`team-phase-gate.ts`) validates state files between waves.
+- `~/ontology/shared-core/` is the higher home-layer authority for cross-project primitives.
+- `kosmos/schemas/*` is the repo-local vocabulary authority for this checkout.
+- `ontology-state/*` and `reports/*` are runtime research artifacts produced by the pipeline.
 
-## Provenance Tags
+## Current-vs-Target Distinction
 
-All claims in ontology-state/ and reports/ use these tags:
-- `[Official]` — direct from source (Palantir docs, vendor docs, specs)
-- `[Synthesis]` — derived from multiple [Official] sources
-- `[Inference]` — reasoning chain from evidence to conclusion
+- Current checked-in repo fact: `package.json` still pins `@palantirKC/claude-schemas#v0.2.1`.
+- Home control-plane target state: `~/ontology/shared-core/`, `palantir-mini v1.0`, and the W5/W6 migration surface documented in `~/REBUILD-2026-04.md`.
+- Historical plans or research outputs may describe the target state before or after implementation. Use them as evidence, not as automatic truth about this checkout.
+
+## Pipeline Surfaces
+
+- Lead entrypoint: `.claude/skills/kosmos-research/SKILL.md`
+- Agent protocols: `.claude/agents/*.md`
+- Hook enforcement: `.claude/settings.json` + `.claude/hooks/*.ts`
+- Primary runtime state: `ontology-state/*.json`
+- Final outputs: `reports/*.md`

@@ -1,7 +1,7 @@
 {
   "version": "3.1.0",
   "leadProtocolVersion": "v2",
-  "pluginMinVersion": "1.1.0",
+  "pluginMinVersion": "1.3.0",
   "description": "Kosmos Agent Registry — SSoT for all enforcement hooks. Add agents/phases here, zero hook code changes. v3.1: Lead Protocol v2 (rule 12) + plugin v1.1 conformance.",
   "phases": [
     { "tag": "INTAKE",       "order": 1, "dependsOn": [] },
