@@ -1,62 +1,70 @@
 # BROWSE.md — Kosmos Project Query Interface
 
-> For AI agents entering this codebase. Start here, not by scanning everything.
+> Start here. Use this file for query routing instead of scanning the repo blindly.
 
 ## Quick Recipes
 
 ### "What does this project do?"
-Read: `CLAUDE.md` (first 30 lines)
+Read: `AGENTS.md` or `CLAUDE.md` (first 30 lines)
 
 ### "How does the research pipeline work?"
-Read: `CLAUDE.md` > Research Pipeline section
-Then: `.claude/skills/kosmos-research/SKILL.md` for Agent Teams execution
+Read: `.claude/skills/kosmos-research/SKILL.md`
+Then: the relevant `.claude/agents/*.md` files for the phase you are touching
 
 ### "What types exist?"
-Read: `schemas/types.ts` — 17 core types + TechBlueprint
+Read: `schemas/types.ts` — repo-local vocabulary + `TechBlueprint`
 
 ### "How are types validated?"
-Read: `schemas/validators.ts` — runtime guards + lifecycle validators
-Key: `isBlueprintReady()`, `isCompleteRecommendation()`, `isScenarioReportReady()`
+Read: `schemas/validators.ts`
+Key guards: `isBlueprintReady()`, `isCompleteRecommendation()`, `isScenarioReportReady()`
 
 ### "What agents exist and what do they do?"
-Read: `.claude/agents/` directory — 6 agent definitions
-Key agents for Agent Teams: researcher, ontologist, simulator, evaluator, reporter
-Legacy: orchestrator (Lead now handles this directly)
+Read: `.claude/agents/` — 8 agent definitions
+Key pipeline agents: `researcher`, `ontologist`, `simulator`, `prototyper`, `eval-runner`, `evaluator`, `reporter`
+Lead-facing decomposition contract: `orchestrator`
 
-### "How do agents communicate?"
-Read: `.claude/skills/kosmos-research/SKILL.md` > Phase 3: Spawn Teammates
-Pattern: researcher → ontologist → simulator → evaluator → reporter via SendMessage
+### "How do agents coordinate?"
+Read: `.claude/skills/kosmos-research/SKILL.md` for the task DAG
+Then: `.claude/hooks/validate-teammate-comms.ts`, `auto-shutdown-completed.ts`, `lead-inbox-monitor.ts`
 
 ### "What hooks enforce quality?"
-Read: `.claude/settings.json` > hooks section — 8 hooks across 6 event types
-Key: `team-phase-gate.ts` (TaskCompleted) validates phase gates for Agent Teams
+Read: `.claude/settings.json` — 8 project-specific hooks + 6 delegated to palantir-mini plugin v1.3 (teammate-idle, task-completed-gate, subagent-stop, subagent-start, user-prompt-submit, session-start + new governance hooks)
+Note: 5 previously-listed hooks moved into plugin v1.1 and stayed at plugin level (not local).
+Key local hooks:
+- `enforce-browse-protocol.ts` — blocks bad retrieval flow
+- `task-completed-gate.ts` — validates phase transitions (renamed from team-phase-gate in plugin v1.1+)
+- `enforce-file-ownership.ts` — guards write scope
+- `event-log-emit.ts` — appends lineage events
+- `validate-stop.ts` — blocks incomplete session stop
 
 ### "What is the current research state?"
-Read (in order):
-1. `ontology-state/decision-log.json` — decomposition + routing decisions
-2. `ontology-state/world-model.json` — D/L/A classified objects
-3. `ontology-state/source-map.json` — retrieved sources + claims
-4. `ontology-state/scenarios.json` — hypothesis testing results
-5. `ontology-state/blueprint.json` — final TechBlueprint output
+Read in order:
+1. `ontology-state/decision-log.json`
+2. `ontology-state/world-model.json`
+3. `ontology-state/source-map.json`
+4. `ontology-state/scenarios.json`
+5. `ontology-state/eval-results.json`
+6. `ontology-state/blueprint.json`
 
-### "What are the evaluation criteria?"
-Read: `docs/scoring-rubric.md` — 7 scoring dimensions (1-7)
-Then: `.claude/agents/simulator.md` — dimensions 8-10 (D/L/A Fit, ForwardProp, Agent Composability)
-Then: `.claude/agents/evaluator.md` — R1-R13 rejection criteria
+### "What is the current migration context?"
+Read: `reports/phase-b-plan.md`
+Then: `~/REBUILD-2026-04.md` and `~/ontology/BROWSE.md`
+Important: these describe the wider home-fleet target state, not necessarily this repo's checked-in runtime
+
+### "What shared primitives exist outside kosmos?"
+Read: `~/ontology/BROWSE.md`
+Then: `~/ontology/shared-core/index.ts`
+
+### "What design and scoring rules apply?"
+Read: `docs/scoring-rubric.md`, `docs/ontology-mapping-rules.md`, `docs/simulation-methodology.md`
 
 ### "How do I launch a research session?"
 Use: `/kosmos-research "your objective here"`
-This spawns 5 Agent Teams teammates with a 9-task DAG pipeline.
-
-### "What design principles apply?"
-Grep: `§DC5` in `~/.claude/research/palantir/platform/devcon.md`
-Key: DDD, DRY, OCP, PECS — applied per agent protocol in `.claude/agents/*.md`
-
----
 
 ## Do NOT
 
-- Scan all files in `~/.claude/research/palantir/` — use BROWSE.md recipes
-- Read `node_modules/` — only `typescript` is installed
-- Edit `ontology-state/` files without understanding the pipeline stage ownership
-- Skip the evaluator gate — R1-R13 are hard requirements
+- Do NOT scan all files in `~/.claude/research/palantir/` — use its `BROWSE.md`
+- Do NOT treat `reports/phase-b-plan.md` or historical `ontology-state/*` text as the same thing as current checked-in runtime facts
+- Do NOT edit `ontology-state/` or `reports/` casually; they are research artifacts
+- Do NOT bypass `~/ontology/shared-core` when looking for cross-project primitives
+- Do NOT assume deleted user-scope `pm-*` stubs still exist

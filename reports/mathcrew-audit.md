@@ -1,5 +1,8 @@
 # mathcrew — Cold Audit, Decomposition & Refactor Plan
 
+> This file has been split into `mathcrew-audit/` for easier navigation.
+> See [mathcrew-audit/INDEX.md](mathcrew-audit/INDEX.md) for the full audit.
+
 > **Date**: 2026-03-23
 > **Orchestrator**: Kosmos Research OS v0.3.0
 > **Target**: `/home/palantirkc/mathcrew/` (git: `park-kyungchan/mathcrew`, 1 commit)

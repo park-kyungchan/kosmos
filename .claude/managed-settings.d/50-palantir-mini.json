@@ -1,5 +1,5 @@
 {
-  "description": "palantir-mini per-project Layer-1 RBAC fragment (v0). Loaded by Claude Code from managed-settings.d/ into the effective permission policy. Layer-1 only — Markings/ObjectSecurity/PermissionsCascade deferred to v1.",
+  "description": "palantir-mini per-project Layer-1+2 RBAC fragment v1.3. Loaded by Claude Code from managed-settings.d/ into the effective permission policy. Layer-1 only — Markings/ObjectSecurity/PermissionsCascade deferred to v1.",
   "permissions": {
     "allow": [
       "Read(~/.claude/schemas/ontology/**)",
@@ -16,7 +16,24 @@
       "mcp__palantir-mini__emit_event",
       "mcp__palantir-mini__apply_edit_function",
       "mcp__palantir-mini__commit_edits",
-      "mcp__palantir-mini__replay_lineage"
+      "mcp__palantir-mini__replay_lineage",
+      "mcp__palantir-mini__ontology_schema_get",
+      "mcp__palantir-mini__project_register",
+      "mcp__palantir-mini__codegen_trigger",
+      "mcp__palantir-mini__scenario_create",
+      "mcp__palantir-mini__capability_token_check",
+      "mcp__palantir-mini__detect_doc_drift",
+      "mcp__palantir-mini__check_cc_version",
+      "mcp__palantir-mini__validate_hook_event_allowlist",
+      "mcp__palantir-mini__scan_file_size_violations",
+      "mcp__palantir-mini__audit_events_5d_conformance",
+      "mcp__palantir-mini__verify_schema_pin",
+      "mcp__palantir-mini__scan_dead_code",
+      "mcp__palantir-mini__verify_codegen_headers",
+      "mcp__palantir-mini__validate_managed_settings_fragments",
+      "mcp__palantir-mini__refresh_research_doc",
+      "mcp__palantir-mini__impact_query",
+      "mcp__palantir-mini__pre_edit_impact"
     ],
     "deny": [
       "Write(~/.claude/schemas/ontology/types.ts)",
