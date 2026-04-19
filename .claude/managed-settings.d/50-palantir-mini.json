@@ -33,7 +33,16 @@
       "mcp__palantir-mini__validate_managed_settings_fragments",
       "mcp__palantir-mini__refresh_research_doc",
       "mcp__palantir-mini__impact_query",
-      "mcp__palantir-mini__pre_edit_impact"
+      "mcp__palantir-mini__pre_edit_impact",
+      "mcp__palantir-mini__populate_impact_graph",
+      "mcp__palantir-mini__auto_spawn_replacement",
+      "mcp__palantir-mini__get_team_health",
+      "mcp__palantir-mini__query_session_duration",
+      "mcp__palantir-mini__pm_preamble",
+      "mcp__palantir-mini__pm_config_get",
+      "mcp__palantir-mini__pm_config_set",
+      "mcp__palantir-mini__pm_retro_query",
+      "mcp__palantir-mini__pm_learn_query"
     ],
     "deny": [
       "Write(~/.claude/schemas/ontology/types.ts)",
