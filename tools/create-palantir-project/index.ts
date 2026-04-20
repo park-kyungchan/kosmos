@@ -1,15 +1,15 @@
 #!/usr/bin/env bun
-// create-palantir-project — scaffold a palantir-mini v0.2 ready project.
+// create-palantir-project — scaffold a palantir-mini v1.0 ready project.
 //
 // Usage:
 //   bun run tools/create-palantir-project/index.ts <target-dir> [--name <project-name>]
 //
 // Produces a minimum-viable project structure that works with the
-// palantir-mini plugin v0.2.0 out-of-the-box:
-//   - package.json with @palantirKC/claude-schemas 0.2.x peerDependency pin
+// palantir-mini plugin v1.0.0 out-of-the-box:
+//   - package.json with @palantirKC/claude-schemas v1.0.0 peerDependency pin
 //   - tsconfig.json with bun-compatible settings
-//   - CLAUDE.md overlay pointing at palantir-mini adoption
-//   - .claude/managed-settings.d/50-palantir-mini.json RBAC fragment
+//   - CLAUDE.md + AGENTS.md thin overlays
+//   - .claude/managed-settings.d/50-palantir-mini.json v1 RBAC fragment
 //   - .palantir-mini/session/ append-only event-log substrate
 //   - ontology/README.md placeholder for project-owned ontology
 //   - src/generated/.gitkeep placeholder for pm-codegen output
@@ -47,7 +47,7 @@ function parseArgs(argv: string[]): Args {
 }
 
 function printUsage(): void {
-  console.log(`create-palantir-project — scaffold a palantir-mini v0.2 project
+  console.log(`create-palantir-project — scaffold a palantir-mini v1.0 project
 
 Usage:
   bun run tools/create-palantir-project/index.ts <target-dir> [--name <name>] [--force]
@@ -121,7 +121,8 @@ function scaffold(args: Args): void {
   console.log("Next steps:");
   console.log(`  cd ${args.targetDir}`);
   console.log(`  /pm-init                              # emit first session_started event`);
-  console.log(`  /pm-verify                            # green-light all 4 pipeline phases`);
+  console.log(`  /pm-ontology-register or /pm-codegen # register or generate ontology artifacts`);
+  console.log(`  /pm-verify                            # green-light the 6-phase validation pipeline`);
 }
 
 scaffold(parseArgs(process.argv));

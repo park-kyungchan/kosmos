@@ -1,10 +1,10 @@
-# CLAUDE.md — {{PROJECT_NAME}}
+# AGENTS.md — {{PROJECT_NAME}}
 
 Scaffolded by `create-palantir-project` on {{CREATED_AT}}.
 
 ## Runtime Overlay
 
-- Keep this file thin. Project truth lives in `ontology/`, `src/`, `tests/`, local `BROWSE.md` / `INDEX.md`, and generated verification outputs.
+- This is the Codex-native thin overlay. Project truth lives in `ontology/`, `src/`, `tests/`, local `BROWSE.md` / `INDEX.md`, and generated verification outputs.
 - `@palantirKC/claude-schemas` is pinned at `git+...#v1.0.0` in `package.json#peerDependencies`.
 - When the shared home layer exists, import cross-project primitives through `~/ontology/shared-core` instead of importing `~/.claude/schemas/` directly from project code.
 - `palantir-mini@1.0.0` is the baseline plugin surface: 10 MCP tools, 15 hooks, 6-phase validation, and L1/L2/L3 RBAC.
@@ -17,10 +17,3 @@ Scaffolded by `create-palantir-project` on {{CREATED_AT}}.
 - Start with local `BROWSE.md`, then local `INDEX.md`.
 - Work `meaning -> ontology -> contracts -> runtime -> artifacts -> audit/learn`.
 - Use installed palantir-mini workflows (`pm-init`, `pm-ontology-register`, `pm-codegen`, `pm-verify`) instead of project-local stubs.
-
-## Next Steps
-
-1. `/pm-init` — emit the first `session_started` event.
-2. Define project-local ontology under `ontology/*.ts`.
-3. `/pm-ontology-register` for new shared-like primitives, or `/pm-codegen` for project generation.
-4. `/pm-verify` — run the 6-phase validation pipeline.

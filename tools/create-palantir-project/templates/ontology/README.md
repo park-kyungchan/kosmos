@@ -1,29 +1,15 @@
-# ontology/
+# ontology/ — {{PROJECT_NAME}}
 
-Project-owned ontology declarations for {{PROJECT_NAME}}.
+This directory owns project-local ontology declarations.
 
-## What goes here
+## Authority Boundary
 
-- D/L/A primitives in TypeScript, consuming types from `@palantirKC/claude-schemas`
-  (pinned at `0.2.x` in `package.json#peerDependencies`).
-- One file per concern (avoid a monolithic `ontology.ts`): data, logic, action,
-  security, learn axes as `ontology/{data,logic,action,security,learn}.ts`.
-- An optional `schema.ts` aggregator re-exports typed primitives.
+- Import shared or cross-project primitives through `~/ontology/shared-core` when that layer exists.
+- Project-local ontology extends shared-core. If you must shadow a shared primitive, document the divergence in this directory before doing it.
+- Generated artifacts in `src/generated/` are codegen-owned; regenerate them instead of editing them.
 
-## What does NOT go here
+## Typical Loop
 
-- Implementation code → `src/`
-- Generated artifacts → `src/generated/` (owned by `pm-codegen`)
-- Tests → `tests/` or colocated `*.spec.ts`
-
-## After editing ontology
-
-1. `/pm-codegen` → regenerates `src/generated/` deterministically.
-2. `/pm-verify` → runs the 4-phase validation pipeline.
-3. Commit ontology + generated together so the state is reproducible.
-
-## References
-
-- `~/.claude/rules/01-ontology-first-core.md` — meaning-first authority chain.
-- `~/.claude/rules/11-codegen-authority.md` — never hand-edit generated files.
-- `~/.claude/schemas/ontology/` — the shared meta-schema (DO NOT edit from here).
+1. Edit local ontology declarations in this directory.
+2. Use `/pm-ontology-register` when introducing a reusable primitive, or `/pm-codegen` when regenerating project artifacts.
+3. Run `/pm-verify` to pass the 6-phase validation pipeline.

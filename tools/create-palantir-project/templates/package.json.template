@@ -13,6 +13,6 @@
     "@types/bun": "latest"
   },
   "peerDependencies": {
-    "@palantirKC/claude-schemas": "0.2.x"
+    "@palantirKC/claude-schemas": "git+https://github.com/park-kyungchan/claude-schemas.git#v1.0.0"
   }
 }
