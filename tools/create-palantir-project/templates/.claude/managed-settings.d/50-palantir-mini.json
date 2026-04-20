@@ -1,22 +1,56 @@
 {
-  "description": "palantir-mini per-project Layer-1 RBAC fragment (v0.2). Loaded by Claude Code from managed-settings.d/ into the effective permission policy. Layer-1 only — Markings/ObjectSecurity/PermissionsCascade deferred to v1.",
+  "description": "palantir-mini per-project RBAC fragment (v1). Loaded by Claude Code from managed-settings.d/ into the effective permission policy. L1 (allow/deny), L2 (CapabilityToken gate), L3 (MarkingDeclaration sensitivity).",
   "permissions": {
     "allow": [
       "Read(~/.claude/schemas/ontology/**)",
       "Read(~/.claude/research/palantir/**)",
+      "Read(~/ontology/**)",
       "Read(./ontology/**)",
       "Read(./.palantir-mini/session/**)",
       "Write(./.palantir-mini/session/events.jsonl)",
       "Write(./.palantir-mini/session/snapshots/**)",
+      "Write(./.palantir-mini/scenarios/**)",
       "Write(./src/generated/**)",
       "Bash(bun run ${CLAUDE_PLUGIN_ROOT}/scripts/*)",
+      "Bash(bun run ${CLAUDE_PLUGIN_ROOT}/lib/rbac/l2-check.ts *)",
+      "Bash(bun run ${CLAUDE_PLUGIN_ROOT}/lib/rbac/l3-check.ts *)",
       "Bash(bun test *)",
       "Bash(bunx tsc *)",
       "mcp__palantir-mini__get_ontology",
       "mcp__palantir-mini__emit_event",
       "mcp__palantir-mini__apply_edit_function",
       "mcp__palantir-mini__commit_edits",
-      "mcp__palantir-mini__replay_lineage"
+      "mcp__palantir-mini__replay_lineage",
+      "mcp__palantir-mini__ontology_schema_get",
+      "mcp__palantir-mini__project_register",
+      "mcp__palantir-mini__scenario_create",
+      "mcp__palantir-mini__capability_token_check"
+    ],
+    "ask": [
+      {
+        "description": "L2: CapabilityToken gate for ship-merge — requires valid token with ship-merge scope",
+        "rule": "mcp__palantir-mini__codegen_trigger",
+        "condition": "action == 'ship-merge'",
+        "preflightScript": "bun run ${CLAUDE_PLUGIN_ROOT}/lib/rbac/l2-check.ts ${CAPABILITY_TOKEN} ship-merge"
+      },
+      {
+        "description": "L2: CapabilityToken gate for schema-write — requires valid token with schema-write scope",
+        "rule": "Write(~/.claude/schemas/**)",
+        "condition": "action == 'schema-write'",
+        "preflightScript": "bun run ${CLAUDE_PLUGIN_ROOT}/lib/rbac/l2-check.ts ${CAPABILITY_TOKEN} schema-write"
+      },
+      {
+        "description": "L2: CapabilityToken gate for ontology-register — requires valid token with ontology-register scope",
+        "rule": "Write(./ontology/**)",
+        "condition": "action == 'ontology-register'",
+        "preflightScript": "bun run ${CLAUDE_PLUGIN_ROOT}/lib/rbac/l2-check.ts ${CAPABILITY_TOKEN} ontology-register"
+      },
+      {
+        "description": "L3: MarkingDeclaration sensitivity gate for cell/column reads — blocks restricted/confidential access without clearance",
+        "rule": "mcp__palantir-mini__get_ontology",
+        "condition": "domain == 'security'",
+        "preflightScript": "bun run ${CLAUDE_PLUGIN_ROOT}/lib/rbac/l3-check.ts ${COLUMN_OR_CELL} ${SESSION_CLEARANCE:-internal}"
+      }
     ],
     "deny": [
       "Write(~/.claude/schemas/ontology/types.ts)",
